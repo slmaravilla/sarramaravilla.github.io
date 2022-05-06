@@ -1,0 +1,227 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>OGCFeatureLayer | Sample | ArcGIS API for JavaScript 4.23</title>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    #appTitle {
+      padding: 15px;
+      width: 400px;
+    }
+
+    #windmill-filter {
+      width: 100%;
+      visibility: hidden;
+    }
+
+    .windmill-item {
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      vertical-align: baseline;
+      cursor: pointer;
+    }
+
+    .filter-title {
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      vertical-align: baseline;
+    }
+
+    .windmill-item:focus {
+      background-color: rgb(186, 185, 185);
+    }
+
+    .windmill-item:hover {
+      background-color: rgb(186, 185, 185);
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.23/"></script>
+
+  <script>
+    require([
+      "esri/views/MapView",
+      "esri/Map",
+      "esri/layers/OGCFeatureLayer",
+      "esri/widgets/Expand"
+    ], (
+      MapView,
+      Map,
+      OGCFeatureLayer,
+      Expand
+    ) => {
+      let windmillLayerView;
+      // Create the OGCFeatureLayer
+      const windmillsLayer = new OGCFeatureLayer({
+        url: "https://demo.pygeoapi.io/stable", // url to the OGC service
+        collectionId: "dutch_windmills", // unique id of the collection
+        // define rendering
+        renderer: {
+          type: "simple",
+          symbol: {
+            type: "picture-marker",
+            url: "https://arcgis.github.io/arcgis-samples-javascript/sample-data/layers-ogcfeaturelayer/windmill.png",
+            height: "32px",
+            width: "32px"
+          }
+        },
+        // define popupTemplate
+        popupTemplate: {
+          title: "{NAAM}",
+          content: [{
+              type: "media",
+              mediaInfos: [{
+                type: "image",
+                value: {
+                  sourceURL: "{THUMBNAIL}",
+                  linkURL: "{FOTO_GROOT}"
+                }
+              }]
+            },
+            {
+              type: "fields",
+              fieldInfos: [{
+                  label: "Name",
+                  fieldName: "NAAM"
+                },
+                {
+                  label: "Location",
+                  fieldName: "PLAATS"
+                },
+                {
+                  label: "Type",
+                  fieldName: "FUNCTIE"
+                },
+                {
+                  label: "Condition",
+                  fieldName: "STAAT"
+                },
+                {
+                  label: "Link",
+                  fieldName: "INFOLINK"
+                }
+              ]
+            }
+          ]
+        }
+      });
+
+      // create map with custom basemap
+      const map = new Map({
+        basemap: "gray-vector",
+        layers: [windmillsLayer] // add OGCFeatureLayer
+      });
+
+      const view = new MapView({
+        container: "viewDiv",
+        map,
+        extent: {
+          xmin: 5.05,
+          ymin: 51.81,
+          xmax: 6.05,
+          ymax: 52.81,
+          spatialReference: {
+            wkid: 4326
+          }
+        },
+        popup: {
+          dockEnabled: true,
+          dockOptions: {
+            position: "bottom-right",
+            breakpoint: false,
+            buttonEnabled: false
+          }
+        }
+      });
+      const titleExpand = new Expand({
+        view: view,
+        content: document.getElementById("appTitle"),
+        expandIconClass: "esri-icon-question",
+        expanded: true,
+        group: "top-left"
+      });
+      view.ui.add(titleExpand, "top-left");
+
+      const windmillElement = document.getElementById("windmill-filter");
+
+      // click event handler for windmill types
+      windmillElement.addEventListener("click", filterByType);
+
+      function filterByType(event) {
+        // determine filter definition based on the selected type
+        const selectedType = event.target.getAttribute("data-windmill");
+        if (!selectedType){
+          return; // do not set filter if one of the filters has not been clicked
+        }
+        let filterDef = "";
+        switch (selectedType){
+          case "other":
+            filterDef = "NOT FUNCTIE = 'korenmolen' AND NOT FUNCTIE = 'poldermolen'"
+            break;
+          case "korenmolen":
+          case "poldermolen":
+            filterDef = "FUNCTIE = '" + selectedType + "'"
+            break;
+          default:
+        }
+        // apply the effect to the features
+        windmillLayerView.featureEffect = {
+          filter: {
+            where: filterDef
+          },
+          excludedEffect: "opacity(20%)"
+        };
+      }
+
+      view.whenLayerView(windmillsLayer).then((layerView) => {
+        windmillLayerView = layerView;
+
+        // set up UI items
+        windmillElement.style.visibility = "visible";
+        const windmillExpand = new Expand({
+          view: view,
+          content: windmillElement,
+          expandIconClass: "esri-icon-filter",
+          group: "top-left"
+        });
+        //clear the filters when user closes the expand widget
+        windmillExpand.watch("expanded", () => {
+          if (!windmillExpand.expanded) {
+            windmillLayerView.featureEffect = null;
+          }
+        });
+        view.ui.add(windmillExpand, "top-left");
+      })
+    });
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+  <div id="windmill-filter" class="esri-widget">
+    <div class="filter-title"><b>Filter by type</b></div>
+    <div class="windmill-item visible-windmill" data-windmill="korenmolen">Grain mill (korenmolen)</div>
+    <div class="windmill-item visible-windmill" data-windmill="poldermolen">Polder mill (poldermolen)</div>
+    <div class="windmill-item visible-windmill" data-windmill="other">Other</div>
+  </div>
+  <div id="appTitle" class="esri-widget">
+    <h3>Windmills in the Netherlands</h3>
+    <p>Click on the icon to see more information about a specific windmill. Use the filter icon on the right to filter
+      the data by mill type.</p>
+  </div>
+</body>
+
+</html>

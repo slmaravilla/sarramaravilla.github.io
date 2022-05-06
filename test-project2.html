@@ -14,6 +14,39 @@
         height: 100%;
         width: 100%
     }
+
+    #appTitle{
+      padding: 15px;
+      width: 400px;
+    }
+
+    #freedive-filter{
+      width: 100%;
+      visibility: hidden;
+    }
+
+    .freedive-item{
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      vertical-align: baseline;
+      cursor: pointer;
+    }
+
+    .filter-title{
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      vertical-align: baseline;
+    }
+
+    .freedive-item:focus{
+      background-color: rgb(186, 185, 185);
+    }
+
+    .freedive-item:hover{
+      background-color: rgb(186, 185, 185);
+    }
   </style>
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
@@ -41,10 +74,19 @@
         container: "viewDiv" // Div element
       });
 
+      const template ={
+        title: "Free Dive Sites",
+        content: getContent()
+      };
+      function getContent(){
+        const Content = "<b>Province:</b>" + "{Province}";
+        const Hyperlink = '<video width="250" height="250" controls><source src=http://techslides.com/demos/sample-videos/small.mp4 type=video/mp4></video> ';
+        return Content + Hyperlink; 
+      }
+
       const sample = new FeatureLayer({
-        portalItem: {
-            id: "d4969deab092418c9e363a5acd073161"
-        }
+        portalItem: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/Free_Dive_Spots/FeatureServer/0",
+        popupTemplate: template
       });
       map.add(sample);
       
