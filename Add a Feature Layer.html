@@ -27,10 +27,10 @@
       "esri/layers/FeatureLayer"
     ], function (esriConfig, Map, MapView, FeatureLayer) {
 
-      esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
+      //esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
 
       const map = new Map({
-        basemap: "arcgis-topographic" // Basemap layer service
+        basemap: "topo-vector" // Basemap layer service
       });
 
       const view = new MapView({
@@ -48,7 +48,21 @@
 
       //Trails feature layer (lines)
       const trailsLayer = new FeatureLayer({
-        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0"
+        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
+        definitionExpression: "ELEV_GAIN < 250",
+        renderer:{
+          type: "simple",
+          symbol: {
+            type: "simple-line",
+            color: "green",
+            width: "2px"
+          }
+        },
+        outFields: ["TRL_NAME", "ELEV_GAIN"],
+        pompTemplate:{
+          title: "{TRL_NAME}",
+          content: "The trail elevation gain is {ELEV_GAIN} ft."
+        }
       });
       map.add(trailsLayer, 0);
 
@@ -58,10 +72,10 @@
       });
       map.add(parksLayer, 0);
 
-      const sample = new FeatureLayer({
-        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/Free_Dive_Spots/FeatureServer/0"
-      });
-      map.add(sample, 0);
+      //const sample = new FeatureLayer({
+      //  url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/Free_Dive_Spots/FeatureServer/0"
+      //});
+      //map.add(sample, 0);
 
     });
   </script>

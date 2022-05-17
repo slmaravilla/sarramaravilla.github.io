@@ -8,11 +8,44 @@
   <style>
     html,
     body,
-    #viewDiv{
-        padding: 0;
-        margin: 0;
-        height: 100%;
-        width: 100%
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%
+    }
+
+    #appTitle {
+      padding: 15px;
+      width: 400px;
+    }
+
+    #location-filter {
+      width: 100%;
+      visibility: hidden;
+    }
+
+    .location-item {
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      vertical-align: baseline;
+      cursor: pointer;
+    }
+
+    .filter-title {
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      vertical-align: baseline;
+    }
+
+    .location-item:focus {
+      background-color: rgb(186, 185, 185);
+    }
+
+    .location-item:hover {
+      background-color: rgb(186, 185, 185);
     }
   </style>
 
@@ -28,26 +61,27 @@
       "esri/widgets/Expand"
     ], function (esriConfig, Map, MapView, FeatureLayer, Expand) {
 
-      esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
+      //esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
 
       const map = new Map({
-        basemap: "arcgis-imagery" // Basemap layer service
+        basemap: "satellite" // Basemap layer service
       });
 
       const view = new MapView({
         map: map,
-        center: [121.7740,12.8797], // Longitude, latitude
+        center: [121.7740, 12.8797], // Longitude, latitude
         zoom: 6, // Zoom level
         container: "viewDiv" // Div element
       });
 
-      const sample = new FeatureLayer({
+      const divingLayer = newFeatureLayer({
         portalItem: {
-            id: "d4969deab092418c9e363a5acd073161"
+          id: "d4969deab092418c9e363a5acd073161"
         }
+       
       });
-      map.add(sample);
-      
+      map.add(divingLayer);
+
 
     });
   </script>
@@ -56,6 +90,14 @@
 
 <body>
   <div id="viewDiv"></div>
+  <div id="location-filter" class="esri-widget">
+    <div class="filter-title"><b>Filter by type<b></div>
+  </div>
+  <div id="appTitle" class="esri-widget">
+    <h3>PAGSISID: Freediving Spots in the Philippines</h3>
+    <p> Click on the icon to see more information about a specific diving spots.
+      Use filter icon on the right to filter the data by region </p>
+  </div>
 </body>
 
 </html>
