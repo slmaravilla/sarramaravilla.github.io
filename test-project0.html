@@ -1,0 +1,90 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Pagsisid: Web Map of Freediving Sites in the Philippines</title>
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.23/"></script>
+
+  <script>
+    require([
+      "esri/config",
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer"
+    ], function (esriConfig, Map, MapView, FeatureLayer) {
+
+      //esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
+
+      const map = new Map({
+        basemap: "satellite" // Basemap layer service
+      });
+
+      const view = new MapView({
+        map: map,
+        center: [121.7740, 12.8797], // Longitude, latitude
+        zoom: 6, // Zoom level
+        container: "viewDiv" // Div element
+      });
+
+    
+      var divingLayer = new FeatureLayer({
+        portalItem: {
+          id: "d4969deab092418c9e363a5acd073161"
+        },
+        popupTemplate: {
+          title: "{MUNI}",
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "MUNI",
+                  label: "Municipality"
+                },
+                {
+                  fieldName: "REG",
+                  label: "Region"
+                },
+                {
+                  fieldName: "PROV",
+                  label: "Province"
+                }
+              ]
+            },
+            {
+              type: "attachments"
+            }
+          ]
+        }
+      });
+      map.add(divingLayer, 0);
+
+      //const sample = new FeatureLayer({
+      //  url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/Free_Dive_Spots/FeatureServer/0"
+      //});
+      //map.add(sample, 0);
+
+    });
+  </script>
+
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+</body>
+
+</html>
