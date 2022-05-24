@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Green Spaces in Metro Manila</title>
+
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+		integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+		crossorigin="" />
+	<script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+		integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+		crossorigin=""></script>
+
+	<style>
+		#map {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+
+		}
+	</style>
+
+
+</head>
+
+<body>
+
+	<div id='map'></div>
+
+	<script>
+		var cemetery = L.layerGroup();
+		var golf = L.layerGroup();
+		var park = L.layerGroup();
+
+		//data for cemetery group
+		var c01 = L.marker([14.522092, 121.048835])
+			.bindPopup("<h3>Heritage Memorial Park</h3> <p>City: Taguig City</p> <p>Type: Cemetery</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(cemetery);
+		var c02 = L.marker([14.540881, 121.050338])
+			.bindPopup("<h3>Manila American Cemetery</h3> <p>City: Taguig City</p> <p>Type: Cemetery</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(cemetery);
+		var c03 = L.marker([14.631502, 120.989085])
+			.bindPopup("<h3>Manila North Cemetery</h3> <p>City: City of Manila</p> <p>Type: Cemetery</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(cemetery);
+		var c04 = L.marker([14.638151, 121.086159])
+			.bindPopup("<h3>Loyola Memorial Park</h3> <p>City: Parañaque City</p> <p>Type: Cemetery</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(cemetery);
+		var c05 = L.marker([14.453356, 121.037851])
+			.bindPopup("<h3>Loyola Memorial Park</h3> <p>City: Marikina City</p> <p>Type: Cemetery</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(cemetery);
+		var c06 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Libingan ng mga Bayani</h3> <p>City: Taguig City</p> <p>Type: Cemetery</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(cemetery);
+
+
+		var mbAttr = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>';
+		var mbUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+
+		var streets = L.tileLayer(mbUrl, { id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mbAttr });
+		var satellite = L.tileLayer(mbUrl, { id: 'mapbox/satellite-v9', tileSize: 512, zoomOffset: -1, attribution: mbAttr });
+
+		var map = L.map('map', {
+			center: [14.556586, 121.023415],
+			zoom: 11.5,
+			layers: [streets, cemetery]
+		});
+
+		var baseLayers = {
+			'Streets': streets,
+			'Satellite': satellite
+		};
+
+		var overlays = {
+			'Cemetery': cemetery
+		};
+
+		var layerControl = L.control.layers(baseLayers, overlays).addTo(map);
+
+
+		//data for golf course group
+		var g01 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Veterans Memorial Golf Club</h3> <p>City: Quezon City</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+		var g02 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Manila Golf and Country Club</h3> <p>City: Makati City</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+		var g03 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Southlinks Golf Club</h3> <p>City: Las Piñas City</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+		var g04 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Kagitingan Executive Golf Course Driving Range</h3> <p>City: Taguig City</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+		var g05 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Capitol Hills Golf and Country Club</h3> <p>City: Quezon City</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+		var g06 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Alabang Golf and Country Club</h3> <p>City: City of Muntinlupa</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+		var g07 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Philippine Navy Golf Club</h3> <p>City: Makati City</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+		var g08 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Intramuros Golf Club</h3> <p>City: City of Manila</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+		var g09 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Villamor Air Base Golf Course</h3> <p>City: Pasay City</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+		var g10 = L.marker([14.519914, 121.044287])
+			.bindPopup("<h3>Wack Wack Golf Club and Country Club</h3> <p>City: City of Mandaluyong</p> <p>Type: Golf Course</p> <p>Status: Operational</p> <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg'+ style=width:250px;height:250px;/>")
+			.addTo(golf);
+
+		layerControl.addOverlay(golf, 'Golf Club');
+	</script>
+
+
+
+</body>
+
+</html>

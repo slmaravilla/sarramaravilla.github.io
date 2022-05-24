@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Green Spaces in Metro Manila</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+        integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+        crossorigin=""></script>
+
+    <style>
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    
+    <script>
+        var map = L.map('map').setView([14.556586, 121.023415], 11.5);
+
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var data = {
+            "type": "FeatureCollection",
+            "features": [
+                { 
+                    "type": "Feature",
+                    "id": 1,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [121.04861867000011, 14.521434430000056] 
+                    }, 
+                    "properties": {
+                        "OBJECTID": 1,
+                        "city": "Taguig City",
+                        "name": "Heritage Memorial Park",
+                        "type": "Cemetery",
+                        "status": "Operational",
+                        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Manila_American_Cemetery_and_Memorial.jpg/750px-Mapcarta.jpg" 
+                    } 
+                }, 
+                { 
+                    "type": "Feature",
+                    "id": 2,
+                    "geometry": { "type": "Point", "coordinates": [121.03369981000003, 14.383865480000054] }, "properties": { "OBJECTID": 2, "city": "Muntinlupa", "name": "Muntinlupa Sunken Garden", "type": "Park", "status": "Operational", "img": null } }, { "type": "Feature", "id": 3, "geometry": { "type": "Point", "coordinates": [121.03962905000003, 14.654364400000077] }, "properties": { "OBJECTID": 3, "city": "Quezon City", "name": "Veterans Memorial Golf Club", "type": "Golf course", "status": "Operational", "img": null } }, { "type": "Feature", "id": 4, "geometry": { "type": "Point", "coordinates": [121.0503356800001, 14.540943140000024] }, "properties": { "OBJECTID": 4, "city": "Taguig City", "name": "Manila American Cemetery", "type": "Cemetery", "status": "Operational", "img": null } }, { "type": "Feature", "id": 5, "geometry": { "type": "Point", "coordinates": [120.98902248000002, 14.631527700000049] }, "properties": { "OBJECTID": 5, "city": "Manila", "name": "Manila North Cemetery", "type": "Cemetery", "status": "Operational", "img": null } }, { "type": "Feature", "id": 6, "geometry": { "type": "Point", "coordinates": [121.03808031000005, 14.454196840000066] }, "properties": { "OBJECTID": 6, "city": "Parañaque City", "name": "Loyola Memorial Park", "type": "Cemetery", "status": "Operational", "img": null } }, { "type": "Feature", "id": 7, "geometry": { "type": "Point", "coordinates": [121.04925818000004, 14.651523270000041] }, "properties": { "OBJECTID": 7, "city": "Quezon City", "name": "Quezon Memorial Circle", "type": "Park", "status": "Operational", "img": null } }, { "type": "Feature", "id": 8, "geometry": { "type": "Point", "coordinates": [121.04179198000008, 14.550119670000072] }, "properties": { "OBJECTID": 8, "city": "Makati City", "name": "Manila Golf and Country Club", "type": "Golf course", "status": "Operational", "img": null } }, { "type": "Feature", "id": 9, "geometry": { "type": "Point", "coordinates": [121.05245596000009, 14.660492270000077] }, "properties": { "OBJECTID": 9, "city": "Quezon City", "name": "Arboretum Forest", "type": "Forest", "status": "Operational", "img": null } }, { "type": "Feature", "id": 10, "geometry": { "type": "Point", "coordinates": [121.00200700000005, 14.403927470000042] }, "properties": { "OBJECTID": 10, "city": "Las Piñas City", "name": "Southlinks Golf Club", "type": "Golf course", "status": "Permanently closed", "img": null } }, { "type": "Feature", "id": 11, "geometry": { "type": "Point", "coordinates": [120.97891154000001, 14.582853490000048] }, "properties": { "OBJECTID": 11, "city": "Manila", "name": "Rizal Park", "type": "Park", "status": "Operational", "img": null } }, { "type": "Feature", "id": 12, "geometry": { "type": "Point", "coordinates": [121.04046691000008, 14.531666720000032] }, "properties": { "OBJECTID": 12, "city": "Taguig City", "name": "Kagitingan Executive Golf Course Driving Range", "type": "Golf course", "status": "Operational", "img": null } }, { "type": "Feature", "id": 13, "geometry": { "type": "Point", "coordinates": [121.08115786000008, 14.664514800000063] }, "properties": { "OBJECTID": 13, "city": "Quezon City", "name": "Capitol Hills Golf and Country Club", "type": "Golf course", "status": "Operational", "img": null } }, { "type": "Feature", "id": 14, "geometry": { "type": "Point", "coordinates": [121.0870038600001, 14.638334280000038] }, "properties": { "OBJECTID": 14, "city": "Marikina City", "name": "Loyola Memorial Park", "type": "Cemetery", "status": "Operational", "img": null } }, { "type": "Feature", "id": 15, "geometry": { "type": "Point", "coordinates": [120.97603111000001, 14.489025110000057] }, "properties": { "OBJECTID": 15, "city": "Las Piñas-Parañaque City", "name": "Las Piñas-Parañaque Critical Habitat", "type": "Park", "status": "Operational", "img": null } }, { "type": "Feature", "id": 16, "geometry": { "type": "Point", "coordinates": [121.01880179000011, 14.40264970000004] }, "properties": { "OBJECTID": 16, "city": "Muntinlupa", "name": "Alabang Golf and Country Club", "type": "Golf course", "status": "Operational", "img": null } }, { "type": "Feature", "id": 17, "geometry": { "type": "Point", "coordinates": [121.0075217000001, 14.51501877000004] }, "properties": { "OBJECTID": 17, "city": "Pasay City", "name": "Old Nayong Pilipino", "type": "Park", "status": "Permanently closed", "img": null } }, { "type": "Feature", "id": 18, "geometry": { "type": "Point", "coordinates": [121.03210831000001, 14.522242470000037] }, "properties": { "OBJECTID": 18, "city": "Makati", "name": "Philippine Navy Golf Club", "type": "Golf course", "status": "Operational", "img": null } }, { "type": "Feature", "id": 19, "geometry": { "type": "Point", "coordinates": [120.97791015000007, 14.586275930000056] }, "properties": { "OBJECTID": 19, "city": "Manila", "name": "Intramuros Golf Club", "type": "Golf course", "status": "Operational", "img": null } }, { "type": "Feature", "id": 20, "geometry": { "type": "Point", "coordinates": [121.02131605000011, 14.524682320000068] }, "properties": { "OBJECTID": 20, "city": "Pasay City", "name": "Villamor Air Base Golf Course", "type": "Golf course", "status": "Operational", "img": null } }, { "type": "Feature", "id": 21, "geometry": { "type": "Point", "coordinates": [121.0504100500001, 14.593340750000038] }, "properties": { "OBJECTID": 21, "city": "Mandaluyong", "name": "Wack Wack Golf Club and Country Club", "type": "Golf course", "status": "Operational", "img": null } }, { "type": "Feature", "id": 22, "geometry": { "type": "Point", "coordinates": [121.04426512000009, 14.519928330000027] }, "properties": { "OBJECTID": 22, "city": "Taguig City", "name": "Libingan ng mga Bayani", "type": "Cemetery", "status": "Operational", "img": null } }, { "type": "Feature", "id": 23, "geometry": { "type": "Point", "coordinates": [121.04392609000001, 14.650613240000041] }, "properties": { "OBJECTID": 23, "city": "Quezon City", "name": "Ninoy Aquino Parks and Wildlife Center", "type": "Park", "status": "Operational", "img": null } }, { "type": "Feature", "id": 24, "geometry": { "type": "Point", "coordinates": [121.07624396000006, 14.711278960000072] }, "properties": { "OBJECTID": 24, "city": "Quezon City", "name": "La Mesa Ecopark", "type": "Park", "status": "Operational", "img": null } }, { "type": "Feature", "id": 25, "geometry": { "type": "Point", "coordinates": [121.07894619000001, 14.656193680000058] }, "properties": { "OBJECTID": 25, "city": "Quezon City", "name": "Balara Filters Park", "type": "Park", "status": "Operational", "img": null } }] }
+
+        var layerGroup = L.geoJSON(data, {
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup(
+                    '<h2>' + feature.properties.name +
+                    '</h2><p>Location: ' + feature.properties.city +
+                    '</p><p>Type: ' + feature.properties.type +
+                    '</p><p>Status: ' + feature.properties.status +
+                    '</p><img src ="' + feature.properties.img + '"style=width:250px;height:250px;">'
+                )
+            }
+        }).addTo(map);
+        
+        L.control.scale().addTo(map);
+
+
+    </script>
+</body>
+
+</html>
