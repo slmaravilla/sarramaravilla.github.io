@@ -63,68 +63,442 @@
         <h1>Green Spaces of Metro Manila</h1>
         <center>This map shows the available green spaces in Metro Manila.</center>
         <center>"Green Space" is either forest, grass, nature reserve, park or meadow.</center>
-        <center>This map is from the work of BA Racoma posted on Facebook last September 2019 and was featured in this article:</center>
-        <center>https://interaksyon.philstar.com/trends-spotlights/2019/09/12/154749/green-spaces-parks-metro-manila/</center>
+        <center>This map is from the work of BA Racoma posted on Facebook last September 2019 and was featured in this
+            article:</center>
+        <center>https://interaksyon.philstar.com/trends-spotlights/2019/09/12/154749/green-spaces-parks-metro-manila/
+        </center>
     </section>
     <section id="map"></section>
 
     <script>
         var data = {
-            "type":"FeatureCollection",
-            "features":[
+            "type": "FeatureCollection",
+            "features": [
                 {
-                    "type":"Feature",
-                    "id":1,
-                    "geometry":{
-                        "type":"Point",
-                        "coordinates":[121.04861867000011,14.521434430000056]
+                    "type": "Feature",
+                    "id": 1,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [121.04861867000011, 14.521434430000056]
                     },
-                    "properties":{
-                        "OBJECTID":1,
-                        "city":"Taguig City",
-                        "name":"Heritage Memorial Park",
-                        "type":"Cemetery","status":
-                        "Operational",
-                        "img":"https://heritagememorialpark.com/wp-content/uploads/elementor/thumbs/GOPR3846-scaled-1-otkuz3nv1tcpvkx6pw9q6bifr07lf1uas9nbeuvq80.jpg",
-                        "src":"heritagememorialpark.com"
+                    "properties": {
+                        "OBJECTID": 1,
+                        "city": "Taguig City",
+                        "name": "Heritage Memorial Park",
+                        "type": "Cemetery", "status":
+                            "Operational",
+                        "img": "https://heritagememorialpark.com/wp-content/uploads/elementor/thumbs/GOPR3846-scaled-1-otkuz3nv1tcpvkx6pw9q6bifr07lf1uas9nbeuvq80.jpg",
+                        "src": "heritagememorialpark.com"
                     }
                 },
                 {
-                    "type":"Feature",
-                    "id":2,
-                    "geometry":{
-                        "type":"Point",
-                        "coordinates":[121.03369981000003,14.383865480000054]
+                    "type": "Feature",
+                    "id": 2,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [121.03369981000003, 14.383865480000054]
                     },
-                    "properties":{
-                        "OBJECTID":2,
-                        "city":"Muntinlupa",
-                        "name":"Muntinlupa Sunken Garden",
-                        "type":"Park",
-                        "status":"Operational",
-                        "img":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/1061National_Bilibid_Prison_Reservation_29.jpg/800px-1061National_Bilibid_Prison_Reservation_29.jpg",
-                        "src":"en.wikipedia.org"
+                    "properties": {
+                        "OBJECTID": 2,
+                        "city": "Muntinlupa",
+                        "name": "Muntinlupa Sunken Garden",
+                        "type": "Park",
+                        "status": "Operational",
+                        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/1061National_Bilibid_Prison_Reservation_29.jpg/800px-1061National_Bilibid_Prison_Reservation_29.jpg",
+                        "src": "en.wikipedia.org"
                     }
                 },
                 {
-                    "type":"Feature",
-                    "id":3,
-                    "geometry":{
-                        "type":"Point",
-                        "coordinates":[121.03962905000003,14.654364400000077]
+                    "type": "Feature",
+                    "id": 3,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [121.03962905000003, 14.654364400000077]
                     },
-                    "properties":{
-                        "OBJECTID":3,
-                        "city":"Quezon City",
-                        "name":"Veterans Memorial Golf Club",
-                        "type":"Golf course",
-                        "status":"Operational",
-                        "img":"https://scontent.fmnl9-2.fna.fbcdn.net/v/t31.18172-8/472391_257225657700377_609158714_o.jpg?_nc_cat=111&ccb=1-7&_nc_sid=e3f864&_nc_eui2=AeHRuXLX9kv-MEg0btUfqr1E_zKzLwzpT37_MrMvDOlPfmQL89njgro9Hlgp19jo1TaGw1SvL3aUjU5P5cqOi-9Y&_nc_ohc=KJ-Ey8kSxj0AX86YK4Y&_nc_ht=scontent.fmnl9-2.fna&oh=00_AT_Re6Us3oEE72Kxa2n_dM7iBalRT7HBw4-_djQ4Ku2O6A&oe=62B17F4D",
-                        "src":"facebook.com"
+                    "properties": {
+                        "OBJECTID": 3,
+                        "city": "Quezon City",
+                        "name": "Veterans Memorial Golf Club",
+                        "type": "Golf course",
+                        "status": "Operational",
+                        "img": "https://scontent.fmnl9-2.fna.fbcdn.net/v/t31.18172-8/472391_257225657700377_609158714_o.jpg?_nc_cat=111&ccb=1-7&_nc_sid=e3f864&_nc_eui2=AeHRuXLX9kv-MEg0btUfqr1E_zKzLwzpT37_MrMvDOlPfmQL89njgro9Hlgp19jo1TaGw1SvL3aUjU5P5cqOi-9Y&_nc_ohc=KJ-Ey8kSxj0AX86YK4Y&_nc_ht=scontent.fmnl9-2.fna&oh=00_AT_Re6Us3oEE72Kxa2n_dM7iBalRT7HBw4-_djQ4Ku2O6A&oe=62B17F4D",
+                        "src": "facebook.com"
                     }
                 },
                 {
-                    "type":"Feature","id":4,"geometry":{"type":"Point","coordinates":[121.0503356800001,14.540943140000024]},"properties":{"OBJECTID":4,"city":"Taguig City","name":"Manila American Cemetery","type":"Cemetery","status":"Operational","img":"https://www.abmc.gov/sites/default/files/styles/3_col/public/galleries/CD0A3917-Gilbert.jpg?itok=0XZDMjAn","src":"abmc.gov"}},{"type":"Feature","id":5,"geometry":{"type":"Point","coordinates":[120.98902248000002,14.631527700000049]},"properties":{"OBJECTID":5,"city":"Manila","name":"Manila North Cemetery","type":"Cemetery","status":"Operational","img":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/65Andres_Bonifacio_Avenue_61.jpg/800px-65Andres_Bonifacio_Avenue_61.jpg","src":"en.wikipedia.org"}},{"type":"Feature","id":6,"geometry":{"type":"Point","coordinates":[121.03808031000005,14.454196840000066]},"properties":{"OBJECTID":6,"city":"Parañaque City","name":"Loyola Memorial Park","type":"Cemetery","status":"Operational","img":"http://www.loyolachapels.com/sucat/LMCCI_sucat_img1.jpg","src":"loyolachapels.com"}},{"type":"Feature","id":7,"geometry":{"type":"Point","coordinates":[121.04925818000004,14.651523270000041]},"properties":{"OBJECTID":7,"city":"Quezon City","name":"Quezon Memorial Circle","type":"Park","status":"Operational","img":"https://upload.wikimedia.org/wikipedia/en/8/86/Quezon_Memorial_Shrine_monument_%28local_img%29.jpg","src":"en.wikipedia.org"}},{"type":"Feature","id":8,"geometry":{"type":"Point","coordinates":[121.04179198000008,14.550119670000072]},"properties":{"OBJECTID":8,"city":"Makati City","name":"Manila Golf and Country Club","type":"Golf course","status":"Operational","img":"https://cdn.allsquaregolf.com/pictures/pictures/000/031/115/large/manila_golf_and_country_club_cover_picture.jpg","src":"allsquaregolf.com"}},{"type":"Feature","id":9,"geometry":{"type":"Point","coordinates":[121.05245596000009,14.660492270000077]},"properties":{"OBJECTID":9,"city":"Quezon City","name":"Arboretum Forest","type":"Park","status":"Operational","img":"https://newsinfo.inquirer.net/files/2020/10/Front-Page93761.jpg","src":"newsinfo.inquirer.net"}},{"type":"Feature","id":10,"geometry":{"type":"Point","coordinates":[121.00200700000005,14.403927470000042]},"properties":{"OBJECTID":10,"city":"Las Piñas City","name":"Southlinks Golf Club","type":"Golf course","status":"Permanently closed","img":"https://golflifeatbp.files.wordpress.com/2015/03/the-9th-is-the-toughest-hole-on-the-course.jpg","src":"golflifeatbp.wordpress.com"}},{"type":"Feature","id":11,"geometry":{"type":"Point","coordinates":[120.97891154000001,14.582853490000048]},"properties":{"OBJECTID":11,"city":"Manila","name":"Rizal Park","type":"Park","status":"Operational","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDD93j6O5r5RaAxdQ6f657VDMtMmoHM4ieHw&usqp=CAU","src":"facebook.com"}},{"type":"Feature","id":12,"geometry":{"type":"Point","coordinates":[121.04046691000008,14.531666720000032]},"properties":{"OBJECTID":12,"city":"Taguig City","name":"Kagitingan Executive Golf Course Driving Range","type":"Golf course","status":"Operational","img":"https://golf-pass.brightspotcdn.com/dims4/default/6ceedf8/2147483647/strip/true/crop/810x810+315+0/resize/1200x1200!/quality/90/?url=https%3A%2F%2Fgolf-pass-brightspot.s3.amazonaws.com%2F45%2F38%2Ffc6ce17f7f02fd29380760bec091%2F18740.jpg","src":"golfpass.com"}},{"type":"Feature","id":13,"geometry":{"type":"Point","coordinates":[121.08115786000008,14.664514800000063]},"properties":{"OBJECTID":13,"city":"Quezon City","name":"Capitol Hills Golf and Country Club","type":"Golf course","status":"Operational","img":"https://thegolfasia.com/storage/capitol-hills-golf-amp-country-club.jpg","src":"thegolfasia.com"}},{"type":"Feature","id":14,"geometry":{"type":"Point","coordinates":[121.0870038600001,14.638334280000038]},"properties":{"OBJECTID":14,"city":"Marikina City","name":"Loyola Memorial Park","type":"Cemetery","status":"Operational","img":"http://www.loyolachapels.com/marikina/LMCCI_marikina_img1.jpg","src":"lakansining.wordpress.com"}},{"type":"Feature","id":15,"geometry":{"type":"Point","coordinates":[120.97603111000001,14.489025110000057]},"properties":{"OBJECTID":15,"city":"Las Piñas-Parañaque City","name":"Las Piñas-Parañaque Critical Habitat","type":"Park","status":"Operational","img":"http://images.gmanews.tv/v3/webpics/v3/2015/03/2015_03_11_18_36_24_0.jpg","src":"gmanetwork.com"}},{"type":"Feature","id":16,"geometry":{"type":"Point","coordinates":[121.01880179000011,14.40264970000004]},"properties":{"OBJECTID":16,"city":"Muntinlupa","name":"Alabang Golf and Country Club","type":"Golf course","status":"Operational","img":"https://photo.golfasian.com/userpics/10001/Alabang%20Golf%20and%20Country%20Club-Clubhouse.jpg","src":"golfasian.com"}},{"type":"Feature","id":17,"geometry":{"type":"Point","coordinates":[121.0075217000001,14.51501877000004]},"properties":{"OBJECTID":17,"city":"Pasay City","name":"Old Nayong Pilipino","type":"Park","status":"Permanently closed","img":"http://photos.wikimapia.org/p/00/02/88/98/33_big.jpg","src":"wikimapia.org"}},{"type":"Feature","id":18,"geometry":{"type":"Point","coordinates":[121.03210831000001,14.522242470000037]},"properties":{"OBJECTID":18,"city":"Makati","name":"Philippine Navy Golf Club","type":"Golf course","status":"Operational","img":"https://scontent.fmnl9-1.fna.fbcdn.net/v/t1.6435-9/113811447_988248801615440_4406409100760146924_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=e3f864&_nc_eui2=AeGz4Rq0v2IcCYTo1Uu4P7uFy3PZBTLCi77Lc9kFMsKLvpa2XoDlWeWm9TBkgGqg5CldvR7QsjzgrMoLLhqw_fcY&_nc_ohc=DxRbchczfcYAX-pjGUn&_nc_ht=scontent.fmnl9-1.fna&oh=00_AT8p0JZ23MASTuL4wmZcGCx9Qumsbv3-dDQsLyKtTmfnvQ&oe=62B2D58A","src":"facebook.com"}},{"type":"Feature","id":19,"geometry":{"type":"Point","coordinates":[120.97791015000007,14.586275930000056]},"properties":{"OBJECTID":19,"city":"Manila","name":"Intramuros Golf Club","type":"Golf course","status":"Operational","img":"https://clubintramurosgolfcourse.com/wp-content/uploads/slider9/cigc_gallery_1.jpeg","src":"clubintramurosgolfcourse.com"}},{"type":"Feature","id":20,"geometry":{"type":"Point","coordinates":[121.02131605000011,14.524682320000068]},"properties":{"OBJECTID":20,"city":"Pasay City","name":"Villamor Air Base Golf Course","type":"Golf course","status":"Operational","img":"https://photo.golfasian.com/userpics/10001/Villamor-Manila-Green[1024].jpg","src":"golfasian.com"}},{"type":"Feature","id":21,"geometry":{"type":"Point","coordinates":[121.0504100500001,14.593340750000038]},"properties":{"OBJECTID":21,"city":"Mandaluyong","name":"Wack Wack Golf Club and Country Club","type":"Golf course","status":"Operational","img":"https://thegolfasia.com/storage/wack-wack-golf-amp-country-club.jpg","src":"thegolfasia.com"}},{"type":"Feature","id":22,"geometry":{"type":"Point","coordinates":[121.04426512000009,14.519928330000027]},"properties":{"OBJECTID":22,"city":"Taguig City","name":"Libingan ng mga Bayani","type":"Cemetery","status":"Operational","img":"https://upload.wikimedia.org/wikipedia/commons/3/3b/Libingan_ng_Mga_Bayani.jpg","src":"en.wikipedia.org"}},{"type":"Feature","id":23,"geometry":{"type":"Point","coordinates":[121.04392609000001,14.650613240000041]},"properties":{"OBJECTID":23,"city":"Quezon City","name":"Ninoy Aquino Parks and Wildlife Center","type":"Park","status":"Operational","img":"https://scontent.fmnl9-2.fna.fbcdn.net/v/t1.6435-9/92895955_2734554010112908_5824121811113082880_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=e3f864&_nc_eui2=AeFI-dI_ejRO58r0pjrVxVgOOpRJnemkuX86lEmd6aS5fwiNEj1BXbFtr1Irs2ha--ePUKT7xk8nALGQnYtaEil_&_nc_ohc=GwIAHNBJmLMAX9rUi2H&_nc_ht=scontent.fmnl9-2.fna&oh=00_AT_Uf2Ja4Lfv9BoQ1pDhL29Cvo1A43cSYkVc7xmknVKbRQ&oe=62B31EC8","src":"facebook.com"}},{"type":"Feature","id":24,"geometry":{"type":"Point","coordinates":[121.07624396000006,14.711278960000072]},"properties":{"OBJECTID":24,"city":"Quezon City","name":"La Mesa Ecopark","type":"Park","status":"Operational","img":"https://www.vigattintourism.com/assets/tourist_spots_photos/optimize/13514821225Oohpdjf.jpg","src":"www.vigattintourism.com"}},{"type":"Feature","id":25,"geometry":{"type":"Point","coordinates":[121.07894619000001,14.656193680000058]},"properties":{"OBJECTID":25,"city":"Quezon City","name":"Balara Filters Park","type":"Park","status":"Operational","img":"https://i0.wp.com/www.traveling-up.com/wp-content/uploads/2020/07/balara-filters-park-photo-from-wikipedia-public-domain.jpeg?resize=600%2C400&ssl=1","src":"traveling-up.com"}}]}
+                    "type": "Feature",
+                    "id": 4,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [121.0503356800001, 14.540943140000024]
+                    },
+                    "properties": {
+                        "OBJECTID": 4,
+                        "city": "Taguig City",
+                        "name": "Manila American Cemetery",
+                        "type": "Cemetery",
+                        "status": "Operational",
+                        "img": "https://www.abmc.gov/sites/default/files/styles/3_col/public/galleries/CD0A3917-Gilbert.jpg?itok=0XZDMjAn",
+                        "src": "abmc.gov"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "id": 5,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [120.98902248000002, 14.631527700000049]
+                    },
+                    "properties": {
+                        "OBJECTID": 5,
+                        "city": "Manila",
+                        "name": "Manila North Cemetery",
+                        "type": "Cemetery",
+                        "status": "Operational",
+                        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/65Andres_Bonifacio_Avenue_61.jpg/800px-65Andres_Bonifacio_Avenue_61.jpg",
+                        "src": "en.wikipedia.org"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "id": 6,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [121.03808031000005, 14.454196840000066]
+                    },
+                    "properties": {
+                        "OBJECTID": 6,
+                        "city": "Parañaque City",
+                        "name": "Loyola Memorial Park",
+                        "type": "Cemetery",
+                        "status": "Operational",
+                        "img": "http://www.loyolachapels.com/sucat/LMCCI_sucat_img1.jpg",
+                        "src": "loyolachapels.com"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "id": 7,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [121.04925818000004, 14.651523270000041]
+                    },
+                    "properties": {
+                        "OBJECTID": 7,
+                        "city": "Quezon City",
+                        "name": "Quezon Memorial Circle",
+                        "type": "Park",
+                        "status": "Operational",
+                        "img": "https://upload.wikimedia.org/wikipedia/en/8/86/Quezon_Memorial_Shrine_monument_%28local_img%29.jpg",
+                        "src": "en.wikipedia.org"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "id": 8,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [121.04179198000008, 14.550119670000072]
+                    },
+                    "properties": {
+                        "OBJECTID": 8,
+                        "city": "Makati City",
+                        "name": "Manila Golf and Country Club",
+                        "type": "Golf course",
+                        "status": "Operational",
+                        "img": "https://cdn.allsquaregolf.com/pictures/pictures/000/031/115/large/manila_golf_and_country_club_cover_picture.jpg",
+                        "src": "allsquaregolf.com"
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 9, 
+                    "geometry": { 
+                        "type": "Point",
+                        "coordinates": [121.05245596000009, 14.660492270000077] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 9, 
+                        "city": "Quezon City", 
+                        "name": "Arboretum Forest", 
+                        "type": "Park", 
+                        "status": "Operational", 
+                        "img": "https://newsinfo.inquirer.net/files/2020/10/Front-Page93761.jpg", 
+                        "src": "newsinfo.inquirer.net" 
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 10, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.00200700000005, 14.403927470000042] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 10, 
+                        "city": "Las Piñas City", 
+                        "name": "Southlinks Golf Club", 
+                        "type": "Golf course", 
+                        "status": "Permanently closed", 
+                        "img": "https://golflifeatbp.files.wordpress.com/2015/03/the-9th-is-the-toughest-hole-on-the-course.jpg", 
+                        "src": "golflifeatbp.wordpress.com" 
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 11, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [120.97891154000001, 14.582853490000048] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 11, 
+                        "city": "Manila", 
+                        "name": "Rizal Park", 
+                        "type": "Park", 
+                        "status": "Operational", 
+                        "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDD93j6O5r5RaAxdQ6f657VDMtMmoHM4ieHw&usqp=CAU", 
+                        "src": "facebook.com" 
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 12, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.04046691000008, 14.531666720000032] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 12, 
+                        "city": "Taguig City", 
+                        "name": "Kagitingan Executive Golf Course Driving Range", 
+                        "type": "Golf course", 
+                        "status": "Operational", 
+                        "img": "https://golf-pass.brightspotcdn.com/dims4/default/6ceedf8/2147483647/strip/true/crop/810x810+315+0/resize/1200x1200!/quality/90/?url=https%3A%2F%2Fgolf-pass-brightspot.s3.amazonaws.com%2F45%2F38%2Ffc6ce17f7f02fd29380760bec091%2F18740.jpg", 
+                        "src": "golfpass.com" 
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 13, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.08115786000008, 14.664514800000063] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 13, 
+                        "city": "Quezon City", 
+                        "name": "Capitol Hills Golf and Country Club", 
+                        "type": "Golf course", 
+                        "status": "Operational", 
+                        "img": "https://thegolfasia.com/storage/capitol-hills-golf-amp-country-club.jpg", 
+                        "src": "thegolfasia.com" 
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 14, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.0870038600001, 14.638334280000038] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 14, 
+                        "city": "Marikina City", 
+                        "name": "Loyola Memorial Park", 
+                        "type": "Cemetery", 
+                        "status": "Operational", 
+                        "img": "http://www.loyolachapels.com/marikina/LMCCI_marikina_img1.jpg", 
+                        "src": "lakansining.wordpress.com" 
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 15, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [120.97603111000001, 14.489025110000057] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 15, 
+                        "city": "Las Piñas-Parañaque City", 
+                        "name": "Las Piñas-Parañaque Critical Habitat", 
+                        "type": "Park", "status": "Operational", 
+                        "img": "http://images.gmanews.tv/v3/webpics/v3/2015/03/2015_03_11_18_36_24_0.jpg", 
+                        "src": "gmanetwork.com" }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 16, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.01880179000011, 14.40264970000004] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 16, 
+                        "city": "Muntinlupa", 
+                        "name": "Alabang Golf and Country Club", 
+                        "type": "Golf course", 
+                        "status": "Operational", 
+                        "img": "https://photo.golfasian.com/userpics/10001/Alabang%20Golf%20and%20Country%20Club-Clubhouse.jpg", 
+                        "src": "golfasian.com" 
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 17, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.0075217000001, 14.51501877000004] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 17, 
+                        "city": "Pasay City", 
+                        "name": "Old Nayong Pilipino", 
+                        "type": "Park", 
+                        "status": "Permanently closed", 
+                        "img": "http://photos.wikimapia.org/p/00/02/88/98/33_big.jpg", 
+                        "src": "wikimapia.org" 
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 18, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.03210831000001, 14.522242470000037] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 18, 
+                        "city": "Makati", 
+                        "name": "Philippine Navy Golf Club", 
+                        "type": "Golf course", 
+                        "status": "Operational", 
+                        "img": "https://scontent.fmnl9-1.fna.fbcdn.net/v/t1.6435-9/113811447_988248801615440_4406409100760146924_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=e3f864&_nc_eui2=AeGz4Rq0v2IcCYTo1Uu4P7uFy3PZBTLCi77Lc9kFMsKLvpa2XoDlWeWm9TBkgGqg5CldvR7QsjzgrMoLLhqw_fcY&_nc_ohc=DxRbchczfcYAX-pjGUn&_nc_ht=scontent.fmnl9-1.fna&oh=00_AT8p0JZ23MASTuL4wmZcGCx9Qumsbv3-dDQsLyKtTmfnvQ&oe=62B2D58A", 
+                        "src": "facebook.com" 
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "id": 19, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [120.97791015000007, 14.586275930000056] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 19, 
+                        "city": "Manila", 
+                        "name": "Intramuros Golf Club", 
+                        "type": "Golf course", 
+                        "status": "Operational", 
+                        "img": "https://clubintramurosgolfcourse.com/wp-content/uploads/slider9/cigc_gallery_1.jpeg", 
+                        "src": "clubintramurosgolfcourse.com" 
+                    }
+                }, 
+                {
+                    "type": "Feature", 
+                    "id": 20, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.02131605000011, 14.524682320000068] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 20, 
+                        "city": "Pasay City", 
+                        "name": "Villamor Air Base Golf Course", 
+                        "type": "Golf course", 
+                        "status": "Operational", 
+                        "img": "https://photo.golfasian.com/userpics/10001/Villamor-Manila-Green[1024].jpg", 
+                        "src": "golfasian.com" 
+                    }
+                }, 
+                {
+                    "type": "Feature", 
+                    "id": 21, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.0504100500001, 14.593340750000038] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 21, 
+                        "city": "Mandaluyong", 
+                        "name": "Wack Wack Golf Club and Country Club", 
+                        "type": "Golf course", 
+                        "status": "Operational", 
+                        "img": "https://thegolfasia.com/storage/wack-wack-golf-amp-country-club.jpg", 
+                        "src": "thegolfasia.com" 
+                    }
+                }, 
+                {
+                    "type": "Feature", 
+                    "id": 22, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.04426512000009, 14.519928330000027] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 22, 
+                        "city": "Taguig City", 
+                        "name": "Libingan ng mga Bayani", 
+                        "type": "Cemetery", 
+                        "status": "Operational", 
+                        "img": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Libingan_ng_Mga_Bayani.jpg", 
+                        "src": "en.wikipedia.org" 
+                    }
+                }, 
+                {
+                    "type": "Feature", 
+                    "id": 23, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.04392609000001, 14.650613240000041] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 23, 
+                        "city": "Quezon City", 
+                        "name": "Ninoy Aquino Parks and Wildlife Center", 
+                        "type": "Park", 
+                        "status": "Operational", 
+                        "img": "https://scontent.fmnl9-2.fna.fbcdn.net/v/t1.6435-9/92895955_2734554010112908_5824121811113082880_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=e3f864&_nc_eui2=AeFI-dI_ejRO58r0pjrVxVgOOpRJnemkuX86lEmd6aS5fwiNEj1BXbFtr1Irs2ha--ePUKT7xk8nALGQnYtaEil_&_nc_ohc=GwIAHNBJmLMAX9rUi2H&_nc_ht=scontent.fmnl9-2.fna&oh=00_AT_Uf2Ja4Lfv9BoQ1pDhL29Cvo1A43cSYkVc7xmknVKbRQ&oe=62B31EC8", 
+                        "src": "facebook.com" 
+                    }
+                }, 
+                {
+                    "type": "Feature", 
+                    "id": 24, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.07624396000006, 14.711278960000072] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 24, 
+                        "city": "Quezon City", 
+                        "name": "La Mesa Ecopark", 
+                        "type": "Park", 
+                        "status": "Operational", 
+                        "img": "https://www.vigattintourism.com/assets/tourist_spots_photos/optimize/13514821225Oohpdjf.jpg", 
+                        "src": "www.vigattintourism.com" 
+                    }
+                }, 
+                { 
+                    "type": "Feature", 
+                    "id": 25, 
+                    "geometry": { 
+                        "type": "Point", 
+                        "coordinates": [121.07894619000001, 14.656193680000058] 
+                    }, 
+                    "properties": { 
+                        "OBJECTID": 25, 
+                        "city": "Quezon City", 
+                        "name": "Balara Filters Park", 
+                        "type": "Park", 
+                        "status": "Operational", 
+                        "img": "https://i0.wp.com/www.traveling-up.com/wp-content/uploads/2020/07/balara-filters-park-photo-from-wikipedia-public-domain.jpeg?resize=600%2C400&ssl=1", 
+                        "src": "traveling-up.com" 
+                    } 
+                }
+            ]
+        }
 
         //filter for cemetery
         var cemetery = L.geoJson(data, { filter: cemeteryFilter });
@@ -139,7 +513,7 @@
                 '</p><p>Type: ' + layer.feature.properties.type +
                 '</p><p>Status: ' + layer.feature.properties.status +
                 '</p><img src ="' + layer.feature.properties.img + '"style=width:300px;height:280px;">' +
-                '</p><p>Image source: ' + layer.feature.properties.src 
+                '</p><p>Image source: ' + layer.feature.properties.src
         });
 
 
@@ -157,7 +531,7 @@
                 '</p><p>Type: ' + layer.feature.properties.type +
                 '</p><p>Status: ' + layer.feature.properties.status +
                 '</p><img src ="' + layer.feature.properties.img + '"style=width:300px;height:250px;">' +
-                '</p><p>Image source: ' + layer.feature.properties.src 
+                '</p><p>Image source: ' + layer.feature.properties.src
         });
 
 
@@ -175,7 +549,7 @@
                 '</p><p>Type: ' + layer.feature.properties.type +
                 '</p><p>Status: ' + layer.feature.properties.status +
                 '</p><img src ="' + layer.feature.properties.img + '"style=width:300px;height:250px;">' +
-                '</p><p>Image source: ' + layer.feature.properties.src 
+                '</p><p>Image source: ' + layer.feature.properties.src
         });
 
 
@@ -205,11 +579,7 @@
 
         var layerControl = L.control.layers(baseLayers, overlays).addTo(map);
 
-
-
     </script>
-
-
 
 </body>
 
