@@ -12,4 +12,4 @@ You can use the layer control button to filter the data based on these types.
 
 You can also switch the basemap layers using the two map options, streets and satellite.
 
-Enjoy the map!
+Enjoy! :)
