@@ -1,0 +1,1628 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
+  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
+  -->
+<title>N2 Viaduct</title>
+
+<style>
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background-color: black;     
+}
+
+/* Container of Entire Screen */
+#applicationDiv {
+  display: flex;
+  flex-wrap: wrap;
+  height: 90vh;
+  padding: 10px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Header container: headerDiv, headerTitleDiv, cpButton, and cpButtonCalss */
+#headerDiv {
+  font-weight: 400;
+  max-width: 2000px;
+  font-style: normal;
+  font-size: 25px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: white;
+  padding: 10px 0px 2px 12px;
+  border: solid 2.5px gray;
+  margin-bottom: 3px;
+  display: grid;
+  grid-template-columns: 250fr 0fr 0fr;
+}
+
+#headerTitleDiv {
+  font-size: 2.3vw;
+  vertical-align: middle;
+}
+
+#cpButton {
+  margin-right:1%;
+  margin:0;
+  width: 350px;
+  text-align: center;
+}
+
+.cpButtonClass {
+  font-style: normal;
+  width: 300px;
+  font-size: 1.2vw;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: white;
+  text-align: center;
+  padding-top: 2%;
+}
+
+/* Container which encloses boxB and boxA */
+.container {
+  display: grid;
+  border: solid 2.5px gray;
+  flex-wrap: wrap;
+  height: 90vh;
+  width: 100%;
+  box-sizing: border-box;
+  grid-template-columns: 4fr 1.2fr;
+  border-right: 0;
+}
+
+/* Inside boxB container: viewDiv and menu */
+#viewDiv {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background-color: black;
+  flex: 1 1 auto;
+  order: 1;
+  overflow: hidden;
+}
+
+#menu {
+  padding: 3px 3px 3px 3px;
+  background-color: rgb(0,0,0,0.3);
+  color: white;
+}
+
+/* Inside boxA container: chartPanel, chartdiv, optionsDiv, and totalProgress */
+ .boxA {
+   border: solid 2px gray;
+   display: flex; flex-direction: Column;
+   flex-wrap: wrap;
+   height: 100%;
+   box-sizing: border-box;
+   border-top: 0;
+   border-bottom: 0;
+  }
+
+#chartPanel {
+  background: rgb(0, 0, 0, 0);
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  padding: 0px;
+  width: 99%;
+  height: 65vh;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  margin: 3px;
+}
+
+#chartdiv {
+  width: 100%;
+  height: 72vh;
+}
+
+#chartTitleDiv {
+  font-weight: 200;
+  text-align: center;
+  font-style: normal;
+  font-size: 1.7vw;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: white;
+  margin-top: 5px;
+  padding-top: 5px;
+  background-color: rgb(0, 0, 0, 0.5);
+  opacity: 0.9;
+  line-height: 0.5;
+  height: 8vh;
+}
+ 
+#optionsDiv {
+  font-size: 2vw;
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  color: white;
+  padding-top: 6%;
+  line-height: 0.3;
+  opacity: 0.8;
+  height: 14vh;
+  width: 100%
+}
+
+#totalProgress {
+  padding-top: 10px;
+}
+
+/* Monthly Progress chart*/
+#monthlyProgressChartDiv {
+  position: absolute;
+  width: 60vw;
+  height: 20vh;
+  background-color: rgb(0,0,0,0);
+  z-index: 99;
+  bottom: 1.5%;
+  left:13vw;   
+}
+
+/* Default Letter */    
+p {
+  color: rgb(0, 197, 255);
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+  width: auto;
+  vertical-align: text-bottom;
+  padding: 3px;
+  margin-top: 10px;
+}
+
+h2 {
+  font-weight: 400;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-style: normal;
+  font-size: 1.8vw;
+  color: white;
+  padding:3px;
+  margin: 0px;
+  vertical-align: text-top;
+}
+
+h4 {
+  color: rgb(0, 197, 255);
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  text-align: left;
+  font-weight: normal;
+  font-size: 1vw;
+  padding-top: 20px;
+  margin: 0;
+  width: 180px;
+  vertical-align: text-bottom;
+}
+
+h5 {
+  color: rgb(0, 197, 255);
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  text-align: left;
+  font-weight: normal;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+}
+
+h6 {
+  color: rgb(0, 197, 255);
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  text-align: center;
+  font-weight: normal;
+  font-size: 3vw;
+  margin-top: 7%;
+}
+
+/* Others */
+br{content:' ';}
+br:after{content:' ';}
+
+.esri-layer-list__item-toggle-icon,
+.esri-layer-list__item-title {
+  color: white;
+}
+
+/** sassy-theme to change properties of esri's box**/
+.sassy-theme .esri-menu,
+.sassy-theme .esri-popup__main-container,
+.sassy-theme .esri-popup .esri-popup__pointer-direction,
+.sassy-theme .esri-popup .esri-popup__button,
+.sassy-theme .esri-button,
+.sassy-theme .esri-input,
+.sassy-theme .esri-legend,
+.sassy-theme .esri-layer-list,
+.sassy-theme .esri-widget a {
+  background-color: rgb(0, 0, 0, 0.7);
+  color: #fff;
+}
+
+</style>
+
+<link
+rel="stylesheet"
+href="https://js.arcgis.com/4.23/esri/themes/dark/main.css"
+/>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+<script src="https://js.arcgis.com/4.23/"></script>
+
+<script>
+require([
+  "esri/Basemap",
+  "esri/Map",
+  "esri/views/MapView",
+  "esri/views/SceneView",
+  "esri/layers/FeatureLayer",
+  "esri/views/layers/support/FeatureFilter",
+  "esri/layers/SceneLayer",
+  "esri/layers/Layer",
+  "esri/layers/TileLayer",
+  "esri/layers/VectorTileLayer",
+  "esri/layers/support/LabelClass",
+  "esri/symbols/LabelSymbol3D",
+  "esri/WebMap",
+  "esri/WebScene",
+  "esri/PopupTemplate",
+  "esri/portal/PortalItem",
+  "esri/portal/Portal",
+  "esri/widgets/TimeSlider",
+  "esri/widgets/Legend",
+  "esri/widgets/LayerList",
+  "esri/widgets/Fullscreen",
+  "esri/tasks/GeometryService",
+  "esri/tasks/support/Query",
+  "esri/tasks/QueryTask",
+  "esri/renderers/smartMapping/statistics/summaryStatistics",
+  "esri/tasks/support/StatisticDefinition",
+  "esri/symbols/WebStyleSymbol",
+  "esri/TimeExtent",
+  "esri/widgets/Expand",
+  "esri/widgets/Editor",
+  "esri/renderers/UniqueValueRenderer",
+  "esri/widgets/support/DatePicker",
+  "esri/widgets/FeatureTable",
+  "esri/widgets/Compass",
+  "esri/TimeExtent",
+  "esri/widgets/Search",
+  "esri/widgets/BasemapToggle"
+], function(Basemap, Map, MapView, SceneView, FeatureLayer, FeatureFilter,
+            SceneLayer, Layer, TileLayer, VectorTileLayer,
+            LabelClass, LabelSymbol3D, WebMap,
+            WebScene, PortalItem, Portal, PopupTemplate,
+            TimeSlider, Legend, LayerList, Fullscreen,
+            GeometryService, Query, QueryTask, summaryStatistics,
+            StatisticDefinition, WebStyleSymbol,
+            TimeExtent, Expand, Editor, UniqueValueRenderer,
+            DatePicker, FeatureTable, Compass, TimeExtent, Search, BasemapToggle) {
+
+
+// Basemap
+var basemap = new Basemap({
+  baseLayers: [
+    new VectorTileLayer({
+      portalItem: {
+        id: "8a9ef2a144e8423786f6139408ac3424"
+      }
+    })
+  ]
+});
+
+// Add Map
+var map = new Map({
+  basemap: basemap, // "streets-night-vector"
+  ground: "world-elevation" // ground: "no"
+}); 
+//map.ground.surfaceColor = "#FFFF";
+//map.ground.opacity = 0.5;
+         
+// Add scene view
+var view = new SceneView({
+  map: map,
+  container: "viewDiv",
+  viewingMode: "local",
+  camera: {
+    position: {
+      x: 120.75200,
+      y: 14.90,
+      z: 2500
+    },
+    tilt: 65
+  },
+  environment: {
+    background: {
+      type: "color", // autocasts as new ColorBackground()
+      color: [0, 0, 0, 1]
+    },
+    
+    // disable stars
+    starsEnabled: false,
+          
+    //disable atmosphere
+    atmosphereEnabled: false
+  }
+});
+
+// Basemap Toggle
+const toggle = new BasemapToggle({
+  view: view,
+  nextBaseMap: "hybrid"
+});
+view.ui.add(toggle, "top-right");
+      
+// Error Abort function 
+function catchAbortError(error) {
+  if (error.name != "AbortError") {
+    console.error(error);
+  }
+f}
+
+
+
+//*******************************//
+// Label Class Property Settings //
+//*******************************//
+// Chainage Label
+var labelChainage = new LabelClass({
+  labelExpressionInfo: {expression: "$feature.KmSpot"},
+  symbol: {
+    type: "text",
+    color: [85, 255, 0],
+    size: 25
+  }
+});
+
+// Pier No Label
+var pierNoLabelClass = new LabelClass({
+  symbol: {
+    type: "label-3d",// autocasts as new LabelSymbol3D()
+    symbolLayers: [
+      {
+        type: "text", // autocasts as new TextSymbol3DLayer()
+        material: {
+          color: "white"
+        },
+        size: 10,
+        color: "black",
+        haloColor: "black",
+        haloSize: 1,
+        font: {
+          family: "Ubuntu Mono",
+          //weight: "bold"
+        },
+      }
+    ],
+    verticalOffset: {
+      screenLength: 40,
+      maxWorldLength: 100,
+      minWorldLength: 20
+    },
+    callout: {
+      type: "line", // autocasts as new LineCallout3D()
+      color: "white",
+      size: 0.7,
+      border: {
+        color: "grey"
+      }
+    }
+  },
+  labelPlacement: "above-center",
+  labelExpressionInfo: {
+    expression: "$feature.PIER"
+            //value: "{TEXTSTRING}"
+  }
+});
+
+// Station labels
+var labelClass = new LabelClass({
+  symbol: {
+    type: "label-3d",// autocasts as new LabelSymbol3D()
+    symbolLayers: [
+      {
+        type: "text", // autocasts as new TextSymbol3DLayer()
+        material: {
+          color: [255, 170, 0]
+        },
+        size: 20,
+        color: "black",
+        haloColor: "black",
+        haloSize: 1,
+        font: {
+          family: "Ubuntu Mono",
+          //weight: "bold"
+        },
+      }
+    ],
+    verticalOffset: {
+      screenLength: 40,
+      maxWorldLength: 100,
+      minWorldLength: 20
+    },
+  },
+  labelPlacement: "above-center",
+  labelExpressionInfo: {
+    expression: "$feature.Station"
+            //value: "{TEXTSTRING}"
+  }
+});
+
+//*****************************//
+//      Renderer Settings      //
+//*****************************//
+// Station Symbol
+function stationsSymbol(name) {
+  return {
+    type: "web-style", // autocasts as new WebStyleSymbol()
+    name: name,
+    styleName: "EsriIconsStyle"//EsriRealisticTransportationStyle, EsriIconsStyle
+  };
+}
+
+// Station Renderer
+var stationsRenderer = {
+  type: "unique-value", // autocasts as new UniqueValueRenderer()
+  field: "Station",
+  defaultSymbol: stationsSymbol("Train"),//Backhoe, Train
+};
+
+// Chainage symbol
+var chainageRenderer = {
+  type: "simple",
+  symbol: {
+    type: "simple-marker",
+    size: 5,
+    color: [255, 255, 255, 0.9],
+    outline: {
+      width: 0.2,
+      color: "black"
+    }
+  }
+};
+
+// Legend Color for Viaduct Layer
+// 0.1: more transparent, 0.9: not transparent 
+const colors = {
+  1: [225, 225, 225, 0.1], // To be Constructed (white)
+  2: [130, 130, 130, 0.5], // Under Construction
+  3: [255, 0, 0, 0.8], // Delayed
+  4: [0, 112, 255, 0.8], // Bored Pile
+  5: [0, 112, 255, 0.8], // Pile cap
+  6: [0, 112, 255, 0.8], // Pier
+  7: [0, 112, 255, 0.8], // Pier head
+  8: [0, 112, 255, 0.8], // Pre-cast
+};
+
+        
+//*******************************//
+// Import Layers                 //
+//*******************************//
+// Station Layer
+var stationLayer = new SceneLayer({
+  portalItem: {
+    id: "207cb34b8a324b40985b5805862c4b29",
+    portal: {
+      url: "https://gis.railway-sector.com/portal"
+    }
+  },
+  labelingInfo: [labelClass],
+  renderer: stationsRenderer,
+  elevationInfo: {
+    mode: "relative-to-ground"
+  },
+  definitionExpression: "Extension = 'N2'"
+              //screenSizePerspectiveEnabled: false, // gives constant size regardless of zoom
+});
+stationLayer.listMode = "hide";
+map.add(stationLayer, 0);
+
+// Centerline and chainage
+var chainageLayer = new FeatureLayer ({
+  portalItem: {
+    id: "590680d19f2e48fdbd8bcddce3aaedb5",
+    portal: {
+      url: "https://gis.railway-sector.com/portal"
+    }   
+  },
+  layerId: 5,
+  title: "Chainage",
+  elevationInfo: {
+    mode: "relative-to-ground"
+  },
+  labelingInfo: [labelChainage],
+  renderer: chainageRenderer,
+  outFields: ["*"],
+  popupEnabled: false
+});
+//chainageLayer.listMode = "hide";
+map.add(chainageLayer, 1);
+
+// Pier No. (point feature)
+var PierNoLayer = new FeatureLayer ({
+  portalItem: {
+    id: "590680d19f2e48fdbd8bcddce3aaedb5",
+    portal: {
+      url: "https://gis.railway-sector.com/portal"
+    }
+  },
+  layerId: 6,
+  labelingInfo: [pierNoLabelClass],
+  elevationInfo: {
+    mode: "on-the-ground" //absolute-height, relative-to-ground
+  },
+  title: "Pier No",
+  outFields: ["*"],
+  popupEnabled: false
+});
+
+//chainageLayer.listMode = "hide";
+map.add(PierNoLayer, 1);
+
+// PROW //
+var rowLayer = new FeatureLayer ({
+  portalItem: {
+    id: "590680d19f2e48fdbd8bcddce3aaedb5",
+    portal: {
+      url: "https://gis.railway-sector.com/portal"
+    }   
+  },
+  layerId: 1,
+  title: "ROW",
+  popupEnabled: false
+});
+map.add(rowLayer,2);
+
+// Viaduct Layer
+var viaductLayer = new SceneLayer({
+  portalItem: {
+    id: "a9c0878766964fa794cc67bbf38b7a09",
+    portal: {
+      url: "https://gis.railway-sector.com/portal"
+    }
+  },
+  // popupTemplate: viadTemplate,
+  elevationInfo: {
+    mode: "absolute-height" //absolute-height, relative-to-ground
+  },
+  title: "Viaduct sample",
+  outFields: ["*"],
+  // when filter using date, example below. use this format
+  //definitionExpression: "EndDate = date'2020-6-3'"
+  /*
+  popupTemplate: {
+    title: "<h5>{Status1}</h5>",
+    lastEditInfoEnabled: false,
+    returnGeometry: true,
+    content: [
+      {
+        type: "fields",
+        fieldInfos: [
+          {
+            fieldName: "Type",
+            label: "Type of Structure"
+          },
+          {
+            fieldName: "PierNumber",
+            Label: "Pier No."
+          }
+        ]
+      }
+    ]
+  }
+  */      
+});
+viaductLayer.listMode = "hide";
+map.add(viaductLayer);
+
+// Symbology for Viaduct Layer
+function renderViaductLayer() {
+  // Obtain unique values from Status1
+  const renderer = new UniqueValueRenderer({
+    field: "Status1"
+  });
+  
+  for (let property in colors) {
+    if (colors.hasOwnProperty(property)) {
+      renderer.addUniqueValueInfo({
+        value: property,
+        symbol: {
+          type: "mesh-3d",
+          symbolLayers: [
+            {
+              type: "fill",
+              material: {
+                color: colors[property],
+                colorMixMode: "replace"
+              },
+              edges: {
+                type: "solid", // autocasts as new SolidEdges3D()
+                color: [225, 225, 225, 0.3]
+              }
+            }
+          ]
+        }
+      });
+    }
+  }
+  viaductLayer.renderer = renderer;
+}
+renderViaductLayer();
+
+
+//*******************************//
+//      Progress Chart           //
+//*******************************//
+// Total progress //
+function perCpProgress() {
+var total_complete = {
+  onStatisticField: "CASE WHEN Status1 = 4 THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_complete",
+  statisticType: "sum"
+};
+
+var total_obs = {
+  onStatisticField: "Status1",
+  outStatisticFieldName: "total_obs",
+  statisticType: "count"
+};
+
+var query = viaductLayer.createQuery();
+query.outStatistics = [total_complete, total_obs];
+query.returnGeometry = true;
+
+viaductLayer.queryFeatures(query).then(function(response) {
+  var stats = response.features[0].attributes;
+
+  const total_complete = stats.total_complete;
+  const total_obs = stats.total_obs;
+  document.getElementById("totalProgress").innerHTML = ((total_complete/total_obs)*100).toFixed(1) + " %";
+});
+}
+perCpProgress();
+
+// Function for zooming to selected layers */
+function zoomToLayer(layer) {
+  return layer.queryExtent().then(function(response) {
+    view.goTo(response.extent, { //response.extent
+      speedFactor: 2
+    }).catch(function(error) {
+      if (error.name != "AbortError") {
+        console.error(error);
+      }
+    });
+  });
+}
+
+// Setup DOM
+var headerDiv = document.getElementById("headerDiv");
+var headerTitleDiv = document.getElementById("headerTitleDiv");
+var applicationDiv = document.getElementById("applicationDiv");
+const cpButtonElement = document.getElementById("cpButton");
+const monthlyProgressChartDiv = document.getElementById("monthlyProgressChartDiv");
+const chartElement = document.getElementById("chartPanel");
+
+
+//*******************************************************************//
+// CHART FUNCTION:
+//
+// All commands related to chart must fall inside am4core
+//*******************************************************************//
+
+ // Create a Bar chart to calculate % completion for each viaduct sample
+am4core.ready(function() {
+am4core.useTheme(am4themes_animated);
+
+// Default label
+if (document.getElementById("N-01").checked = true) {
+    viaductLayer.definitionExpression = "CP = 'N-01'";
+    PierNoLayer.definitionExpression = "CP = 'N-01'";
+    zoomToLayer(viaductLayer);
+    MonthlyProgressChart();
+    updateChart();
+    perCpProgress();
+}
+
+// click event handler for contract packages
+cpButtonElement.addEventListener("click", filterByTest);
+function filterByTest(event) {
+  const selectedID = event.target.id;
+
+  if(selectedID === "N-01") {
+    viaductLayer.definitionExpression = "CP = '" + selectedID + "'";
+    PierNoLayer.definitionExpression = "CP = '" + selectedID + "'";
+ 
+    zoomToLayer(viaductLayer);
+    updateChart();
+    perCpProgress();
+
+  } else if (selectedID === "N-02") {
+    viaductLayer.definitionExpression = "CP = '" + selectedID + "'";
+    PierNoLayer.definitionExpression = "CP = '" + selectedID + "'";
+
+    zoomToLayer(viaductLayer);
+    updateChart();
+    perCpProgress();
+
+  } else if (selectedID === "N-03") {
+    viaductLayer.definitionExpression = "CP = '" + selectedID + "'";
+    PierNoLayer.definitionExpression = "CP = '" + selectedID + "'";
+
+    zoomToLayer(viaductLayer);
+    updateChart();
+    perCpProgress();
+
+  } else if (selectedID === "N-04") {
+    viaductLayer.definitionExpression = "CP = '" + selectedID + "'";
+    PierNoLayer.definitionExpression = "CP = '" + selectedID + "'";
+ 
+    zoomToLayer(viaductLayer);
+    updateChart(); 
+    perCpProgress();
+}
+}
+
+// Time line bar charts //
+// This stacked bar charnts show monthly construction progress by year and components
+
+function MonthlyProgressChart(){
+
+// Note that the following arrays are derived from python code which is run in ArcGIS Pro
+const pile_2021 = {1: [2], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [2], 8: [52], 9: [120], 10: [197], 11: [296], 12: [229]};
+const pileC_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [1], 10: [2], 11: [9], 12: [7]};
+const pier_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [5], 12: [5]};
+const pierH_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const precast_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: [1]};
+const pile_2022 = {1: [268], 2: [166], 3: [166], 4: [157], 5: [119], 6: [17], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const pileC_2022 = {1: [10], 2: [15], 3: [17], 4: [17], 5: [14], 6: [3], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const pier_2022 = {1: [5], 2: [8], 3: [11], 4: [12], 5: [16], 6: [2], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const pierH_2022 = {1: [], 2: [3], 3: [9], 4: [6], 5: [6], 6: [3], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const precast_2022 = {1: [1], 2: [], 3: [4], 4: [2], 5: [2], 6: [1], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+
+var chart = am4core.create("monthlyProgressChartDiv", am4charts.XYChart);
+
+// Add data
+chart.data = [
+  {
+  date: new Date(2020, 12), // Jan. 2021
+  value1: pile_2021[1],
+  value2: pileC_2021[1],
+  value3: pier_2021[1],
+  value4: pierH_2021[1],
+  value5: precast_2022[1]
+},
+{
+  date: new Date(2021, 1),
+  value1: pile_2021[2],
+  value2: pileC_2021[2],
+  value3: pier_2021[2],
+  value4: pierH_2021[2],
+  value5: precast_2021[2]
+},
+{
+  date: new Date(2021, 2),
+  value1: pile_2021[3],
+  value2: pileC_2021[3],
+  value3: pier_2021[3],
+  value4: pierH_2021[3],
+  value5: precast_2021[3]
+},
+{
+  date: new Date(2021, 3),
+  value1: pile_2021[4],
+  value2: pileC_2021[4],
+  value3: pier_2021[4],
+  value4: pierH_2021[4],
+  value5: precast_2021[4]
+},
+{
+  date: new Date(2021, 4),
+  value1: pile_2021[5],
+  value2: pileC_2021[5],
+  value3: pier_2021[5],
+  value4: pierH_2021[5],
+  value5: precast_2021[5]
+},
+{
+  date: new Date(2021, 5),
+  value1: pile_2021[6],
+  value2: pileC_2021[6],
+  value3: pier_2021[6],
+  value4: pierH_2021[6],
+  value5: precast_2021[6]
+},
+{
+  date: new Date(2021, 6),
+  value1: pile_2021[7],
+  value2: pileC_2021[7],
+  value3: pier_2021[7],
+  value4: pierH_2021[7],
+  value5: precast_2021[7]
+},
+{
+  date: new Date(2021, 7),
+  value1: pile_2021[8],
+  value2: pileC_2021[8],
+  value3: pier_2021[8],
+  value4: pierH_2021[8],
+  value5: precast_2021[8]
+},
+{
+  date: new Date(2021, 8),
+  value1: pile_2021[9],
+  value2: pileC_2021[9],
+  value3: pier_2021[9],
+  value4: pierH_2021[9],
+  value5: precast_2021[9]
+},
+{
+  date: new Date(2021, 9),
+  value1: pile_2021[10],
+  value2: pileC_2021[10],
+  value3: pier_2021[10],
+  value4: pierH_2021[10],
+  value5: precast_2021[10]
+},
+{
+  date: new Date(2021, 10),
+  value1: pile_2021[11],
+  value2: pileC_2021[11],
+  value3: pier_2021[11],
+  value4: pierH_2021[11],
+  value5: precast_2021[11]
+},
+{
+  date: new Date(2021, 11),
+  value1: pile_2021[12],
+  value2: pileC_2021[12],
+  value3: pier_2021[12],
+  value4: pierH_2021[12],
+  value5: precast_2021[12]
+},
+{
+  date: new Date(2021, 12),
+  value1: pile_2022[1],
+  value2: pileC_2022[1],
+  value3: pier_2022[1],
+  value4: pierH_2022[1],
+  value5: precast_2022[1]
+},
+{
+  date: new Date(2022, 1),
+  value1: pile_2022[2],
+  value2: pileC_2022[2],
+  value3: pier_2022[2],
+  value4: pierH_2022[2],
+  value5: precast_2022[2]
+},
+{
+  date: new Date(2022, 2),
+  value1: pile_2022[3],
+  value2: pileC_2022[3],
+  value3: pier_2022[3],
+  value4: pierH_2022[3],
+  value5: precast_2022[3]
+},
+{
+  date: new Date(2022, 3),
+  value1: pile_2022[4],
+  value2: pileC_2022[4],
+  value3: pier_2022[4],
+  value4: pierH_2022[4],
+  value5: precast_2022[4]
+},
+{
+  date: new Date(2022, 4),
+  value1: pile_2022[5],
+  value2: pileC_2022[5],
+  value3: pier_2022[5],
+  value4: pierH_2022[5],
+  value5: precast_2022[5]
+},
+{
+  date: new Date(2022, 5),
+  value1: pile_2022[6],
+  value2: pileC_2022[6],
+  value3: pier_2022[6],
+  value4: pierH_2022[6],
+  value5: precast_2022[6]
+}
+];
+
+//** Legend Properties
+const LegendFontSizze = 14;
+chart.legend = new am4charts.Legend();
+
+/// Alignment of Legend
+chart.legend.valueLabels.template.align = "right"
+chart.legend.valueLabels.template.textAlign = "end";  
+
+/// Position, Font Size, Fill
+chart.legend.position = "bottom";
+chart.legend.labels.template.fontSize = LegendFontSizze;
+chart.legend.labels.template.fill = "#ffffff";
+chart.legend.valueLabels.template.fill = am4core.color("#ffffff"); 
+chart.legend.valueLabels.template.fontSize = LegendFontSizze;
+
+/// Legend marker size and shape and color
+var marker = chart.legend.markers.template.children.getIndex(0);
+var markerTemplate = chart.legend.markers.template;
+marker.cornerRadius(12, 12, 12, 12);
+marker.strokeWidth = 1;
+marker.strokeOpacity = 1;
+marker.stroke = am4core.color("#ccc");
+markerTemplate.width = 16;
+markerTemplate.height = 16;
+
+//** Category Axis Properties
+var categoryAxis = chart.xAxes.push(new am4charts.DateAxis());
+categoryAxis.dataFields.category = "date";
+categoryAxis.renderer.grid.template.location = 0;
+categoryAxis.renderer.grid.template.location = 0;
+categoryAxis.renderer.labels.template.fontSize = 10;
+categoryAxis.renderer.labels.template.fill = "#ffffff";
+categoryAxis.renderer.minGridDistance = 5; //can change label
+categoryAxis.baseInterval = {
+  "timeUnit": "month",
+  "count": 1
+};
+var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+valueAxis.renderer.inside = true;
+valueAxis.renderer.labels.template.disabled = true;
+valueAxis.min = 0;
+
+//** Create series function for bar chart
+function createSeries(field, name) {
+  // Set up series
+  var series = chart.series.push(new am4charts.ColumnSeries());
+  series.name = name;
+  series.dataFields.valueY = field;
+  series.dataFields.dateX = "date";
+  series.sequencedInterpolation = true;
+
+  // Make it stacked
+  series.stacked = true;
+  
+  // Configure columns
+  series.columns.template.width = am4core.percent(60);
+  series.columns.template.tooltipText = "[bold]{name}[/]\n[font-size:14px]{categoryX}: {valueY}";
+  
+  // Add label
+  /*
+  var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+  labelBullet.label.text = "{valueY}";
+  labelBullet.locationY = 0.5;
+  labelBullet.label.hideOversized = true;
+  */
+  return series;
+}
+createSeries("value1", "Pile");
+createSeries("value2", "Pile Cap");
+createSeries("value3", "Pier");
+createSeries("value4", "Pier Head");
+createSeries("value5", "Precast");
+// Create scrollbars
+//chart.scrollbarX = new am4core.Scrollbar();
+//chart.scrollbarY = new am4core.Scrollbar();
+}
+
+
+// Progress Bar Charts //
+// Pile
+function updateChart() {
+var total_pile_tobeC = {
+    onStatisticField: "CASE WHEN (Type = 1 and Status1 = 1) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pile_tobeC",
+    statisticType: "sum"
+    };
+var total_pile_underC = {
+    onStatisticField: "CASE WHEN (Type = 1 and Status1 = 2) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pile_underC",
+    statisticType: "sum"
+    };
+var total_pile_done = {
+    onStatisticField: "CASE WHEN (Type = 1 and Status1 = 4) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pile_done",
+    statisticType: "sum"
+    };
+var total_pile_delayed = {
+    onStatisticField: "CASE WHEN (Type = 1 and Status1 = 3) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pile_delayed",
+    statisticType: "sum"
+    };
+
+// Pile cap
+var total_pilecap_tobeC = {
+    onStatisticField: "CASE WHEN (Type = 2 and Status1 = 1) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pilecap_tobeC",
+    statisticType: "sum"
+    };
+var total_pilecap_underC = {
+    onStatisticField: "CASE WHEN (Type = 2 and Status1 = 2) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pilecap_underC",
+    statisticType: "sum"
+    };
+var total_pilecap_done = {
+    onStatisticField: "CASE WHEN (Type = 2 and Status1 = 4) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pilecap_done",
+    statisticType: "sum"
+    };
+var total_pilecap_delayed = {
+    onStatisticField: "CASE WHEN (Type = 2 and Status1 = 3) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pilecap_delayed",
+    statisticType: "sum"
+    };
+
+// Pier
+var total_pier_tobeC = {
+    onStatisticField: "CASE WHEN (Type = 3 and Status1 = 1) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pier_tobeC",
+    statisticType: "sum"
+    };
+var total_pier_underC = {
+    onStatisticField: "CASE WHEN (Type = 3 and Status1 = 2) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pier_underC",
+    statisticType: "sum"
+    };
+var total_pier_done = {
+    onStatisticField: "CASE WHEN (Type = 3 and Status1 = 4) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pier_done",
+    statisticType: "sum"
+    };
+var total_pier_delayed = {
+    onStatisticField: "CASE WHEN (Type = 3 and Status1 = 3) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pier_delayed",
+    statisticType: "sum"
+    };
+
+// Pier Head
+var total_pierhead_tobeC = {
+    onStatisticField: "CASE WHEN (Type = 4 and Status1 = 1) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pierhead_tobeC",
+    statisticType: "sum"
+    };
+var total_pierhead_underC = {
+    onStatisticField: "CASE WHEN (Type = 4 and Status1 = 2) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pierhead_underC",
+    statisticType: "sum"
+    };
+var total_pierhead_done = {
+    onStatisticField: "CASE WHEN (Type = 4 and Status1 = 4) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pierhead_done",
+    statisticType: "sum"
+    };
+var total_pierhead_delayed = {
+    onStatisticField: "CASE WHEN (Type = 4 and Status1 = 3) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_pierhead_delayed",
+    statisticType: "sum"
+    };
+
+// Pre-cast
+var total_precast_tobeC = {
+    onStatisticField: "CASE WHEN (Type = 5 and Status1 = 1) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_precast_tobeC",
+    statisticType: "sum"
+    };
+var total_precast_underC = {
+    onStatisticField: "CASE WHEN (Type = 5 and Status1 = 2) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_precast_underC",
+    statisticType: "sum"
+    };
+var total_precast_done = {
+    onStatisticField: "CASE WHEN (Type = 5 and Status1 = 4) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_precast_done",
+    statisticType: "sum"
+    };
+var total_precast_delayed = {
+    onStatisticField: "CASE WHEN (Type = 5 and Status1 = 3) THEN 1 ELSE 0 END",  // service field for 2015 population
+    outStatisticFieldName: "total_precast_delayed",
+    statisticType: "sum"
+    };
+
+
+var query = viaductLayer.createQuery();
+//query.where = "Stations = 'Tandang Sora'"; // Selected Stations
+query.outStatistics = [total_pile_tobeC, total_pile_underC, total_pile_done, total_pile_delayed,
+                       total_pilecap_tobeC, total_pilecap_underC, total_pilecap_done, total_pilecap_delayed,
+                       total_pier_tobeC, total_pier_underC, total_pier_done, total_pier_delayed,
+                       total_pierhead_tobeC, total_pierhead_underC, total_pierhead_done, total_pierhead_delayed,
+                       total_precast_tobeC, total_precast_underC, total_precast_done, total_precast_delayed];
+query.returnGeometry = true;
+
+viaductLayer.queryFeatures(query).then(function(response){
+  var stats = response.features[0].attributes;
+  
+  // Pile
+  const pile_tobeC = stats.total_pile_tobeC;
+  const pile_underC = stats.total_pile_underC;
+  const pile_done = stats.total_pile_done;
+  const pile_delayed = stats.total_pile_delayed;
+  
+  // Pile cap
+  const pilecap_tobeC = stats.total_pilecap_tobeC;
+  const pilecap_underC = stats.total_pilecap_underC;
+  const pilecap_done = stats.total_pilecap_done;
+  const pilecap_delayed = stats.total_pilecap_delayed;
+
+  // Pier
+  const pier_tobeC = stats.total_pier_tobeC;
+  const pier_underC = stats.total_pier_underC;
+  const pier_done = stats.total_pier_done;
+  const pier_delayed = stats.total_pier_delayed;
+
+  // Pier Head
+  const pierhead_tobeC = stats.total_pierhead_tobeC;
+  const pierhead_underC = stats.total_pierhead_underC;
+  const pierhead_done = stats.total_pierhead_done;
+  const pierhead_delayed = stats.total_pierhead_delayed;
+
+  // Precast
+  const precast_tobeC = stats.total_precast_tobeC;
+  const precast_underC = stats.total_precast_underC;
+  const precast_done = stats.total_precast_done;
+  const precast_delayed = stats.total_precast_delayed;
+
+ // Chart //
+var chart = am4core.create("chartdiv", am4charts.XYChart);
+chart.responsive.enabled = true;
+chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+chart.data = [
+  {
+    category: "Precast",
+    value1: precast_done,
+    value2: precast_underC,
+    value3: precast_tobeC,
+    value4: precast_delayed
+  },
+  {
+    category: "Pier head",
+    value1: pierhead_done,
+    value2: pierhead_underC,
+    value3: pierhead_tobeC,
+    value4: pierhead_delayed
+  },
+  {
+    category: "Pier",
+    value1: pier_done,
+    value2: pier_underC,
+    value3: pier_tobeC,
+    value4: pier_delayed
+  },
+  {
+    category: "Pilecap",
+    value1: pilecap_done,
+    value2: pilecap_underC,
+    value3: pilecap_tobeC,
+    value4: pilecap_delayed
+  },
+  {
+    category: "Pile",
+    value1: pile_done,
+    value2: pile_underC,
+    value3: pile_tobeC,
+    value4: pile_delayed
+  }
+];
+ 
+chart.colors.step = 2;
+chart.padding(10, 10, 10, 10);
+
+//** Legend Properties
+const LegendFontSizze = 16;
+chart.legend = new am4charts.Legend();
+chart.legend.valueLabels.template.align = "right"
+chart.legend.valueLabels.template.textAlign = "end";  
+
+chart.legend.position = "bottom";
+chart.legend.labels.template.fontSize = LegendFontSizze;
+chart.legend.labels.template.fill = "#ffffff";
+chart.legend.valueLabels.template.fill = am4core.color("#ffffff"); 
+chart.legend.valueLabels.template.fontSize = LegendFontSizze;
+
+/// Legend marker size, shape, and color
+var marker = chart.legend.markers.template.children.getIndex(0);
+var markerTemplate = chart.legend.markers.template;
+marker.cornerRadius(12, 12, 12, 12);
+marker.strokeWidth = 1;
+marker.strokeOpacity = 1;
+marker.stroke = am4core.color("#ccc");
+
+markerTemplate.width = 16;
+markerTemplate.height = 16;
+
+//** Category Axis Properties
+var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+categoryAxis.dataFields.category = "category";
+categoryAxis.renderer.grid.template.location = 0;
+categoryAxis.renderer.labels.template.fontSize = 20;
+categoryAxis.renderer.labels.template.fill = "#ffffff";
+categoryAxis.renderer.minGridDistance = 5; //can change label
+categoryAxis.renderer.inversed = true;
+categoryAxis.renderer.grid.template.disabled = true;
+categoryAxis.renderer.grid.template.strokeOpacity = 1;
+categoryAxis.renderer.grid.template.stroke = am4core.color("#FFFFFFFF");
+categoryAxis.renderer.grid.template.strokeWidth = 1.5;
+categoryAxis.renderer.line.strokeOpacity = 1;
+categoryAxis.renderer.line.strokeWidth = 0;
+categoryAxis.renderer.line.stroke = am4core.color("#FFFFFFFF");
+
+// Value Axis
+var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+valueAxis.min = 0;
+valueAxis.max = 100;
+valueAxis.strictMinMax = true;
+valueAxis.calculateTotals = true;
+valueAxis.renderer.minWidth = 50;
+valueAxis.renderer.labels.template.fontSize = 14;
+valueAxis.renderer.labels.template.fill = "#ffffff";
+valueAxis.renderer.line.strokeOpacity = 1;
+valueAxis.renderer.line.strokeWidth = 0;
+valueAxis.renderer.line.stroke = am4core.color("#FFFFFF");
+
+// Chart Title
+let title = chart.titles.create();
+title.text = "Construction Progress";
+title.fontSize = 27;
+title.fontWeight = "bold";
+title.fill = am4core.color("#ffffff");
+title.marginTop = 3;
+title.marginBottom = 10;
+
+// Create series function for bar chart
+function createSeries(field, name) {
+  var series = chart.series.push(new am4charts.ColumnSeries());
+  series.calculatePercent = true;
+  series.dataFields.valueX = field;
+  series.dataFields.categoryY = "category";
+  series.stacked = true;
+  series.dataFields.valueXShow = "totalPercent";
+  series.dataItems.template.locations.categoryY = 0.5;
+
+  // Bar chart line color and width
+  series.columns.template.stroke = am4core.color("#ffffff");
+  series.columns.template.strokeWidth = 0.1;
+  series.name = name;
+
+  // hover labels Properties
+  var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+
+  // Define label-bullet properries for each construction status
+  if (name == "To be Constructed"){
+    series.fill = am4core.color("#000000");
+    labelBullet.locationX = 0.5;
+    labelBullet.label.text = "";
+    //labelBullet.label.fill = am4core.color("#00FFFFFF");
+    labelBullet.label.text = "";
+    labelBullet.label.fill = am4core.color("#000000");
+    labelBullet.interactionsEnabled = false;
+    labelBullet.label.fontSize = 20;
+    labelBullet.locationX = 0.5;
+
+  } else if (name == "Under Construction"){
+    series.fill = am4core.color("#c2c2c2");
+    labelBullet.locationX = 0.5;
+    labelBullet.label.text = "";
+    labelBullet.label.fill = am4core.color("#ffffff");
+    labelBullet.interactionsEnabled = false;
+    labelBullet.label.fontSize = 20;
+    labelBullet.locationX = 0.5;
+
+  } else if (name == "Completed"){
+    series.fill = am4core.color("#0070ff");
+    labelBullet.locationX = 0.5;
+    labelBullet.label.text = "{valueX.totalPercent.formatNumber('#.')}%";
+    labelBullet.label.fill = am4core.color("#ffffff");
+    labelBullet.interactionsEnabled = false;
+    labelBullet.label.fontSize = 20;
+    labelBullet.locationX = 0.5;
+
+  } else {
+    series.fill = am4core.color("#ff0000"); // delayed
+    labelBullet.locationX = 0.5;
+    labelBullet.label.text = "";
+    labelBullet.label.fill = am4core.color("#ffffff");
+    labelBullet.interactionsEnabled = false;
+    labelBullet.label.fontSize = 20;
+    labelBullet.locationX = 0.5; 
+  }
+  series.columns.template.width = am4core.percent(60);
+  series.columns.template.tooltipText = "[font-size:12px]{name}: {valueX.value.formatNumber('#.')}"
+ 
+// Click chart and filter, update maps
+series.columns.template.events.on("hit", filterByChart, this);
+  function filterByChart(ev) {
+    const selectedC = ev.target.dataItem.component.name;
+    const selectedP = ev.target.dataItem.categoryY;
+
+    // Layer
+    if (selectedP == "Precast") {
+      selectedLayer = 5;
+
+    } else if (selectedP == "Pier head") {
+      selectedLayer = 4;
+
+    } else if (selectedP == "Pier") {
+      selectedLayer = 3;
+
+    } else if (selectedP == "Pilecap") {
+      selectedLayer = 2;
+
+    } else if (selectedP == "Pile") {
+      selectedLayer = 1;
+
+    } else {
+      selectedLayer = null;
+    }
+
+    var highlight = null;
+    
+    // Update layerView based on viaduct components being selected
+    view.whenLayerView(viaductLayer).then(function (viaductLayerView) {
+      viaductLayerView.filter = {
+        where: "Type = " + selectedLayer // + " AND " +  "Status1 = " + selectedStatus
+        //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'" 
+      };
+      
+      viaductLayerView.queryFeatures().then(function(results) {
+        const ggg = results.features;
+        const rowN = ggg.length;
+        
+        // Extract and obtain OBJECTID
+        let objID = [];
+        for (var i=0; i< rowN; i++) {
+          var obj = results.features[i].attributes.OBJECTID;
+          objID.push(obj);
+        }
+
+        /*
+
+        // Query Extent
+        var queryExt = new Query({
+          objectIds: objID
+        });
+        
+        viaductLayerView.queryExtent(queryExt).then(function(result) {
+          if (result.extent) {
+            view.goTo(result.extent)
+          }
+        });
+        
+        if (highlight) {
+          highlight.remove();
+        }
+        highlight = viaductLayerView.highlight(objID);
+        */
+       
+        // Reset selection by clicking anywhere on the map
+        view.on("click", function() {
+          viaductLayerView.filter = null;
+          // highlight.remove();
+        });
+      });
+    }); // whenLayerView
+  } // End of filterByChart
+} // End of createSeries function
+
+createSeries("value1", "Completed");
+createSeries("value2", "Under Construction");
+createSeries("value3", "To be Constructed");
+createSeries("value4", "Delayed");
+});
+
+} // end of updateChart()  
+
+}); // end am4core.ready()
+
+// Editor: enable when necessary
+/*
+view.when(function () {
+  view.popup.autoOpenEnabled = true; //disable popups
+  // Create the Editor
+  const editor = new Editor({
+    view: view
+  });
+  // Add widget to top-right of the view
+  view.ui.add(editor, "top-right");
+});
+*/
+
+// Monthly Progress Chart 
+const progressExpand = new Expand({
+  view: view,
+  content: document.getElementById("monthlyProgressChartDiv"),
+  expandIconClass: "esri-icon-filter"
+});
+
+// LayerList and Add legend to the LayerList
+var layerList = new LayerList({
+  view: view,
+  listItemCreatedFunction: function(event) {
+    const item = event.item;
+    if (item.title === "Chainage"){
+      item.visible = false
+    }
+  }
+});
+
+// Legend
+var legend = new Legend({
+  view: view,
+  container: document.getElementById("legendDiv"),
+  layerInfos: [
+    {
+      layer: rowLayer,
+      title: "PROW"
+    },
+    {
+      layer: chainageLayer,
+      title: "chainage"
+    },
+    {
+      layer: PierNoLayer,
+      title: "Pier No."
+    }
+  ]
+});
+var legendExpand = new Expand({
+    view: view,
+    content: legend,
+    expandIconClass: "esri-icon-legend",
+    group: "bottom-right"
+});
+view.ui.add(legendExpand, {
+    position: "top-right"
+});
+
+var layerListExpand = new Expand ({
+  view: view,
+  content: layerList,
+  expandIconClass: "esri-icon-visible",
+  group: "bottom-left"
+});
+view.ui.add(layerListExpand, {
+  position: "top-left"
+});
+
+// Empty top-left widget
+view.ui.empty("top-left");
+
+// See-through-Ground
+view.when(function() {
+  // allow navigation above and below the ground
+  map.ground.navigationConstraint = {
+    type: "none"
+  };
+  // the webscene has no basemap, so set a surfaceColor on the ground
+  map.ground.surfaceColor = "#fff";
+          
+  // to see through the ground, set the ground opacity to 0.4
+  map.ground.opacity = 0.9;
+});
+          
+document.getElementById("opacityInput")
+        .addEventListener("change", function(event) {
+          map.ground.opacity = event.target.checked ? 0.1 : 0.6;
+        });
+view.ui.add("menu", "bottom-left");
+
+//Search Widget 
+var searchWidget = new Search({
+  view: view,
+  locationEnabled: false,
+  allPlaceholder: "Chainage or Utility ID",
+  includeDefaultSources: false,
+  sources: [
+    {
+      layer: chainageLayer,
+      searchFields: ["KmSpot"],
+      displayField: "KmSpot",
+      exactMatch: false,
+      outFields: ["KmSpot"],
+      name: "Main KM",
+      placeholder: "example: 80+400"
+  },
+  {
+      layer: viaductLayer,
+      searchFields: ["PierNumber"],
+      displayField: "PierNumber",
+      exactMatch: false,
+      outFields: ["PierNumber"],
+      name: "Pier No.",
+      placeholder: "example: PLK-01"
+  },
+  {
+      layer: viaductLayer,
+      searchFields: ["OBJECTID"],
+      displayField: "OBJECTID",
+      exactMatch: false,
+      outFields: ["OBJECTID"],
+      name: "OBJECTID",
+      placeholder: "example: 12617"
+  }
+]
+});
+
+const searchExpand = new Expand({
+  view: view,
+  content: searchWidget,
+  expandIconClass: "esri-icon-search"
+});
+view.ui.add(searchExpand, {
+  position: "top-right"
+});
+
+searchExpand.watch("expanded", function() {
+  if(!searchExpand.expanded) {
+    searchWidget.searchTerm = null;
+  }
+});
+
+// Full screen widget
+view.ui.add(
+  new Fullscreen({
+    view: view,
+    element: applicationDiv
+    //element: viewDiv // if you change element to viewDiv, only viewDiv panel is fully expanded
+    // this is good for demonstration, as this removes header and chart panels.
+  }),
+  "top-left"
+);
+
+// Compass
+var compassWidget = new Compass({
+  view: view
+});
+view.ui.add(compassWidget, "top-left");
+});
+
+</script>
+</head>
+<body class="sassy-theme">
+  <div id="applicationDiv">
+    <div id="headerDiv">
+      <div id="headerTitleDiv">N2 Viaduct Construction</div>
+      <div class="dateDiv">
+        <h4>As of June 6, 2022</h4>
+      </div>
+      <div class="cpButtonBox">
+        <div id="cpButton" class="cpButtonClass">
+          <label for="cpButton"></label>
+          <input type="radio" id="N-01" name="cpButton" checked/> N-01
+          <input type="radio" id="N-02" name="cpButton"> N-02
+          <input type="radio" id="N-03" name="cpButton"> N-03
+          <input type="radio" id="N-04" name="cpButton"> N-04
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="boxB">
+        <div id="viewDiv"></div>
+        <div id="menu" class="esri-widget">
+          <input type="checkbox" id="opacityInput" unchecked />
+          <label for="opacityInput">See through ground</label>
+        </div>
+      </div>
+      <div class="boxA">
+        <div id="chartPanel">
+          <div id="chartdiv"></div>
+          <div id="optionsDiv" class="esri-widget">
+            <div><b>Total Progress</b></div>
+            <h6 id="totalProgress"></h6>
+          </div>
+        </div>
+      </div>
+      <div id="monthlyProgressChartDiv"></div>
+    </div>
+  </div>
+</body>
+</html>
