@@ -19,7 +19,7 @@
 
     <script>
       require(["esri/Map", "esri/views/SceneView", "esri/layers/BuildingSceneLayer"], (Map, SceneView, BuildingSceneLayer) => {
-    
+
 
         // Create Map
         const map = new Map({
@@ -32,7 +32,7 @@
           container: "viewDiv",
           map: map,
           camera: {
-            position: [4.479712, 51.904454, 300],
+            position: [120.57930, 15.18, 500],
             tilt: 65,
             
           }
@@ -41,7 +41,7 @@
         // Create SceneLayer and add to the map
         const buildingLayer = new BuildingSceneLayer({
           portalItem: {
-            id: "86111fd4d4804be59334121131a86b5e"
+            id: "d377e8049a0f4f56ab0f3fe61978682c"
           },
         });
         map.add(buildingLayer);

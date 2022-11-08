@@ -1,0 +1,49 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>ArcGIS API for JavaScript Tutorials: Display a web scene</title>
+  <style>
+    html, body, #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.24"></script>
+  <script>
+    require([
+
+      "esri/config",
+
+      "esri/Map",
+      "esri/MapView",
+
+      "esri/WebScene",
+      "esri/views/SceneView",
+      "esri/widgets/Legend"
+
+    ], function(esriConfig,WebScene, SceneView, Legend) {
+
+     esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
+
+     const webscene = new WebScene({
+        portalItem: {
+          id: "d377e8049a0f4f56ab0f3fe61978682c"
+        }
+      });
+
+      const view = new SceneView({
+        container: "viewDiv",
+        map: webscene
+      });
+
+    });
+  </script>
+</head>
+<body>
+  <div id="viewDiv"></div>
+</body>
+</html>

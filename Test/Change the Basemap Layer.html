@@ -1,0 +1,74 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS API for JavaScript Tutorials: Change the Basemap Layer</title>
+
+    <style>
+        html,
+
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.24/"></script>
+
+    <script>
+        require([
+            "esri/config",
+            "esri/Map",
+            "esri/views/MapView",
+
+            "esri/widgets/BasemapToggle",
+            "esri/widgets/BasemapGallery"
+
+        ], function (esriConfig, Map, MapView, BasemapToggle, BasemapGallery) {
+
+            esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
+
+            const map = new Map({
+                basemap: "arcgis-topographic"
+            });
+
+            const view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-118.80543, 34.02700],
+                zoom: 13
+            });
+
+            const basemapToggle = new BasemapToggle({
+                view: view,
+                nextBasemap: "arcgis-imagery"
+            });
+
+            view.ui.add(basemapToggle, "bottom-right");
+
+            const basemapGallery = new BasemapGallery({
+                view:view,
+                source:{
+                    query:{
+                        title: '"World Basemaps for Developers" AND owner:esri'
+                    }
+                }
+            });
+            view.ui.add(basemapGallery, "top-right");
+
+        });
+    </script>
+
+
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+</body>
+
+</html>

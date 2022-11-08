@@ -727,7 +727,7 @@ if (document.getElementById("N-01").checked = true) {
     viaductLayer.definitionExpression = "CP = 'N-01'";
     PierNoLayer.definitionExpression = "CP = 'N-01'";
     zoomToLayer(viaductLayer);
-    MonthlyProgressChart();
+    summaryStats().then(MonthlyProgressChart);
     updateChart();
     perCpProgress();
 }
@@ -773,20 +773,114 @@ function filterByTest(event) {
 
 // Time line bar charts //
 // This stacked bar charnts show monthly construction progress by year and components
+//************************************
+// Define Year, Month, and Types
+const years = [2021,2022];
+const months = [1,2,3,4,5,6,7,8,9,10,11,12];
+const typesN = [1,2,3,4,5];
 
-function MonthlyProgressChart(){
+const pile_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const pile_2022 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
 
-// Note that the following arrays are derived from python code which is run in ArcGIS Pro
-const pile_2021 = {1: [2], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [2], 8: [52], 9: [120], 10: [197], 11: [296], 12: [229]};
-const pileC_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [1], 10: [2], 11: [9], 12: [7]};
-const pier_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [5], 12: [5]};
-const pierH_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
-const precast_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: [1]};
-const pile_2022 = {1: [268], 2: [166], 3: [166], 4: [157], 5: [119], 6: [17], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
-const pileC_2022 = {1: [10], 2: [15], 3: [17], 4: [17], 5: [14], 6: [3], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
-const pier_2022 = {1: [5], 2: [8], 3: [11], 4: [12], 5: [16], 6: [2], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
-const pierH_2022 = {1: [], 2: [3], 3: [9], 4: [6], 5: [6], 6: [3], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
-const precast_2022 = {1: [1], 2: [], 3: [4], 4: [2], 5: [2], 6: [1], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const pileC_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const pileC_2022 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+
+const pier_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const pier_2022 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+
+const pierH_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: [],};
+const pierH_2022 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: [],};
+
+const precast_2021 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+const precast_2022 = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []};
+
+// Length of Year and Month array
+var ylength = years.length;
+var mlength = months.length;
+var arr = new Array();
+
+// Compile Year and Month in an empty Array
+for(var i=years[0]; i<=years[ylength-1]; i++){
+  for(var j=months[0]; j<=months[mlength-1]; j++){
+    var ym = i.toString() + "-" + j.toString();
+    arr.push(new Date(ym).toLocaleDateString('en-ZA'));
+  }
+}
+ 
+// OPTION 1:
+  function summaryStats(){
+    var total_count = {
+    onStatisticField: "CASE WHEN Status1 = 4 THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_count",
+    statisticType: "sum"
+}
+
+  var query = viaductLayer.createQuery();
+  query.where = "Year IS NOT NULL";
+query.outStatistics = [total_count];
+//query.orderByFields = ["Type Year Month"];
+query.groupByFieldsForStatistics = ["Type", "Year", "Month"];
+
+  return viaductLayer.queryFeatures(query).then(function(response) {
+    stats = response.features;
+    
+    stats.forEach((result, index) => {
+      const attributes = result.attributes;
+      const TYPE = attributes.Type;
+      const YEAR = attributes.Year;
+      const MONTH = attributes.Month;
+      const DATE = attributes.end_date;
+      const VALUE = attributes.total_count;
+
+      // Type = 1 (Bored Piles)
+      if(TYPE === 1 && YEAR === 2021){
+        pile_2021[MONTH].push(VALUE);
+
+      } else if (TYPE === 1 && YEAR === 2022){
+        pile_2022[MONTH].push(VALUE);
+
+      } else if (TYPE === 2 && YEAR === 2021){
+        pileC_2021[MONTH].push(VALUE);
+
+      } else if (TYPE === 2 && YEAR === 2022){
+        pileC_2022[MONTH].push(VALUE);
+        
+      } else if (TYPE === 3 && YEAR === 2021){
+        pier_2021[MONTH].push(VALUE);
+        
+      } else if (TYPE === 3 && YEAR === 2022){
+        pier_2022[MONTH].push(VALUE);
+        
+      } else if (TYPE === 4 && YEAR === 2021){
+        pierH_2021[MONTH].push(VALUE);
+        
+      } else if (TYPE === 4 && YEAR === 2022){
+        pierH_2022[MONTH].push(VALUE);
+        
+      } else if (TYPE === 5 && YEAR === 2021){
+        precast_2021[MONTH].push(VALUE);
+        
+      } else if (TYPE === 5 && YEAR === 2022){
+        precast_2022[MONTH].push(VALUE);
+        
+      }
+
+    });
+    return [pile_2021, pile_2022,
+            pileC_2021, pileC_2022,
+            pier_2021, pier_2022,
+            pierH_2021, pierH_2022,
+            precast_2021, precast_2022];
+});
+  }
+//*************************************
+
+function MonthlyProgressChart([pile_2021, pile_2022,
+            pileC_2021, pileC_2022,
+            pier_2021, pier_2022,
+            pierH_2021, pierH_2022,
+            precast_2021, precast_2022]){
+
 
 var chart = am4core.create("monthlyProgressChartDiv", am4charts.XYChart);
 
@@ -935,6 +1029,14 @@ chart.data = [
   value3: pier_2022[6],
   value4: pierH_2022[6],
   value5: precast_2022[6]
+},
+{
+  date: new Date(2022, 6),
+  value1: pile_2022[7],
+  value2: pileC_2022[7],
+  value3: pier_2022[7],
+  value4: pierH_2022[7],
+  value5: precast_2022[7]
 }
 ];
 
@@ -1173,7 +1275,87 @@ viaductLayer.queryFeatures(query).then(function(response){
 
  // Chart //
 var chart = am4core.create("chartdiv", am4charts.XYChart);
+///////////////////////////////
+
+// Responsive to screen size
 chart.responsive.enabled = true;
+chart.responsive.useDefault = false
+
+chart.responsive.rules.push({
+  relevant: function(target) {
+    if (target.pixelWidth <= 400) {
+      return true;
+    }
+    
+    return false;
+  },
+  state: function(target, stateId) {
+    
+    if (target instanceof am4charts.Chart) {
+      var state = target.states.create(stateId);
+      state.properties.paddingTop = 0;
+      state.properties.paddingRight = 15;
+      state.properties.paddingBottom = 5;
+      state.properties.paddingLeft = 15;
+      return state;
+    }
+    
+   
+    if (target instanceof am4charts.Legend) {
+      var state = target.states.create(stateId);
+      state.properties.paddingTop = 0;
+      state.properties.paddingRight = 0;
+      state.properties.paddingBottom = 0;
+      state.properties.paddingLeft = 0;
+      state.properties.marginLeft = 0;
+      return state;
+    }
+    
+    if (target instanceof am4charts.AxisRendererY) {
+      var state = target.states.create(stateId);
+      state.properties.inside = false;
+      state.properties.maxLabelPosition = 0.99;
+      return state;
+    }
+    
+    if ((target instanceof am4charts.AxisLabel) && (target.parent instanceof am4charts.AxisRendererY)) { 
+      var state = target.states.create(stateId);
+      state.properties.dy = 0;
+      state.properties.paddingTop = 3;
+      state.properties.paddingRight = 5;
+      state.properties.paddingBottom = 3;
+      state.properties.paddingLeft = 5;
+      
+      // Create a separate state for background
+      target.setStateOnChildren = true;
+      var bgstate = target.background.states.create(stateId);
+      bgstate.properties.fill = am4core.color("#fff");
+      bgstate.properties.fillOpacity = 0;
+      
+      return state;
+    }
+    
+    // if ((target instanceof am4core.Rectangle) && (target.parent instanceof am4charts.AxisLabel) && (target.parent.parent instanceof am4charts.AxisRendererY)) { 
+    //   var state = target.states.create(stateId);
+    //   state.properties.fill = am4core.color("#f00");
+    //   state.properties.fillOpacity = 0.5;
+    //   return state;
+    // }
+    
+    return null;
+  }
+});
+
+
+
+
+
+
+
+
+
+////////////////////////////////
+
 chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
 
 chart.data = [
@@ -1592,7 +1774,7 @@ view.ui.add(compassWidget, "top-left");
     <div id="headerDiv">
       <div id="headerTitleDiv">N2 Viaduct Construction</div>
       <div class="dateDiv">
-        <h4>As of June 6, 2022</h4>
+        <h4>As of July 8, 2022</h4>
       </div>
       <div class="cpButtonBox">
         <div id="cpButton" class="cpButtonClass">
