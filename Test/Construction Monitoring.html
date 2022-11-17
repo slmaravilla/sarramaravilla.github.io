@@ -12,7 +12,9 @@
       margin: 0;
       height: 100%;
       width: 100%;
-    }
+    };
+
+
   </style>
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css" />
@@ -91,6 +93,8 @@
 
           }
         });
+        //end
+
 
         // Create BuildingSceneLayer and add to the map
         var buildingLayer = new BuildingSceneLayer({
@@ -149,11 +153,12 @@
             }
           });
         });
+        //end
 
 
         //Remove deafult widgets on the left
         view.ui.empty("top-left");
-
+        //end
 
         //Adding building explorer
         const buildingExplorer = new BuildingExplorer({
@@ -167,6 +172,9 @@
           phases: false,
           disciplines: true
         };
+        //end
+
+
 
         // Adding OpenStreetMap 3D Buildings
         // Defining the osm 3D building symbol
@@ -199,26 +207,44 @@
           type: "simple",
           symbol: osmSymbol
         }
+        //end
 
-        //Adding LayerList with OSM 3D building being off
+
+        //Add the 3D cities rotterdam
+        var city3D = new SceneLayer ({
+          portalItem: {
+            id: "84c714b47e9140d4afb4a52d46027523"
+          },
+          title: "Esri Netherlands Textured 3D Buildings"
+        });
+        map.add(city3D)
+        //end
+
+
+        //Adding LayerList with OSM 3D building & textured building being off
         var LayerList = new LayerList({
           view: view,
-          listItemCreatedFunction: function(event){
+          listItemCreatedFunction: function (event) {
             const item = event.item;
-            if (item.title === "OpenStreetMap 3D Buildings"){
+            if (item.title === "OpenStreetMap 3D Buildings" ||
+                item.title === "Esri Netherlands Textured 3D Buildings") {
               item.visible = false
             }
           }
         });
 
-        var layerListExpand = new Expand ({
+        var layerListExpand = new Expand({
           view: view,
           content: LayerList,
           expandIconClass: "esri-icon-visible",
           group: "top-right"
         });
 
-        view.ui.add(layerListExpand,"top-right");
+        view.ui.add(layerListExpand, "top-right");
+        //end
+
+        
+
 
       });
   </script>
@@ -226,6 +252,7 @@
 
 <body>
   <div id="viewDiv"></div>
+
 </body>
 
 </html>
