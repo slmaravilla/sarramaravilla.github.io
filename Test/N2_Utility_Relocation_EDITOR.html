@@ -1,0 +1,2931 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
+  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
+  -->
+<title>N2 Utility Relocation</title>
+
+    <style>
+      html,
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: black;       
+      }
+
+      #applicationDiv {
+        display: flex;
+        flex-wrap: wrap;
+        height: 90vh;
+        padding: 10px;
+        margin: 0 auto;
+        box-sizing: border-box;
+      }
+      
+      .container {
+        display: grid;
+          border: solid 2.5px gray;
+          flex-wrap: wrap;
+        height: 90vh;
+        width: 100%;
+        box-sizing: border-box;
+          grid-template-columns: 4fr 1fr;
+          border-right: 0;
+      }
+
+      #headerDiv {
+        font-weight: 400;
+        max-width: 2000px;
+        font-style: normal;
+        font-size: 25px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        color: white;
+        padding: 10px 0px 2px 12px;
+        border: solid 2.5px gray;
+        margin-bottom: 3px;
+        display: grid;
+        grid-template-columns: 40px 250fr 0fr 0fr;
+      }
+
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        background-color: black;
+        flex: 1 1 auto;
+        order: 1;
+        overflow: hidden;
+      }
+
+      .boxA {
+        border: solid 2px gray;
+        display: flex; flex-direction: Column;
+        flex-wrap: wrap;
+        height: 100%;
+        box-sizing: border-box;
+        border-top: 0;
+        border-bottom: 0;
+      }
+
+      #chartTitleDiv {
+        font-weight: 200;
+        text-align: center;
+        font-style: normal;
+        font-size: 22px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        color: white;
+        background-color: rgb(0, 0, 0, 0.5);
+        opacity: 0.9;
+        margin-top: 5px;
+        line-height: 0.5;
+      }
+ 
+      #chartPanel {
+        background: rgb(0, 0, 0, 0);
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-size: 17px;
+        padding: 5px;
+        width: 99%;
+        height: 70%;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+        margin: 3px;
+      }
+
+      #chartdiv {
+          width: 100%;
+          height: 100%;
+          align-items: center;
+          }
+      
+      #cpButton {
+        margin:0;
+        width: 400px;
+        text-align: left;
+        padding: 10px;
+
+      }
+      .cpButtonClass {
+          font-style: normal;
+          width: 350px;
+          font-size: 14px;
+          font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+          color: white;
+          text-align: center;
+          }
+
+      #dataTypeInput {
+        font-size: 14px;
+        border:1px solid rgb(169,169,169, 0.5);
+        margin-top: 20px;
+      }
+
+      .advice {
+          margin-top: 30px;
+          margin-left: 15px;
+          margin-right: 15px;
+          position: relative;
+          width: 75%;
+          line-height: 1.5;
+  }
+
+.label {
+  color: white;
+  vertical-align: super;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 13px;
+}
+
+      p {
+        color: rgb(0, 197, 255);
+        text-align: center;
+        font-weight: bold;
+        font-size: 14px;
+        width: auto;
+        vertical-align: text-bottom;
+        padding: 3px;
+        margin-top: 10px;
+        margin-bottom: 0px;
+      }
+
+      h2 {
+        font-weight: 400;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-style: normal;
+        font-size: 23px;
+        color: white;
+        padding:3px;
+        margin: 0px;
+        vertical-align: text-top;
+      }
+
+      img {
+        padding: 0;
+        margin: 0;
+      }
+
+      h4 {
+        color: rgb(0, 197, 255);
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        text-align: left;
+        font-weight: normal;
+        font-size: 14px;
+        padding-top: 20px;
+        margin: 0;
+        width: 160px;
+        vertical-align: text-bottom;
+      }
+
+      h5 {
+        color: rgb(0, 197, 255);
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        text-align: left;
+        font-weight: normal;
+        font-size: 14px;
+        padding: 0;
+        margin: 0;
+      }
+
+      br{content:' ';}
+      br:after{content:' ';}
+
+      .esri-layer-list__item-toggle-icon,
+     .esri-layer-list__item-title {
+      color: white;
+     }
+
+      .sassy-theme .esri-menu,
+      .sassy-theme .esri-popup__main-container,
+      .sassy-theme .esri-popup .esri-popup__pointer-direction,
+      .sassy-theme .esri-popup .esri-popup__button,
+      .sassy-theme .esri-button,
+      .sassy-theme .esri-input,
+      .sassy-theme .esri-legend,
+      .sassy-theme .esri-layer-list,
+      .sassy-theme .esri-widget a {
+        background-color: rgb(0, 0, 0, 0.7);
+        color: #fff;
+      }
+
+      .sassy-theme .esri-legend__layer-caption {
+    display: none;
+  }
+  
+    </style>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.22/esri/themes/dark/main.css"
+    />
+    <!-- Resources -->
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+    <script src="https://js.arcgis.com/4.22/"></script>
+
+    <script>
+      require([
+        "esri/Basemap",
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/views/SceneView",
+        "esri/layers/FeatureLayer",
+        "esri/views/layers/support/FeatureFilter",
+        "esri/layers/SceneLayer",
+        "esri/layers/Layer",
+        "esri/layers/TileLayer",
+        "esri/layers/VectorTileLayer",
+        "esri/layers/support/LabelClass",
+        "esri/symbols/LabelSymbol3D",
+        "esri/WebMap",
+        "esri/WebScene",
+        "esri/portal/PortalItem",
+        "esri/portal/Portal",
+        "esri/widgets/Legend",
+        "esri/widgets/LayerList",
+        "esri/widgets/Fullscreen",
+        "esri/tasks/GeometryService",
+        "esri/tasks/support/Query",
+        "esri/tasks/QueryTask",
+        "esri/renderers/smartMapping/statistics/summaryStatistics",
+        "esri/tasks/support/StatisticDefinition",
+        "esri/symbols/WebStyleSymbol",
+        "esri/widgets/Expand",
+        "esri/widgets/Editor",
+        "esri/renderers/UniqueValueRenderer",
+        "esri/layers/support/Sublayer",
+        "esri/widgets/Search",
+        "esri/widgets/Compass"
+      ], function(Basemap, Map, MapView, SceneView, 
+                  FeatureLayer, FeatureFilter,
+                  SceneLayer, Layer, TileLayer, VectorTileLayer,
+                  LabelClass, LabelSymbol3D, WebMap,
+                  WebScene, PortalItem, Portal, Legend, LayerList, Fullscreen,
+                  GeometryService, Query, QueryTask, summaryStatistics,
+                  StatisticDefinition, WebStyleSymbol, Expand, Editor,
+                  UniqueValueRenderer, Sublayer, Search, Compass) {
+
+let chartLayerView;
+  const features = [];
+  
+//******************************//
+// Basemap and Scenview Setting //
+//******************************//
+        var basemap = new Basemap({
+        baseLayers: [
+          new VectorTileLayer({
+            portalItem: {
+              id: "8a9ef2a144e8423786f6139408ac3424" // 3a62040541b84f528da3ac7b80cf4a63
+            }
+          })
+        ]
+      });
+
+         var map = new Map({
+              basemap: basemap, // "streets-night-vector", 
+              ground: "world-elevation"
+        }); 
+        //map.ground.surfaceColor = "#FFFF";
+        //map.ground.opacity = 0.5;
+         
+        var view = new SceneView({
+            map: map,
+            container: "viewDiv",
+            viewingMode: "local",
+            camera: {
+                position: {
+                    x: 120.57930,
+                    y: 15.18,
+                    z: 500
+                    },
+                    tilt: 65
+                    },
+            environment: {
+                background: {
+                    type: "color", // autocasts as new ColorBackground()
+                    color: [0, 0, 0, 1]
+                    },
+                    // disable stars
+                    starsEnabled: false,
+                    //disable atmosphere
+                    atmosphereEnabled: false
+                    }
+        });
+
+        function shiftCamera(deg) {
+          var camera = view.camera.clone();
+          camera.position.longitude += deg;
+          return camera;
+        }
+
+        function catchAbortError(error) {
+          if (error.name != "AbortError") {
+            console.error(error);
+          }
+        }
+           // Setup UI
+        var chartTitleDiv = document.getElementById("chartTitleDiv");
+        var headerDiv = document.getElementById("headerDiv");
+        var headerTitleDiv = document.getElementById("headerTitleDiv");
+        var applicationDiv = document.getElementById("applicationDiv");
+
+
+//*******************************//
+// Label Class Property Settings //
+//*******************************//
+// Chainage Label
+var labelChainage = new LabelClass({
+  labelExpressionInfo: {expression: "$feature.KM_MAIN"},
+  symbol: {
+    type: "text",
+    color: [85, 255, 0],
+    size: 25
+  }
+});
+
+// Station Label
+var labelClass = new LabelClass({
+          symbol: {
+            type: "label-3d",// autocasts as new LabelSymbol3D()
+            symbolLayers: [
+              {
+                type: "text", // autocasts as new TextSymbol3DLayer()
+                material: {
+                  color: "white"
+                },
+                size: 15,
+                color: "black",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  family: "Ubuntu Mono",
+                  //weight: "bold"
+                },
+              }
+            ],
+            verticalOffset: {
+              screenLength: 40,
+              maxWorldLength: 100,
+              minWorldLength: 20
+            },
+
+          },
+          labelPlacement: "above-center",
+          labelExpressionInfo: {
+            expression: 'DefaultValue($feature.Station, "no data")'
+            //value: "{TEXTSTRING}"
+        }
+        });
+
+// Utility Point Label
+var labelUtilPtSymbol = {
+  type: "label-3d", // autocasts as new LabelSymbol3D()
+  labelPlacement: "above-center",
+  labelExpressionInfo: {
+    //value: "{Company}",
+    expression: "When($feature.Status == 0, DomainName($feature, 'Comp_Agency'), '')" //$feature.Comp_Agency
+  },
+  symbolLayers: [
+    {
+      type: "text", // autocasts as new TextSymbol3DLayer()
+      material: {
+        color: "black"
+      },
+      halo: {
+        color: [255, 255, 255, 0.7],
+        size: 2
+      },
+      size: 10
+    }
+  ],
+
+};
+
+// Utility Line Label
+
+var testLineLabelClass = {
+  type: "label-3d", // autocasts as new LabelSymbol3D()
+  labelPlacement: "above-center", // Polyline has not choice
+  labelExpressionInfo: {
+    expression: "When($feature.Status == 0, DomainName($feature, 'Comp_Agency'), '')"
+  },
+  symbolLayers: [
+    {
+      type: "text", // autocasts as new TextSymbol3DLayer()
+      material: {
+        color: "black"
+      },
+      halo: {
+        color: [255, 255, 255, 0.7],
+        size: 2
+      },
+      size: 10
+    }
+  ],
+};
+
+//*****************************//
+// 3D Web Symbo Style Settings //
+//*****************************//
+
+// Esri Icon Symbol
+        function IconSymbol(name) {
+          return {
+            type: "web-style", // autocasts as new WebStyleSymbol()
+            name: name,
+            styleName: "EsriIconsStyle"//EsriRealisticTransportationStyle, EsriIconsStyle
+          };
+        }
+
+// Utility Point Symbol
+/// https://developers.arcgis.com/javascript/latest/guide/esri-web-style-symbols-3d/
+function utilPtSymbolInfra(name) {
+  return {
+    type: "web-style",
+    name: name,
+    styleName: "EsriInfrastructureStyle"
+  };
+}
+
+function utilPtSymbolStreet(name) {
+  return {
+    type: "web-style",
+    name: name,
+    styleName: "EsriRealisticStreetSceneStyle"
+  };
+}
+
+function utilPtSymbolIcons(name) {
+  return {
+    type: "web-style",
+    name: name,
+    styleName: "EsriIconsStyle"
+  };
+}
+
+/* custom 3D Web Style for Utility Pole */
+// Choice: 3D_Electric_Pole, 3D_Drain_Box, 3D_Water_Valve, 3D_Telecom_BTS, 3D_TelecomCATV_Pole
+
+function customSymbol3D(name) {
+  return {
+    type: "web-style",
+    portal: "https://www.maps.arcgis.com",
+
+    // IMPORTANT: Your browser needs to be able to open the following link. It will say insecure so need to go to advanced.
+    styleUrl: "https://www.maps.arcgis.com/sharing/rest/content/items/c04d4d4145f64f8fa38407dd5331dd1f/data",
+    name: name
+  };
+}
+
+
+/* Company and Utilty Relocation Status Symbols with Callout */
+var verticalOffsetExisting = {
+  screenLength: 10,
+  maxWorldLength: 10,
+  minWorldLength: 15
+};
+
+var verticalOffsetRelocation = {
+  screenLength: 10,
+  maxWorldLength: 30,
+  minWorldLength: 35
+};
+
+
+          // Function that automatically creates the symbol for the points of interest
+          function getUniqueValueSymbol(name, color, sizeS, util) {
+          // The point symbol is visualized with an icon symbol. To clearly see the location of the point
+          // we displace the icon vertically and add a callout line. The line connects the offseted symbol with the location
+          // of the point feature.
+          if (util == "Existing") {
+            return {
+            type: "point-3d", // autocasts as new PointSymbol3D()
+            symbolLayers: [
+              {
+                type: "icon", // autocasts as new IconSymbol3DLayer()
+                resource: {
+                  href: name
+                },
+                size: sizeS,
+                outline: {
+                  color: "white",
+                  size: 2
+                }
+              }
+            ],
+
+            verticalOffset: verticalOffsetExisting,
+
+            callout: {
+              type: "line", // autocasts as new LineCallout3D()
+              color: "grey",
+              size: 0.4,
+              border: {
+                color: "grey"
+              }
+            }
+          };
+          } else {
+            return {
+            type: "point-3d", // autocasts as new PointSymbol3D()
+            symbolLayers: [
+              {
+                type: "icon", // autocasts as new IconSymbol3DLayer()
+                resource: {
+                  href: name
+                },
+                size: sizeS,
+                outline: {
+                  color: "white",
+                  size: 2
+                }
+              }
+            ],
+
+            verticalOffset: verticalOffsetRelocation,
+
+            callout: {
+              type: "line", // autocasts as new LineCallout3D()
+              color: "grey",
+              size: 0.4,
+              border: {
+                color: "grey"
+              }
+            }
+          };
+          }
+
+        }
+
+
+//*****************************//
+//      Renderer Settings      //
+//*****************************//
+
+// Chainage symbol
+var chainageRenderer = {
+    type: "simple",
+    symbol: {
+      type: "simple-marker",
+      size: 5,
+      color: [255, 255, 255, 0.9],
+      outline: {
+        width: 0.2,
+        color: "black"
+      }
+    }
+  };
+
+// Station
+var stationsRenderer = {
+          type: "unique-value", // autocasts as new UniqueValueRenderer()
+          field: "Station",
+          defaultSymbol: IconSymbol("Train"),//Backhoe, Train
+        };
+
+// Utility Point
+/* 3D Web Style */
+var utilTypePtRenderer = {
+          type: "unique-value", //"unique-value", "simple"
+          //field: "UtilType2",
+          //defaultSymbol: IconSymbol("Train"),
+          //valueExpression: "When($feature.UtilType == 1, 'Telecom', $feature.UtilType == 2, 'Water',$feature.UtilType == 3, 'Power', $feature.UtilType)",
+          valueExpression: "When($feature.UtilType2 == 1, 'Telecom Pole (BTS)', $feature.UtilType2 == 2, 'Telecom Pole (CATV)', $feature.UtilType2 == 3, 'Water Meter', \
+                                 $feature.UtilType2 == 4, 'Water Valve', $feature.UtilType2 == 5, 'Manhole', $feature.UtilType2 == 6, 'Drain Box', \
+                                 $feature.UtilType2 == 7, 'Electric Pole', $feature.UtilType2 == 8, 'Street Light', $feature.UtilType)",
+          uniqueValueInfos: [
+            {
+              value: "Telecom Pole (BTS)",
+              symbol: customSymbol3D("3D_Telecom_BTS")
+            },
+            {
+              value: "Telecom Pole (CATV)",
+              symbol: customSymbol3D("3D_TelecomCATV_Pole")
+            },
+            {
+              value: "Manhole",
+              symbol: utilPtSymbolStreet("Storm_Drain")
+            },
+            {
+              value: "Electric Pole",
+              //symbol: utilPtSymbolInfra("Powerline_Pole")
+              symbol: customSymbol3D("3D_Electric_Pole")
+            },
+            {
+              value: "Street Light",
+              symbol: utilPtSymbolStreet("Overhanging_Street_and_Sidewalk_-_Light_on")
+            }
+          ],
+          visualVariables: [
+            {
+              type: "size",
+              axis: "height",
+              field: "SIZE",
+              valueUnit: "meters"
+            },
+            {
+              type: "rotation",
+              field: "ROTATION"
+            },
+            {
+              type: "opacity",
+              //valueExpression: "($feature.Status * $feature.LAYER) / 2",
+              valueExpression: "When($feature.Status == 1 && $feature.LAYER == 1, 0, 1)",
+              field: "SIZE",
+              stops: [
+                {value: 0, opacity: 0.005}, //  want to delete
+                {value: 1, opacity: 1}, // want to visualize
+              ],
+              legendOptions: {
+                showLegend: false
+              }
+            }
+
+          ]
+        };
+
+/* Company and Utilty Relocation Status Symbols with Callout */
+/// Symbol for Utility Existing feature layer
+var utilExistSymbolRenderer = {
+          type: "unique-value", // autocasts as new UniqueValueRenderer()
+          field: "Company",
+          uniqueValueInfos: [
+            {
+              value: "Meralco",
+              symbol: getUniqueValueSymbol(
+                "https://EijiGorilla.github.io/Symbols/Meralco_Gray.png",
+                "#D13470",
+                10,
+                "Existing"
+              )
+            },
+            {
+              value: "Globe",
+              symbol: getUniqueValueSymbol(
+                "https://EijiGorilla.github.io/Symbols/GlobeGray.png",
+                "#D13470",
+                10,
+                "Existing"
+                )
+            }
+          ],
+          visualVariables: [         
+            {
+              type: "opacity",
+              field: "SIZE",
+              stops: [
+                {value: 0, opacity: 0.5},
+                {value: 20, opacity: 0.5},
+              ],
+              legendOptions: {
+                showLegend: false
+              }
+            }
+            
+          ]
+        };
+//IsEmpty($feature.LAYER)
+/// Symbol for Utility Relocated feature layer
+var utilReloSymbolRenderer = {
+          type: "unique-value", // autocasts as new UniqueValueRenderer()
+          valueExpression: "When($feature.Remarks == 'pending', 'NoAction', \
+                                 $feature.Status == 1 && $feature.LAYER == 1, 'DemolishComplete',\
+                                 $feature.Status == 0 && $feature.LAYER == 1, 'DemolishIncomplete',\
+                                 $feature.Status == 0 && $feature.LAYER == 2, 'RelocIncomplete', \
+                                 $feature.Status == 1 && $feature.LAYER == 2, 'RelocComplete', \
+                                 $feature.Status == 0 && $feature.LAYER == 3, 'NewlyAdded', \
+                                 $feature.Status == 1 && $feature.LAYER == 3, 'NewlyAddedComplete',$feature.Comp_Agency)", 
+          //field: "Company",
+          uniqueValueInfos: [
+            {
+              value: "DemolishIncomplete",
+              label: "To be Demolished",
+              symbol: getUniqueValueSymbol(
+                "https://EijiGorilla.github.io/Symbols/Demolished.png",
+                "#D13470",
+                20,
+                "Relocation"
+              )
+            },
+            {
+              value: "DemolishComplete",
+              label: "Demolision Completed",
+              symbol: getUniqueValueSymbol(
+                "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png",
+                "#D13470",
+                25,
+                "Relocation"
+                )
+            },
+            {
+              value: "RelocIncomplete",
+              label: "To be Relocated",
+              symbol: getUniqueValueSymbol(
+                "https://EijiGorilla.github.io/Symbols/Relocatd.png",
+                "#D13470",
+                30,
+                "Relocation"
+                )
+            },
+            {
+              value: "RelocComplete",
+              label: "Relocation Completed",
+              symbol: getUniqueValueSymbol(
+                "https://EijiGorilla.github.io/Symbols/Utility_Relocated_Completed_Symbol.png",
+                "#D13470",
+                30,
+                "Relocation"
+                )
+            },
+            {
+              value: "NewlyAdded",
+              label: "To be Newly Added",
+              symbol: getUniqueValueSymbol(
+                "https://EijiGorilla.github.io/Symbols/NewlyAdded.png",
+                "#D13470",
+                35,
+                "Relocation"
+                )
+            },
+            {
+              value: "NewlyAddedComplete",
+              label: "Newly Added Completed",
+              symbol: getUniqueValueSymbol(
+                "https://EijiGorilla.github.io/Symbols/NewlyAdded_Completed.png",
+                "#D13470",
+                35,
+                "Relocation"
+                )
+            },
+            {
+              value: "NoAction",
+              label: "Require Data Checking",
+              symbol: getUniqueValueSymbol(
+                "https://EijiGorilla.github.io/Symbols/Unknown_v2.png",
+                "#D13470",
+                35,
+                "Relocation"
+                )
+            }
+          ]
+        };
+
+
+// Existing Points
+
+// Utility Line
+/* UniqueValueRenderer for line3D: color, width, and line type*/
+const options = { // Circle
+          profile: "circle",
+          cap: "none",
+          join: "miter",
+          width: 0.5,
+          height: 0.5,
+          //color: [200, 200, 200],
+          profileRotation: "all"
+        };
+
+const options1 = { // rectangular
+    profile: "quad",
+    cap: "none",
+    join: "miter",
+    width: 0.5,
+    height: 0.5,
+    color: [200, 200, 200],
+    profileRotation: "heading"
+};
+
+/* The colors used for the each transit line */
+
+const colorsRelocation = {
+    1: [32,178,170, 0.1], //Telecom Line
+    2: [112,128,144, 0.1], // Internet Cable Line
+    3: [0, 128, 255, 0.5], // Water Distribution Pipe
+    4: [224, 224, 224, 0.3], // Sewage
+    5: [105,105,105, 0.3], // Drainage
+    6: [205,133,63, 0.3], // Canal
+    7: [139,69,19, 0.3], // Creek
+    8: [211,211,211, 0.3] // Elecric Line
+    };
+
+    const colorsExisting = {
+    1: [229, 229, 229, 0.1], //Telecom/CA (Utility TYpe)
+    2: [229, 229, 229, 0.1], // Water
+    3: [229, 229, 229, 0.1], // Power
+    }; 
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+ //*****************************//
+//      Layer Import           //
+//*****************************//
+
+// Centerline and chainage
+var chainageLayer = new FeatureLayer ({
+  portalItem: {
+    id: "590680d19f2e48fdbd8bcddce3aaedb5",
+    portal: {
+      url: "https://gis.railway-sector.com/portal"
+    }
+  },
+  layerId: 5,
+  title: "Chainage",
+  elevationInfo: {
+    mode: "relative-to-ground"
+  },
+  labelingInfo: [labelChainage],
+  renderer: chainageRenderer,
+  outFields: ["*"],
+  popupEnabled: false
+
+});
+//chainageLayer.listMode = "hide";
+map.add(chainageLayer, 1);
+
+// ROW //
+var rowLayer = new FeatureLayer ({
+  portalItem: {
+    id: "590680d19f2e48fdbd8bcddce3aaedb5",
+    portal: {
+      url: "https://gis.railway-sector.com/portal"
+    }
+  },
+  layerId: 1,
+  title: "ROW",
+  definitionExpression: "Extension = 'N2'",
+  popupEnabled: false
+});
+map.add(rowLayer,2);
+
+// Station
+var stationLayer = new SceneLayer({
+            portalItem: {
+                id: "207cb34b8a324b40985b5805862c4b29",
+                portal: {
+                  url: "https://gis.railway-sector.com/portal"
+                }
+            },
+             labelingInfo: [labelClass],
+             renderer: stationsRenderer,
+             elevationInfo: {
+                 // this elevation mode will place points on top of
+                 // buildings or other SceneLayer 3D objects
+                 mode: "relative-to-ground"
+                 }
+             //definitionExpression: "Extension = 'N2'"
+              //screenSizePerspectiveEnabled: false, // gives constant size regardless of zoom
+        });
+        //stationLayer.listMode = "hide";
+        map.add(stationLayer, 0);
+
+// Utility Point
+// To locate a symbol with callout on the ground, 
+// If basemap elevation layer is on, use "relative-to-scene"
+// If basemap elevatio layer is off, use "absolute-height"
+/* 3D Web Style */
+
+var testUtilPt = new FeatureLayer({
+  portalItem: {
+    id: "109d4ef09fd946d1bda17396f35deb94",
+    portal: {
+        url: "https://gis.railway-sector.com/portal"
+    }
+  },
+  layerId: 1,
+  title: "Relocation Plan (Point)",
+   outFields: ["*"],
+   renderer: utilTypePtRenderer,
+   elevationInfo: {
+     mode: "relative-to-scene",
+     featureExpressionInfo: {
+       expression: "$feature.Height"
+  },
+  unit: "meters"
+     //offset: 0
+   },
+   popupTemplate: {
+     title: "<h5>{Comp_Agency}</h5>",
+     lastEditInfoEnabled: false,
+     returnGeometry: true,
+     actions: [
+       {
+        id: "find-relocated",
+        title: "Go to Relocated"
+       }
+     ],
+     content: [
+       {
+         type: "fields",
+         fieldInfos: [
+           {
+             fieldName: "ID"
+           },
+           {
+             fieldName: "UtilType",
+             label: "Utility Type"
+           },
+           {
+             fieldName: "UtilType2",
+             label: "Utility Name"
+           },
+           {
+             fieldName: "LAYER",
+             label: "<h5>Action</h5>"
+           },
+           {
+             fieldName: "Status",
+             label: "<h5>Status</h5>"
+           },
+           {
+             fieldName: "CP"
+           },
+           {
+             fieldName: "Remarks"
+           }
+         ]
+       }
+     ]
+   }
+});
+
+map.add(testUtilPt, 3);
+
+/* Symbols with callout */
+// To locate a symbol with callout on the ground, 
+// If basemap elevation layer is on, use "relative-to-scene"
+// If basemap elevatio layer is off, use "absolute-height"
+
+var testUtilPt1 = new FeatureLayer({
+    portalItem: {
+    id: "109d4ef09fd946d1bda17396f35deb94",
+    portal: {
+        url: "https://gis.railway-sector.com/portal"
+    }
+  },
+  layerId: 1,
+  title: "Utility 3D Render Test",
+   outFields: ["*"],
+   renderer: utilReloSymbolRenderer,
+   elevationInfo: {
+     mode: "relative-to-scene",
+     featureExpressionInfo: {
+       expression: "$feature.Height"
+  },
+  unit: "meters"
+     //offset: 0
+   },
+   labelingInfo: [labelUtilPtSymbol],
+   popupTemplate: {
+     title: "<h5>{comp_agency}</h5>",
+     lastEditInfoEnabled: false,
+     returnGeometry: true,
+     actions: [
+       {
+        id: "find-relocated",
+        title: "Go to Relocated"
+       }
+     ],
+     content: [
+       {
+         type: "fields",
+         fieldInfos: [
+           {
+             fieldName: "ID"
+           },
+           {
+             fieldName: "UtilType",
+             label: "Utility Type"
+           },
+           {
+             fieldName: "UtilType2",
+             label: "Utility Name"
+           },
+           {
+             fieldName: "LAYER",
+             label: "<h5>Action</h5>"
+           },
+           {
+             fieldName: "Status",
+             label: "<h5>Status</h5>"
+           },
+           {
+             fieldName: "cp"
+           },
+           {
+             fieldName: "Remarks"
+           }
+         ]
+       }
+     ]
+   }
+});
+testUtilPt1.listMode = "hide";
+map.add(testUtilPt1);
+
+
+
+// Utility Line
+ var testLine = new FeatureLayer({
+    portalItem: {
+    id: "109d4ef09fd946d1bda17396f35deb94",
+    portal: {
+        url: "https://gis.railway-sector.com/portal"
+    }
+  },
+  layerId: 2,
+   title: "Relocation Plan (Line)",
+   elevationInfo: {
+     mode: "relative-to-scene",
+     featureExpressionInfo: {
+       expression: "$feature.height"
+  },
+  unit: "meters"
+     //offset: 0
+   },
+   outFields: ["*"],
+   popupTemplate: {
+     title: "<h5>{comp_agency}</h5>",
+     lastEditInfoEnabled: false,
+     returnGeometry: true,
+     actions: [
+       {
+        id: "find-relocated-line",
+        title: "Go to Relocated"
+       }
+     ],
+     content: [
+       {
+         type: "fields",
+         fieldInfos: [
+           {
+             fieldName: "id"
+           },
+           {
+             fieldName: "utiltype",
+             label: "Utility Type"
+           },
+           {
+             fieldName: "utiltype2",
+             label: "Utility Name"
+           },
+           {
+             fieldName: "layer",
+             label: "<h5>Action</h5>"
+           },
+           {
+             fieldName: "status",
+             label: "<h5>Status</h5>"
+           },
+           {
+             fieldName: "cp"
+           },
+           {
+             fieldName: "remarks"
+           }
+         ]
+       }
+     ]
+   }
+ });
+ map.add(testLine, 4);
+
+ /* Utility Line rendnerer*/
+ function lineSizeShapeSymbolLayers(profile, cap, join, width, height, profileRotation, property){
+    return {
+            type: "line-3d",
+            symbolLayers: [
+                {
+                    type: "path",
+                      profile: profile,
+                      material: {
+                        color: colorsRelocation[property]
+                      },
+                      width: width,
+                      height: height,
+                      join: join,
+                      cap: cap,
+                      anchor: "bottom",
+                      profileRotation: profileRotation
+                }
+            ]
+    }
+}
+        function rendertestLine() {
+          const renderer = new UniqueValueRenderer({
+            field: "utiltype2"
+          });
+
+          for (let property in colorsRelocation) { // For each utility type 2
+            if (property == 1) { // If utility type2 === Telecom Line
+                renderer.addUniqueValueInfo({
+                value: property,
+                symbol: lineSizeShapeSymbolLayers("circle","none","miter",0.5,0.5,"all", property)
+              });
+
+            } else if (property == 2) { // "Internet Cable Line"
+                renderer.addUniqueValueInfo({
+                value: property,
+                symbol: lineSizeShapeSymbolLayers("circle","none","miter",0.4,0.4,"all", property)
+              });
+
+            } else if (property == 3) { // "Water Distributin Pipe"
+                renderer.addUniqueValueInfo({
+                value: property,
+                symbol: lineSizeShapeSymbolLayers("circle","none","miter", 1, 1, "all", property)
+              });
+  
+            } else if (property == 4) { // "Sewerage"
+                renderer.addUniqueValueInfo({
+                value: property,
+                symbol: lineSizeShapeSymbolLayers("circle","none","miter", 1, 1,"all", property)
+              });
+
+            } else if (property == 5) { // "Drainage"
+                renderer.addUniqueValueInfo({
+                value: property,
+                symbol: lineSizeShapeSymbolLayers("circle","none","miter", 1, 1,"all", property)
+              });
+            
+            } else if (property == 6) { // "Canal"
+                renderer.addUniqueValueInfo({
+                value: property,
+                symbol: lineSizeShapeSymbolLayers("quad","none","miter", 2, 2,"all", property)
+              });
+
+            } else if (property == 7) { // "Creek"
+                renderer.addUniqueValueInfo({
+                value: property,
+                symbol: lineSizeShapeSymbolLayers("circle","none","miter", 1, 1,"all", property)
+              });
+
+            } else if (property == 8) { // "Electric Line"
+                renderer.addUniqueValueInfo({
+                value: property,
+                symbol: lineSizeShapeSymbolLayers("circle","none","miter", 0.3, 0.3,"all", property)
+              });
+
+            } else {// end of 'property == '1'
+              renderer.addUniqueValueInfo({
+                value: property,
+                symbol: lineSizeShapeSymbolLayers("quad","none","miter", 0.3, 0.3,"all", property)
+
+              });
+            }
+            
+
+          }
+
+          testLine.renderer = renderer;
+        }
+
+        rendertestLine();
+
+/*Line for Symbols */
+var testLine1 = new FeatureLayer({
+    portalItem: {
+    id: "109d4ef09fd946d1bda17396f35deb94",
+    portal: {
+        url: "https://gis.railway-sector.com/portal"
+    }
+  },
+  layerId: 2,
+   title: "testLine",
+   elevationInfo: {
+     mode: "relative-to-scene",
+     featureExpressionInfo: {
+       expression: "$feature.height"
+  },
+  unit: "meters"
+     //offset: 0
+   },
+   outFields: ["*"],
+   renderer: utilReloSymbolRenderer,
+   labelingInfo: [testLineLabelClass],
+   popupTemplate: {
+     title: "<h5>{comp_agency}</h5>",
+     lastEditInfoEnabled: false,
+     returnGeometry: true,
+     actions: [
+       {
+        id: "find-relocated-line",
+        title: "Go to Relocated"
+       }
+     ],
+     content: [
+       {
+         type: "fields",
+         fieldInfos: [
+           {
+             fieldName: "id"
+           },
+           {
+             fieldName: "utiltype",
+             label: "Utility Type"
+           },
+           {
+             fieldName: "utiltype2",
+             label: "Utility Name"
+           },
+           {
+             fieldName: "layer",
+             label: "<h5>Action</h5>"
+           },
+           {
+             fieldName: "status",
+             label: "<h5>Status</h5>"
+           },
+           {
+             fieldName: "cp"
+           },
+           {
+             fieldName: "remarks"
+           }
+         ]
+       }
+     ]
+   }
+ });
+ testLine1.listMode = "hide";
+ map.add(testLine1);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// FOR EXPERIMENT
+// Utility Point Existing (this is real dataset)
+/* 3D web Style*/
+
+/*
+ var utilPointExist1 = new FeatureLayer({
+            portalItem: {
+                id: "816c6332f99a4c6f8d27183d9d56c758" // 816c6332f99a4c6f8d27183d9d56c758
+            },
+            title: "Existing Points",
+            elevationInfo: {
+              mode: "relative-to-scene",
+              unit: "meters"
+              //offset: 0
+            },
+            renderer: utilExistSymbolRenderer,//utilExistSymbolRenderer,
+            popupTemplate: {
+              title: "{Company}",
+              lastEditInfoEnabled: false,
+              returnGeometry: true,
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "UtilType",
+                      label: "Utility Type"
+                    }
+                  ]
+                }
+              ]
+            }
+        });
+        //utilPointExist1.listMode = "hide";
+        map.add(utilPointExist1, 5);
+
+
+
+        var utilPointExist2 = new FeatureLayer({
+            portalItem: {
+                id: "816c6332f99a4c6f8d27183d9d56c758"
+            },
+            title: "Existing Points (3D)",
+            elevationInfo: {
+              mode: "on-the-ground",
+              unit: "meters"
+              //offset: 0
+            },
+            renderer: utilTypePtRenderer
+        });
+        utilPointExist2.listMode = "hide";
+        map.add(utilPointExist2);
+  
+// Utility Line Existing (this is real dataset)
+
+var utilLineExist = new FeatureLayer({
+            portalItem: {
+                id: "98fe86a7d2de4565a3b20e848a9b90c6"
+            },
+            title: "Existing Line",
+            elevationInfo: {
+              mode: "relative-to-scene",
+              featureExpressionInfo: {
+                expression: "$feature.Height"
+              },
+              unit: "meters"
+            },
+            outFields: ["*"],
+            popupTemplate: {
+              title: "{Company}",
+              lastEditInfoEnabled: false,
+              returnGeometry: true,
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "UtilType",
+                      label: "Utility Type"
+                    }
+                  ]
+                }
+              ]
+            }
+        });
+        //utilLineExist.listMode = "hide";
+        map.add(utilLineExist, 6);
+
+        function rendertestLineExisting() {
+          const renderer = new UniqueValueRenderer({
+            field: "UtilType"
+          });
+
+          for (let property in colorsExisting) {
+            if (property == 1) {
+              if (colorsExisting.hasOwnProperty(property)) {
+              renderer.addUniqueValueInfo({
+                value: property,
+                symbol: {
+                  type: "line-3d",
+                  symbolLayers: [
+                    {
+                      type: "path",
+                      profile: options1.profile,
+                      material: {
+                        color: colorsExisting[property]
+                      },
+                      width: options1.width,
+                      height: options1.height,
+                      join: options1.join,
+                      cap: options1.cap,
+                      anchor: "bottom",
+                      profileRotation: options1.profileRotation
+                    }
+                  ]
+                }
+              });
+            }
+            } else {// end of 'property == '1'
+            if (colorsExisting.hasOwnProperty(property)) {
+              renderer.addUniqueValueInfo({
+                value: property,
+                symbol: {
+                  type: "line-3d",
+                  symbolLayers: [
+                    {
+                      type: "path",
+                      profile: options.profile,
+                      material: {
+                        color: colorsExisting[property]
+                      },
+                      width: options.width,
+                      height: options.height,
+                      join: options.join,
+                      cap: options.cap,
+                      anchor: "bottom",
+                      profileRotation: options.profileRotation
+                    }
+                  ]
+                }
+              });
+            }
+            }
+            
+
+          }
+
+          utilLineExist.renderer = renderer;
+        }
+        rendertestLineExisting();
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////
+//*******************************//
+//      Progress Chart           //
+//*******************************//
+/* Function for zooming to selected layers */
+function zoomToLayer(layer) {
+  return layer.queryExtent().then(function(response) {
+    view.goTo(response.extent, { //response.extent
+      speedFactor: 2
+    }).catch(function(error) {
+      if (error.name != "AbortError") {
+        console.error(error);
+      }
+    });
+  });
+}
+
+//
+const seasonsNodes = document.querySelectorAll(`.test-item`);
+const testElement = document.getElementById("test-filter");
+const utilTypesButton = document.getElementById("dataTypeInput");
+const cpButtonElement = document.getElementById("cpButton");
+
+let cpArray = [];
+let typeArray = [];
+
+// Start of am4core
+am4core.ready(function() {
+am4core.useTheme(am4themes_animated);
+
+let compileArrayPoint = [];
+let compileArrayLine = [];
+
+const chartTitleLabel = "Relocation Progress";
+// Default label
+chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + "Overall" + "</p>";
+
+// As default, chart shows the progress of all the relocated layers (point + line)
+if (document.getElementById("None").checked = true) {
+  updateChartCombine();
+}
+
+//document.getElementsByTagName('input')[0].checked = true;
+
+document.querySelectorAll('.cpButtonClass').forEach(item => {
+    item.addEventListener("change", filterByChartTypes);
+    function filterByChartTypes(e) {
+        const selectedTypes = e.target.id; // e.g., "N-01"
+        const itemName = item.id; // e.g., "cpButton" class name
+
+        // Start Filtering:
+        if (itemName === "cpButton") {
+          cpArray.push(selectedTypes);
+        } else {
+          typeArray.push(selectedTypes);
+        }
+
+        // Always choose the newest ones
+        cpArrayConcat = cpArray[cpArray.length-1];
+        typeArrayConcat = typeArray[typeArray.length-1];
+
+        if ((cpArrayConcat === undefined && typeArrayConcat === "Point") || (cpArrayConcat === "None" && typeArrayConcat === "Point")) { // [undefined, "Point"] or ["None", "Point"]
+          testUtilPt.definitionExpression = "Type = '" + typeArrayConcat + "'";
+          testUtilPt1.definitionExpression = "Type = '" + typeArrayConcat + "'";
+
+          /* As points and table feature layers do not share the same information for 'Type' (unline CP)*/
+          /* We need to define expression such that lines are disappeard when 'Point' is selected*/
+          testLine.definitionExpression = "Type = 'Point'";
+          testLine1.definitionExpression = "Type = 'Point'";
+
+          chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + "Point" + "</p>";
+          
+          zoomToLayer(testUtilPt);
+          updateChartPoint();
+
+        } else if ((cpArrayConcat === undefined && typeArrayConcat === "Line") || (cpArrayConcat === "None" && typeArrayConcat === "Line")) { // [undefined, "Line"] or ["None", "Line"]
+          testLine.definitionExpression = "Type = '" + typeArrayConcat + "'";
+          testLine1.definitionExpression = "Type = '" + typeArrayConcat + "'";
+          testUtilPt.definitionExpression = "Type = 'Line'";
+          testUtilPt1.definitionExpression = "Type = 'Line'";
+
+          chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + "Line" + "</p>";
+
+          zoomToLayer(testLine);
+          updateChartLine();
+
+        } else if (cpArrayConcat === undefined && typeArrayConcat === "None") { // [undefined, "None"]
+          testLine.definitionExpression = null;
+          testLine1.definitionExpression = null;
+          testUtilPt.definitionExpression = null;
+          testUtilPt1.definitionExpression = null;
+
+          chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + "Overall" + "</p>";
+
+          updateChartCombine();
+
+        } else if (cpArrayConcat === "None" && typeArrayConcat === undefined) { // ["None", undefined]
+        testLine.definitionExpression = null;
+          testLine1.definitionExpression = null;
+          testUtilPt.definitionExpression = null;
+          testUtilPt1.definitionExpression = null;
+
+          chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + "Overall" + "</p>";
+
+          zoomToLayer(testUtilPt);
+          updateChartCombine();
+
+        } else if (typeArrayConcat === undefined) { // ["N-01", undefined]
+          testUtilPt.definitionExpression = "CP = '" + cpArrayConcat + "'";
+          testUtilPt1.definitionExpression = "CP = '" + cpArrayConcat + "'";
+          testLine.definitionExpression = "CP = '" + cpArrayConcat + "'";
+          testLine1.definitionExpression = "CP = '" + cpArrayConcat + "'";
+
+          chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + cpArrayConcat + "</p>";
+
+          zoomToLayer(testUtilPt);
+          updateChartCombine();
+
+        } else if (typeArrayConcat === "Point") { // ["N-01", "Point"]
+          testUtilPt.definitionExpression = "CP = '" + cpArrayConcat + "'";
+          testUtilPt1.definitionExpression = "CP = '" + cpArrayConcat + "'";
+
+          // For disappearing Line
+          testLine.definitionExpression = "Type = '" + typeArrayConcat + "'";
+          testLine1.definitionExpression = "Type = '" + typeArrayConcat + "'";
+
+          chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + cpArrayConcat + ", " + typeArrayConcat + "</p>";
+
+          zoomToLayer(testUtilPt);;
+          updateChartPoint();
+
+        } else if (typeArrayConcat === "Line") { // ["N-01", "Line"]
+          testLine.definitionExpression = "CP = '" + cpArrayConcat + "'";
+          testLine1.definitionExpression = "CP = '" + cpArrayConcat + "'";
+
+          // For disappearing Point
+          testUtilPt.definitionExpression = "Type = '" + typeArrayConcat + "'";
+          testUtilPt1.definitionExpression = "Type = '" + typeArrayConcat + "'";
+
+          chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + cpArrayConcat + ", " + typeArrayConcat + "</p>";
+
+          zoomToLayer(testLine); //CHECK
+          updateChartLine();
+
+          // "None" buttons
+        } else if (cpArrayConcat === "None" && typeArrayConcat === "None") { // ["None", "None"]
+          testLine.definitionExpression = null;
+          testLine1.definitionExpression = null;
+          testUtilPt.definitionExpression = null;
+          testUtilPt1.definitionExpression = null;
+
+          chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + "Overall" + "</p>";
+
+          zoomToLayer(testUtilPt);
+          updateChartCombine();
+        }
+
+        else if (typeArrayConcat === "None") { // ["N-01, "None"]
+          testLine.definitionExpression = "CP = '" + cpArrayConcat + "'";
+          testLine1.definitionExpression = "CP = '" + cpArrayConcat + "'";
+          testUtilPt.definitionExpression = "CP = '" + cpArrayConcat + "'";
+          testUtilPt1.definitionExpression = "CP = '" + cpArrayConcat + "'";
+
+          chartTitleDiv.innerHTML = chartTitleLabel + "<p>" + cpArrayConcat + "</p>";
+
+          zoomToLayer(testUtilPt);
+          updateChartCombine();
+        }
+
+
+
+      }
+    });
+
+// Click event handler for choices
+
+
+/* Create Expand widget for selecting CP and updating chart */
+
+
+// Start of "updateChart" function for Utility Point
+async function updateChartPoint() {
+  // Define statistics
+  /* Telecom/CATV */
+  var total_telecom_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 1 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_telecom_incomp",
+    statisticType: "sum"
+  };
+
+  var total_telecom_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 1 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_telecom_comp",
+    statisticType: "sum"  
+  };
+
+  /* Water */
+  var total_water_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 2 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_water_incomp",
+    statisticType: "sum"
+  };
+
+  var total_water_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 2 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_water_comp",
+    statisticType: "sum"  
+  };
+
+  /* Sewage */
+  var total_sewage_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 3 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_sewage_incomp",
+    statisticType: "sum"
+  };
+
+  var total_sewage_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 3 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_sewage_comp",
+    statisticType: "sum"  
+  };
+
+
+  /* Power */
+  var total_power_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 4 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_power_incomp",
+    statisticType: "sum"
+  };
+
+  var total_power_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 4 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_power_comp",
+    statisticType: "sum"  
+  };
+
+  // Start Query
+  var query = testUtilPt.createQuery();
+  //query.where = "Stations = 'Tandang Sora'"; // Selected Stations
+  query.outStatistics = [total_telecom_incomp, total_telecom_comp,
+                        total_water_incomp, total_water_comp,
+                        total_sewage_incomp, total_sewage_comp,
+                        total_power_incomp, total_power_comp];
+  query.returnGeometry = true;
+
+
+  testUtilPt.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    /* Telecom */
+    const telecom_incomp = stats.total_telecom_incomp;
+    const telecom_comp = stats.total_telecom_comp;
+
+    /* Water */
+    const water_incomp = stats.total_water_incomp;
+    const water_comp = stats.total_water_comp;
+
+     /* Sewage */
+     const sewage_incomp = stats.total_sewage_incomp;
+    const sewage_comp = stats.total_sewage_comp;   
+
+    /* Power */
+    const power_incomp = stats.total_power_incomp;
+    const power_comp = stats.total_power_comp;
+
+// Chart //
+var chart = am4core.create("chartdiv", am4charts.XYChart);
+chart.hiddenState.properties.opacity = 0;
+
+chart.data = [
+  {
+    category: "Telecom/CATV",
+    value1: telecom_comp,
+    value2: telecom_incomp
+  },
+  {
+    category: "Water",
+    value1: water_comp,
+    value2: water_incomp
+  },
+  {
+    category: "Sewage",
+    value1: sewage_comp,
+    value2: sewage_incomp
+  },
+  {
+    category: "Power",
+    value1: power_comp,
+    value2: power_incomp
+  }
+];
+
+chart.colors.step = 2;
+chart.padding(10, 10, 10, 10);
+chart.legend = new am4charts.Legend();
+chart.legend.position = "bottom";
+chart.legend.labels.template.fontSize = 14;
+chart.legend.labels.template.fill = "#ffffff";
+
+var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+categoryAxis.dataFields.category = "category";
+categoryAxis.renderer.grid.template.location = 0;
+categoryAxis.renderer.labels.template.fontSize = 15;
+categoryAxis.renderer.labels.template.fill = "#ffffff";
+categoryAxis.renderer.minGridDistance = 5; //can change label
+
+var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+valueAxis.min = 0;
+valueAxis.max = 100;
+valueAxis.strictMinMax = true;
+valueAxis.calculateTotals = true;
+valueAxis.renderer.minWidth = 50;
+valueAxis.renderer.labels.template.fontSize = 13;
+valueAxis.renderer.labels.template.fill = "#ffffff";
+
+let arrLviews = [];
+
+// Layerview and Expand
+function createSeries(field, name) {
+  var series = chart.series.push(new am4charts.ColumnSeries());
+  series.calculatePercent = true;
+  series.dataFields.valueX = field;
+  series.dataFields.categoryY = "category";
+  series.stacked = true;
+  series.dataFields.valueXShow = "totalPercent";
+  series.dataItems.template.locations.categoryY = 0.5;
+
+    // Bar chart line color and width
+    series.columns.template.stroke = am4core.color("#ffffff");
+  series.columns.template.strokeWidth = 2;
+  series.name = name;
+
+  var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+
+  if (name == "Incomplete"){
+    series.fill = am4core.color("#000000");
+    
+    labelBullet.locationX = 0.5;
+    labelBullet.label.text = "";
+    labelBullet.label.fill = am4core.color("#000000");
+    labelBullet.interactionsEnabled = false;
+    labelBullet.label.fontSize = 13;
+    labelBullet.locationX = 0.5;
+
+  } else {
+    series.fill = am4core.color("#0070ff"); // Completed
+    labelBullet.locationX = 0.5;
+  labelBullet.label.text = "{valueX.totalPercent.formatNumber('#.')}%";
+  labelBullet.label.fill = am4core.color("#ffffff");
+  labelBullet.interactionsEnabled = false;
+  labelBullet.label.fontSize = 13;
+  labelBullet.locationX = 0.5;
+
+  }
+
+  series.columns.template.width = am4core.percent(60);
+  series.columns.template.tooltipText = "[font-size:12px]{name}: {valueX.value.formatNumber('#.')}"
+
+
+  // Click chart and filter, update maps
+  const chartElement = document.getElementById("chartPanel");
+  series.columns.template.events.on("hit", filterByChart, this);
+  function filterByChart(ev) {
+    const selectedC = ev.target.dataItem.component.name;
+    const selectedP = ev.target.dataItem.categoryY;
+
+    // Layer
+
+      if (selectedP == "Telecom/CATV" && selectedC == "Incomplete") {
+      selectedLayer = 1;
+      selectedStatus = 0;
+    } else if (selectedP == "Telecom/CATV" && selectedC == "Complete") {
+      selectedLayer = 1;
+      selectedStatus = 1;
+    } else if (selectedP == "Water" && selectedC == "Incomplete") {
+      selectedLayer = 2;
+      selectedStatus = 0;
+    } else if (selectedP == "Water" && selectedC == "Complete") {
+      selectedLayer = 2;
+      selectedStatus = 1;
+    } else if (selectedP == "Sewage" && selectedC == "Incomplete") {
+      selectedLayer = 3;
+      selectedStatus = 0;
+    } else if (selectedP == "Sewage" && selectedC == "Complete") {
+      selectedLayer = 3;
+      selectedStatus = 1;
+    } else if (selectedP == "Power" && selectedC == "Incomplete") {
+      selectedLayer = 4;
+      selectedStatus = 0;
+    } else if (selectedP == "Power" && selectedC == "Complete") {
+      selectedLayer = 4;
+      selectedStatus = 1;
+    } else {
+      selectedLayer = null;
+    }
+    
+
+    view.when(function() {
+        view.whenLayerView(testUtilPt).then(function (layerView) {
+        chartLayerView = layerView;
+        arrLviews.push(layerView);
+        chartElement.style.visibility = "visible";
+
+        //testUtilPt1.definitionExpression = sqlExpression;
+        testUtilPt.queryFeatures().then(function(results) {
+            const ggg = results.features;
+            const rowN = ggg.length;
+
+            let objID = [];
+            for (var i=0; i < rowN; i++) {
+                var obj = results.features[i].attributes.OBJECTID;
+                objID.push(obj);
+            }
+
+            var queryExt = new Query({
+                objectIds: objID
+            });
+
+            testUtilPt.queryExtent(queryExt).then(function(result) {
+                if (result.extent) {
+                    view.goTo(result.extent)
+                }
+            });
+
+
+            if (highlightSelect) {
+                highlightSelect.remove();
+            }
+            highlightSelect = layerView.highlight(objID);
+
+            view.on("click", function() {
+            layerView.filter = null;
+            highlightSelect.remove();
+        });
+
+        }); // end of query features   
+}); // end of when layerview
+
+// Point: 2
+    view.whenLayerView(testUtilPt1).then(function (layerView) {
+        chartLayerView = layerView;
+        arrLviews.push(layerView);
+        chartElement.style.visibility = "visible";
+
+        view.on("click", function() {
+            layerView.filter = null;
+        });
+
+    }); // end of when layerview
+  }); // end of view.when
+    
+    for(var i = 0; i < arrLviews.length; i++) {
+      arrLviews[i].filter = {
+        where: "UtilType = " + selectedLayer + " AND " +  "Status = " + selectedStatus
+      }
+    }
+ 
+
+  } // End of filterByChart
+
+  // LayerView for point 2
+
+} // End of createSeries function
+// LayerView for point 1
+
+
+// End of LayerView
+// Run createSeries
+createSeries("value1", "Complete");
+createSeries("value2", "Incomplete");
+
+}); // End of queryFeatures
+} // End of updateChartPoint function
+
+
+////////////////////////////
+// UpdateChart for LINE
+// Start of "updateChart" function for Utility Point
+async function updateChartLine() {
+  // Define statistics
+  /* Telecom/CATV */
+  var total_telecom_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 1 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_telecom_incomp",
+    statisticType: "sum"
+  };
+
+  var total_telecom_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 1 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_telecom_comp",
+    statisticType: "sum"  
+  };
+
+  /* Water */
+  var total_water_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 2 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_water_incomp",
+    statisticType: "sum"
+  };
+
+  var total_water_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 2 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_water_comp",
+    statisticType: "sum"  
+  };
+
+    /* Sewage */
+    var total_sewage_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 3 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_sewage_incomp",
+    statisticType: "sum"
+  };
+
+  var total_sewage_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 3 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_sewage_comp",
+    statisticType: "sum"  
+  };
+
+  /* Power */
+  var total_power_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 4 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_power_incomp",
+    statisticType: "sum"
+  };
+
+  var total_power_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 4 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_power_comp",
+    statisticType: "sum"  
+  };
+
+  // Start Query
+  var query = testLine.createQuery();
+  //query.where = "Stations = 'Tandang Sora'"; // Selected Stations
+  query.outStatistics = [total_telecom_incomp, total_telecom_comp,
+                        total_water_incomp, total_water_comp,
+                        total_sewage_incomp, total_sewage_comp,
+                        total_power_incomp, total_power_comp];
+  query.returnGeometry = true;
+
+ testLine.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    /* Telecom */
+    const telecom_incomp = stats.total_telecom_incomp;
+    const telecom_comp = stats.total_telecom_comp;
+
+    /* Water */
+    const water_incomp = stats.total_water_incomp;
+    const water_comp = stats.total_water_comp;
+
+    /* Sewage */
+    const sewage_incomp = stats.total_sewage_incomp;
+    const sewage_comp = stats.total_sewage_comp;   
+
+    /* Power */
+    const power_incomp = stats.total_power_incomp;
+    const power_comp = stats.total_power_comp;
+
+// Chart //
+var chart = am4core.create("chartdiv", am4charts.XYChart);
+chart.hiddenState.properties.opacity = 0;
+
+chart.data = [
+  {
+    category: "Telecom/CATV",
+    value1: telecom_comp,
+    value2: telecom_incomp
+  },
+  {
+    category: "Water",
+    value1: water_comp,
+    value2: water_incomp
+  },
+  {
+    category: "Sewage",
+    value1: sewage_comp,
+    value2: sewage_incomp
+  },
+  {
+    category: "Power",
+    value1: power_comp,
+    value2: power_incomp
+  }
+];
+
+chart.colors.step = 2;
+chart.padding(10, 10, 10, 10);
+chart.legend = new am4charts.Legend();
+chart.legend.position = "bottom";
+chart.legend.labels.template.fontSize = 14;
+chart.legend.labels.template.fill = "#ffffff";
+
+var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+categoryAxis.dataFields.category = "category";
+categoryAxis.renderer.grid.template.location = 0;
+categoryAxis.renderer.labels.template.fontSize = 15;
+categoryAxis.renderer.labels.template.fill = "#ffffff";
+categoryAxis.renderer.minGridDistance = 5; //can change label
+
+var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+valueAxis.min = 0;
+valueAxis.max = 100;
+valueAxis.strictMinMax = true;
+valueAxis.calculateTotals = true;
+valueAxis.renderer.minWidth = 50;
+valueAxis.renderer.labels.template.fontSize = 13;
+valueAxis.renderer.labels.template.fill = "#ffffff";
+
+let arrLviews = [];
+
+// Layerview and Expand
+function createSeries(field, name) {
+  var series = chart.series.push(new am4charts.ColumnSeries());
+  series.calculatePercent = true;
+  series.dataFields.valueX = field;
+  series.dataFields.categoryY = "category";
+  series.stacked = true;
+  series.dataFields.valueXShow = "totalPercent";
+  series.dataItems.template.locations.categoryY = 0.5;
+
+    // Bar chart line color and width
+    series.columns.template.stroke = am4core.color("#ffffff");
+  series.columns.template.strokeWidth = 2;
+  series.name = name;
+
+  var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+
+  if (name == "Incomplete"){
+    series.fill = am4core.color("#000000");
+    
+    labelBullet.locationX = 0.5;
+    labelBullet.label.text = "";
+    labelBullet.label.fill = am4core.color("#000000");
+    labelBullet.interactionsEnabled = false;
+    labelBullet.label.fontSize = 13;
+    labelBullet.locationX = 0.5;
+
+  } else {
+    series.fill = am4core.color("#0070ff"); // Completed
+    labelBullet.locationX = 0.5;
+  labelBullet.label.text = "{valueX.totalPercent.formatNumber('#.')}%";
+  labelBullet.label.fill = am4core.color("#ffffff");
+  labelBullet.interactionsEnabled = false;
+  labelBullet.label.fontSize = 13;
+  labelBullet.locationX = 0.5;
+
+  }
+  series.columns.template.width = am4core.percent(60);
+  series.columns.template.tooltipText = "[font-size:12px]{name}: {valueX.value.formatNumber('#.')}"
+
+
+  // Click chart and filter, update maps
+  const chartElement = document.getElementById("chartPanel");
+  series.columns.template.events.on("hit", filterByChart, this);
+  function filterByChart(ev) {
+    const selectedC = ev.target.dataItem.component.name;
+    const selectedP = ev.target.dataItem.categoryY;
+
+    // Layer
+
+      if (selectedP == "Telecom/CATV" && selectedC == "Incomplete") {
+      selectedLayer = 1;
+      selectedStatus = 0;
+    } else if (selectedP == "Telecom/CATV" && selectedC == "Complete") {
+      selectedLayer = 1;
+      selectedStatus = 1;
+    } else if (selectedP == "Water" && selectedC == "Incomplete") {
+      selectedLayer = 2;
+      selectedStatus = 0;
+    } else if (selectedP == "Water" && selectedC == "Complete") {
+      selectedLayer = 2;
+      selectedStatus = 1;
+    } else if (selectedP == "Sewage" && selectedC == "Incomplete") {
+      selectedLayer = 3;
+      selectedStatus = 0;
+    } else if (selectedP == "Sewage" && selectedC == "Complete") {
+      selectedLayer = 3;
+      selectedStatus = 1;
+    } else if (selectedP == "Power" && selectedC == "Incomplete") {
+      selectedLayer = 4;
+      selectedStatus = 0;
+    } else if (selectedP == "Power" && selectedC == "Complete") {
+      selectedLayer = 4;
+      selectedStatus = 1;
+    } else {
+      selectedLayer = null;
+    }
+
+    view.when(function() {
+        view.whenLayerView(testLine).then(function (layerView) {
+        chartLayerView = layerView;
+        arrLviews.push(layerView);
+        chartElement.style.visibility = "visible";
+
+        //testLine1.definitionExpression = sqlExpression;
+        testLine1.queryFeatures().then(function(results) {
+            const ggg = results.features;
+            const rowN = ggg.length;
+
+            let objID = [];
+            for (var i=0; i < rowN; i++) {
+                var obj = results.features[i].attributes.OBJECTID;
+                objID.push(obj);
+            }
+
+            var queryExt = new Query({
+                objectIds: objID
+            });
+
+            testLine1.queryExtent(queryExt).then(function(result) {
+                if (result.extent) {
+                    view.goTo(result.extent)
+                }
+            });
+
+            if (highlightSelect) {
+                highlightSelect.remove();
+            }
+            highlightSelect = layerView.highlight(objID);
+
+            view.on("click", function() {
+            layerView.filter = null;
+            highlightSelect.remove();
+        });
+
+        }); // end of query features   
+}); // end of when layerview
+
+// Point: 2
+view.whenLayerView(testLine1).then(function (layerView) {
+        chartLayerView = layerView;
+        arrLviews.push(layerView);
+        chartElement.style.visibility = "visible";
+
+            if (highlightSelect) {
+                highlightSelect.remove();
+            }
+            highlightSelect = layerView.highlight(objID);
+
+        view.on("click", function() {
+            layerView.filter = null;
+            highlightSelect.remove();
+        });
+
+}); // end of when layerview
+    }); // end of view.when
+
+    for(var i = 0; i < arrLviews.length; i++) {
+      arrLviews[i].filter = {
+        where: "UtilType = " + selectedLayer + " AND " +  "Status = " + selectedStatus
+      }
+    }
+
+  } // End of filterByChart
+
+// End of LayerView
+} // End of createSeries function
+
+// Run createSeries
+createSeries("value1", "Complete");
+createSeries("value2", "Incomplete");
+
+}); // End of queryFeatures
+} // End of updateChartLine function
+
+////////////////////////////////////////////////////////////////////////////////////
+// Chart combinging both Points and Lines
+//////////////////////////////////////////////////////////////////////////////////
+function testUtilPtForCombineChart() {
+
+    var total_telecom_incomp1 = {
+    onStatisticField: "CASE WHEN (UtilType = 1 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_telecom_incomp1",
+    statisticType: "sum"
+  };
+
+  var total_telecom_comp1 = {
+    onStatisticField: "CASE WHEN (UtilType = 1 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_telecom_comp1",
+    statisticType: "sum"  
+  };
+
+  /* Water */
+  var total_water_incomp1 = {
+    onStatisticField: "CASE WHEN (UtilType = 2 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_water_incomp1",
+    statisticType: "sum"
+  };
+
+  var total_water_comp1 = {
+    onStatisticField: "CASE WHEN (UtilType = 2 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_water_comp1",
+    statisticType: "sum"  
+  };
+
+    /* Sewage */
+    var total_sewage_incomp1 = {
+    onStatisticField: "CASE WHEN (UtilType = 3 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_sewage_incomp1",
+    statisticType: "sum"
+  };
+
+  var total_sewage_comp1 = {
+    onStatisticField: "CASE WHEN (UtilType = 3 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_sewage_comp1",
+    statisticType: "sum"  
+  };
+
+  /* Power */
+  var total_power_incomp1 = {
+    onStatisticField: "CASE WHEN (UtilType = 4 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_power_incomp1",
+    statisticType: "sum"
+  };
+
+  var total_power_comp1 = {
+    onStatisticField: "CASE WHEN (UtilType = 4 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_power_comp1",
+    statisticType: "sum"  
+  };
+
+  // Start Query
+  var query = testUtilPt.createQuery();
+  query.outStatistics = [total_telecom_incomp1, total_telecom_comp1,
+                        total_water_incomp1, total_water_comp1,
+                        total_sewage_incomp1, total_sewage_comp1,
+                        total_power_incomp1, total_power_comp1];
+  query.returnGeometry = true;
+
+  return testUtilPt.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    /* Telecom */
+    const telecom_incomp1 = stats.total_telecom_incomp1;
+    const telecom_comp1 = stats.total_telecom_comp1;
+
+    /* Water */
+    const water_incomp1 = stats.total_water_incomp1;
+    const water_comp1 = stats.total_water_comp1;
+
+    /* Sewage */
+    const sewage_incomp1 = stats.total_sewage_incomp1;
+    const sewage_comp1 = stats.total_sewage_comp1;   
+
+    /* Power */
+    const power_incomp1 = stats.total_power_incomp1;
+    const power_comp1 = stats.total_power_comp1;
+
+    var compileArrayPoint = [telecom_incomp1, water_incomp1, sewage_incomp1 ,power_incomp1, // Incomplete
+                             telecom_comp1, water_comp1, sewage_comp1, power_comp1]; // Complete
+
+    return compileArrayPoint;
+  });
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+  // Define statistics
+  /* Telecom/CATV */
+  function testLineForCombineChart(compileArrayPoint) {
+
+     var total_telecom_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 1 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_telecom_incomp",
+    statisticType: "sum"
+  };
+
+  var total_telecom_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 1 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_telecom_comp",
+    statisticType: "sum"  
+  };
+
+  /* Water */
+  var total_water_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 2 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_water_incomp",
+    statisticType: "sum"
+  };
+
+  var total_water_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 2 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_water_comp",
+    statisticType: "sum"  
+  };
+
+  /* Sewage */
+    var total_sewage_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 3 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_sewage_incomp",
+    statisticType: "sum"
+  };
+
+  var total_sewage_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 3 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_sewage_comp",
+    statisticType: "sum"  
+  };
+
+  /* Power */
+  var total_power_incomp = {
+    onStatisticField: "CASE WHEN (UtilType = 4 and Status = 0) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_power_incomp",
+    statisticType: "sum"
+  };
+
+  var total_power_comp = {
+    onStatisticField: "CASE WHEN (UtilType = 4 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_power_comp",
+    statisticType: "sum"  
+  };
+
+  // Start Query
+  var query = testLine.createQuery();
+  //query.where = "Stations = 'Tandang Sora'"; // Selected Stations
+  query.outStatistics = [total_telecom_incomp, total_telecom_comp,
+                        total_water_incomp, total_water_comp,
+                        total_sewage_incomp, total_sewage_comp,
+                        total_power_incomp, total_power_comp];
+query.returnGeometry = true;
+
+ return testLine.queryFeatures(query).then(function(response) {
+  var stats = response.features[0].attributes;
+  /* Telecom */
+  const telecom_incomp = stats.total_telecom_incomp;
+  const telecom_comp = stats.total_telecom_comp;
+
+  /* Water */
+  const water_incomp = stats.total_water_incomp;
+  const water_comp = stats.total_water_comp;
+
+  /* Sewage */
+  const sewage_incomp = stats.total_sewage_incomp;
+  const sewage_comp = stats.total_sewage_comp;   
+
+  /* Power */
+  const power_incomp = stats.total_power_incomp;
+  const power_comp = stats.total_power_comp;
+
+  /* Calculate total values for points and lines */
+  const telecomIncompTotal = telecom_incomp + compileArrayPoint[0];
+  const telecomCompTotal = telecom_comp + compileArrayPoint[4];
+
+  const waterIncompTotal = water_incomp + compileArrayPoint[1];
+  const waterCompTotal = water_comp + compileArrayPoint[5];
+
+  const sewageIncompTotal = sewage_incomp + compileArrayPoint[2];
+  const sewageCompTotal = sewage_comp + compileArrayPoint[6];
+
+  const powerIncompTotal = power_incomp + compileArrayPoint[3];
+  const powerCompTotal = power_comp + compileArrayPoint[7];
+
+    var totalValues = [telecomIncompTotal, telecomCompTotal, // Telecom
+                       waterIncompTotal, waterCompTotal, // Water
+                       sewageIncompTotal, sewageCompTotal, // Sewage
+                       powerIncompTotal, powerCompTotal]; // Power
+
+    return totalValues;
+ });
+
+}
+
+function displayCombineChart (totalValues) {
+ // headerTitleDiv.innerHTML = totalValues;
+    var chart = am4core.create("chartdiv", am4charts.XYChart);
+chart.hiddenState.properties.opacity = 0;
+
+chart.data = [
+  {
+    category: "Telecom/CATV",
+    value1: totalValues[1],
+    value2: totalValues[0]
+  },
+  {
+    category: "Water",
+    value1: totalValues[3],
+    value2: totalValues[2]
+  },
+  {
+    category: "Sewage",
+    value1: totalValues[5],
+    value2: totalValues[4]
+  },  
+  {
+    category: "Power",
+    value1: totalValues[7],
+    value2: totalValues[6]
+  }
+];
+
+chart.colors.step = 2;
+chart.padding(10, 10, 10, 10);
+chart.legend = new am4charts.Legend();
+chart.legend.position = "bottom";
+chart.legend.labels.template.fontSize = 14;
+chart.legend.labels.template.fill = "#ffffff";
+
+var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+categoryAxis.dataFields.category = "category";
+categoryAxis.renderer.grid.template.location = 0;
+categoryAxis.renderer.labels.template.fontSize = 15;
+categoryAxis.renderer.labels.template.fill = "#ffffff";
+categoryAxis.renderer.minGridDistance = 5; //can change label
+
+var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+valueAxis.min = 0;
+valueAxis.max = 100;
+valueAxis.strictMinMax = true;
+valueAxis.calculateTotals = true;
+valueAxis.renderer.minWidth = 50;
+valueAxis.renderer.labels.template.fontSize = 13;
+valueAxis.renderer.labels.template.fill = "#ffffff";
+
+let arrLviews = [];
+
+// Layerview and Expand
+function createSeriesCombine(field, name) {
+  var series = chart.series.push(new am4charts.ColumnSeries());
+  series.calculatePercent = true;
+  series.dataFields.valueX = field;
+  series.dataFields.categoryY = "category";
+  series.stacked = true;
+  series.dataFields.valueXShow = "totalPercent";
+  series.dataItems.template.locations.categoryY = 0.5;
+
+    // Bar chart line color and width
+    series.columns.template.stroke = am4core.color("#ffffff");
+  series.columns.template.strokeWidth = 2;
+  series.name = name;
+
+  var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+
+  if (name == "Incomplete"){
+    series.fill = am4core.color("#000000");
+    
+    labelBullet.locationX = 0.5;
+    labelBullet.label.text = "";
+    labelBullet.label.fill = am4core.color("#000000");
+    labelBullet.interactionsEnabled = false;
+    labelBullet.label.fontSize = 13;
+    labelBullet.locationX = 0.5;
+
+  } else {
+    series.fill = am4core.color("#0070ff"); // Completed
+    labelBullet.locationX = 0.5;
+  labelBullet.label.text = "{valueX.totalPercent.formatNumber('#.')}%";
+  labelBullet.label.fill = am4core.color("#ffffff");
+  labelBullet.interactionsEnabled = false;
+  labelBullet.label.fontSize = 13;
+  labelBullet.locationX = 0.5;
+
+  }
+  series.columns.template.width = am4core.percent(60);
+  series.columns.template.tooltipText = "[font-size:12px]{name}: {valueX.value.formatNumber('#.')}"
+
+
+    // Click chart and filter, update maps
+    const chartElement = document.getElementById("chartPanel");
+  series.columns.template.events.on("hit", filterByChart, this);
+  function filterByChart(ev) {
+    const selectedC = ev.target.dataItem.component.name;
+    const selectedP = ev.target.dataItem.categoryY;
+
+    // Layer
+
+    if (selectedP == "Telecom/CATV" && selectedC == "Incomplete") {
+      selectedLayer = 1;
+      selectedStatus = 0;
+    } else if (selectedP == "Telecom/CATV" && selectedC == "Complete") {
+      selectedLayer = 1;
+      selectedStatus = 1;
+    } else if (selectedP == "Water" && selectedC == "Incomplete") {
+      selectedLayer = 2;
+      selectedStatus = 0;
+    } else if (selectedP == "Water" && selectedC == "Complete") {
+      selectedLayer = 2;
+      selectedStatus = 1;
+    } else if (selectedP == "Sewage" && selectedC == "Incomplete") {
+      selectedLayer = 3;
+      selectedStatus = 0;
+    } else if (selectedP == "Sewage" && selectedC == "Complete") {
+      selectedLayer = 3;
+      selectedStatus = 1;
+    } else if (selectedP == "Power" && selectedC == "Incomplete") {
+      selectedLayer = 4;
+      selectedStatus = 0;
+    } else if (selectedP == "Power" && selectedC == "Complete") {
+      selectedLayer = 4;
+      selectedStatus = 1;
+    } else {
+      selectedLayer = null;
+    }
+
+    for (var i = 0; i < arrLviews.length; i++) {
+      arrLviews[i].filter = {
+        where: "UtilType = " + selectedLayer + " AND " +  "Status = " + selectedStatus
+      }
+    }
+  
+  } // End of filterByChart
+
+// End of LayerView
+    // LayerView for point 2
+    view.whenLayerView(testLine1).then(function (layerView) {
+  chartLayerView = layerView;
+  arrLviews.push(layerView);
+  
+  chartElement.style.visibility = "visible";
+
+  
+view.on("click", function() {
+  layerView.filter = null;
+});
+
+});
+
+  view.whenLayerView(testLine).then(function (layerView) {
+  chartLayerView = layerView;
+  arrLviews.push(layerView);
+  
+  chartElement.style.visibility = "visible";
+
+  
+view.on("click", function() {
+  layerView.filter = null;
+});
+});
+
+view.whenLayerView(testUtilPt).then(function (layerView) {
+  chartLayerView = layerView;
+  arrLviews.push(layerView);
+  
+  chartElement.style.visibility = "visible";
+
+  
+view.on("click", function() {
+  layerView.filter = null;
+});
+
+});
+
+  view.whenLayerView(testUtilPt1).then(function (layerView) {
+  chartLayerView = layerView;
+  arrLviews.push(layerView);
+  
+  chartElement.style.visibility = "visible";
+
+  
+view.on("click", function() {
+  layerView.filter = null;
+});
+});
+
+} // End of createSeries function
+
+
+// Run createSeries
+createSeriesCombine("value1", "Complete");
+createSeriesCombine("value2", "Incomplete");
+}
+
+// Combined Chart (Utility Point + Utility Line)
+async function updateChartCombine() {
+
+testUtilPtForCombineChart() // Promise
+    .then(testLineForCombineChart)
+    .then(displayCombineChart);
+} // End of Combined Chart function
+
+}); // End of am4core.ready
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//*****************************//
+//      PopUp Settig           //
+//*****************************//
+// Utility Point
+var highlightSelect;
+
+view.when(function() {
+  var popup = view.popup;
+  popup.viewModel.on("trigger-action", function(event) {
+    if (event.action.id == "find-relocated") {
+      var attributes = popup.viewModel.selectedFeature.attributes;
+      var info = attributes.Id;
+      var infoObjId = attributes.OBJECTID; //1
+
+      view.whenLayerView(testUtilPt).then(function(layerView) {
+      testUtilPt.queryFeatures().then(function(results) {
+          const ggg = results.features;
+          const rowN = ggg.length; //7
+          //var rrr = results.features[0].attributes.Id;
+          //var rrr = results.features[6].attributes.Id; // return Id of 7th row
+          
+          var i;
+          let objID = [];
+            for (i=0; i < rowN; i++) {
+              if (results.features[i].attributes.Id == info) {
+                  if (results.features[i].attributes.OBJECTID == infoObjId) {
+                      continue;
+                  }
+                  var obj = results.features[i].attributes.OBJECTID;
+                  objID.push(obj);
+                }
+            }
+
+      var queryExt = new Query({
+        //objectIds: [1,2,3,4,5]
+        //objectIds: objID
+        objectIds: objID
+      });
+
+      testUtilPt1.queryExtent(queryExt).then(function(result) {
+        if (result.extent) {
+          view.goTo(result.extent.expand(200))
+        }
+      });
+
+      if (highlightSelect) {
+        highlightSelect.remove();
+      }
+      highlightSelect = layerView.highlight(objID);
+
+      view.on("click", function() {
+        highlightSelect.remove();
+});
+
+//
+
+
+
+    }); // End of queryFeatures()
+
+
+}); // End of layerView
+
+    } // End of if (event.action.id...)
+  });
+}); // End of view.when()
+
+// Utility Line
+view.when(function() {
+  var popup = view.popup;
+  popup.viewModel.on("trigger-action", function(event) {
+    if (event.action.id == "find-relocated-line") {
+      var attributes = popup.viewModel.selectedFeature.attributes;
+      var info = attributes.Id;
+      var infoObjId = attributes.OBJECTID; //1
+
+      view.whenLayerView(testLine).then(function(layerView) {
+        testLine.queryFeatures().then(function(results) {
+          const ggg = results.features;
+          const rowN = ggg.length; //7
+          //var rrr = results.features[0].attributes.Id;
+          //var rrr = results.features[6].attributes.Id; // return Id of 7th row
+          
+          var i;
+          let objID = [];
+            for (i=0; i < rowN; i++) {
+              if (results.features[i].attributes.Id == info) {
+                  if (results.features[i].attributes.OBJECTID == infoObjId) {
+                      continue;
+                  }
+                  var obj = results.features[i].attributes.OBJECTID;
+                  objID.push(obj);
+                }
+            }
+
+      var queryExt = new Query({
+        //objectIds: [1,2,3,4,5]
+        //objectIds: objID
+        objectIds: objID
+      });
+
+      testLine1.queryExtent(queryExt).then(function(result) {
+        if (result.extent) {
+          view.goTo(result.extent)
+        }
+      });
+
+      if (highlightSelect) {
+        highlightSelect.remove();
+      }
+      highlightSelect = layerView.highlight(objID);
+
+      view.on("click", function() {
+        highlightSelect.remove();
+});
+    }); // End of queryFeatures()
+
+
+}); // End of layerView
+
+    } // End of if (event.action.id...)
+  });
+}); // End of view.when()
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+view.when(function () {
+          view.popup.autoOpenEnabled = true; //disable popups
+
+          // Create the Editor
+          let editor = new Editor({
+            view: view
+          });
+
+          // Add widget to top-right of the view
+          view.ui.add(editor, "bottom-right");
+        });
+
+// LayerList and Add legend to the LayerList
+        // On-off feature layer tab
+        var layerList = new LayerList({
+            view: view,
+            listItemCreatedFunction: function(event) {
+              const item = event.item;
+              if (item.title === "Chainage" || item.title === "Existing Points" || item.title === "Existing Line"){
+                item.visible = false
+              }
+            }
+          });
+/*
+          view.ui.add(layerList, {
+            position: "bottom-left"
+          });
+*/
+var legend = new Legend({
+  view: view,
+  container: document.getElementById("legendDiv"),
+  layerInfos: [
+  {
+      layer: testUtilPt,
+      title: "UL Point"
+    },
+    {
+      layer: testLine,
+      title: "UL Line"
+    },
+  {
+      layer: testUtilPt1,
+      title: "UL Status"
+    }
+  ]
+});
+
+var legendExpand = new Expand({
+    view: view,
+    content: legend,
+    expandIconClass: "esri-icon-legend",
+    group: "bottom-right"
+});
+view.ui.add(legendExpand, {
+    position: "bottom-right"
+});
+
+        var layerListExpand = new Expand ({
+            view: view,
+            content: layerList,
+            expandIconClass: "esri-icon-visible",
+            group: "bottom-left"
+        });
+        view.ui.add(layerListExpand, {
+            position: "bottom-left"
+        });
+        // End of LayerList
+
+        view.ui.empty("top-left");
+
+        // Compass
+        var compass = new Compass({
+          view: view});
+          // adds the compass to the top left corner of the MapView
+        view.ui.add(compass, "top-left");
+
+                // Full screen logo
+        view.ui.add(
+            new Fullscreen({
+                view: view,
+                element: applicationDiv
+            }),
+            "top-left"
+        );
+
+        // See-through-Ground        
+          view.when(function() {
+          // allow navigation above and below the ground
+          map.ground.navigationConstraint = {
+            type: "none"
+          };
+          // the webscene has no basemap, so set a surfaceColor on the ground
+          map.ground.surfaceColor = "#fff";
+          // to see through the ground, set the ground opacity to 0.4
+          map.ground.opacity = 0.9; //
+        });
+          
+
+        // See through Gound
+        document
+          .getElementById("opacityInput")
+          .addEventListener("change", function(event) {
+            //map.ground.opacity = event.target.checked ? 0.1 : 0.9;
+            map.ground.opacity = event.target.checked ? 0.1 : 0.6;
+          });
+
+        view.ui.add("menu", "bottom-left");
+
+
+//*****************************//
+//      Search Widget          //
+//*****************************//
+var searchWidget = new Search({
+  view: view,
+  locationEnabled: false,
+  allPlaceholder: "Chainage or Utility ID",
+  includeDefaultSources: false,
+  sources: [
+  {
+    layer: chainageLayer,
+      searchFields: ["KmSpot"],
+      displayField: "KmSpot",
+      exactMatch: false,
+      outFields: ["*"],
+      zoomScale: 1000,
+      name: "Main KM",
+      placeholder: "example: 80+400"
+  },
+  {
+      layer: testUtilPt,
+      searchFields: ["Id"],
+      displayField: "Id",
+      exactMatch: false,
+      outFields: ["Id"],
+      name: "Unique ID (Point)",
+      placeholder: "example: MER0001-X01"
+  },
+  {
+      layer: testLine1,
+      searchFields: ["Id"],
+      displayField: "Id",
+      exactMatch: false,
+      outFields: ["Id"],
+      name: "Unique ID (Line)",
+      placeholder: "example: MER0001-X01"
+  }
+]
+});
+
+  const searchExpand = new Expand({
+    view: view,
+    content: searchWidget,
+    expandIconClass: "esri-icon-search",
+    group: "top-right"
+  });
+        view.ui.add(searchExpand, {
+          position: "top-right"
+        });
+searchExpand.watch("expanded", function() {
+    if(!searchExpand.expanded) {
+      searchWidget.searchTerm = null;
+    }
+  });
+
+      });
+    </script>
+  </head>
+  <body class="sassy-theme">
+    <div id="applicationDiv">
+      <div id="headerDiv">
+        <img src="https://EijiGorilla.github.io/Symbols/UtilitySymbol_smartmap_v2.png" width="30" height="30">
+        <div id="headerTitleDiv">
+          <h2>Status of Utility Relocation (N2)</h2>
+        </div>
+          <div class="dateDiv">
+              <h4>As of December 17, 2021</h4>
+          </div>
+          <div class="cpButtonBox">
+            <div id="cpButton" class="cpButtonClass">
+                <label for="cpButton">CP</label>
+                <input type="radio" id="None" name="cpButton"> None
+                <input type="radio" id="N-01" name="cpButton"> N-01
+                <input type="radio" id="N-02" name="cpButton"> N-02
+                <input type="radio" id="N-03" name="cpButton"> N-03
+                <input type="radio" id="N-04" name="cpButton"> N-04
+                <input type="radio" id="N-05" name="cpButton"> N-05
+              </div>
+          </div>
+      </div>
+      <div class="container">
+        <div class="boxB">
+            <div id="viewDiv"></div>
+                  <div id="menu" class="esri-widget">
+                <input type="checkbox" id="opacityInput" unchecked />
+                <label for="opacityInput">See through ground</label>
+              </div>
+          </div>
+        <div class="boxA">
+            <div id="chartPanel">
+              <div id="chartTitleDiv" class="esri-widget">Relocation Progress</div>
+              <div id="chartdiv"></div>
+              <div id="dataTypeInput" class="cpButtonClass">
+                <label for="dataTypeInput">Data Type</label>
+                <input type="radio" id="None" name="dataTypeInput" checked/> None
+                <input type="radio" id="Point" name="dataTypeInput"> Point
+                <input type="radio" id="Line" name="dataTypeInput"> Line
+              </div>
+          </div>
+      </div>
+      </div>
+    </div>
+  </body>
+</html>
