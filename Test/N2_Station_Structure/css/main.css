@@ -1,0 +1,334 @@
+html,
+body,
+#viewDiv {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#headerTitleDiv {
+    font-size: 2.5vw;
+    vertical-align: middle;
+    padding-top: 3px;
+    z-index: 99;
+    position: absolute;
+    left: 13;
+    top: 18;
+    color: white;
+  }
+
+  #chartPanelDiv {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    z-index: 99;
+    position: absolute;
+    left: 0;
+    margin-top: 14%;
+    bottom: 80;
+  }
+
+  #chartdiv {
+      width: 20vw;
+      height: 37vh;
+      align-items: center;
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      padding: 0;
+      margin: 0;
+  }
+
+  .labelStFraming,
+  .labelStFoundation,
+  .labelStColumn,
+  .labelFloors,
+  .labelWalls,
+  .labelColumns {
+    color: white;
+    font-size: 1.3vw;
+    margin: 0;
+    padding-top: 5;
+    float: right;
+    background-color: rgb(0, 0, 0, 0);
+    height: 4vh;
+    text-align: center;
+  }
+  
+  #labelTotalDiv {
+    color: white;
+    font-size: 1.5vw;
+    width: 100%;
+    height: 5vh;
+    padding-top: 6;
+    text-align: center;
+  }
+  
+  #boxStFoundation {
+    display: grid;
+    position: fixed;
+    z-index: 99;
+    background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    background-color: rgb(0,0,0,0.5);
+    bottom: 4%;
+    left: 0.5%;
+    color: white;
+    font-size: 2vw;
+    width: 10.8vw;
+    height: 14vh;
+    text-align: center;
+  }
+  
+  #boxStColumn {
+    display: grid;
+    position: fixed;
+    z-index: 99;
+    background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    background-color: rgb(0,0,0,0.5);
+    bottom: 4%;
+    left: 11.5%;
+    color: white;
+    font-size: 2vw;
+    width: 10.8vw;
+    height: 14vh;
+    text-align: center;
+  }
+  
+  #boxStFraming {
+    display: grid;
+    position: fixed;
+    z-index: 99;
+    background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    background-color: rgb(0,0,0,0.5);
+    bottom: 4%;
+    left: 22.5%;
+    color: white;
+    font-size: 2vw;
+    width: 10.8vw;
+    height: 14vh;
+    text-align: center;
+  }
+  
+  #boxFloors {
+    display: grid;
+    position: fixed;
+    z-index: 99;
+    background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    background-color: rgb(0,0,0,0.5);
+    bottom: 4%;
+    left: 33.5%;
+    color: white;
+    font-size: 2vw;
+    width: 10.8vw;
+    height: 14vh;
+    text-align: center;
+  }
+  
+  #boxWalls {
+    display: grid;
+    position: fixed;
+    z-index: 99;
+    background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    background-color: rgb(0,0,0,0.5);
+    bottom: 4%;
+    left: 44.5%;
+    color: white;
+    font-size: 2vw;
+    width: 10.8vw;
+    height: 14vh;
+    text-align: center;
+  }
+  
+  #boxColumns {
+    display: grid;
+    position: fixed;
+    z-index: 99;
+    background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    background-color: rgb(0,0,0,0.5);
+    bottom: 4%;
+    left: 55.5%;
+    color: white;
+    font-size: 2vw;
+    width: 10.8vw;
+    height: 14vh;
+    text-align: center;
+  }
+  
+  #boxTotal {
+    display: grid;
+    position: fixed;
+    z-index: 99;
+    background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    background-color: rgb(0,0,0,0.5);
+    bottom: 4%;
+    left: 66.5%;
+    color: white;
+    font-size: 2vw;
+    width: 10.8vw;
+    height: 14vh;
+    text-align: center;
+  }
+  
+  #chartStFramingDiv,
+  #chartStFoundationDiv,
+  #chartStColumnDiv,
+  #chartFloorsDiv,
+  #chartWallsDiv,
+  #chartColumnsDiv {
+    padding-top: 3%;
+    background-color: rgb(0,0,0,0);
+    width: 10vw;
+    height: 11vh;
+  }
+  
+  #totalProgressDiv {
+    color: rgb(0, 197, 255);
+    font-size: 2.5vw;
+    width: 100%;
+    height: 6vh;
+    padding-top: 3;
+    text-align: center;
+  }
+
+.panel {
+  padding: 0px;
+  margin:0;
+  box-sizing: border-box;
+  width: 15vw;
+  height: 40vh;
+  position: absolute;
+  top: 10%;
+  right: 1;
+  font-size: 1.3vw;
+  color: white;
+  background-color: rgb(0, 0, 0, 0);
+  z-index: 99;
+  transition: 3;
+  line-height: 2;
+}
+
+.active, .test:hover {
+background-color: rgba(77, 75, 75, 0);
+color: orange;
+font-size: 1.7vw;
+}
+
+
+.dateDiv {
+    color: rgb(0, 197, 255);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    text-align: left;
+    font-weight: normal;
+    font-size: 1.1vw;
+    padding-top: 20px;
+    margin: 0;
+    z-index:99;
+    top: 55;
+    left: 20;
+    position:absolute;
+  }
+
+#menu {
+  position: absolute;
+  padding: 0.8em;
+  max-width: 250px;
+  background-color: rgb(0, 0, 0, 0);
+  z-index: 99;
+  bottom: 13rem;
+  right: 5;
+}
+
+#menu1 {
+    padding: 0.8em;
+    width: 250px;
+    z-index: 99;
+    position: absolute;
+    right: 0;
+  }
+
+  #sliceContainer {
+    width: inherit;
+  }
+
+  #sliceOptions {
+    margin: 0 15px;
+  }
+
+  #sliceOptions>button {
+    margin-bottom: 15px;
+  }
+
+  #sliceContainer {
+    max-width: 228px;
+  }
+
+  br{content:' ';}
+  br:after{content:' ';}
+
+  .esri-layer-list__item-toggle-icon,
+ .esri-layer-list__item-title {
+  color: white;
+ }
+
+  .sassy-theme .esri-menu,
+  .sassy-theme .esri-building-explorer,
+  .sassy-theme .esri-popup__main-container,
+  .sassy-theme .esri-popup .esri-popup__pointer-direction,
+  .sassy-theme .esri-popup .esri-popup__button,
+  .sassy-theme .esri-button,
+  .sassy-theme .esri-input,
+  .sassy-theme .esri-legend,
+  .sassy-theme .esri-layer-list,
+  .sassy-theme .esri-widget a {
+    background-color: rgb(0, 0, 0, 0.5);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+display: none;
+}
+
+  .sassy-theme .esri-legend__layer-caption {
+display: none;
+}
+
+.overlay {
+  position: absolute;
+  z-index: 99;
+  width: 2rem;
+  bottom: 8rem;
+  left: 0;
+  background-color: rgba(80, 80, 80, 0);
+  /*text-align: center;*/
+  font-family: "Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.button {
+  cursor: pointer;
+  font-size: 20pt !important;
+  font-weight: bold !important;
+  color: rgb(230, 230, 230);
+}
+
+.button:hover, #label {
+  color: white;
+}
+
+.button, #label {
+  margin: 15px;
+}
+
+.esri-view-surface--inset-outline:focus::after {
+  outline: none !important;
+}

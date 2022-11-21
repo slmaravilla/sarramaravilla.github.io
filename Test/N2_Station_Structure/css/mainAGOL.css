@@ -1,0 +1,169 @@
+html,
+body,
+#viewDiv {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#headerTitleDiv {
+    font-size: 2.5vw;
+    vertical-align: middle;
+    padding-top: 3px;
+    z-index: 99;
+    position: absolute;
+    left: 13;
+    top: 18;
+    color: white;
+  }
+
+  #chartPanelDiv {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    z-index: 99;
+    position: absolute;
+    left: 0;
+    margin-top: 14%;
+    bottom: 80;
+  }
+
+  #chartdiv {
+      width: 20vw;
+      height: 37vh;
+      align-items: center;
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      padding: 0;
+      margin: 0;
+  }
+
+
+.panel {
+  padding: 0px;
+  margin:0;
+  box-sizing: border-box;
+  width: 15vw;
+  height: 40vh;
+  position: absolute;
+  top: 10%;
+  right: 1;
+  font-size: 1.3vw;
+  color: white;
+  background-color: rgb(0, 0, 0, 0);
+  z-index: 99;
+  transition: 3;
+  line-height: 2;
+}
+
+.active, .test:hover {
+background-color: rgba(77, 75, 75, 0);
+color: orange;
+font-size: 1.7vw;
+}
+
+
+.dateDiv {
+    color: rgb(0, 197, 255);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    text-align: left;
+    font-weight: normal;
+    font-size: 1.1vw;
+    padding-top: 20px;
+    margin: 0;
+    z-index:99;
+    top: 55;
+    left: 20;
+    position:absolute;
+  }
+
+
+#menu {
+  padding: 0.8em;
+  max-width: 250px;
+  background-color: rgb(0, 0, 0, 0);
+}
+
+#menu1 {
+    padding: 0.8em;
+    width: 250px;
+    z-index: 99;
+    position: absolute;
+    right: 0;
+  }
+
+
+  #sliceContainer {
+    width: inherit;
+  }
+
+  #sliceOptions {
+    margin: 0 15px;
+  }
+
+  #sliceOptions>button {
+    margin-bottom: 15px;
+  }
+
+  #sliceContainer {
+    max-width: 228px;
+  }
+
+  br{content:' ';}
+  br:after{content:' ';}
+
+  .esri-layer-list__item-toggle-icon,
+ .esri-layer-list__item-title {
+  color: white;
+ }
+
+  .sassy-theme .esri-menu,
+  .sassy-theme .esri-building-explorer,
+  .sassy-theme .esri-popup__main-container,
+  .sassy-theme .esri-popup .esri-popup__pointer-direction,
+  .sassy-theme .esri-popup .esri-popup__button,
+  .sassy-theme .esri-button,
+  .sassy-theme .esri-input,
+  .sassy-theme .esri-legend,
+  .sassy-theme .esri-layer-list,
+  .sassy-theme .esri-widget a {
+    background-color: rgb(0, 0, 0, 0.5);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+display: none;
+}
+
+  .sassy-theme .esri-legend__layer-caption {
+display: none;
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  bottom: 50px;
+  left: 0px;
+  background-color: rgba(80, 80, 80, 0);
+  text-align: center;
+  font-family: "Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.button {
+  cursor: pointer;
+  font-size: 45pt !important;
+  font-weight: bold !important;
+  color: rgb(230, 230, 230);
+}
+
+.button:hover, #label {
+  color: white;
+}
+
+.button, #label {
+  margin: 15px;
+}
+
+
+.esri-view-surface--inset-outline:focus::after {
+    outline: none !important;
+}
+ 
