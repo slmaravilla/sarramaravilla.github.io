@@ -698,30 +698,6 @@
           "top-right"
         );//end
 
-        //////////////
-        let abort = false;
-        let center = null;
-        function rotate() {
-          if (!view.interacting && !abort) {
-
-            play.style.display = "none";
-            pause.style.display = "block";
-
-            center = center || view.center;
-
-            view.goTo({
-              heading: view.camera.heading + 0.2,
-              center
-            }, { animate: false });
-
-            requestAnimationFrame(rotate);
-          } else {
-            abort = false;
-            center = null;
-            play.style.display = "block";
-            pause.style.display = "none";
-          }
-        } // end
 
 
 
