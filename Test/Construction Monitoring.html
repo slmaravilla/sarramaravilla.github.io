@@ -131,6 +131,44 @@
     .esri-view-surface--inset-outline:focus::after {
       outline: none !important;
     }
+
+
+
+    #boxTotal {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 4%;
+      left: 66.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+
+    #labelTotalDiv {
+      color: white;
+      font-size: 1.5vw;
+      width: 100%;
+      height: 5vh;
+      padding-top: 6;
+      text-align: center;
+    }
+
+    #totalProgressDiv {
+      color: rgb(0, 197, 255);
+      font-size: 2.5vw;
+      width: 100%;
+      height: 6vh;
+      padding-top: 3;
+      text-align: center;
+    }
   </style>
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css" />
@@ -363,353 +401,177 @@
 
 
         /// chart
-        const headerTitleDiv = document.getElementById("headerTitleDiv");
+        //const headerTitleDiv = document.getElementById("headerTitleDiv");
 
         /***************************
          * Creating charts
          ***************************/
 
-        am4core.ready(() => {
-          am4core.useTheme(am4themes_animated);
+        //FOR TOTAL PERCENTAGE
 
-          const compArray = {
-            1: [], 2: [], 3: [], 4: [],
-            5: [], 6: [], 7: [], 8: [],
-            9: [], 10: [], 11: [], 12: []
+        //Architectural Column
+        function totalProgressColumns() {
+          var total_complete = {
+            onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_complete",
+            statisticType: "sum"
           };
 
+          var total_obs = {
+            onStatisticField: "Status",
+            outStatisticFieldName: "total_obs",
+            statisticType: "count"
+          };
 
-          function columns() {
-            var total_columns_tobeC = {
-              onStatisticField: "CASE WHEN Status = 1 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_columns_tobeC",
-              statisticType: "sum"
-            };
-            var total_columns_underC = {
-              onStatisticField: "CASE WHEN Status = 2 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_columns_underC",
-              statisticType: "sum"
-            };
-            var total_columns_done = {
-              onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_columns_done",
-              statisticType: "sum"
-            };
-            var total_columns_delayed = {
-              onStatisticField: "CASE WHEN Status = 3 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_columns_delayed",
-              statisticType: "sum"
-            };
+          var query = columnsLayer.createQuery();
+          query.outStatistics = [total_complete, total_obs];
+          query.returnGeometry = true;
+          return columnsLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
 
-            var query = columnsLayer.createQuery();
-            query.outStatistics = [total_columns_tobeC, total_columns_underC, total_columns_done, total_columns_delayed];
-            query.returnGeometry = true;
+            const total_comp = stats.total_complete;
+            const total_obs = stats.total_obs;
+            const compile_columns = [total_comp, total_obs];
+            return compile_columns;
+          });
+        }
 
-            return columnsLayer.queryFeatures(query).then(function (response) {
-              var stats = response.features[0].attributes;
+        //Architectural Slabs
+        function totalProgressSlabs(compile_columns) {
+          var total_complete = {
+            onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_complete",
+            statisticType: "sum"
+          };
 
-              // columns
-              const columns_tobeC = stats.total_columns_tobeC;
-              const columns_underC = stats.total_columns_underC;
-              const columns_done = stats.total_columns_done;
-              const columns_delayed = stats.total_columns_delayed;
-              const compile_columns = [columns_done, columns_underC, columns_tobeC, columns_delayed];
+          var total_obs = {
+            onStatisticField: "Status",
+            outStatisticFieldName: "total_obs",
+            statisticType: "count"
+          };
 
-              for (var i = 0; i <= 3; i++) {
-                compArray[i + 1] = compile_columns[i];
-              }
-              return compArray;
-            });
-          } //end of columns function
+          var query = slabsLayer.createQuery();
+          query.outStatistics = [total_complete, total_obs];
+          query.returnGeometry = true;
+          return slabsLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
 
+            const total_comp = stats.total_complete;
+            const total_obs = stats.total_obs;
+            const comp_comp = total_comp + compile_columns[0];
+            const comp_obs = total_obs + compile_columns[1];
+            const compile_slabs = [comp_comp, comp_obs];
 
-          function slabs() {
-            var total_slabs_tobeC = {
-              onStatisticField: "CASE WHEN Status = 1 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_slabs_tobeC",
-              statisticType: "sum"
-            };
-            var total_slabs_underC = {
-              onStatisticField: "CASE WHEN Status = 2 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_slabs_underC",
-              statisticType: "sum"
-            };
-            var total_slabs_done = {
-              onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_slabs_done",
-              statisticType: "sum"
-            };
-            var total_slabs_delayed = {
-              onStatisticField: "CASE WHEN Status = 3 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_slabs_delayed",
-              statisticType: "sum"
-            };
+            return compile_slabs;
+          });
+        }
 
-            var query = slabsLayer.createQuery();
-            query.outStatistics = [total_slabs_tobeC, total_slabs_underC, total_slabs_done, total_slabs_delayed];
-            query.returnGeometry = true;
+        //Architectural Walls
+        function totalProgressWalls(compile_slabs) {
+          var total_complete = {
+            onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_complete",
+            statisticType: "sum"
+          };
 
-            return slabsLayer.queryFeatures(query).then(function (response) {
-              var stats = response.features[0].attributes;
+          var total_obs = {
+            onStatisticField: "Status",
+            outStatisticFieldName: "total_obs",
+            statisticType: "count"
+          };
 
-              // slabs
-              const slabs_tobeC = stats.total_slabs_tobeC;
-              const slabs_underC = stats.total_slabs_underC;
-              const slabs_done = stats.total_slabs_done;
-              const slabs_delayed = stats.total_slabs_delayed;
-              const compile_slabs = [slabs_done, slabs_underC, slabs_tobeC, slabs_delayed];
+          var query = wallsLayer.createQuery();
+          query.outStatistics = [total_complete, total_obs];
+          query.returnGeometry = true;
+          return wallsLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
 
-              for (var i = 0; i <= 3; i++) {
-                compArray[i + 5] = compile_slabs[i];
-              }
-              return compArray;
-            });
-          } //end of slabs function
+            const total_comp = stats.total_complete;
+            const total_obs = stats.total_obs;
+            const comp_comp = total_comp + compile_slabs[0];
+            const comp_obs = total_obs + compile_slabs[1];
+            const compile_walls = [comp_comp, comp_obs];
 
+            return compile_walls;
+          });
+        }
 
-          function walls() {
-            var total_walls_tobeC = {
-              onStatisticField: "CASE WHEN Status = 1 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_walls_tobeC",
-              statisticType: "sum"
-            };
-            var total_walls_underC = {
-              onStatisticField: "CASE WHEN Status = 2 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_walls_underC",
-              statisticType: "sum"
-            };
-            var total_walls_done = {
-              onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_walls_done",
-              statisticType: "sum"
-            };
-            var total_walls_delayed = {
-              onStatisticField: "CASE WHEN Status = 3 THEN 1 ELSE 0 END",
-              outStatisticFieldName: "total_walls_delayed",
-              statisticType: "sum"
-            };
+        //Structural Beams
+        function totalProgressBeams(compile_walls) {
+          var total_complete = {
+            onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_complete",
+            statisticType: "sum"
+          };
 
-            var query = wallssLayer.createQuery();
-            query.outStatistics = [total_walls_tobeC, total_walls_underC, total_walls_done, total_walls_delayed];
-            query.returnGeometry = true;
+          var total_obs = {
+            onStatisticField: "Status",
+            outStatisticFieldName: "total_obs",
+            statisticType: "count"
+          };
 
-            return wallsLayer.queryFeatures(query).then(function (response) {
-              var stats = response.features[0].attributes;
+          var query = beamsLayer.createQuery();
+          query.outStatistics = [total_complete, total_obs];
+          query.returnGeometry = true;
+          return beamsLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
 
-              // walls
-              const walls_tobeC = stats.total_walls_tobeC;
-              const walls_underC = stats.total_walls_underC;
-              const walls_done = stats.total_walls_done;
-              const walls_delayed = stats.total_walls_delayed;
-              const compile_walls = [walls_done, walls_underC, walls_tobeC, walls_delayed];
+            const total_comp = stats.total_complete;
+            const total_obs = stats.total_obs;
+            const comp_comp = total_comp + compile_walls[0];
+            const comp_obs = total_obs + compile_walls[1];
+            const compile_beams = [comp_comp, comp_obs];
 
-              for (var i = 0; i <= 3; i++) {
-                compArray[i + 9] = compile_walls[i];
-              }
-              return compArray;
-            });
-          } //end of walls function
+            return compile_beams;
+          });
+        }
 
-          function updateArchi(compArray) {
-            //CHART//
-            var chart = am4core.create("chartdiv", arm4charts.XYChart);
-            chart.hiddenState.properties.opacity = 0;
+        //Structural Foundation
+        function totalProgressStFoundation(compile_beams) {
+          var total_complete = {
+            onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_complete",
+            statisticType: "sum"
+          };
 
-            chart.data = [
-              {
-                category: "Columns",
-                value1: compArray[1],
-                value2: compArray[2],
-                value3: compArray[3],
-                value4: compArray[4]
-              },
-              {
-                category: "Slabs",
-                value1: compArray[5],
-                value2: compArray[6],
-                value3: compArray[7],
-                value4: compArray[8]
-              },
-              {
-                category: "Walls",
-                value1: compArray[9],
-                value2: compArray[10],
-                value3: compArray[11],
-                value4: compArray[12]
-              }
-            ]; //End of Chart
+          var total_obs = {
+            onStatisticField: "Status",
+            outStatisticFieldName: "total_obs",
+            statisticType: "count"
+          };
+
+          var query = stFoundationLayer.createQuery();
+          query.outStatistics = [total_complete, total_obs];
+          query.returnGeometry = true;
+          return stFoundationLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const total_comp = stats.total_complete;
+            const total_obs = stats.total_obs;
+            const comp_comp = total_comp + compile_beams[0];
+            const comp_obs = total_obs + compile_beams[1];
+            const compile_stFoundation = [comp_comp, comp_obs];
+
+            return compile_stFoundation;
+          });
+        }
+
+        function progressAll(compile_stFoundation) {
+          document.getElementById("totalProgressDiv").innerHTML = ((compile_stFoundation[0] / compile_stFoundation[1]) * 100).toFixed(1) + " %";
+        }
+
+        function totalProgressStation() {
+          totalProgressColumns()
+            .then(totalProgressSlabs)
+            .then(totalProgressWalls)
+            .then(totalProgressBeams)
+            .then(totalProgressStFoundation)
+            .then(progressAll)
+        }
 
 
-            chart.colors.step = 2;
-            chart.padding(10, 10, 10, 10);
 
-            // Legend
-            const LegendFontSizze = 15;
-            chart.legend = new am4charts.Legend();
-
-            chart.legend.valueLabels.template.align = "right"
-            chart.legend.valueLabels.template.textAlign = "end";
-
-            chart.legend.position = "bottom";
-            chart.legend.labels.template.fontSize = LegendFontSizze;
-            chart.legend.labels.template.fill = "#ffffff";
-            chart.legend.valueLabels.template.fill = am4core.color("#ffffff");
-            chart.legend.valueLabels.template.fontSize = LegendFontSizze;
-            chart.legend.disabled = true;
-
-            var marker = chart.legend.markers.template.children.getIndex(0);
-            var markerTemplate = chart.legend.markers.template;
-            marker.cornerRadius(12, 12, 12, 12);
-            marker.strokeWidth = 1;
-            marker.strokeOpacity = 1;
-            marker.stroke = am4core.color("#ccc");
-
-            // Change size of legend marker
-            markerTemplate.width = 16;
-            markerTemplate.height = 16;
-
-            var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
-            categoryAxis.dataFields.category = "category";
-            categoryAxis.renderer.grid.template.location = 0;
-            categoryAxis.renderer.labels.template.fontSize = 16;
-            categoryAxis.renderer.labels.template.fill = "#ffffff";
-            categoryAxis.renderer.minGridDistance = 5; //can change label
-
-            var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
-            valueAxis.min = 0;
-            valueAxis.max = 100;
-            valueAxis.strictMinMax = true;
-            valueAxis.calculateTotals = true;
-            valueAxis.renderer.minWidth = 50;
-            valueAxis.renderer.labels.template.fontSize = 14;
-            valueAxis.renderer.labels.template.fill = "#ffffff";
-
-            function createSeries(field, name) {
-              var series = chart.series.push(new am4charts.ColumnSeries());
-              series.calculatePercen = true;
-              series.dataFields.valueX = field;
-              series.dataFields.categoryY = "category";
-              series.stacked = true;
-              series.dataFields.valueXShow = "totalPercent";
-              series.dataItems.template.locations.categoryY = 0.5;
-              // Bar chart line color and width
-              series.columns.template.stroke = am4core.color("#ffffff");
-              series.columns.template.strokeWidth = 0.5;
-              series.name = name;
-
-              var labelBullet = series.bullets.push(new am4charts.LabelBullet());
-
-              if (name == "To be Constructed") {
-                series.fill = am4core.color("#000000");
-                series.fillOpacity = 0.7;
-                labelBullet.locationX = 0.7;
-
-                labelBullet.locationX = 0.5;
-                labelBullet.label.text = "";
-
-                //labelBullet.label.fill = am4core.color("#00FFFFFF");
-                labelBullet.label.fill = am4core.color("#000000");
-                labelBullet.interactionsEnabled = false;
-                labelBullet.label.fontSize = 13;
-                labelBullet.locationX = 0.5;
-
-              } else if (name == "Under Construction") {
-                series.fill = am4core.color("#c2c2c2");
-                series.fillOpacity = 0.7;
-                labelBullet.locationX = 0.7;
-                labelBullet.locationX = 0.5;
-                labelBullet.label.text = "{valueX.totalPercent.formatNumber('#.')}%";
-                labelBullet.label.fill = am4core.color("#ffffff");
-                labelBullet.interactionsEnabled = false;
-                labelBullet.label.fontSize = 0;
-                labelBullet.locationX = 0.5;
-
-              } else if (name == "Completed") {
-                series.fill = am4core.color("#0070ff");
-                series.fillOpacity = 0.7;
-                labelBullet.locationX = 0.7;
-                labelBullet.label.text = "{valueX.totalPercent.formatNumber('#.')}%";
-                labelBullet.label.fill = am4core.color("#ffffff");
-                labelBullet.interactionsEnabled = false;
-                labelBullet.label.fontSize = 20;
-                labelBullet.locationX = 0.5;
-
-              } else {
-                series.fill = am4core.color("#ff0000"); // delayed
-                series.fillOpacity = 0.7;
-                labelBullet.locationX = 0.7;
-                labelBullet.locationX = 0.5;
-                labelBullet.label.text = "{valueX.totalPercent.formatNumber('#.')}%";
-                labelBullet.label.fill = am4core.color("#ffffff");
-                labelBullet.interactionsEnabled = false;
-                labelBullet.label.fontSize = 0;
-                labelBullet.locationX = 0.5;
-
-              }
-              series.columns.template.width = am4core.percent(60);
-              series.columns.template.tooltipText = "[font-size:12px]{name}: {valueX.value.formatNumber('#.')}"
-
-              // Click chart and filter, update maps
-              //const chartElement = document.getElementById("chartPanel");
-              ///////////////////////
-              // Click chart and filter, update maps
-              const chartPanelDiv = document.getElementById("chartPanelDiv");
-
-              series.columns.template.events.on("hit", filterByChart, this);
-              function filterByChart(ev) {
-                //const selectedC = ev.target.dataItem.component.name;
-                const selectedP = ev.target.dataItem.categoryY;
-
-                // D-walls
-                if (selectedP == "Columns") {
-                  selectedLayer = "Columns";
-                  columnsLayer.visible = true;
-                  slabsLayer.visible = false;
-                  wallsLayer.visible = false;
-
-                } else if (selectedP == "Slabs") {
-                  selectedLayer = "Slabs"
-                  columnsLayer.visible = false;
-                  slabsLayer.visible = true;
-                  wallsLayer.visible = false;
-
-                } else if (selectedP == "Walls") {
-                  selectedLayer = "Walls";
-                  columnsLayer.visible = false;
-                  slabsLayer.visible = false;
-                  wallsLayer.visible = true;
-
-                } else {
-                  selectedLayer = null;
-                }
-
-                // Listen to the click event on the map view and resets to default 
-                view.on("click", function () {
-                  columnsLayer.visible = true;
-                  slabsLayer.visible = true;
-                  wallsLayer.visible = true;
-                });
-              } // End of filterByChart
-
-              //////////////////////////
-
-            } // End of createSeries function
-            createSeries("value1", "Completed");
-            createSeries("value2", "Under Construction");
-            createSeries("value3", "To be Constructed");
-            createSeries("value4", "Delayed");
-
-          } // Update Chart
-
-          function combineAll() {
-            columns()
-              .then(slabs)
-              .then(walls)
-              .then(updateArchi);
-          }
-
-        });
-
+  
 
 
 
@@ -855,6 +717,10 @@
 
     <div id="chartDiv">
       <div id="ChartTitleDiv" class="esri-widget">Construction Progress</div>
+      <div id="boxTotal">
+        <div id="labelTotalDiv">TOTAL</div>
+        <div id="totalProgressDiv"></div>
+      </div>
     </div>
 
     <div id="menu" class="esri-widget">
