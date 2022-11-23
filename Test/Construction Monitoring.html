@@ -25,7 +25,20 @@
       color: white;
     }
 
-    #chartTitleDiv {
+    #progressPanel {
+      width: 20vw;
+      height: 80vh;
+      align-items: center;
+      position: absolute;
+      z-index: 99;
+      left: 13;
+      bottom: 3%;
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+    }
+
+    .chartTitleDiv {
       font-weight: 200;
       text-align: center;
       font-style: normal;
@@ -36,31 +49,9 @@
       opacity: 0.9;
       margin-top: 10px;
       line-height: 0.5;
+      left: 35;
+      position: absolute 
     }
-
-    #chartPanelDiv {
-      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-      z-index: 99;
-      position: absolute;
-      left: 0;
-      margin-top: 14%;
-      bottom: 80;
-    }
-
-    #chartdiv {
-      width: 20vw;
-      height: 80vh;
-      align-items: center;
-      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-      position: absolute;
-      z-index: 99;
-      left: 13;
-      bottom: 18;
-      border-color: white;
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-      background-color: rgb(0, 0, 0, 0.5);
-    }
-
 
     .dateDiv {
       color: rgb(0, 197, 255);
@@ -72,7 +63,7 @@
       margin: 0;
       z-index: 99;
       top: 55;
-      left: 30;
+      left: 13;
       position: absolute;
     }
 
@@ -132,11 +123,27 @@
       outline: none !important;
     }
 
+    #boxTotal {
+    display: grid;
+    position: fixed;
+    z-index: 99;
+    background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    background-color: rgb(0,0,0,0.5);
+    bottom: 3%;
+    left: 13;
+    color: white;
+    font-size: 2vw;
+    width: 20vw;
+    height: 12vh;
+    text-align: center;
+  }
 
 
     #labelTotalDiv {
       color: white;
-      font-size: 1.5vw;
+      font-size: 1.8vw;
       width: 100%;
       height: 5vh;
       text-align: center;
@@ -150,6 +157,7 @@
       height: 6vh;
       padding-top: 3;
       text-align: center;
+      font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
   </style>
 
@@ -168,7 +176,7 @@
       "esri/views/MapView",
       "esri/views/SceneView",
       "esri/layers/FeatureLayer",
-      "esri/views/layers/support/FeatureFilter",
+      "esri/layers/support/FeatureFilter",
       "esri/layers/SceneLayer",
       "esri/layers/Layer",
       "esri/layers/TileLayer",
@@ -205,7 +213,8 @@
       "esri/symbols/edges/SolidEdges3D",
       "esri/layers/GroupLayer",
       "esri/widgets/BasemapToggle",
-      "esri/widgets/Daylight"],
+      "esri/widgets/Daylight",
+      "esri/core/promiseUtils"],
       function (Basemap, Map, MapView, SceneView,
         FeatureLayer, FeatureFilter,
         SceneLayer, Layer, TileLayer, VectorTileLayer,
@@ -217,7 +226,8 @@
         TimeExtent, Expand, Editor, UniqueValueRenderer, DatePicker,
         FeatureTable, Compass, ElevationLayer, Ground,
         BuildingSceneLayer, BuildingExplorer, Slice, SlicePlane,
-        SimpleRenderer, MeshSymbol3D, SolidEdges3D, GroupLayer, BasemapToggle, Daylight) {
+        SimpleRenderer, MeshSymbol3D, SolidEdges3D, GroupLayer, BasemapToggle, Daylight,
+        promiseUtil) {
 
 
         // Create Map
@@ -257,7 +267,7 @@
 
 
         // Create BuildingSceneLayer and add to the map
-        var buildingLayer = new BuildingSceneLayer({
+        const buildingLayer = new BuildingSceneLayer({
           portalItem: {
             id: "aacb26501e824b36be4f307fdc86085c"
           },
@@ -279,9 +289,9 @@
         buildingLayer.when(() => {
           buildingLayer.allSublayers.forEach((layer) => {
             switch (layer.modelName) {
-              //case "FullModel":
-              // layer.visible = true;
-              // break;
+              case "FullModel":
+                layer.visible = true;
+                break;
 
               case "GenericModel":
               case "OpeningElement":
@@ -382,8 +392,8 @@
 
 
 
-        /// chart
-        //const headerTitleDiv = document.getElementById("headerTitleDiv");
+
+
 
         /***************************
          * Creating charts
@@ -402,18 +412,20 @@
           var total_obs = {
             onStatisticField: "Status",
             outStatisticFieldName: "total_obs",
-            statisticType: "count"
+            statisticType: 'count'
           };
 
           var query = columnsLayer.createQuery();
           query.outStatistics = [total_complete, total_obs];
           query.returnGeometry = true;
+
           return columnsLayer.queryFeatures(query).then(function (response) {
             var stats = response.features[0].attributes;
 
             const total_comp = stats.total_complete;
             const total_obs = stats.total_obs;
             const compile_columns = [total_comp, total_obs];
+
             return compile_columns;
           });
         }
@@ -542,7 +554,7 @@
           document.getElementById("totalProgressDiv").innerHTML = ((compile_stFoundation[0] / compile_stFoundation[1]) * 100).toFixed(1) + " %";
         }
 
-        function totalProgressStation() {
+        function totalProgress() {
           totalProgressColumns()
             .then(totalProgressSlabs)
             .then(totalProgressWalls)
@@ -552,7 +564,6 @@
         }
 
 
-        
 
 
 
@@ -562,134 +573,143 @@
 
 
 
-          /***************************
-           * Initialize all widgets
-           ***************************/
-
-          //Adding LayerList with OSM 3D building & textured building being off
-          var LayerList = new LayerList({
-            view: view,
-            listItemCreatedFunction: function (event) {
-              const item = event.item;
-              if (item.title === "OpenStreetMap 3D Buildings" ||
-                item.title === "Esri Netherlands Textured 3D Buildings") {
-                item.visible = false
-              }
-            }
-          });
-
-          var layerListExpand = new Expand({
-            view: view,
-            content: LayerList,
-            expandIconClass: "esri-icon-visible",
-            group: "top-right"
-          });
-
-          view.ui.add(layerListExpand, "top-right");
-          //end
-
-
-          //Adding the daylight widget
-          const daylight = new Daylight({
-            view: view,
-            //play the animation twice as fast than the default one
-            playSpeedMultiplier: 2,
-            //disable the timezone selection button
-            visibleElements: {
-              timezone: false
-            }
-          }); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-right");
-          //end
-
-          /*****Add Editor Widget
-          view.when(() => {
-            view.popup.autoOpenEnabled = true;
-  
-            let editor = new Editor ({
-            view:view
-          });
-  
-          view.ui.add(editor, "bottom-right");
-          });******/
-
-
-          //Compass
-          const compass = new Compass({
-            view: view
-          });
-          view.ui.add(compass, "top-right");
-          //end
 
 
 
-          //Full Screen Logo
-          view.ui.add(
-            new Fullscreen({
-              view: view,
-              element: viewDiv
-            }),
-            "top-right"
-          );//end
 
 
 
-          // See-through-Ground        
-          view.when(function () {
-            // allow navigation above and below the ground
-            map.ground.navigationConstraint = {
-              type: "none"
-            };
-            // the webscene has no basemap, so set a surfaceColor on the ground
-            map.ground.surfaceColor = "#fff";
-            // to see through the ground, set the ground opacity to 0.4
-            map.ground.opacity = 0.9; //
-          });
 
 
-          // See through Gound
-          document
-            .getElementById("opacityInput")
-            .addEventListener("change", function (event) {
-              //map.ground.opacity = event.target.checked ? 0.1 : 0.9;
-              map.ground.opacity = event.target.checked ? 0.1 : 0.6;
-            });
 
-          view.ui.add("menu", "bottom-left");
-          //end
+        /***************************
+         * Initialize all widgets
+         ***************************/
 
-          ////Adding Camera Fly Through
-          let abort = false;
-          let center = null;
-          function rotate() {
-            if (!view.interacting && !abort) {
-
-              play.style.display = "none";
-              pause.style.display = "block";
-
-              center = center || view.center;
-
-              view.goTo({
-                heading: view.camera.heading + 0.2,
-                center
-              }, { animate: false });
-
-              requestAnimationFrame(rotate);
-            } else {
-              abort = false;
-              center = null;
-              play.style.display = "block";
-              pause.style.display = "none";
+        //Adding LayerList with OSM 3D building & textured building being off
+        var LayerList = new LayerList({
+          view: view,
+          listItemCreatedFunction: function (event) {
+            const item = event.item;
+            if (item.title === "OpenStreetMap 3D Buildings" ||
+              item.title === "Esri Netherlands Textured 3D Buildings") {
+              item.visible = false
             }
           }
-
-          play.onclick = rotate;
-          pause.onclick = function () {
-            abort = true;
-          };
-          //End of Camera Fly Through
-
-
         });
+
+        var layerListExpand = new Expand({
+          view: view,
+          content: LayerList,
+          expandIconClass: "esri-icon-visible",
+          group: "top-right"
+        });
+
+        view.ui.add(layerListExpand, "top-right");
+        //end
+
+
+        //Adding the daylight widget
+        const daylight = new Daylight({
+          view: view,
+          //play the animation twice as fast than the default one
+          playSpeedMultiplier: 2,
+          //disable the timezone selection button
+          visibleElements: {
+            timezone: false
+          }
+        }); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-right");
+        //end
+
+        /*****Add Editor Widget
+        view.when(() => {
+          view.popup.autoOpenEnabled = true;
+ 
+          let editor = new Editor ({
+          view:view
+        });
+ 
+        view.ui.add(editor, "bottom-right");
+        });******/
+
+
+        //Compass
+        const compass = new Compass({
+          view: view
+        });
+        view.ui.add(compass, "top-right");
+        //end
+
+
+
+        //Full Screen Logo
+        view.ui.add(
+          new Fullscreen({
+            view: view,
+            element: viewDiv
+          }),
+          "top-right"
+        );//end
+
+
+
+        // See-through-Ground        
+        view.when(function () {
+          // allow navigation above and below the ground
+          map.ground.navigationConstraint = {
+            type: "none"
+          };
+          // the webscene has no basemap, so set a surfaceColor on the ground
+          map.ground.surfaceColor = "#fff";
+          // to see through the ground, set the ground opacity to 0.4
+          map.ground.opacity = 0.9; //
+        });
+
+
+        // See through Gound
+        document
+          .getElementById("opacityInput")
+          .addEventListener("change", function (event) {
+            //map.ground.opacity = event.target.checked ? 0.1 : 0.9;
+            map.ground.opacity = event.target.checked ? 0.1 : 0.6;
+          });
+
+        view.ui.add("menu", "bottom-left");
+        //end
+
+        ////Adding Camera Fly Through
+        let abort = false;
+        let center = null;
+        function rotate() {
+          if (!view.interacting && !abort) {
+
+            play.style.display = "none";
+            pause.style.display = "block";
+
+            center = center || view.center;
+
+            view.goTo({
+              heading: view.camera.heading + 0.2,
+              center
+            }, { animate: false });
+
+            requestAnimationFrame(rotate);
+          } else {
+            abort = false;
+            center = null;
+            play.style.display = "block";
+            pause.style.display = "none";
+          }
+        }
+
+        play.onclick = rotate;
+        pause.onclick = function () {
+          abort = true;
+        };
+        //End of Camera Fly Through
+
+
+      });
   </script>
 
 
@@ -700,11 +720,17 @@
     <div id="headerTitleDiv">DE ZALMHAVEN MIDRISE</div>
     <div class="dateDiv">As of November 22, 2022</div>
 
-    <div id="chartDiv">
-      <div id="ChartTitleDiv" class="esri-widget">Construction Progress</div>
+
+    <div id="progressPanel">
+
+      <label class="ChartTitleDiv"> Construction Progress</label>
+
+      <div id="boxTotal">
         <div id="labelTotalDiv">TOTAL</div>
         <div id="totalProgressDiv"></div>
+      </div>
     </div>
+
 
     <div id="menu" class="esri-widget">
       <input type="checkbox" id="opacityInput" unchecked />
