@@ -227,6 +227,20 @@ require([
        * Creating charts
        ***************************/
 
+
+       function zoomToLayer(layer) {
+        return layer.queryExtent().then(function(response) {
+        view.goTo(response.extent, { //response.extent
+        speedFactor: 2
+        }).catch(function(error) {
+        if (error.name != "AbortError") {
+          console.error(error);
+        }
+        });
+        });
+        }
+
+
       //FOR TOTAL PERCENTAGE
 
       //Architectural Column
@@ -375,12 +389,15 @@ require([
           const compile_stFoundation = [comp_comp, comp_obs];
           
           return compile_stFoundation;
+          
         });
+        
+
       }
 
 
       function progressAll(compile_stFoundation) {
-        document.getElementById("totalProgress").innerHTML = ((compile_stFoundation[0] / compile_stFoundation[1]) * 100).toFixed(1) + " %";
+        document.getElementById("totalProgressDiv").innerHTML = ((compile_stFoundation[0] / compile_stFoundation[1]) * 100).toFixed(1) + " %";
       }
 
       function totalProgress() {
@@ -391,6 +408,9 @@ require([
           .then(totalProgressStFoundation)
           .then(progressAll)
       }
+    
+
+      
 
 
 

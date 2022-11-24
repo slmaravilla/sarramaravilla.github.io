@@ -12,7 +12,7 @@ body,
     vertical-align: middle;
     padding-top: 3px;
     z-index: 99;
-    position: absolute;
+    position: fixed;
     left: 13;
     top: 18;
     color: white;
@@ -42,7 +42,7 @@ body,
     opacity: 0.9;
     margin-top: 10px;
     line-height: 0.5;
-    left: 35;
+    left: 12%;
     position: absolute
 }
 
@@ -66,10 +66,10 @@ body,
     background-color: rgba(0, 0, 0, 0.0);
     color: rgb(255, 255, 255);
     z-index: 99;
-    position: absolute;
+    position: fixed;
     width: 10vw;
-    left: 400px;
-    bottom: 1.5em;
+    left: 22%;
+    bottom: 3%;
 
 
 }
@@ -87,11 +87,11 @@ body,
 }
 
 .overlay {
-    position: absolute;
+    position: fixed;
     z-index: 99;
     width: 2rem;
-    bottom: 4rem;
-    left: 400;
+    bottom: 6%;
+    left: 21%;
     background-color: rgba(80, 80, 80, 0);
     /*text-align: center;*/
     font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -145,7 +145,7 @@ body,
     font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-#totalProgress {
+#totalProgressDiv {
     color: rgb(0, 197, 255);
     font-size: 2.5vw;
     width: 100%;
