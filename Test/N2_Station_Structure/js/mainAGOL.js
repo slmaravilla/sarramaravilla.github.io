@@ -225,7 +225,7 @@ disciplines: false
 //////////////////////////////////////////////////////////////////////////////////
 
 /// chart
-const headerTitleDiv = document.getElementById("headerTitleDiv");
+//const headerTitleDiv = document.getElementById("headerTitleDiv");
 
 
 /*

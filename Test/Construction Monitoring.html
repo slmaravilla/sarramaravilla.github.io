@@ -50,7 +50,7 @@
       margin-top: 10px;
       line-height: 0.5;
       left: 35;
-      position: absolute 
+      position: absolute
     }
 
     .dateDiv {
@@ -75,8 +75,10 @@
       z-index: 99;
       position: absolute;
       width: 10vw;
-      left: 400;
-      bottom: 0.5;
+      left: 400px;
+      bottom: 1.5em;
+      
+      
     }
 
     .sassy-theme .esri-button {
@@ -124,21 +126,21 @@
     }
 
     #boxTotal {
-    display: grid;
-    position: fixed;
-    z-index: 99;
-    background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
-    border-color: white;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-    background-color: rgb(0,0,0,0.5);
-    bottom: 3%;
-    left: 13;
-    color: white;
-    font-size: 2vw;
-    width: 20vw;
-    height: 12vh;
-    text-align: center;
-  }
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 3%;
+      left: 13;
+      color: white;
+      font-size: 2vw;
+      width: 20vw;
+      height: 12vh;
+      text-align: center;
+    }
 
 
     #labelTotalDiv {
@@ -150,7 +152,7 @@
       font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
-    #totalProgressDiv {
+    #totalProgress {
       color: rgb(0, 197, 255);
       font-size: 2.5vw;
       width: 100%;
@@ -340,7 +342,7 @@
         // only display the building levels filter
         buildingExplorer.visibleElements = {
           phases: false,
-          disciplines: true
+          disciplines: false
         };
         //end
 
@@ -545,13 +547,14 @@
             const comp_comp = total_comp + compile_beams[0];
             const comp_obs = total_obs + compile_beams[1];
             const compile_stFoundation = [comp_comp, comp_obs];
-
+            
             return compile_stFoundation;
           });
         }
 
+
         function progressAll(compile_stFoundation) {
-          document.getElementById("totalProgressDiv").innerHTML = ((compile_stFoundation[0] / compile_stFoundation[1]) * 100).toFixed(1) + " %";
+          document.getElementById("totalProgress").innerHTML = ((compile_stFoundation[0] / compile_stFoundation[1]) * 100).toFixed(1) + " %";
         }
 
         function totalProgress() {
@@ -562,7 +565,6 @@
             .then(totalProgressStFoundation)
             .then(progressAll)
         }
-
 
 
 
@@ -727,7 +729,7 @@
 
       <div id="boxTotal">
         <div id="labelTotalDiv">TOTAL</div>
-        <div id="totalProgressDiv"></div>
+        <div id="totalProgress"></div>
       </div>
     </div>
 
