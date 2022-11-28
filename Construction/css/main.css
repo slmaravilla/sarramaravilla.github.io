@@ -154,3 +154,7 @@ body,
     text-align: center;
     font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+
+#formDiv {
+    width: 100%;
+}

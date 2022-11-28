@@ -50,7 +50,7 @@
       const trailsLayer = new FeatureLayer({
         url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
         definitionExpression: "ELEV_GAIN < 250",
-        renderer:{
+        renderer: {
           type: "simple",
           symbol: {
             type: "simple-line",
@@ -59,7 +59,7 @@
           }
         },
         outFields: ["TRL_NAME", "ELEV_GAIN"],
-        pompTemplate:{
+        pompTemplate: {
           title: "{TRL_NAME}",
           content: "The trail elevation gain is {ELEV_GAIN} ft."
         }
@@ -76,6 +76,10 @@
       //  url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/Free_Dive_Spots/FeatureServer/0"
       //});
       //map.add(sample, 0);
+
+      //Add Editor Widget
+      var editor = new Editor({ view: view });
+      view.ui.add(editor, "bottom-right");
 
     });
   </script>

@@ -152,11 +152,8 @@ require([
       });
     });
     //end
+   
 
-
-
-
-    
 
     //Remove deafult widgets on the left
     view.ui.empty("top-left");
@@ -261,14 +258,6 @@ require([
       }
     }); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-right");
     //end
-
-
-    
-    //Add Editor Widget
-    var editor = new Editor ({
-      view:view,
-    });
-    view.ui.add(editor, "bottom-right");
 
 
 
@@ -533,7 +522,7 @@ require([
         .then(progressAll)
     }*/
 
-
+    /**
     function totalProgress() {
       var total_complete = {
         onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
@@ -560,13 +549,14 @@ require([
       });
     }
     totalProgress();
-    
+    **/
 
 
 
 
 
-});
+
+  });
 
 
 
