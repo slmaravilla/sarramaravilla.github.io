@@ -14,6 +14,59 @@
             height: 100%;
             width: 100%;
         }
+
+        .chartTitleDiv {
+            font-weight: 200;
+            text-align: center;
+            font-style: normal;
+            font-size: 1.5vw;
+            font-family: 'Roboto-Condensed', sans-serif;
+            color: white;
+            background-color: rgba(0, 0, 0, 0);
+            opacity: 0.9;
+            margin-top: 10px;
+            line-height: 0.5;
+            left: 12%;
+            position: absolute
+        }
+
+
+        #boxTotal {
+            display: grid;
+            position: fixed;
+            z-index: 99;
+            background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+            border-color: white;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            background-color: rgb(0, 0, 0, 0.5);
+            bottom: 3%;
+            left: 13;
+            color: white;
+            font-size: 2vw;
+            width: 20vw;
+            height: 12vh;
+            text-align: center;
+        }
+
+
+        #labelTotalDiv {
+            color: white;
+            font-size: 1.8vw;
+            width: 100%;
+            height: 5vh;
+            text-align: center;
+            font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        #totalProgress {
+            color: rgb(0, 197, 255);
+            font-size: 2.5vw;
+            width: 100%;
+            height: 6vh;
+            padding-top: 3;
+            text-align: center;
+            font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
     </style>
 
     <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
@@ -92,22 +145,17 @@
                         position: [4.479686585031793, 51.9071412859027, 200],
                         tilt: 60,
                     },
+                    environment: {
+                        background: {
+                            type: "color",
+                            color: [0, 0, 0, 1]
+                        },
+                        // disable stars
+                        starsEnabled: false,
+                        //disable atmosphere
+                        atmosphereEnabled: false
+                    }
                 });
-
-                /*const buildingLayer = new BuildingSceneLayer({
-                    portalItem: {
-                        id: "aacb26501e824b36be4f307fdc86085c"
-                    },
-                    outFields: ["*"],
-                    title: "De Zalmhaven Midrise"
-                });
-                map.add(buildingLayer);*/
-
-
-                /*const slabsLayer = new SceneLayer({
-                    url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/De_Zalmhaven_Midrise_Slabs/SceneServer"
-                });
-                map.add(slabsLayer);*/
 
                 const buildingLayer = new SceneLayer({
                     url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/De_Zalmhaven_Midrise_1/SceneServer"
@@ -117,6 +165,64 @@
                 const editor = new Editor({
                     view: view
                 }); view.ui.add(editor, "top-right");
+
+                function totalProgress() {
+                    var total_complete = {
+                        onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+                        outStatisticFieldName: "total_complete",
+                        statisticType: "sum"
+                    };
+
+                    var total_obs = {
+                        onStatisticField: "Status",
+                        outStatisticFieldName: "total_obs",
+                        statisticType: "count"
+                    };
+                    var query = buildingLayer.createQuery();
+                    query.outStatistics = [total_complete, total_obs];
+                    query.returnGeometry = true;
+                    buildingLayer.queryFeatures(query).then(function (response) {
+                        var stats = response.features[0].attributes;
+
+                        const total_complete = stats.total_complete;
+                        const total_obs = stats.total_obs;
+                        document.getElementById("totalProgress").innerHTML = ((total_complete / total_obs) * 100).toFixed(1) + " %";
+                    });
+                }
+                totalProgress();
+
+
+
+
+
+
+                /***********************
+                 ***Initialize Widgets**
+                 ***********************/
+
+                // See-through-Ground        
+                view.when(function () {
+                    // allow navigation above and below the ground
+                    map.ground.navigationConstraint = {
+                        type: "none"
+                    };
+                    // the webscene has no basemap, so set a surfaceColor on the ground
+                    map.ground.surfaceColor = "#fff";
+                    // to see through the ground, set the ground opacity to 0.4
+                    map.ground.opacity = 0.9; //
+                });
+
+
+                // See through Gound
+                document
+                    .getElementById("opacityInput")
+                    .addEventListener("change", function (event) {
+                        //map.ground.opacity = event.target.checked ? 0.1 : 0.9;
+                        map.ground.opacity = event.target.checked ? 0.1 : 0.6;
+                    });
+
+                view.ui.add("menu", "bottom-left");
+                //end
 
 
 
@@ -131,7 +237,20 @@
 </head>
 
 <body>
-    <div id="viewDiv"></div>
+    <div id="viewDiv">
+
+        <div id="progressPanel">
+
+            <label class="ChartTitleDiv"> Construction Progress</label>
+
+            <div id="boxTotal">
+                <div id="labelTotalDiv">TOTAL</div>
+                <div id="totalProgress"></div>
+            </div>
+        </div>
+
+    </div>
+
 </body>
 
 </html>
