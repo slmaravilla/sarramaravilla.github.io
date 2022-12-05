@@ -357,7 +357,7 @@ require([
     //FOR TOTAL PERCENTAGE
 
     //Architectural Column
-    /**function totalProgressColumns() {
+    function totalProgressColumns() {
       var total_complete = {
         onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
         outStatisticFieldName: "total_complete",
@@ -506,10 +506,10 @@ require([
       });
     
     
-    }*///
+    }
 
 
-    /*function progressAll(compile_stFoundation) {
+    function progressAll(compile_stFoundation) {
       document.getElementById("totalProgressDiv").innerHTML = ((compile_stFoundation[0] / compile_stFoundation[1]) * 100).toFixed(1) + " %";
     }
     
@@ -520,43 +520,8 @@ require([
         .then(totalProgressBeams)
         .then(totalProgressStFoundation)
         .then(progressAll)
-    }*/
-
-    /**
-    function totalProgress() {
-      var total_complete = {
-        onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
-        outStatisticFieldName: "total_complete",
-        statisticType: "sum"
-      };
-
-      var total_obs = {
-        onStatisticField: "Status",
-        outStatisticFieldName: "total_obs",
-        statisticType: 'count'
-      };
-
-      var query = stFoundationLayer.createQuery();
-      query.outStatistics = [total_complete, total_obs];
-      query.returnGeometry = true;
-
-      stFoundationLayer.queryFeatures(query).then(function (response) {
-        var stats = response.features[0].attributes;
-
-        const total_comp = stats.total_complete;
-        const total_obs = stats.total_obs;
-        document.getElementById("totalProgressDiv").innerHTML = ((total_comp / total_obs) * 100).toFixed(1) + " %";
-      });
-    }
-    totalProgress();
-    **/
-
-
-
-
-
-
-  });
+    } totalProgress();
+  }); 
 
 
 
