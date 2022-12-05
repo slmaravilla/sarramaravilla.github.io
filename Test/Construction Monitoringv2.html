@@ -46,7 +46,6 @@
         }
 
 
-
         .chartTitleDiv {
             font-weight: 200;
             text-align: center;
@@ -244,7 +243,7 @@
                 BuildingSceneLayer, BuildingExplorer, Slice, SlicePlane,
                 SimpleRenderer, MeshSymbol3D, SolidEdges3D, GroupLayer, BasemapToggle, Daylight,
                 promiseUtil) {
-                let editFeature, highlight, chartLayerView;
+                let editFeature, highlight, chartLayerView, editExpand;
 
 
                 /////////////
@@ -289,6 +288,7 @@
 
                 });
                 map.add(buildingLayer);
+
 
 
                 //EDITOR WIDGET
@@ -937,30 +937,9 @@
 
                         }); // End of queryFeatures function
 
-
-
                     } updateChart();
 
-
-
-
                 }); // End of am4Core.ready()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             });
