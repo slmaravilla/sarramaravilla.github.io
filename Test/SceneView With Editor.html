@@ -157,14 +157,21 @@
                     }
                 });
 
+
+
                 const buildingLayer = new SceneLayer({
                     url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/De_Zalmhaven_Midrise_1/SceneServer"
                 });
                 map.add(buildingLayer);
 
+
+
                 const editor = new Editor({
                     view: view
-                }); view.ui.add(editor, "top-right");
+                }); view.ui.add(editor, "bottom-right");
+
+
+
 
                 function totalProgress() {
                     var total_complete = {
