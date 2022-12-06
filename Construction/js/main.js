@@ -351,8 +351,7 @@ require([
      ***************************/
 
 
-
-
+    return [columnsLayer, slabsLayer, wallsLayer, beamsLayer, stFoundationLayer];
 
     //FOR TOTAL PERCENTAGE
 
@@ -507,7 +506,6 @@ require([
     
     
     }
-
 
     function progressAll(compile_stFoundation) {
       document.getElementById("totalProgressDiv").innerHTML = ((compile_stFoundation[0] / compile_stFoundation[1]) * 100).toFixed(1) + " %";

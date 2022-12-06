@@ -39,6 +39,22 @@
             background-color: rgb(0, 0, 0, 0.5);
         }
 
+
+        #dropdownDiv {
+            width: 230px;
+            padding: 0 12px 0 12px;
+            padding: 10px;
+            align-items: center;
+            position: absolute;
+            z-index: 99;
+            right: 100;
+            top: 3%;
+            border-color: white;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            background-color: white;
+        }
+
+
         #chartdiv {
             width: 100%;
             height: 78%;
@@ -46,7 +62,7 @@
         }
 
 
-        .chartTitleDiv {
+        #chartTitleDiv {
             font-weight: 200;
             text-align: center;
             font-style: normal;
@@ -174,8 +190,7 @@
         }
     </style>
 
-    <link rel="stylesheet"
-    href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
 
     <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
@@ -284,8 +299,28 @@
 
                 const buildingLayer = new SceneLayer({
                     url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/De_Zalmhaven_Midrise_1/SceneServer",
-                    title: "De Zalmhaven Midrise"
-
+                    title: "De Zalmhaven Midrise",
+                    popupTemplate: {
+                        content: [
+                            {
+                                type: "fields",
+                                fieldInfos: [
+                                    {
+                                        fieldName: "SubType",
+                                        label: "Category"
+                                    },
+                                    {
+                                        fieldName: "BldgLevel",
+                                        label: "Floor"
+                                    },
+                                    {
+                                        fieldName: "Status",
+                                        label: "Status"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 });
                 map.add(buildingLayer);
 
@@ -483,43 +518,87 @@
 
 
 
+
+
+
                 /***********************
                 ***PROGRESS CHARTS**
                  ***********************/
 
 
 
-                function totalProgress() {
-                    var total_complete = {
-                        onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
-                        outStatisticFieldName: "total_complete",
-                        statisticType: "sum"
-                    };
 
-                    var total_obs = {
-                        onStatisticField: "Status",
-                        outStatisticFieldName: "total_obs",
-                        statisticType: "count"
-                    };
-                    var query = buildingLayer.createQuery();
-                    query.outStatistics = [total_complete, total_obs];
-                    query.returnGeometry = true;
-                    buildingLayer.queryFeatures(query).then(function (response) {
-                        var stats = response.features[0].attributes;
-
-                        const total_complete = stats.total_complete;
-                        const total_obs = stats.total_obs;
-                        document.getElementById("totalProgress").innerHTML = ((total_complete / total_obs) * 100).toFixed(1) + " %";
-                    });
-                } totalProgress();
-
-
+                var dropdownValue = document.getElementById("floorSelect");
 
                 // Create Bar chart to show progress of station structure
                 am4core.ready(function () {
                     am4core.useTheme(am4themes_animated);
 
-                    const chartTitleLabel = "Construction Progress";
+
+                    function getValues() {
+                        var testArray = [];
+                        var query = buildingLayer.createQuery();
+                        query.outFields = ["BldgLevel"];
+                        buildingLayer.returnGeometry = true;
+                        return buildingLayer.queryFeatures(query).then(function (response) {
+                            var stats = response.features;
+                            stats.forEach((result, index) => {
+                                var attributes = result.attributes;
+                                const values = attributes.BldgLevel;
+                                testArray.push(values);
+                            });
+                            return testArray;
+                        });
+                    }
+
+                    function getUniqueValues(values) {
+                        var uniqueValues = [];
+                        values.forEach(function (item, i) {
+                            if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
+                                uniqueValues.push(item);
+                            }
+                        });
+                        return uniqueValues;
+                    }
+
+                    function addToSelect(values) {
+                        dropdownValue.options.length = 0;
+                        values.sort(function (a, b) { return a - b }); //ascending order
+                        values.unshift('All');
+                        values.forEach(function (value) {
+                            var option = document.createElement("option");
+                            option.text = value;
+                            dropdownValue.add(option);
+                        });
+                    }
+
+                    getValues()
+                        .then(getUniqueValues)
+                        .then(addToSelect)
+
+
+                    dropdownValue.addEventListener("click", filterByTest);
+                    function filterByTest(event) {
+                        const selectedID = event.target.value;
+
+                        if (selectedID === "All") {
+                            buildingLayer.definitionExpression = null;
+                            
+                            //totalProgress();
+                            //updateChart();
+                        } else {
+                            buildingLayer.definitionExpression = "BldgLevel = '" + selectedID + "'";
+                            //totalProgress();
+                            //updateChart();
+                        }
+                    }
+
+
+
+
+
+
+
 
                     function updateChart() {
                         //Column
@@ -640,10 +719,10 @@
 
                         var query = buildingLayer.createQuery();
                         query.outStatistics = [total_column_tobeC, total_column_underC, total_column_done, total_column_delayed,
-                                                total_slab_tobeC, total_slab_underC, total_slab_done, total_slab_delayed,
-                                                total_wall_tobeC, total_wall_underC, total_wall_done, total_wall_delayed,
-                                                total_beam_tobeC, total_beam_underC, total_beam_done, total_beam_delayed,
-                                                total_stFoundation_tobeC, total_stFoundation_underC, total_stFoundation_done, total_stFoundation_delayed]
+                            total_slab_tobeC, total_slab_underC, total_slab_done, total_slab_delayed,
+                            total_wall_tobeC, total_wall_underC, total_wall_done, total_wall_delayed,
+                            total_beam_tobeC, total_beam_underC, total_beam_done, total_beam_delayed,
+                            total_stFoundation_tobeC, total_stFoundation_underC, total_stFoundation_done, total_stFoundation_delayed]
                         query.returnGeometry = true;
 
                         buildingLayer.queryFeatures(query).then(function (response) {
@@ -720,7 +799,7 @@
                                     value3: stFoundation_tobeC,
                                     value4: stFoundation_delayed
                                 }
-                                
+
                             ]; //End of chart
 
                             chart.colors.step = 2;
@@ -942,6 +1021,50 @@
                 }); // End of am4Core.ready()
 
 
+
+                function totalProgress() {
+                    var total_complete = {
+                        onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+                        outStatisticFieldName: "total_complete",
+                        statisticType: "sum"
+                    };
+
+                    var total_obs = {
+                        onStatisticField: "Status",
+                        outStatisticFieldName: "total_obs",
+                        statisticType: "count"
+                    };
+                    var query = buildingLayer.createQuery();
+                    query.outStatistics = [total_complete, total_obs];
+                    query.returnGeometry = true;
+                    buildingLayer.queryFeatures(query).then(function (response) {
+                        var stats = response.features[0].attributes;
+
+                        const total_complete = stats.total_complete;
+                        const total_obs = stats.total_obs;
+                        document.getElementById("totalProgress").innerHTML = ((total_complete / total_obs) * 100).toFixed(1) + " %";
+                    });
+                } totalProgress();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             });
     </script>
 
@@ -952,10 +1075,16 @@
         <div id="headerTitleDiv">DE ZALMHAVEN MIDRISE</div>
         <div class="dateDiv">As of December 5, 2022</div>
 
+        <div class="esri-widgets" id="dropdownDiv">
+            <label for="sel-options"> Filter building by floor: </label>
+            <select class="esri-widget" id="floorSelect"></select>
+
+        </div>
+
 
         <div id="progressPanel">
 
-            <label class="ChartTitleDiv"> Construction Progress</label>
+            <div id="ChartTitleDiv"> Construction Progress</div>
             <div id="chartdiv"></div>
             <div id="boxTotal">
                 <div id="labelTotalDiv">TOTAL</div>
