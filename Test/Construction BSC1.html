@@ -1,0 +1,447 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Construction Monitoring</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css" />
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        #headerTitleDiv {
+            font-size: 3.0vw;
+            vertical-align: middle;
+            padding-top: 3px;
+            z-index: 99;
+            position: fixed;
+            left: 13;
+            top: 18;
+            color: white;
+        }
+
+        #progressPanel {
+            width: 20vw;
+            height: 80vh;
+            align-items: center;
+            position: absolute;
+            z-index: 99;
+            left: 13;
+            bottom: 3%;
+            border-color: white;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            background-color: rgb(0, 0, 0, 0.5);
+        }
+
+        .chartTitleDiv {
+            font-weight: 200;
+            text-align: center;
+            font-style: normal;
+            font-size: 1.5vw;
+            font-family: 'Roboto-Condensed', sans-serif;
+            color: white;
+            background-color: rgba(0, 0, 0, 0);
+            opacity: 0.9;
+            margin-top: 10px;
+            line-height: 0.5;
+            left: 12%;
+            position: absolute
+        }
+
+        .dateDiv {
+            color: rgb(0, 197, 255);
+            font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            text-align: left;
+            font-weight: normal;
+            font-size: 1.1vw;
+            padding-top: 2%;
+            margin: 0;
+            z-index: 99;
+            top: 55;
+            left: 13;
+            position: absolute;
+        }
+
+        #menu {
+            padding: 1;
+            max-width: 250px;
+            background-color: rgba(0, 0, 0, 0.0);
+            color: rgb(255, 255, 255);
+            z-index: 99;
+            position: fixed;
+            width: 10vw;
+            left: 22%;
+            bottom: 3%;
+
+
+        }
+
+        .sassy-theme .esri-button {
+            background-color: rgba(0, 0, 0, 0);
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sassy-theme .esri-legend__layer-caption {
+            display: none;
+        }
+
+        .overlay {
+            position: fixed;
+            z-index: 99;
+            width: 2rem;
+            bottom: 6%;
+            left: 21%;
+            background-color: rgba(80, 80, 80, 0);
+            /*text-align: center;*/
+            font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        .button {
+            cursor: pointer;
+            font-size: 25pt !important;
+            font-weight: bold !important;
+            color: rgb(230, 230, 230);
+        }
+
+        .button:hover,
+        #label {
+            color: white;
+        }
+
+        .button,
+        #label {
+            margin: 15px;
+        }
+
+        .esri-view-surface--inset-outline:focus::after {
+            outline: none !important;
+        }
+
+        #boxTotal {
+            display: grid;
+            position: fixed;
+            z-index: 99;
+            background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+            border-color: white;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            background-color: rgb(0, 0, 0, 0.5);
+            bottom: 3%;
+            left: 13;
+            color: white;
+            font-size: 2vw;
+            width: 20vw;
+            height: 12vh;
+            text-align: center;
+        }
+
+
+        #labelTotalDiv {
+            color: white;
+            font-size: 1.8vw;
+            width: 100%;
+            height: 5vh;
+            text-align: center;
+            font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        #totalProgressDiv {
+            color: rgb(0, 197, 255);
+            font-size: 2.5vw;
+            width: 100%;
+            height: 6vh;
+            padding-top: 3;
+            text-align: center;
+            font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        #formDiv {
+            width: 100%;
+        }
+    </style>
+
+    <script src="https://js.arcgis.com/4.24/"></script>
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+    <script>
+
+        require([
+            "esri/Basemap",
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/views/SceneView",
+            "esri/layers/FeatureLayer",
+            "esri/layers/support/FeatureFilter",
+            "esri/layers/SceneLayer",
+            "esri/layers/Layer",
+            "esri/layers/TileLayer",
+            "esri/layers/VectorTileLayer",
+            "esri/layers/support/LabelClass",
+            "esri/symbols/LabelSymbol3D",
+            "esri/WebMap",
+            "esri/WebScene",
+            "esri/portal/PortalItem",
+            "esri/portal/Portal",
+            "esri/widgets/TimeSlider",
+            "esri/widgets/Legend",
+            "esri/widgets/LayerList",
+            "esri/widgets/Fullscreen",
+            "esri/rest/geometryService",
+            "esri/rest/support/Query",
+            "esri/rest/support/StatisticDefinition",
+            "esri/symbols/WebStyleSymbol",
+            "esri/TimeExtent",
+            "esri/widgets/Expand",
+            "esri/widgets/Editor",
+            "esri/renderers/UniqueValueRenderer",
+            "esri/widgets/support/DatePicker",
+            "esri/widgets/FeatureTable",
+            "esri/widgets/Compass",
+            "esri/layers/ElevationLayer",
+            "esri/Ground",
+            "esri/layers/BuildingSceneLayer",
+            "esri/widgets/BuildingExplorer",
+            "esri/widgets/Slice",
+            "esri/analysis/SlicePlane",
+            "esri/renderers/SimpleRenderer",
+            "esri/symbols/MeshSymbol3D",
+            "esri/symbols/edges/SolidEdges3D",
+            "esri/layers/GroupLayer",
+            "esri/widgets/BasemapToggle",
+            "esri/widgets/Daylight",
+            "esri/core/promiseUtils"],
+            function (Basemap, Map, MapView, SceneView,
+                FeatureLayer, FeatureFilter,
+                SceneLayer, Layer, TileLayer, VectorTileLayer,
+                LabelClass, LabelSymbol3D, WebMap,
+                WebScene, PortalItem, Portal,
+                TimeSlider, Legend, LayerList, Fullscreen,
+                geometryService, Query,
+                StatisticDefinition, WebStyleSymbol,
+                TimeExtent, Expand, Editor, UniqueValueRenderer, DatePicker,
+                FeatureTable, Compass, ElevationLayer, Ground,
+                BuildingSceneLayer, BuildingExplorer, Slice, SlicePlane,
+                SimpleRenderer, MeshSymbol3D, SolidEdges3D, GroupLayer, BasemapToggle, Daylight,
+                promiseUtil) {
+
+
+                // Create Map
+                var map = new Map({
+                    basemap: "dark-gray-vector",
+                    ground: "world-elevation"
+                });
+
+                // Create the SceneView
+                var view = new SceneView({
+                    container: "viewDiv",
+                    map: map,
+                    camera: {
+                        position: [4.479686585031793, 51.9071412859027, 200],
+                        tilt: 60,
+                    },
+                    environment: {
+                        background: {
+                            type: "color", // autocasts as new ColorBackground()
+                            color: [0, 0, 0, 1]
+                        },
+                        // disable stars
+                        starsEnabled: false,
+                        //disable atmosphere
+                        atmosphereEnabled: false
+                    }
+                });
+                //end
+
+
+                //Add Basemap toggle
+                const toggle = new BasemapToggle({
+                    view: view,
+                    nextBasemap: "hybrid"
+                });
+                view.ui.add(toggle, "top-right");
+
+
+                // Create BuildingSceneLayer and add to the map
+                const buildingLayer = new BuildingSceneLayer({
+                    portalItem: {
+                        id: "aacb26501e824b36be4f307fdc86085c"
+                    },
+                    outFields: ["*"],
+                    title: "De Zalmhaven Midrise"
+                });
+                map.add(buildingLayer);
+
+
+                //Discipline: Architectural
+                var columnsLayer = null;
+                var slabsLayer = null;
+                var wallsLayer = null;
+
+                //Discipline: Structural
+                var beamsLayer = null;
+                var stFoundationLayer = null;
+
+                buildingLayer.when(() => {
+                    buildingLayer.allSublayers.forEach((layer) => {
+                        switch (layer.modelName) {
+                            case "FullModel":
+                                layer.visible = true;
+                                break;
+
+                            case "GenericModel":
+                            case "OpeningElement":
+                                layer.visible = false;
+                                break;
+
+                            case "Columns":
+                                columnsLayer = layer;
+                                break;
+
+                            case "Slabs":
+                                slabsLayer = layer;
+                                break;
+
+                            case "Walls":
+                                wallsLayer = layer;
+                                break;
+
+                            case "Beams":
+                                beamsLayer = layer;
+                                break;
+
+                            case "StructuralFoundation":
+                                stFoundationLayer = layer;
+                                break;
+
+                            default:
+                                layer.visible = true;
+                        }
+                    });
+                });
+                //end
+
+
+
+                //Remove deafult widgets on the left
+                view.ui.empty("top-left");
+                //end
+
+                //Adding building explorer
+                const buildingExplorer = new BuildingExplorer({
+                    view: view,
+                    layers: [buildingLayer]
+                });
+                view.ui.add(buildingExplorer, "bottom-right");
+
+                // only display the building levels filter
+                buildingExplorer.visibleElements = {
+                    phases: false,
+                    disciplines: false
+                };
+                //end
+
+
+
+
+                /***************************
+                 * Creating charts
+                 ***************************/
+
+
+
+                var headerTitleDiv = document.getElementById("headerTitleDiv");
+                //headerTitleDiv.innerHTML = total_obs;
+
+                //FOR TOTAL PERCENTAGE0
+
+                //Architectural Column
+
+
+                function totalProgressColumn() {
+                    var total_complete = {
+                        onStatisticField: "CASE WHEN STATUS = 4 THEN 1 ELSE 0 END",
+                        outStatisticFieldName: "total_complete",
+                        statisticType: "sum"
+                    };
+
+                    var total_obs = {
+                        onStatisticField: "Status",
+                        outStatisticFieldName: "total_obs",
+                        statisticType: "count"
+                    };
+
+                    var query = columnsLayer.createQuery();
+                    query.outStatistics = [total_complete, total_obs];
+                    query.returnGeometry = true;
+                    return columnsLayer.queryFeatures(query).then(function(response) {
+                        var stats = response.feautes[0].attributes;
+
+                        const total_comp = stats.total_complete;
+                        const total_obs = stats.total_obs;
+                        const compile_column = [total_comp, total_obs];
+                        headerTitleDiv.innerHTML = total_comp;
+                        //return compile_column;
+                    });
+                }
+                
+                
+                
+
+                
+
+
+
+
+            });
+
+
+    </script>
+
+</head>
+
+<body class="sassy-theme">
+    <div id="viewDiv">
+        <div id="headerTitleDiv">DE ZALMHAVEN MIDRISE</div>
+        <div class="dateDiv">As of November 24, 2022</div>
+
+
+        <div id="progressPanel">
+
+            <label class="ChartTitleDiv"> Construction Progress</label>
+
+            <div id="boxTotal">
+                <div id="labelTotalDiv">TOTAL</div>
+                <div id="totalProgressDiv"></div>
+            </div>
+        </div>
+
+
+        <div id="menu" class="esri-widget">
+            <input type="checkbox" id="opacityInput" unchecked />
+            <label for="opacityInput">No ground</label>
+        </div>
+
+        <div class="overlay">
+            <div>
+                <span id="play" class="button esri-icon-play" style="display: block;" />
+            </div>
+            <div>
+                <span id="pause" class="button esri-icon-pause" style="display: none;" />
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
