@@ -535,6 +535,11 @@
                     am4core.useTheme(am4themes_animated);
 
 
+                    //buildingLayer.definitionExpression = null;
+                    //totalProgress();
+                    //updateChart();
+
+
                     function getValues() {
                         var testArray = [];
                         var query = buildingLayer.createQuery();
@@ -577,19 +582,21 @@
                         .then(addToSelect)
 
 
+                    
+
+
                     dropdownValue.addEventListener("click", filterByTest);
                     function filterByTest(event) {
                         const selectedID = event.target.value;
 
                         if (selectedID === "All") {
                             buildingLayer.definitionExpression = null;
-                            
-                            //totalProgress();
-                            //updateChart();
+                            totalProgress();
+                            updateChart();
                         } else {
-                            buildingLayer.definitionExpression = "BldgLevel = '" + selectedID + "'";
-                            //totalProgress();
-                            //updateChart();
+                            buildingLayer.definitionExpression = "BldgLevel = " + selectedID;
+                            totalProgress();
+                            updateChart();
                         }
                     }
 

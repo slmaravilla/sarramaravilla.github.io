@@ -169,7 +169,7 @@
         }
     </style>
 
-    <script src="https://js.arcgis.com/4.24/"></script>
+    <script src="https://js.arcgis.com/4.25/"></script>
     <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
     <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
@@ -274,9 +274,7 @@
 
                 // Create BuildingSceneLayer and add to the map
                 const buildingLayer = new BuildingSceneLayer({
-                    portalItem: {
-                        id: "aacb26501e824b36be4f307fdc86085c"
-                    },
+                    url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/De_Zalmhaven_Midrise_2/SceneServer",
                     outFields: ["*"],
                     title: "De Zalmhaven Midrise"
                 });
@@ -301,8 +299,10 @@
 
                             case "GenericModel":
                             case "OpeningElement":
+                            case "ExteriorShell":
                                 layer.visible = false;
                                 break;
+
 
                             case "Columns":
                                 columnsLayer = layer;
@@ -333,24 +333,24 @@
 
 
 
-                //Remove deafult widgets on the left
+                //*Remove deafult widgets on the left
                 view.ui.empty("top-left");
                 //end
-
-                //Adding building explorer
-                const buildingExplorer = new BuildingExplorer({
-                    view: view,
-                    layers: [buildingLayer]
-                });
-                view.ui.add(buildingExplorer, "bottom-right");
-
-                // only display the building levels filter
-                buildingExplorer.visibleElements = {
-                    phases: false,
-                    disciplines: false
-                };
-                //end
-
+                /*
+                                //Adding building explorer
+                                const buildingExplorer = new BuildingExplorer({
+                                    view: view,
+                                    layers: [buildingLayer]
+                                });
+                                view.ui.add(buildingExplorer, "bottom-right");
+                
+                                // only display the building levels filter
+                                buildingExplorer.visibleElements = {
+                                    phases: false,
+                                    disciplines: false
+                                };
+                                //end
+                */
 
 
 
@@ -361,9 +361,9 @@
 
 
                 var headerTitleDiv = document.getElementById("headerTitleDiv");
-                //headerTitleDiv.innerHTML = total_obs;
 
-                //FOR TOTAL PERCENTAGE0
+
+                //FOR TOTAL PERCENTAGE
 
                 //Architectural Column
 
@@ -381,24 +381,26 @@
                         statisticType: "count"
                     };
 
-                    var query = columnsLayer.createQuery();
+                    var query = stFoundationLayer.createQuery();
                     query.outStatistics = [total_complete, total_obs];
                     query.returnGeometry = true;
-                    return columnsLayer.queryFeatures(query).then(function(response) {
-                        var stats = response.feautes[0].attributes;
+                    return stFoundationLayer.queryFeatures(query).then(function (response) {
+                        var stats = response.features[0].attributes;
 
                         const total_comp = stats.total_complete;
                         const total_obs = stats.total_obs;
                         const compile_column = [total_comp, total_obs];
-                        headerTitleDiv.innerHTML = total_comp;
-                        //return compile_column;
+                        headerTitleDiv.innerHTML = total_obs;
+
+                        return compile_column;
                     });
                 }
-                
-                
-                
+                //headerTitleDiv.innerHTML = "aaaa";
 
-                
+
+
+
+
 
 
 
