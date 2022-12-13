@@ -59,6 +59,7 @@
             width: 100%;
             height: 78%;
             padding-top: 10%;
+            
         }
 
 
@@ -73,7 +74,7 @@
             opacity: 0.9;
             margin-top: 10px;
             line-height: 0.5;
-            left: 12%;
+            left: 13%;
             position: absolute
         }
 
@@ -188,6 +189,8 @@
             text-align: center;
             font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
+
+        
     </style>
 
     <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
@@ -244,7 +247,12 @@
             "esri/layers/GroupLayer",
             "esri/widgets/BasemapToggle",
             "esri/widgets/Daylight",
-            "esri/core/promiseUtils"],
+            "esri/core/promiseUtils",
+            "esri/widgets/FeatureForm",
+            "esri/Graphic",
+            "esri/form/FormTemplate",
+            "esri/widgets/FeatureForm/FieldConfig",
+            "esri/form/elements/FieldElement"],
             function (Basemap, Map, MapView, SceneView,
                 FeatureLayer, FeatureFilter,
                 SceneLayer, Layer, TileLayer, VectorTileLayer,
@@ -257,8 +265,8 @@
                 FeatureTable, Compass, ElevationLayer, Ground,
                 BuildingSceneLayer, BuildingExplorer, Slice, SlicePlane,
                 SimpleRenderer, MeshSymbol3D, SolidEdges3D, GroupLayer, BasemapToggle, Daylight,
-                promiseUtil) {
-                let editFeature, highlight, chartLayerView, editExpand;
+                promiseUtil, FeatureForm, Graphic, FormTemplate, FieldConfig, FieldElement) {
+                let editFeature, highlight, chartLayerView, featureForm, editArea, attributeEditing, updateInstructionDiv;
 
 
                 /////////////
@@ -272,7 +280,7 @@
                     map: map,
                     container: "viewDiv",
                     camera: {
-                        position: [4.479686585031793, 51.9071412859027, 200],
+                        position: [4.479633688492269, 51.90712219959256, 200],
                         tilt: 60,
                     },
                     environment: {
@@ -300,39 +308,19 @@
                 const buildingLayer = new SceneLayer({
                     url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/De_Zalmhaven_Midrise_1/SceneServer",
                     title: "De Zalmhaven Midrise",
-                    popupTemplate: {
-                        content: [
-                            {
-                                type: "fields",
-                                fieldInfos: [
-                                    {
-                                        fieldName: "SubType",
-                                        label: "Category"
-                                    },
-                                    {
-                                        fieldName: "BldgLevel",
-                                        label: "Floor"
-                                    },
-                                    {
-                                        fieldName: "Status",
-                                        label: "Status"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
+                    outFields: ["*"],
+                    
                 });
                 map.add(buildingLayer);
 
 
-
+/*
                 //EDITOR WIDGET
                 const editor = new Editor({
                     view: view
                 }); view.ui.add(editor, "bottom-right");
                 //END OF EDITOR WIDGET
-
-
+*/
 
                 // Adding OpenStreetMap 3D Buildings
                 // Defining the osm 3D building symbol
@@ -517,20 +505,7 @@
 
 
 
-
-
-
-
-                /***********************
-                ***PROGRESS CHARTS**
-                 ***********************/
-
-
-
-
-                var dropdownValue = document.getElementById("floorSelect");
-
-                // Create Bar chart to show progress of station structure
+                // adding the amChart function
                 am4core.ready(function () {
                     am4core.useTheme(am4themes_animated);
 
@@ -539,6 +514,12 @@
                     //totalProgress();
                     //updateChart();
 
+
+                    /*********************
+                     ***FILTER BY FLOOR***
+                     ********************/
+
+                    var dropdownValue = document.getElementById("floorSelect");
 
                     function getValues() {
                         var testArray = [];
@@ -582,7 +563,6 @@
                         .then(addToSelect)
 
 
-                    
 
 
                     dropdownValue.addEventListener("click", filterByTest);
@@ -601,11 +581,53 @@
                     }
 
 
+                    /*********************
+                     *********END*********
+                     ********************/
+
+
+
+                    /*********************
+                     ***TOTAL PROGRESS***
+                     ********************/
+
+
+
+                    function totalProgress() {
+                        var total_complete = {
+                            onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "total_complete",
+                            statisticType: "sum"
+                        };
+
+                        var total_obs = {
+                            onStatisticField: "Status",
+                            outStatisticFieldName: "total_obs",
+                            statisticType: "count"
+                        };
+                        var query = buildingLayer.createQuery();
+                        query.outStatistics = [total_complete, total_obs];
+                        query.returnGeometry = true;
+                        buildingLayer.queryFeatures(query).then(function (response) {
+                            var stats = response.features[0].attributes;
+
+                            const total_complete = stats.total_complete;
+                            const total_obs = stats.total_obs;
+                            document.getElementById("totalProgress").innerHTML = ((total_complete / total_obs) * 100).toFixed(1) + " %";
+                        });
+                    } totalProgress();
+
+
+                    /*********************
+                     *********END*********
+                     ********************/
 
 
 
 
-
+                    /***********************
+                    *****PROGRESS CHART****
+                    ***********************/
 
                     function updateChart() {
                         //Column
@@ -880,7 +902,7 @@
                                     //labelBullet.label.fill = am4core.color("#00FFFFFF");
                                     labelBullet.label.fill = am4core.color("#000000");
                                     labelBullet.interactionsEnabled = false;
-                                    labelBullet.label.fontSize = 13;
+                                    labelBullet.label.fontSize = 14;
                                     labelBullet.locationX = 0.5;
 
                                 } else if (name == "Under Construction") {
@@ -1027,47 +1049,9 @@
 
                 }); // End of am4Core.ready()
 
-
-
-                function totalProgress() {
-                    var total_complete = {
-                        onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
-                        outStatisticFieldName: "total_complete",
-                        statisticType: "sum"
-                    };
-
-                    var total_obs = {
-                        onStatisticField: "Status",
-                        outStatisticFieldName: "total_obs",
-                        statisticType: "count"
-                    };
-                    var query = buildingLayer.createQuery();
-                    query.outStatistics = [total_complete, total_obs];
-                    query.returnGeometry = true;
-                    buildingLayer.queryFeatures(query).then(function (response) {
-                        var stats = response.features[0].attributes;
-
-                        const total_complete = stats.total_complete;
-                        const total_obs = stats.total_obs;
-                        document.getElementById("totalProgress").innerHTML = ((total_complete / total_obs) * 100).toFixed(1) + " %";
-                    });
-                } totalProgress();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                /*********************
+                *********END*********
+                ********************/
 
 
 
@@ -1081,6 +1065,7 @@
     <div id="viewDiv">
         <div id="headerTitleDiv">DE ZALMHAVEN MIDRISE</div>
         <div class="dateDiv">As of December 5, 2022</div>
+
 
         <div class="esri-widgets" id="dropdownDiv">
             <label for="sel-options"> Filter building by floor: </label>
@@ -1116,6 +1101,7 @@
         </div>
 
     </div>
+
 </body>
 
 </html>
