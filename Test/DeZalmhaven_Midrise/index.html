@@ -1,0 +1,63 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>De Zalmhaven Construction Monitoring</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
+    <link rel="stylesheet" href="./css/main.css">
+
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+    <script src="https://js.arcgis.com/4.23/"></script>
+    <script src="./js/main.js"></script>
+
+</head>
+
+<body class="sassy-theme">
+    <div id="viewDiv">
+        <div id="headerTitleDiv">DE ZALMHAVEN MIDRISE</div>
+        <div class="dateDiv">As of December 13, 2022</div>
+
+
+        <div class="esri-widgets" id="dropdownDiv">
+            <label for="sel-options"> Filter building by floor: </label>
+            <select class="esri-widget" id="floorSelect"></select>
+
+        </div>
+
+
+        <div id="progressPanel">
+
+            <div id="ChartTitleDiv"> Construction Progress</div>
+            <div id="chartdiv"></div>
+            <div id="boxTotal">
+                <div id="labelTotalDiv">TOTAL</div>
+                <div id="totalProgress"></div>
+            </div>
+
+        </div>
+
+
+        <div id="menu" class="esri-widget">
+            <input type="checkbox" id="opacityInput" unchecked />
+            <label for="opacityInput">No ground</label>
+        </div>
+
+        <div class="overlay">
+            <div>
+                <span id="play" class="button esri-icon-play" style="display: block;" />
+            </div>
+            <div>
+                <span id="pause" class="button esri-icon-pause" style="display: none;" />
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
