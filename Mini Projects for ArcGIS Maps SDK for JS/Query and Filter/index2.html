@@ -1,0 +1,46 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Query and Filter: Two Dropdown List</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/dark/main.css">
+    <link rel="stylesheet" href="./css/main.css">
+
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>   
+    <script src="https://js.arcgis.com/4.23/"></script>
+    <script src="./js/main2b.js"></script>
+
+</head>
+
+<body>
+    <div id="viewDiv">
+        <div id="headerTitleDiv">Status for ISF Relocation (N2)</div>
+        <div class="dateDiv">As of November 4, 2022</div>
+
+        <div id="progressPanel">
+            <div id="chartTitleDiv">Status of Relocation</div>
+            <div id="chartdiv"></div>
+            <div id="boxNLO">
+                <div id="labelNLO">Number of NLO</div>
+            </div>
+        </div>
+
+        <div class="esri-widget" id="dropdownDiv">
+            <label for="sel-options">Municipality:</label>
+            <select id="muniSelect" class="esri-widget" class="esri-widget" width = "150" style="width: 120px" >
+            </select>
+            <label for="sel-options">Barangay:</label>
+            <select id="brgySelect" class="esri-widget" width = "150" style="width: 120px">
+            </select>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

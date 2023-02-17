@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Query features from a FeatureLayer - 4.14</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.14/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.14/"></script>
+
+    <style>
+        html,
+        body,
+        #viewDiv {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #infoDiv {
+            background-color: white;
+            color: black;
+            padding: 6px;
+            width: 400px;
+        }
+
+        #results {
+            font-weight: bolder;
+            padding-top: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 60px;
+        }
+
+        #drop-downs {
+            padding-bottom: 15px;
+        }
+    </style>
+
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/layers/GraphicsLayer",
+            "esri/geometry/geometryEngine",
+            "esri/Graphic",
+            "esri/widgets/Slider"
+        ], function (
+            Map,
+            MapView,
+            FeatureLayer,
+            GraphicsLayer,
+            geometryEngine,
+            Graphic,
+            Slider
+        ) {
+            var wellBuffer, wellsGeometries, magnitude;
+
+            var wellTypeSelect = document.getElementById("well-type");
+            var wellTypeTwoSelect = document.getElementById("well-typetwo");
+
+            var queryWellsButton = document.getElementById("query-wells");
+
+            // oil and gas wells
+            var wellsLayer = new FeatureLayer({
+                portalItem: {
+                    // autocasts as new PortalItem()
+                    id: "8af8dc98e75049bda6811b0cdf9450ee"
+                },
+                outFields: ["*"],
+                visible: false
+            });
+
+            // GraphicsLayer for displaying results
+            var resultsLayer = new GraphicsLayer();
+
+            var map = new Map({
+                basemap: "dark-gray",
+                layers: [wellsLayer, resultsLayer]
+            });
+
+            var view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-97.75188, 37.23308],
+                zoom: 10
+            });
+            view.ui.add("infoDiv", "top-right");
+
+            // query all features from the wells layer
+            view
+                .when(function () {
+                    return wellsLayer.when(function () {
+                        console.log("map loads");
+                        var query = wellsLayer.createQuery();
+                        return wellsLayer.queryFeatures(query);
+                    });
+                })
+                .then(getValues)
+                .then(getUniqueValues)
+                .then(addToSelect);
+
+            function getValues(response) {
+                var features = response.features;
+                var values = features.map(function (feature) {
+                    return feature.attributes.STATUS2;
+                });
+                console.log("Get Well status values");
+                return values;
+            }
+
+            function getUniqueValues(values) {
+                var uniqueValues = [];
+
+                values.forEach(function (item, i) {
+                    if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
+                        uniqueValues.push(item);
+                    }
+                });
+                console.log("Get Well status unique values ");
+                return uniqueValues;
+            }
+
+            function addToSelect(values) {
+                values.sort();
+                values.forEach(function (value) {
+                    var option = document.createElement("option");
+                    option.text = value;
+                    wellTypeSelect.add(option);
+                });
+                console.log("Add well status values to dropdown");
+                //return setWellsDefinitionExpression(wellTypeSelect.value);
+            }
+
+            function setWellsStatusExpression(newValue) {
+                wellsLayer.definitionExpression = "STATUS2 = '" + newValue + "'";
+
+                if (!wellsLayer.visible) {
+                    wellsLayer.visible = true;
+                }
+                console.log(
+                    "Sets definition expression only well status is available"
+                );
+            }
+
+            function setWellsDefinitionExpression(newValue1, newValue2) {
+                if ((newValue2 = undefined)) {
+                    console.log("Only STATUS2 is available");
+                    wellsLayer.definitionExpression = "STATUS2 = '" + newValue1 + "'";
+                } else {
+                    console.log("Both status are available");
+                    wellsLayer.definitionExpression =
+                        "STATUS2 = '" + newValue1 + "AND STATUS = '" + newValue2 + "'";
+                }
+
+                if (!wellsLayer.visible) {
+                    wellsLayer.visible = true;
+                }
+
+                return queryForWellGeometries();
+            }
+
+            function queryForWellGeometries() {
+                console.log("Query well geometries");
+                var wellsQuery = wellsLayer.createQuery();
+
+                return wellsLayer.queryFeatures(wellsQuery).then(function (response) {
+                    wellsGeometries = response.features.map(function (feature) {
+                        return feature.geometry;
+                    });
+                    return wellsGeometries;
+                });
+            }
+
+            wellTypeSelect.addEventListener("change", function () {
+                console.log("Change Well status values in dropdown");
+                var type = event.target.value;
+                setWellsStatusExpression(type);
+                filterWellType();
+            });
+
+            function filterWellType() {
+                console.log("Filter for well type");
+                var query2 = wellsLayer.createQuery();
+                query2.where = wellsLayer.definitionExpression;
+
+                wellsLayer
+                    .queryFeatures(query2)
+                    .then(getQuery2Values)
+                    .then(getUniqueValues)
+                    .then(addToSelectQuery2);
+            }
+
+            function getQuery2Values(response) {
+                var featuresQuery2 = response.features;
+                var query2Values = featuresQuery2.map(function (feature) {
+                    return feature.attributes.STATUS;
+                });
+                console.log("Get Well type values");
+                return query2Values;
+            }
+
+            //Add the unique values to the STS Route type select element. This will allow the user to filter by campaigns.
+            function addToSelectQuery2(query2Values) {
+                query2Values.sort();
+                query2Values.forEach(function (value) {
+                    var option = document.createElement("option");
+                    option.text = value;
+                    query2Values.add(option);
+                });
+                console.log("Add well type values to second dropdown");
+            }
+
+            //Set a new definitionExpression on the STS Route layer and view the selected campaign and run
+            wellTypeTwoSelect.addEventListener("change", function () {
+                console.log("Get Well status values");
+                var type = event.target.value;
+            });
+
+            queryWellsButton.addEventListener("click", function () {
+                var type = event.target.value;
+                setWellsDefinitionExpression(values.value, query2Values.value).then(
+                    queryForWellGeometries
+                );
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+    <div id="infoDiv" class="esri-widget">
+        <div id="drop-downs">
+            Select well status:
+            <select id="well-type" class="esri-widget">
+                <option value="">Select well status</option>
+            </select>
+            Select well type:
+            <select id="well-typetwo" class="esri-widget">
+                <option value="">Select well type</option>
+            </select>
+        </div>
+        <button id="query-wells" class="esri-widget">Query Wells</button>
+        <div id="results" class="esri-widget"></div>
+    </div>
+</body>
+
+</html>
