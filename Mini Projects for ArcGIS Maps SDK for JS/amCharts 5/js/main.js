@@ -183,7 +183,7 @@ require([
 
 
     // CREATE TWO DROPDOWN LIST: FILTER BY MUNICIPALITY AND BARANGAY
-    
+
     const muniDropdown = document.getElementById("muniSelect");
     const brgyDropdown = document.getElementById("brgySelect")
 
@@ -248,7 +248,7 @@ require([
             var brgyArray = [];
             var query2 = isf_layer.createQuery();
             isf_layer.returnGeometry = true;
-            return isf_layer.queryFeatures(query2).then (function(response){
+            return isf_layer.queryFeatures(query2).then(function (response) {
                 var featuresQuery2 = response.features;
                 featuresQuery2.forEach((result, index) => {
                     var attributes = result.attributes;
@@ -381,6 +381,53 @@ require([
     // End of Dropdown list
 
     // PROGRESS CHART
+
+
+    // Create root and chart
+    var root = am5.Root.new("chartdiv");
+
+    root.setThemes([
+        am5themes_Animated.new(root)
+    ]);
+
+    var chart = root.container.children.push(
+        am5percent.PieChart.new(root, {
+            layout: root.verticalLayout
+        })
+    );
+
+    // Define data
+    var data = [{
+        country: "France",
+        sales: 100000
+    }, {
+        country: "Spain",
+        sales: 160000
+    }, {
+        country: "United Kingdom",
+        sales: 80000
+    }];
+
+    // Create series
+    var series = chart.series.push(
+        am5percent.PieSeries.new(root, {
+            name: "Series",
+            valueField: "sales",
+            categoryField: "country"
+        })
+    );
+    series.data.setAll(data);
+
+    // Add legend
+    var legend = chart.children.push(am5.Legend.new(root, {
+        centerX: am5.percent(50),
+        x: am5.percent(50),
+        layout: root.horizontalLayout
+    }));
+
+    legend.data.setAll(series.dataItems);
+
+
 
 
 
