@@ -1,10 +1,12 @@
 <html>
 
-<head>
-    
-    <script src="//cdn.amcharts.com/lib/5/index.js"></script>
-    <script src="//cdn.amcharts.com/lib/5/percent.js"></script>
-    <script src="//cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+    <div id="chartdiv"></div>
 
 
 
@@ -20,30 +22,6 @@
     </style>
 
     <script>
-        // Create root and chart
-        var root = am5.Root.new("chartdiv");
-
-        root.setThemes([
-            am5themes_Animated.new(root)
-        ]);
-
-        var chart = root.container.children.push(
-            am5percent.PieChart.new(root, {
-                layout: root.verticalLayout
-            })
-        );
-
-        /**
- * ---------------------------------------
- * This demo was created using amCharts 5.
- *
- * For more information visit:
- * https://www.amcharts.com/
- *
- * Documentation is available at:
- * https://www.amcharts.com/docs/v5/
- * ---------------------------------------
- */
 
         // Create root and chart
         var root = am5.Root.new("chartdiv");
@@ -91,7 +69,8 @@
 
 
     </script>
-</head>
+
+
 
 
 </html>

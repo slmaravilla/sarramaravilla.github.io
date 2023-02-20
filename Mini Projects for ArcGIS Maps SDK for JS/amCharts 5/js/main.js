@@ -254,7 +254,7 @@ require([
                     var attributes = result.attributes;
                     const query2Values = attributes.Barangay;
                     brgyArray.push(query2Values);
-                    console.log(query2Values);
+                    //console.log(query2Values);
                 });
                 return brgyArray;
             });
@@ -413,10 +413,13 @@ require([
         am5percent.PieSeries.new(root, {
             name: "Series",
             valueField: "sales",
-            categoryField: "country"
+            categoryField: "country",
         })
     );
     series.data.setAll(data);
+    series.appear();
+    //chart.appear();
+    
 
     // Add legend
     var legend = chart.children.push(am5.Legend.new(root, {
