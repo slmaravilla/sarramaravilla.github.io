@@ -98,6 +98,39 @@ require([
         layerId: 4,
         title: "Status of Relocation (ISF)",
         outFields: ["*"],
+        popupTemplate: {
+            title: "<p>{StrucID}</p>",
+            lastEditInfoEnabled: false,
+            returnGeometry: true,
+            content: [
+                {
+                    type: "fields",
+                    fieldInfos: [
+                        {
+                            fieldName: "StrucOwner",
+                            label: "Structure Owner"
+                        },
+                        {
+                            fieldName: "Municipality"
+                        },
+                        {
+                            fieldName: "Barangay"
+                        },
+                        {
+                            fieldName: "StatusRC",
+                            label: "<p>Status for Relocation(ISF)</>"
+                        },
+                        {
+                            fieldName: "Name"
+                        },
+                        {
+                            fieldName: "Status",
+                            label: "Status of NLO/LO"
+                        }
+                    ]
+                }
+            ]
+        }
     });
     map.add(isf_layer);
 
@@ -358,6 +391,7 @@ require([
 
         changeSelected();
 
+        updateChart();
 
     })
 
@@ -376,26 +410,160 @@ require([
         muniBrgyExpression(municipal, barangay);
 
         zoomToLayer(isf_layer);
+
+        updateChart();
     });
 
     // End of Dropdown list
 
-    // PROGRESS CHART
+
+
+
+
+    /************************
+    ***** PROGRESS CHART ****
+    *************************/
 
 
     // Create root and chart
     var root = am5.Root.new("chartdiv");
 
-    root.setThemes([
-        am5themes_Animated.new(root)
-    ]);
 
-    var chart = root.container.children.push(
+    function updateChart() {
+
+        var total_relocated = {
+            onStatisticField: "CASE WHEN StatusRC = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_relocated",
+            statisticType: "sum"
+        };
+
+        var total_paid = {
+            onStatisticField: "CASE WHEN StatusRC = 2 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_paid",
+            statisticType: "sum"
+        };
+
+        var total_payp = {
+            onStatisticField: "CASE WHEN StatusRC = 3 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_payp",
+            statisticType: "sum"
+        };
+
+        var total_legalpass = {
+            onStatisticField: "CASE WHEN StatusRC = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_legalpass",
+            statisticType: "sum"
+        };
+
+        var total_otc = {
+            onStatisticField: "CASE WHEN StatusRC = 5 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_otc",
+            statisticType: "sum"
+        };
+
+        var total_lbp = {
+            onStatisticField: "CASE WHEN StatusRC = 6 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_lbp",
+            statisticType: "sum"
+        };
+
+
+        var query = isf_layer.createQuery();
+        query.outStatistics = [total_relocated, total_paid, total_payp, total_legalpass, total_otc, total_lbp];
+        query.returnGeometry = true;
+
+        return isf_layer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const clear = stats.total_relocated;
+            const paid = stats.total_paid;
+            const payp = stats.total_payp;
+            const legalpass = stats.total_legalpass;
+            const otc = stats.total_otc;
+            const lbp = stats.total_lbp;
+
+            //console.log(clear);
+
+            root.setThemes([
+                am5themes_Animated.new(root),
+
+            ]);
+
+            var chart = root.container.children.push(
+                am5percent.PieChart.new(root, {
+                    layout: root.verticalLayout
+                })
+            );
+
+            const statusISF = ["Relocated", "Paid", "For Payment Processing",
+                "For Legal Pass", "For Appraisal/OtC/Requirements for Other Entitlements",
+                "LBP Account Opening"]
+
+            var data = [
+                {
+                    category: statusISF[0],
+                    value: clear,
+                    sliceSettings: {
+                        fill: am5.color("#00C5FF")
+                    }
+                },
+                {
+                    category: statusISF[1],
+                    value: paid
+                },
+                {
+                    category: statusISF[2],
+                    value: payp
+                },
+                {
+                    category: statusISF[3],
+                    value: legalpass
+                },
+                {
+                    category: statusISF[4],
+                    value: otc
+                },
+                {
+                    category: statusISF[5],
+                    value: lbp,
+                    sliceSettings: {
+                        fill: am5.color("#FF0000")
+                    }
+                }
+            ];
+
+            var series = chart.series.push(
+                am5percent.PieSeries.new(root, {
+                    name: "Series",
+                    categoryField: "category",
+                    valueField: "value",
+                })
+            );
+            series.data.setAll(data);
+            //series.appear();
+
+            
+            var legend = chart.children.push(am5.Legend.new(root, {
+                centerX: am5.percent(50),
+                x: am5.percent(50),
+                layout: root.verticalLayout,
+                marginBottom: 50,
+            }));
+            legend.data.setAll(series.dataItems);
+
+
+        });
+
+    }
+    updateChart();
+
+
+    /*var chart = root.container.children.push(
         am5percent.PieChart.new(root, {
             layout: root.verticalLayout
         })
     );
-
+ 
     // Define data
     var data = [{
         country: "France",
@@ -407,7 +575,7 @@ require([
         country: "United Kingdom",
         sales: 80000
     }];
-
+ 
     // Create series
     var series = chart.series.push(
         am5percent.PieSeries.new(root, {
@@ -420,15 +588,15 @@ require([
     series.appear();
     //chart.appear();
     
-
+ 
     // Add legend
     var legend = chart.children.push(am5.Legend.new(root, {
         centerX: am5.percent(50),
         x: am5.percent(50),
         layout: root.horizontalLayout
     }));
-
-    legend.data.setAll(series.dataItems);
+ 
+    legend.data.setAll(series.dataItems);*/
 
 
 
