@@ -4,6 +4,7 @@
 //You can use filter using 2nd dropdown evern if first dropdown is null
 //Call the getQuery2Values, getUniqueValues, addToSelectQuery2 at the end of the
 //Of the second query so that "None" shows at the Barangay Dropdown
+//Adding pie chart series
 
 require([
     "esri/Basemap",
@@ -53,6 +54,8 @@ require([
     TimeExtent, Expand, Editor, UniqueValueRenderer, DatePicker,
     FeatureTable, Compass, ElevationLayer, Ground,
     GraphicsLayer, Search, BasemapToggle) {
+
+    let highlightSelect;
 
 
 
@@ -429,7 +432,11 @@ require([
     var root = am5.Root.new("chartdiv");
 
 
+
+
     function updateChart() {
+
+        //Query statistics
 
         var total_relocated = {
             onStatisticField: "CASE WHEN StatusRC = 1 THEN 1 ELSE 0 END",
@@ -468,11 +475,12 @@ require([
         };
 
 
+        //Start of query function
         var query = isf_layer.createQuery();
         query.outStatistics = [total_relocated, total_paid, total_payp, total_legalpass, total_otc, total_lbp];
         query.returnGeometry = true;
 
-        return isf_layer.queryFeatures(query).then(function (response) {
+        isf_layer.queryFeatures(query).then(function (response) {
             var stats = response.features[0].attributes;
 
             const clear = stats.total_relocated;
@@ -484,8 +492,10 @@ require([
 
             //console.log(clear);
 
+
             root.setThemes([
                 am5themes_Animated.new(root),
+                am5themes_Responsive.new(root)
 
             ]);
 
@@ -503,9 +513,6 @@ require([
                 {
                     category: statusISF[0],
                     value: clear,
-                    sliceSettings: {
-                        fill: am5.color("#00C5FF")
-                    }
                 },
                 {
                     category: statusISF[1],
@@ -525,36 +532,168 @@ require([
                 },
                 {
                     category: statusISF[5],
-                    value: lbp,
-                    sliceSettings: {
-                        fill: am5.color("#FF0000")
-                    }
+                    value: lbp
                 }
             ];
+
 
             var series = chart.series.push(
                 am5percent.PieSeries.new(root, {
                     name: "Series",
                     categoryField: "category",
                     valueField: "value",
+                    radius: am5.percent(85),
+                    innerRadius: am5.percent(40),
+                    legendValueText: "{valuePercentTotal.formatNumber('#.')}%({value})",
                 })
             );
-            series.data.setAll(data);
-            //series.appear();
 
+
+            //Setting unique color on series color set
+            series.get("colors").set("colors", [
+                am5.color("#845EC2"),
+                am5.color("#D65DB1"),
+                am5.color("#FF6F91"),
+                am5.color("#FF9671"),
+                am5.color("#FFC75F"),
+                am5.color("#F9F871")
+            ]);
+
+
+            //Customize default slice settings
+            series.slices.template.setAll({
+                fillOpacity: 0.9,
+                stroke: am5.color("#ffffff"),
+                strokeWidth: 1
+            });
+
+            series.slices.template.states.create("active", {
+                shiftRadius: 0,
+                stroke: am5.color("#ffffff"),
+                strokeWidth: 2
+            });
+
+
+            // highlight and zoom to selected features
+
+
+
+            series.slices.template.events.on("click", function (event) {
+                const SELECTED = event.target.dataItem.dataContext.category;
+                if (SELECTED == statusISF[0]) {
+                    selectedStatus = 1
+                } else if (SELECTED == statusISF[1]) {
+                    selectedStatus = 2
+                } else if (SELECTED == statusISF[2]) {
+                    selectedStatus = 3
+                } else if (SELECTED == statusISF[3]) {
+                    selectedStatus = 4
+                } else if (SELECTED == statusISF[4]) {
+                    selectedStatus = 5
+                } else if (SELECTED == statusISF[5]) {
+                    selectedStatus = 6
+                } else {
+                    selectedStatus = null;
+                }
+
+                view.when(function () {
+                    view.whenLayerView(isf_layer).then(function (layerView) {
+
+                        
+                        var query = isf_layer.createQuery();
+                        query.where = "StatusRC =" + selectedStatus;
             
+
+                        isf_layer.queryFeatures(query).then(function(result) {
+                            const gg = result.features;
+                            const hh = gg.length;
+
+                            let objID = [];
+                            for (var i = 0; i < hh; i++) {
+                                var obj = result.features[i].attributes.OBJECTID;
+                                objID.push(obj);
+                                //console.log(hh);
+                                //console.log(obj);
+                            }
+
+                            var queryExt = new Query({
+                                objectIds: [objID]
+                            });
+                            console.log(objID);
+                            //queryExt.returnGeometry = true;
+
+                            isf_layer.queryExtent(queryExt).then(function (result) {
+                                if (result.extent) {
+                                    view.goTo(result.extent)
+                                }
+                            });
+
+                            if (highlightSelect) {
+                                highlightSelect.remove();
+                            }
+                            highlightSelect = layerView.highlight(objID);
+
+                            view.on("click", function () {
+                                layerView.filter = null;
+                                highlightSelect.remove();
+                            });
+                        });
+                        layerView.filter = {
+                            where: "StatusRC =" + selectedStatus
+                        }
+                    });
+                });
+            });
+
+
+
+            series.data.setAll(data);
+            series.appear();
+            series.labels.template.set("forceHidden", true);
+            series.ticks.template.set("forceHidden", true);
+
+
+            //Legend
             var legend = chart.children.push(am5.Legend.new(root, {
-                centerX: am5.percent(50),
-                x: am5.percent(50),
+                centerY: am5.percent(50),
+                y: am5.percent(80),
                 layout: root.verticalLayout,
-                marginBottom: 50,
+                truncate: "true",
             }));
+
+
+            legend.labels.template.setAll({
+                breakWords: true,
+                fill: am5.color("#ffffff"),
+                fontSize: 12,
+            });
+
+            //legend.valueLabels.template.set("forceHidden", true);
+            legend.valueLabels.template.setAll({
+                fill: am5.color("#ffffff"),
+                fontSize: 12,
+            });
+
+            //Customize marker
+            legend.markerRectangles.template.setAll({
+                cornerRadiusTL: 10,
+                cornerRadiusTR: 10,
+                cornerRadiusBL: 10,
+                cornerRadiusBR: 10
+            });
+
             legend.data.setAll(series.dataItems);
 
 
-        });
 
-    }
+
+
+
+
+
+        }); //End of query function
+
+    } // End of updateChart
     updateChart();
 
 

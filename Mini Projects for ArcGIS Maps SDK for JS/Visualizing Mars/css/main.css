@@ -1,0 +1,17 @@
+html,
+body,
+#viewDiv {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+button {
+    background: white;
+    padding: 7px;
+    border: 1px solid #005e95;
+    font-size: 0.9em;
+    margin: 5px;
+    color: #005e95;
+}
