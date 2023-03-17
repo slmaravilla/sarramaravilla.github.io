@@ -156,7 +156,7 @@ require([
 
 
     //Add PROW featureLayer and add it to the map
-    var rowLayer = new FeatureLayer({
+    /*var rowLayer = new FeatureLayer({
         portalItem: {
             id: "590680d19f2e48fdbd8bcddce3aaedb5",
             portal: {
@@ -166,7 +166,7 @@ require([
         title: "ROW",
         popupEnabled: false,
     });
-    map.add(rowLayer);
+    map.add(rowLayer);*/
 
 
 
