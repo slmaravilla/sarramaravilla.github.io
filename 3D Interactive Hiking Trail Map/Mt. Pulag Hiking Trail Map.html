@@ -39,7 +39,7 @@
         container: "viewDiv",
           map: map,
           camera: {
-            position: [120.898979, 16.566493, 10000],
+            position: [120.893273, 16.520, 7000], 
             tilt: 60,
           },
           environment: {
@@ -54,11 +54,23 @@
           }
       });
 
+      function shiftCamera(deg) {
+          var camera = view.camera.clone();
+          camera.position.longitude += deg;
+          return camera;
+        }
+
       //Trailheads feature layer (points)
       const trailheadsLayer = new FeatureLayer({
         url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0"
       });
       map.add(trailheadsLayer);
+
+      //Trailheads feature layer (points)
+      const trailheadsLayer2 = new FeatureLayer({
+        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/AmbangegTrail/FeatureServer"
+      });
+      map.add(trailheadsLayer2);
 
       //Trails feature layer (lines)
       const trailsLayer = new FeatureLayer({
@@ -86,14 +98,7 @@
       });
       map.add(parksLayer, 0);
 
-      //const sample = new FeatureLayer({
-      //  url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/Free_Dive_Spots/FeatureServer/0"
-      //});
-      //map.add(sample, 0);
-
-      //Add Editor Widget
-      var editor = new Editor({ view: view });
-      view.ui.add(editor, "bottom-right");
+      
 
     });
   </script>
