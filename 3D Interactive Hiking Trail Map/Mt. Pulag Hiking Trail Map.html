@@ -14,6 +14,34 @@
       height: 100%;
       width: 100%;
     }
+
+    #menuPanel {
+      width: 25vw;
+      height: 100vh;
+      align-items: center;
+      position: absolute;
+      z-index: 99;
+      left: 0;
+
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgba(104, 104, 104, 0.5);
+    }
+
+    #headerTitleDiv {
+      font-size: 2.5vw;
+      vertical-align: middle;
+      padding-top: 3px;
+      z-index: 99;
+      position: fixed;
+      left: 35;
+      top: 18;
+      color: white;
+    }
+
+    .esri-elevation-profile.esri-component.esri-widget--panel {
+        width: 350px !important;
+      }
   </style>
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
@@ -25,80 +53,64 @@
       "esri/Map",
       "esri/views/MapView",
       "esri/views/SceneView",
-      "esri/layers/FeatureLayer"
-    ], function (esriConfig, Map, MapView, SceneView, FeatureLayer) {
-
-      //esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
+      "esri/layers/FeatureLayer",
+      "esri/widgets/ElevationProfile"
+    ], function (esriConfig, Map, MapView, SceneView, FeatureLayer, ElevationProfile) {
 
       const map = new Map({
-        basemap: "hybrid", // Basemap layer service
+        basemap: "hybrid",
         ground: "world-elevation"
       });
 
       const view = new SceneView({
         container: "viewDiv",
-          map: map,
-          camera: {
-            position: [120.893273, 16.520, 7000], 
-            tilt: 60,
+        map: map,
+        camera: {
+          spatialReference: { latestWkid: 3857, wkid: 102100 },
+          position: [120.893273, 16.520, 7000],
+          tilt: 60,
+        },
+        environment: {
+          background: {
+            type: "color", // autocasts as new ColorBackground()
+            color: [0, 0, 0, 1]
           },
-          environment: {
-            background: {
-              type: "color", // autocasts as new ColorBackground()
-              color: [0, 0, 0, 1]
-            },
-            // disable stars
-            starsEnabled: false,
-            //disable atmosphere
-            atmosphereEnabled: false
-          }
-      });
-
-      function shiftCamera(deg) {
-          var camera = view.camera.clone();
-          camera.position.longitude += deg;
-          return camera;
+          // disable stars
+          starsEnabled: false,
+          //disable atmosphere
+          atmosphereEnabled: false
         }
-
-      //Trailheads feature layer (points)
-      const trailheadsLayer = new FeatureLayer({
-        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0"
       });
-      map.add(trailheadsLayer);
 
-      //Trailheads feature layer (points)
-      const trailheadsLayer2 = new FeatureLayer({
+      //Remove deafult widgets on the left
+      view.ui.empty("top-left");
+      //end
+
+
+      //Trailheads feature layer (lines)
+      const trailsLayer = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/AmbangegTrail/FeatureServer"
       });
-      map.add(trailheadsLayer2);
+      map.add(trailsLayer);
 
-      //Trails feature layer (lines)
-      const trailsLayer = new FeatureLayer({
-        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
-        definitionExpression: "ELEV_GAIN < 250",
-        renderer: {
-          type: "simple",
-          symbol: {
-            type: "simple-line",
-            color: "green",
-            width: "2px"
-          }
-        },
-        outFields: ["TRL_NAME", "ELEV_GAIN"],
-        pompTemplate: {
-          title: "{TRL_NAME}",
-          content: "The trail elevation gain is {ELEV_GAIN} ft."
+      const elevationProfile = new ElevationProfile({
+        view: view,
+        profiles: [{
+          type: "view" // first profile line samples the ground elevation
+        }/*, {
+          type: "view" // second profile line samples the view and shows building profiles
+        }*/],
+        // hide the select button
+        // this button can be displayed when there are polylines in the
+        // scene to select and display the elevation profile for
+        visibleElements: {
+          selectButton: true
         }
       });
-      map.add(trailsLayer, 0);
+      view.ui.add(elevationProfile, "top-right");
 
-      // Parks and open spaces (polygons)
-      const parksLayer = new FeatureLayer({
-        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0"
-      });
-      map.add(parksLayer, 0);
 
-      
+
 
     });
   </script>
@@ -106,7 +118,14 @@
 </head>
 
 <body>
-  <div id="viewDiv"></div>
+  <div id="viewDiv">
+
+    <div id="menuPanel">
+      <div id="headerTitleDiv">MT. PULAG HIKES</div>
+    </div>
+
+  </div>
+
 </body>
 
 </html>
