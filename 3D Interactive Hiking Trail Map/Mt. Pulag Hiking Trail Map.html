@@ -40,25 +40,51 @@
     }
 
     .esri-elevation-profile.esri-component.esri-widget--panel {
-        width: 350px !important;
-      }
+      width: 350px !important;
+    }
+
+
+    .overlay {
+      position: fixed;
+      z-index: 99;
+      width: 2rem;
+      top: 225;
+      right: 15;
+      background-color: rgba(80, 80, 80, 0);
+      /*text-align: center;*/
+      font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .button {
+      cursor: pointer;
+      font-size: 25pt !important;
+      font-weight: bold !important;
+      color: rgb(230, 230, 230);
+    }
   </style>
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
+  <script type="module" src="https://js.arcgis.com/calcite-components/1.0.7/calcite.esm.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.0.7/calcite.css" />
   <script src="https://js.arcgis.com/4.23/"></script>
 
   <script>
     require([
       "esri/config",
       "esri/Map",
+      "esri/widgets/BasemapToggle",
+      "esri/widgets/Daylight",
+      "esri/widgets/Compass",
+      "esri/widgets/Expand",
+      "esri/widgets/Fullscreen",
       "esri/views/MapView",
       "esri/views/SceneView",
       "esri/layers/FeatureLayer",
       "esri/widgets/ElevationProfile"
-    ], function (esriConfig, Map, MapView, SceneView, FeatureLayer, ElevationProfile) {
+    ], function (esriConfig, Map, BasemapToggle, Daylight, Compass, Expand, Fullscreen, MapView, SceneView, FeatureLayer, ElevationProfile) {
 
       const map = new Map({
-        basemap: "hybrid",
+        basemap: "satellite",
         ground: "world-elevation"
       });
 
@@ -67,8 +93,8 @@
         map: map,
         camera: {
           spatialReference: { latestWkid: 3857, wkid: 102100 },
-          position: [120.893273, 16.520, 7000],
-          tilt: 60,
+          position: [120.88, 16.60, 20000],
+          
         },
         environment: {
           background: {
@@ -86,12 +112,142 @@
       view.ui.empty("top-left");
       //end
 
+      //Add Basemap toggle
+      const toggle = new BasemapToggle({
+        view: view,
+        nextBasemap: "topo-vector"
+      });
+      view.ui.add(toggle, "top-right");
+
+
+      //Adding the daylight widget
+      const daylight = new Daylight({
+        view: view,
+        //play the animation twice as fast than the default one
+        playSpeedMultiplier: 2,
+        //disable the timezone selection button
+        visibleElements: {
+          timezone: false
+        }
+      }); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-right");
+      //end
+
+
+      //Compass
+      const compass = new Compass({
+        view: view
+      });
+      view.ui.add(compass, "top-right");
+      //end
+
+
+
+      //Full Screen Logo
+      view.ui.add(
+        new Fullscreen({
+          view: view,
+          element: viewDiv
+        }),
+        "top-right"
+      );//end
+
 
       //Trailheads feature layer (lines)
       const trailsLayer = new FeatureLayer({
-        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/AmbangegTrail/FeatureServer"
+        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/MtPulagTrails/FeatureServer"
       });
       map.add(trailsLayer);
+
+
+      // Zoom to selected layers
+      function zoomToLayer(layer) {
+        return layer.queryExtent().then(function (response) {
+          view.goTo({
+            target: response.extent,
+            tilt:60
+          }, { speedFactor: .5
+          }).catch(function (error) {
+            if (error.name != "AbortError") {
+              console.error(error);
+            }
+          });
+        });
+      }
+      
+
+
+      ////Adding Camera Fly Through
+      let abort = false;
+      let center = null;
+      function rotate() {
+        if (!view.interacting && !abort) {
+
+          play.style.display = "none";
+          pause.style.display = "block";
+
+          center = center || view.center;
+
+          view.goTo({
+            heading: view.camera.heading + 0.2,
+            center
+          }, { animate: false });
+
+          requestAnimationFrame(rotate);
+        } else {
+          abort = false;
+          center = null;
+          play.style.display = "block";
+          pause.style.display = "none";
+        }
+      }
+      play.onclick = rotate;
+      pause.onclick = function () {
+        abort = true;
+      };
+      //End of Camera Fly Through
+
+
+      /*********************
+      ****FILTER BY NAME****
+      ********************/
+
+
+      document.getElementById("nameSelect").addEventListener("click", selectTrail);
+      function selectTrail(event) {
+        const selectedID = event.target.id;
+
+        if (selectedID === "All") {
+          trailsLayer.definitionExpression = null;
+
+          zoomToLayer(trailsLayer);
+
+        } else if (selectedID === "Akiki Trail") {
+          trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
+
+          zoomToLayer(trailsLayer);
+          rotate;
+
+        } else if (selectedID === "Ambangeg Trail") {
+          trailsLayer.definitionExpression = "Name ='" + selectedID + "'";
+
+          zoomToLayer(trailsLayer);
+          rotate;
+
+        } else if (selectedID === "Tawangan Trail") {
+          trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
+
+          zoomToLayer(trailsLayer);
+          rotate;
+
+        } else if (selectedID === "Via Balena Trail") {
+          trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
+
+          zoomToLayer(trailsLayer);
+          rotate;
+        }
+
+      }
+
 
       const elevationProfile = new ElevationProfile({
         view: view,
@@ -107,11 +263,7 @@
           selectButton: true
         }
       });
-      view.ui.add(elevationProfile, "top-right");
-
-     
-
-
+      view.ui.add(elevationProfile, "bottom-right");
 
 
     });
@@ -119,14 +271,40 @@
 
 </head>
 
-<body>
-  <div id="viewDiv">
-
-    <div id="menuPanel">
+<body class="calcite-theme-dark">
+  <calcite-shell content-behind>
+    <div id="viewDiv">
       <div id="headerTitleDiv">MT. PULAG HIKES</div>
-    </div>
+      <div id="menuPanel">
+        <div id="nameSelect">
+          <calcite-segmented-control>
+            <calcite-segmented-control-item id="Akiki Trail" value="Akiki Trail">Akiki
+              Trail</calcite-segmented-control-item>
+            <calcite-segmented-control-item id="Ambangeg Trail" value="Ambangeg Trail">Ambangeg
+              Trail</calcite-segmented-control-item>
+            <calcite-segmented-control-item id="Tawangan Trail" value="Tawangan Trail">Tawangan
+              Trail</calcite-segmented-control-item>
+            <calcite-segmented-control-item id="Via Balena Trail" value="Via Balena Trail">Balena
+              Trail</calcite-segmented-control-item>
+          </calcite-segmented-control>
+          <calcite-segmented-control-item id="All" value="All">Remove Selection</calcite-segmented-control-item>
+        </div>
+        <calcite-tab>
+          <button id="All" value="All">Remove Selection</button>
+        </calcite-tab>
+        </calcite-shell>
+      </div>
 
-  </div>
+      <div class="overlay">
+        <div>
+          <span id="play" class="button esri-icon-play" style="display: block;">
+        </div>
+        <div>
+          <span id="pause" class="button esri-icon-pause" style="display: none;">
+        </div>
+      </div>
+
+    </div>
 
 </body>
 
