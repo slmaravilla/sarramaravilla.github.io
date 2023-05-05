@@ -17,7 +17,7 @@
 
     #menuPanel {
       width: 25vw;
-      height: 40vh;
+      height: 80vh;
       align-items: center;
       position: absolute;
       z-index: 99;
@@ -128,7 +128,7 @@
           // disable stars
           starsEnabled: false,
           //disable atmosphere
-          atmosphereEnabled: false
+          atmosphereEnabled: true
         }
       });
 
@@ -248,21 +248,21 @@
       ********************/
 
       const hikeSelect = document.getElementById("hikeSelect");
+      const hikeDesc = document.getElementById("hikeDesc");
 
-      //function updateDesc() {
 
-        //*var query = trailsLayerPt.createQuery();
-        //return trailsLayerPt.queryFeatures(query);
+      function updateDesc() {
 
-        //*function getValues(response) {
-        //  var features = response.features;
-        //  var values = features.map(function (feature) {
-        //    return feature.attributes.RouteType;
-        //  });
-        //  return values;
-        //}*//
-        //document.getElementById("hikeDesc").innerHTML = "Generally considered a challenging route, it takes an average of 5 h 28 min to complete. This is a popular trail for camping and hiking, but you can still enjoy some solitude during quieter times of day. The trail is open year-round and is beautiful to visit anytime.";
-      //}///
+        var query = trailsLayerPt.createQuery();
+        trailsLayerPt.queryFeatures(query).then(function(response) {
+          var stats = response.features[0].attributes;
+          const type = stats.RouteType;
+  
+          console.log(type);
+          hikeDesc.innerHTML = `${type}`;// "Generally considered a challenging route, it takes an average of 5 h 28 min to complete. This is a popular trail for camping and hiking, but you can still enjoy some solitude during quieter times of day. The trail is open year-round and is beautiful to visit anytime.";
+        });
+        
+      }
 
 
 
@@ -288,6 +288,7 @@
           trailsLayer.definitionExpression = "Name ='" + selectedID + "'";
 
           zoomToLayer(trailsLayer);
+          updateDesc();
 
 
         } else if (selectedID === "Tawangan Trail") {
@@ -360,11 +361,16 @@
             <calcite-segmented-control-item id="All" value="All">Remove Selection</calcite-segmented-control-item>
           </div>
         </div>
+
+        
         
         
 
-
+        <div id = "panelSwitch"></div>
+        <div id="hikeDesc"></div>
       </div>
+
+
   </calcite-shell>
 
 
