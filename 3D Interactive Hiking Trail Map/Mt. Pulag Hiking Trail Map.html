@@ -17,7 +17,7 @@
 
     #menuPanel {
       width: 25vw;
-      height: 100vh;
+      height: 40vh;
       align-items: center;
       position: absolute;
       z-index: 99;
@@ -249,7 +249,7 @@
 
       const hikeSelect = document.getElementById("hikeSelect");
 
-      function updateDesc() {
+      //function updateDesc() {
 
         //*var query = trailsLayerPt.createQuery();
         //return trailsLayerPt.queryFeatures(query);
@@ -261,8 +261,8 @@
         //  });
         //  return values;
         //}*//
-        document.getElementById("hikeDesc").innerHTML = "amamamam";
-      }//
+        //document.getElementById("hikeDesc").innerHTML = "Generally considered a challenging route, it takes an average of 5 h 28 min to complete. This is a popular trail for camping and hiking, but you can still enjoy some solitude during quieter times of day. The trail is open year-round and is beautiful to visit anytime.";
+      //}///
 
 
 
@@ -311,15 +311,15 @@
       const elevationProfile = new ElevationProfile({
         view: view,
         profiles: [{
-          type: "query", // first profile line samples the ground elevation
-          source: {
-            queryElevation(geometry, options) {
-              return trailsLayer.queryElevation(geometry, { ...options, demResolution: 20 })
-            }
-          }
-        }/*, {
+          //type: "query", // first profile line samples the ground elevation
+          //source: {
+            //queryElevation(geometry, options) {
+              //return trailsLayer.queryElevation(geometry, { ...options, demResolution: 20 })
+            //}
+          //}
+        //}, {
           type: "view" // second profile line samples the view and shows building profiles
-        }*/],
+        }],
         // hide the select button
         // this button can be displayed when there are polylines in the
         // scene to select and display the elevation profile for
@@ -361,9 +361,7 @@
           </div>
         </div>
         
-        <div id = "panelSwitch">
-          <div id="hikeDesc"></div>
-        </div>
+        
 
 
       </div>
