@@ -17,7 +17,7 @@
 
     #menuPanel {
       width: 25vw;
-      height: 80vh;
+      height: 45vh;
       align-items: center;
       position: absolute;
       z-index: 99;
@@ -74,15 +74,15 @@
 
     #panelSwitch,
     #panelSwitch2 {
-      color: rgb(0, 197, 255);
+      color: rgb(137, 240, 89, 0.932);
       text-align: center;
       font-weight: normal;
-      font-size: 1.6vw;
+      font-size: 1vw;
       border: solid 0.5px gray;
       padding-top: 2%;
       padding-bottom: 4%;
       margin: auto;
-      width: 80%;
+      width: 90%;
     }
   </style>
 
@@ -328,7 +328,7 @@
           selectButton: true
         }
       });
-      view.ui.add(elevationProfile, "bottom-right");
+      view.ui.add(elevationProfile, "bottom-left");
 
 
     });
@@ -346,7 +346,7 @@
           Mt. Pulag National Park is part of the Tentative list of Philippines in order to qualify for inclusion in the
           World Heritage List.
         </div>
-        <div id="panelSwitch2">
+        <div id="panelSwitch">
           <div id="hikeSelect">
             <calcite-segmented-control>
               <calcite-segmented-control-item id="Akiki Trail" value="Akiki Trail">Akiki
@@ -366,8 +366,10 @@
         
         
 
-        <div id = "panelSwitch"></div>
-        <div id="hikeDesc"></div>
+        <div id = "panelSwitch2">
+          <div id="hikeDesc"></div>
+        </div>
+        
       </div>
 
 
