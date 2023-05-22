@@ -17,10 +17,10 @@
 
     #menuPanel {
       width: 25vw;
-      height: 45vh;
+      height: auto;
       align-items: center;
       position: absolute;
-      z-index: 99;
+
       left: 0;
 
       border-color: white;
@@ -28,16 +28,42 @@
       background-color: rgba(104, 104, 104, 0.596);
     }
 
+
     #titlePanel {
-      color: rgba(137, 240, 89, 0.932);
+      width: auto;
+      height: auto;
+      align-items: center;
+      position: absolute;
+      left: 15em;
+      top: 0.5em;
+      border-block-start: 2mm ridge rgba(211, 220, 50, .6);
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      color: rgb(255, 255, 255);
       text-align: center;
-      font-weight: normal;
+      font-weight: bold;
       font-size: 2.5vw;
-      padding-top: 2%;
-      padding-bottom: 4%;
-      margin: auto;
-      width: 82%;
+      text-shadow: 1px 1px 2px black, 0 0 1em rgba(255, 255, 255, 0.377), 0 0 0.2em rgb(124, 124, 124);
+
     }
+
+    #imageBorder {
+      width: auto;
+      height: auto;
+      left: 15em;
+      position: absolute;
+      border-color: rgba(255, 255, 255, 0);
+    }
+
+    #titleImage {
+      width: 20%;
+      height: auto;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 0;
+      margin-bottom: -10;
+    }
+
+
 
     .esri-elevation-profile.esri-component.esri-widget--panel {
       width: 350px !important;
@@ -47,7 +73,7 @@
       position: fixed;
       z-index: 99;
       width: 2rem;
-      top: 225;
+      top: 265;
       right: 15;
       background-color: rgba(80, 80, 80, 0);
       /*text-align: center;*/
@@ -254,14 +280,14 @@
       function updateDesc() {
 
         var query = trailsLayerPt.createQuery();
-        trailsLayerPt.queryFeatures(query).then(function(response) {
+        trailsLayerPt.queryFeatures(query).then(function (response) {
           var stats = response.features[0].attributes;
           const type = stats.RouteType;
-  
+
           console.log(type);
           hikeDesc.innerHTML = `${type}`;// "Generally considered a challenging route, it takes an average of 5 h 28 min to complete. This is a popular trail for camping and hiking, but you can still enjoy some solitude during quieter times of day. The trail is open year-round and is beautiful to visit anytime.";
         });
-        
+
       }
 
 
@@ -314,11 +340,11 @@
         profiles: [{
           //type: "query", // first profile line samples the ground elevation
           //source: {
-            //queryElevation(geometry, options) {
-              //return trailsLayer.queryElevation(geometry, { ...options, demResolution: 20 })
-            //}
+          //queryElevation(geometry, options) {
+          //return trailsLayer.queryElevation(geometry, { ...options, demResolution: 20 })
           //}
-        //}, {
+          //}
+          //}, {
           type: "view" // second profile line samples the view and shows building profiles
         }],
         // hide the select button
@@ -328,7 +354,15 @@
           selectButton: true
         }
       });
-      view.ui.add(elevationProfile, "bottom-left");
+      //view.ui.add(elevationProfile, "bottom-right");
+
+      var elevationProfileExpand = new Expand({
+        view: view,
+        content: elevationProfile,
+        expandIconClass: "esri-icon-visible",
+        group: "top-right"
+      });
+      view.ui.add(elevationProfileExpand, "top-right");
 
 
     });
@@ -340,12 +374,16 @@
   <calcite-shell content-behind>
     <div id="viewDiv">
 
+
+      <div id="titlePanel">MT. PULAG HIKES</div>
+      
+      <div id="imageBorder">
+        <img id="titleImage" src="https://sarramaravilla.github.io/Symbols/mntn03.svg">
+      </div>
+
       <div id="menuPanel">
-        <div id="titlePanel">MT. PULAG HIKES</div>
-        <div id="descPanel">
-          Mt. Pulag National Park is part of the Tentative list of Philippines in order to qualify for inclusion in the
-          World Heritage List.
-        </div>
+
+
         <div id="panelSwitch">
           <div id="hikeSelect">
             <calcite-segmented-control>
@@ -362,15 +400,17 @@
           </div>
         </div>
 
-        
-        
-        
 
-        <div id = "panelSwitch2">
+
+
+
+        <div id="panelSwitch2">
           <div id="hikeDesc"></div>
         </div>
-        
+
       </div>
+
+
 
 
   </calcite-shell>
