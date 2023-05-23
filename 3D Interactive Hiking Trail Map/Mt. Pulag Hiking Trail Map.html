@@ -15,20 +15,6 @@
       width: 100%;
     }
 
-    #menuPanel {
-      width: 25vw;
-      height: auto;
-      align-items: center;
-      position: absolute;
-
-      left: 0;
-
-      border-color: white;
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-      background-color: rgba(104, 104, 104, 0.596);
-    }
-
-
     #titlePanel {
       width: auto;
       height: auto;
@@ -63,6 +49,38 @@
       margin-bottom: -10;
     }
 
+    #menuPanel {
+      width: auto;
+      height: auto;
+      align-items: center;
+      position: absolute;
+      left: 38%;
+      top: 10%;
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgba(104, 104, 104, 0.596);
+    }
+
+
+    #descPanel {
+      display: none;
+      width: 18vw;
+      height: 30vh;
+      align-items: center;
+      position: absolute;
+      z-index: 99;
+      left: 13;
+      bottom: 3%;
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      color: rgb(255, 255, 255);
+      text-align: center;
+      font-size: 1vw;
+      padding-top: 2em;
+    }
+
 
 
     .esri-elevation-profile.esri-component.esri-widget--panel {
@@ -86,36 +104,12 @@
       font-weight: bold !important;
       color: rgb(230, 230, 230);
     }
-
-    #descPanel {
-      color: rgba(137, 240, 89, 0.932);
-      text-align: center;
-      font-weight: normal;
-      font-size: 1vw;
-      padding-top: 2%;
-      padding-bottom: 8%;
-      margin: auto;
-      width: 82%;
-    }
-
-    #panelSwitch,
-    #panelSwitch2 {
-      color: rgb(137, 240, 89, 0.932);
-      text-align: center;
-      font-weight: normal;
-      font-size: 1vw;
-      border: solid 0.5px gray;
-      padding-top: 2%;
-      padding-bottom: 4%;
-      margin: auto;
-      width: 90%;
-    }
   </style>
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
   <script type="module" src="https://js.arcgis.com/calcite-components/1.0.7/calcite.esm.js"></script>
   <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.0.7/calcite.css" />
-  <script src="https://js.arcgis.com/4.23/"></script>
+  <script src="https://js.arcgis.com/4.26/"></script>
 
   <script>
     require([
@@ -290,6 +284,14 @@
 
       }
 
+      function openPanel() {
+        document.getElementById("descPanel").style.display = "block";
+      }
+
+      function closePanel() {
+        document.getElementById("descPanel").style.display = "none";
+      }
+
 
 
 
@@ -301,6 +303,7 @@
           trailsLayer.definitionExpression = null;
 
           zoomToLayer(trailsLayer);
+          closePanel();
 
         } else if (selectedID === "Akiki Trail") {
           trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
@@ -308,6 +311,7 @@
 
           zoomToLayer(trailsLayer);
           updateDesc();
+          openPanel();
 
 
         } else if (selectedID === "Ambangeg Trail") {
@@ -315,18 +319,24 @@
 
           zoomToLayer(trailsLayer);
           updateDesc();
+          openPanel();
+
 
 
         } else if (selectedID === "Tawangan Trail") {
           trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
 
           zoomToLayer(trailsLayer);
+          updateDesc();
+          openPanel();
 
 
         } else if (selectedID === "Via Balena Trail") {
           trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
 
           zoomToLayer(trailsLayer);
+          updateDesc();
+          openPanel();
 
         }
 
@@ -366,6 +376,7 @@
 
 
     });
+
   </script>
 
 </head>
@@ -376,36 +387,28 @@
 
 
       <div id="titlePanel">MT. PULAG HIKES</div>
-      
-      <div id="imageBorder">
-        <img id="titleImage" src="https://sarramaravilla.github.io/Symbols/mntn03.svg">
-      </div>
 
       <div id="menuPanel">
+        <div id="hikeSelect">
+          <calcite-segmented-control>
+            <calcite-segmented-control-item id="Akiki Trail" value="Akiki Trail">Akiki
+              Trail</calcite-segmented-control-item>
+            <calcite-segmented-control-item id="Ambangeg Trail" value="Ambangeg Trail">Ambangeg
+              Trail</calcite-segmented-control-item>
+            <calcite-segmented-control-item id="Tawangan Trail" value="Tawangan Trail">Tawangan
+              Trail</calcite-segmented-control-item>
+            <calcite-segmented-control-item id="Via Balena Trail" value="Via Balena Trail">Balena
+              Trail</calcite-segmented-control-item>
+              <calcite-segmented-control-item id="All" value="All">Remove Selection</calcite-segmented-control-item>
+          </calcite-segmented-control>
 
 
-        <div id="panelSwitch">
-          <div id="hikeSelect">
-            <calcite-segmented-control>
-              <calcite-segmented-control-item id="Akiki Trail" value="Akiki Trail">Akiki
-                Trail</calcite-segmented-control-item>
-              <calcite-segmented-control-item id="Ambangeg Trail" value="Ambangeg Trail">Ambangeg
-                Trail</calcite-segmented-control-item>
-              <calcite-segmented-control-item id="Tawangan Trail" value="Tawangan Trail">Tawangan
-                Trail</calcite-segmented-control-item>
-              <calcite-segmented-control-item id="Via Balena Trail" value="Via Balena Trail">Balena
-                Trail</calcite-segmented-control-item>
-            </calcite-segmented-control>
-            <calcite-segmented-control-item id="All" value="All">Remove Selection</calcite-segmented-control-item>
-          </div>
         </div>
+      </div>
 
+      <div id="descPanel">
 
-
-
-
-        <div id="panelSwitch2">
-          <div id="hikeDesc"></div>
+        <div id="hikeDesc">
         </div>
 
       </div>
