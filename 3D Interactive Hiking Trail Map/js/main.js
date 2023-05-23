@@ -153,8 +153,8 @@ require([
     ****FILTER BY NAME****
     ********************/
 
-    const hikeSelect = document.getElementById("hikeSelect");
-    const hikeDesc = document.getElementById("hikeDesc");
+    
+    var hikeDesc = document.getElementById("hikeDesc");
 
 
     function updateDesc() {
@@ -179,11 +179,55 @@ require([
     }
 
 
+    var hikeSelect = document.getElementById("hikeSelect");
+
+    function getValues() {
+        var testArray = [];
+        var query = trailsLayer.createQuery();
+        query.outFields = ["Name"];
+        trailsLayer.returnGeometry = true;
+        return trailsLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features;
+            stats.forEach((result, index) => {
+                var attributes = result.attributes;
+                const values = attributes.Name;
+                testArray.push(values);
+            });
+            return testArray;
+        });
+    }
+
+    function getUniqueValues(values) {
+        var uniqueValues = [];
+        values.forEach(function (item, i) {
+            if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
+                uniqueValues.push(item);
+            }
+        });
+        return uniqueValues;
+    }
+
+    function addToSelect(values) {
+        hikeSelect.options.length = 0;
+        values.sort(); 
+        values.unshift('All');
+        values.forEach(function (value) {
+            var option = document.createElement("option");
+            option.text = value;
+            hikeSelect.add(option);
+        });
+    }
+
+    getValues()
+        .then(getUniqueValues)
+        .then(addToSelect)
 
 
-    hikeSelect.addEventListener("click", selectTrail);
+
+
+    hikeSelect.addEventListener("change", selectTrail);
     function selectTrail(event) {
-        const selectedID = event.target.id;
+        const selectedID = event.target.value;
 
         if (selectedID === "All") {
             trailsLayer.definitionExpression = null;
@@ -191,39 +235,12 @@ require([
             zoomToLayer(trailsLayer);
             closePanel();
 
-        } else if (selectedID === "Akiki Trail") {
-            trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
-            trailsLayerPt.definitionExpression = "Name = '" + selectedID + "'";
-
-            zoomToLayer(trailsLayer);
-            updateDesc();
-            openPanel();
-
-
-        } else if (selectedID === "Ambangeg Trail") {
-            trailsLayer.definitionExpression = "Name ='" + selectedID + "'";
-
-            zoomToLayer(trailsLayer);
-            updateDesc();
-            openPanel();
-
-
-
-        } else if (selectedID === "Tawangan Trail") {
+        } else {
             trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
 
             zoomToLayer(trailsLayer);
             updateDesc();
             openPanel();
-
-
-        } else if (selectedID === "Via Balena Trail") {
-            trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
-
-            zoomToLayer(trailsLayer);
-            updateDesc();
-            openPanel();
-
         }
 
     }
