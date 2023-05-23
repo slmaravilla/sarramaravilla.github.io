@@ -1,0 +1,98 @@
+html,
+body,
+#viewDiv {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+#titlePanel {
+    width: auto;
+    height: auto;
+    align-items: center;
+    position: absolute;
+    left: 15em;
+    top: 0.5em;
+    border-block-start: 2mm ridge rgba(211, 220, 50, .6);
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: rgb(255, 255, 255);
+    text-align: center;
+    font-weight: bold;
+    font-size: 2.5vw;
+    text-shadow: 1px 1px 2px black, 0 0 1em rgba(255, 255, 255, 0.377), 0 0 0.2em rgb(124, 124, 124);
+
+}
+
+#imageBorder {
+    width: auto;
+    height: auto;
+    left: 15em;
+    position: absolute;
+    border-color: rgba(255, 255, 255, 0);
+}
+
+#titleImage {
+    width: 20%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0;
+    margin-bottom: -10;
+}
+
+#menuPanel {
+    width: auto;
+    height: auto;
+    align-items: center;
+    position: absolute;
+    left: 38%;
+    top: 10%;
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color: rgba(104, 104, 104, 0.596);
+}
+
+
+#descPanel {
+    display: none;
+    width: 18vw;
+    height: 30vh;
+    align-items: center;
+    position: absolute;
+    z-index: 99;
+    left: 13;
+    bottom: 3%;
+    border-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color: rgb(0, 0, 0, 0.5);
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: rgb(255, 255, 255);
+    text-align: center;
+    font-size: 1vw;
+    padding-top: 2em;
+}
+
+
+
+.esri-elevation-profile.esri-component.esri-widget--panel {
+    width: 350px !important;
+}
+
+.overlay {
+    position: fixed;
+    z-index: 99;
+    width: 2rem;
+    top: 265;
+    right: 15;
+    background-color: rgba(80, 80, 80, 0);
+    /*text-align: center;*/
+    font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.button {
+    cursor: pointer;
+    font-size: 25pt !important;
+    font-weight: bold !important;
+    color: rgb(230, 230, 230);
+}
