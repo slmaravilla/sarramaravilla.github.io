@@ -165,7 +165,7 @@ require([
             const type = stats.RouteType;
 
             console.log(type);
-            hikeDesc.innerHTML = `${type}`;// "Generally considered a challenging route, it takes an average of 5 h 28 min to complete. This is a popular trail for camping and hiking, but you can still enjoy some solitude during quieter times of day. The trail is open year-round and is beautiful to visit anytime.";
+            hikeDesc.innerHTML = `${type}`;
         });
 
     }
