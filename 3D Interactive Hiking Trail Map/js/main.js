@@ -290,12 +290,14 @@ require([
 
         if (selectedID === "All") {
             trailsLayer.definitionExpression = null;
+            trailsLayerPt.definitionExpression = null;
 
             zoomToLayer(trailsLayer);
             closePanel();
 
         } else {
             trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
+            trailsLayerPt.definitionExpression = "Name = '" + selectedID + "'";
 
             zoomToLayer(trailsLayer);
             updateDesc();
