@@ -82,6 +82,63 @@ require([
     );//end
 
 
+
+    var trailPtLabelClass = {
+        symbol: {
+            type: "label-3d",// autocasts as new LabelSymbol3D()
+            symbolLayers: [
+                {
+                    type: "text", // autocasts as new TextSymbol3DLayer()
+                    material: {
+                        color: "orange"
+                    },
+                    size: 12,
+                    color: "black",
+                    haloColor: "black",
+                    haloSize: 1,
+                    font: {
+                        family: "Ubuntu Mono",
+                        //weight: "bold"
+                    },
+                }
+            ],
+            verticalOffset: {
+                screenLength: 50,
+                maxWorldLength: 300,
+                minWorldLength: 40
+            },
+            callout: {
+                type: "line", // autocasts as new LineCallout3D()
+                color: "white",
+                size: 0.5,
+                border: {
+                    color: "grey"
+                }
+            }
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+            expression: "$feature.Name"
+            //value: "{TEXTSTRING}"
+        }
+    }
+
+
+    let trailPtSymbol = {
+        type: "simple",  // autocasts as new SimpleRenderer()
+        symbol: {
+            type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+            size: 5,
+            color: "white",
+            outline: {  // autocasts as new SimpleLineSymbol()
+                width: 0.5,
+                color: [0, 0, 0, 0]
+            }
+        }
+    };
+
+
+
     //Trailheads feature layer (lines)
     const trailsLayer = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/MtPulagTrails/FeatureServer",
@@ -91,6 +148,8 @@ require([
 
     const trailsLayerPt = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/MtPulagTrails_Pt/FeatureServer",
+        renderer: trailPtSymbol,
+        labelingInfo: [trailPtLabelClass],
         outFields: ["*"],
     });
     map.add(trailsLayerPt);
@@ -153,7 +212,7 @@ require([
     ****FILTER BY NAME****
     ********************/
 
-    
+
     var hikeDesc = document.getElementById("hikeDesc");
 
 
@@ -209,7 +268,7 @@ require([
 
     function addToSelect(values) {
         hikeSelect.options.length = 0;
-        values.sort(); 
+        values.sort();
         values.unshift('All');
         values.forEach(function (value) {
             var option = document.createElement("option");
@@ -231,12 +290,14 @@ require([
 
         if (selectedID === "All") {
             trailsLayer.definitionExpression = null;
+            trailsLayerPt.definitionExpression = null;
 
             zoomToLayer(trailsLayer);
             closePanel();
 
         } else {
             trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
+            trailsLayerPt.definitionExpression = "Name = '" + selectedID + "'";
 
             zoomToLayer(trailsLayer);
             updateDesc();
@@ -276,6 +337,9 @@ require([
         group: "top-right"
     });
     view.ui.add(elevationProfileExpand, "top-right");
+
+    //Remove the ui components
+    view.ui.components = [];
 
 
 });
