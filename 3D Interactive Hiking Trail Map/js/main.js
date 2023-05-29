@@ -10,7 +10,7 @@ require([
     "esri/views/SceneView",
     "esri/layers/FeatureLayer",
     "esri/widgets/ElevationProfile",
-    "esri/layers/ElevationLayer"
+    "esri/layers/ElevationLayer",
 ], function (esriConfig, Map, BasemapToggle, Daylight, Compass, Expand, Fullscreen, MapView, SceneView, FeatureLayer, ElevationProfile, ElevationLayer) {
 
     const map = new Map({
