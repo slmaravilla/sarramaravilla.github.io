@@ -24,8 +24,10 @@
       "esri/config",
       "esri/Map",
       "esri/views/MapView",
-      "esri/layers/FeatureLayer"
-    ], function (esriConfig, Map, MapView, FeatureLayer) {
+      "esri/layers/FeatureLayer",
+      "esri/widgets/Print",
+      "esri/widgets/Expand",
+    ], function (esriConfig, Map, MapView, FeatureLayer, Print, Expand) {
 
       //esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
 
@@ -78,8 +80,22 @@
       //map.add(sample, 0);
 
       //Add Editor Widget
-      var editor = new Editor({ view: view });
-      view.ui.add(editor, "bottom-right");
+
+
+      const print = new Print({
+        view: view,
+        printServiceUrl: "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
+        container: "printDiv"
+      });
+      var printExpand = new Expand({
+        view: view,
+        content: print,
+        expandIconClass: "esri-icon-printer",
+        group: "top-left"
+      });
+      view.ui.add(printExpand, {
+        position: "top-left"
+      });
 
     });
   </script>
