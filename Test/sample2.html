@@ -1,0 +1,81 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS API for JavaScript Tutorials: Display a map</title>
+
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.26/"></script>
+
+    <script>
+        require([
+            "esri/config",
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/widgets/Print",
+            "esri/widgets/Expand",
+            "esri/Basemap",
+        ], function (esriConfig, Map, MapView, FeatureLayer, Print, Expand, Basemap) {
+
+            //esriConfig.apiKey = "AAPK023d3678289d4661ab740346f67338b2w2dPpDFrVin-37k5MQpx2V2AKwVG8gWiU-vzadOwwgux3tDtJkHBBsYucLpsBySM";
+
+            const map = new Map({
+                basemap: "topo-vector" // Basemap layer service
+            });
+
+            const view = new MapView({
+                map: map,
+                center: [120.57930, 15.100], // Longitude, latitude
+                zoom: 13, // Zoom level
+                container: "viewDiv" // Div element
+            });
+
+            //Add PROW featureLayer and add it to the map
+            var rowLayer = new FeatureLayer({
+                url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/MtPulagTrails/FeatureServer",
+                
+            });
+            map.add(rowLayer);
+
+            // Parks and open spaces (polygons)
+
+
+            const print = new Print({
+                view: view,
+                printServiceUrl: "https://gis.railway-sector.com/server/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
+                container: "printDiv"
+            });
+            var printExpand = new Expand({
+                view: view,
+                content: print,
+                expandIconClass: "esri-icon-printer",
+                group: "top-left"
+            });
+            view.ui.add(printExpand, {
+                position: "top-left"
+            });
+
+
+        });
+    </script>
+
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+</body>
+
+</html>

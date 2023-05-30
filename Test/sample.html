@@ -96,8 +96,8 @@
     "esri/Basemap",
     "esri/rest/support/TopFeaturesQuery",
     "esri/rest/support/TopFilter",
-    "esri/widgets/Home"
-  ], (Map, MapView, FeatureLayer, WebStyleSymbol, Basemap, TopFeaturesQuery, TopFilter, Home) => (async () => {
+    "esri/widgets/Home", "esri/widgets/Print"
+  ], (Map, MapView, FeatureLayer, WebStyleSymbol, Basemap, TopFeaturesQuery, TopFilter, Home, Print) => (async () => {
 
     const layer = new FeatureLayer({
       url:
@@ -268,6 +268,18 @@
     }
 
     filterItems();
+
+    view.when(() => {
+          const print = new Print({
+            view: view,
+            // specify your own print service
+            printServiceUrl:
+              "https://gis.railway-sector.com/server/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+          });
+
+          // Add widget to the top right corner of the view
+          view.ui.add(print, "top-right");
+        });
 
   })());
 

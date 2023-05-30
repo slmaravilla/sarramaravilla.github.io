@@ -10,34 +10,37 @@
   <link rel="stylesheet" href="./css/main.css">
 
   <script src="https://js.arcgis.com/4.26/"></script>
-  <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/dark/main.css">
   <script src="./js/main.js"></script>
 
 </head>
 
 <body class="calcite-theme-dark">
+  <calcite-loader></calcite-loader>
   <calcite-shell content-behind>
+
+
     <div id="viewDiv">
 
 
       <div id="titlePanel">MT. PULAG HIKES</div>
 
-      
-
-        <div class="esri-widgets" id="menuPanel">
-          <label for="sel-options"> Select your hike: </label>
-          <select class="esri-widget" id="hikeSelect"></select>
-        </div>
 
 
+      <div class="esri-widgets" id="menuPanel">
+        <label for="sel-options"> Select your hike: </label>
+        <select class="esri-widget" id="hikeSelect"></select>
       </div>
 
-      <div id="descPanel">
 
-        <div id="hikeDesc">
-        </div>
+    </div>
 
+    <div id="descPanel">
+
+      <div id="hikeDesc">
       </div>
+
+    </div>
 
   </calcite-shell>
 

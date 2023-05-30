@@ -11,12 +11,21 @@ require([
     "esri/layers/FeatureLayer",
     "esri/widgets/ElevationProfile",
     "esri/layers/ElevationLayer",
-], function (esriConfig, Map, BasemapToggle, Daylight, Compass, Expand, Fullscreen, MapView, SceneView, FeatureLayer, ElevationProfile, ElevationLayer) {
+    "esri/WebMap",
+    "esri/widgets/Bookmarks",
+    "esri/widgets/BasemapGallery",
+    "esri/widgets/LayerList",
+    "esri/widgets/Legend",
+    "esri/widgets/Print",
+    "esri/widgets/LayerList",
+], function (esriConfig, Map, BasemapToggle, Daylight, Compass, Expand, Fullscreen, MapView, SceneView, FeatureLayer, ElevationProfile, ElevationLayer, WebMap,
+    Bookmarks, BasemapGallery, LayerList, Legend, Print, LayerList) {
 
     const map = new Map({
         basemap: "satellite",
         ground: "world-elevation"
     });
+
 
     const view = new SceneView({
         container: "viewDiv",
@@ -35,52 +44,15 @@ require([
             starsEnabled: false,
             //disable atmosphere
             atmosphereEnabled: true
+        },
+        popup: {
+            dockEnabled: true,
+            dockOptions: {
+                buttonEnabled: false,
+                breakpoint: false
+            }
         }
     });
-
-    //Remove deafult widgets on the left
-    view.ui.empty("top-left");
-    //end
-
-    //Add Basemap toggle
-    const toggle = new BasemapToggle({
-        view: view,
-        nextBasemap: "topo-vector"
-    });
-    view.ui.add(toggle, "top-right");
-
-
-    //Adding the daylight widget
-    const daylight = new Daylight({
-        view: view,
-        //play the animation twice as fast than the default one
-        playSpeedMultiplier: 2,
-        //disable the timezone selection button
-        visibleElements: {
-            timezone: false
-        }
-    }); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-right");
-    //end
-
-
-    //Compass
-    const compass = new Compass({
-        view: view
-    });
-    view.ui.add(compass, "top-right");
-    //end
-
-
-
-    //Full Screen Logo
-    view.ui.add(
-        new Fullscreen({
-            view: view,
-            element: viewDiv
-        }),
-        "top-right"
-    );//end
-
 
 
     var trailPtLabelClass = {
@@ -143,8 +115,28 @@ require([
     const trailsLayer = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/MtPulagTrails/FeatureServer",
         outFields: ["*"],
+        popupTemplate: {
+            title: "Trail Description",
+           content: [
+            {
+                type: "fields",
+                fieldInfos: [
+                    {
+                        fieldName: "Name",
+                        visible: true,
+                    }
+                ]
+            }
+           ]
+        }
     });
     map.add(trailsLayer);
+
+
+
+
+
+
 
     const trailsLayerPt = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/MtPulagTrails_Pt/FeatureServer",
@@ -309,6 +301,113 @@ require([
 
 
 
+    let basemapGallery = new BasemapGallery({
+        view: view
+    });
+
+    const basemapGalleryExpand = new Expand({
+        view,
+        content: basemapGallery,
+        expandIconClass: "esri-icon-basemap",
+        group: "top-right"
+    });
+    // Add widget to the top right corner of the view
+    view.ui.add(basemapGalleryExpand, {
+        position: "top-right"
+    });
+
+
+
+    // Legend
+    var legend = new Legend({
+        view: view,
+        container: document.getElementById("legendDiv"),
+        layerInfos: [
+            {
+                layer: trailsLayer,
+                title: "Trails"
+            },
+            {
+                layer: trailsLayerPt,
+                title: "Jump-off"
+            }
+        ]
+    });
+
+    var legendExpand = new Expand({
+        view: view,
+        content: legend,
+        expandIconClass: "esri-icon-legend",
+        group: "top-right"
+    });
+    view.ui.add(legendExpand, {
+        position: "top-right"
+    });
+
+
+
+
+
+
+
+
+    //Remove deafult widgets on the left
+    view.ui.empty("top-left");
+    //end
+
+    /*//Add Basemap toggle
+    const toggle = new BasemapToggle({
+        view: view,
+        nextBasemap: "topo-vector"
+    });
+    view.ui.add(toggle, "top-right");*/
+
+
+    //Adding the daylight widget
+    const daylight = new Daylight({
+        view: view,
+        //play the animation twice as fast than the default one
+        playSpeedMultiplier: 2,
+        //disable the timezone selection button
+        visibleElements: {
+            timezone: false
+        }
+    }); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-right");
+    //end
+
+
+    //Compass
+    const compass = new Compass({
+        view: view
+    });
+    view.ui.add(compass, "top-right");
+    //end
+
+
+
+    //Full Screen Logo
+    view.ui.add(
+        new Fullscreen({
+            view: view,
+            element: viewDiv
+        }),
+        "top-right"
+    );//end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     const elevationProfile = new ElevationProfile({
         view: view,
         profiles: [{
@@ -340,6 +439,12 @@ require([
 
     //Remove the ui components
     view.ui.components = [];
+
+
+
+
+
+
 
 
 });
