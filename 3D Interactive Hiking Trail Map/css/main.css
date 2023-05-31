@@ -84,7 +84,7 @@ body,
     z-index: 99;
     width: 2rem;
     top: 265;
-    right: 15;
+    left: 15;
     background-color: rgba(80, 80, 80, 0);
     /*text-align: center;*/
     font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
