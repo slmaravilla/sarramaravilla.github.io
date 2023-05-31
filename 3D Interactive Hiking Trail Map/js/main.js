@@ -50,7 +50,7 @@ require([
             dockEnabled: true,
             dockOptions: {
                 buttonEnabled: false,
-                breakpoint: false
+                breakpoint: false,
             }
 
         },
@@ -285,31 +285,13 @@ require([
         });
     }
 
-    function closePopUp() {
-
-        /*trailsLayer.when(function(){
-            view.whenLayerView(trailsLayer).then(function(layerView) {
-              trailLyrView = layerView;
-            });
-          })*/
-
-
-        //var query = trailsLayer.createQuery();
-        //trailsLayer.queryFeatures(query).then(function (results) {
-         //  const test = results.features;
-            
-            let highlights = [];
-            if (highlights.length > 0) {
-                highlights.forEach(function(highlight) {
-                  highlight.remove();
-                });
-                highlights = [];
-            }
-
-            
-        //});
-            
+    function closePopUp() {      
+         view.popup.viewModel.set("visible", false);
     }
+    view.popup.viewModel.includeDefaultActions = false;
+    
+
+    
 
 
 var hikeSelect = document.getElementById("hikeSelect");

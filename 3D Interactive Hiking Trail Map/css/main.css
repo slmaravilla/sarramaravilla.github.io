@@ -96,3 +96,8 @@ body,
     font-weight: bold !important;
     color: rgb(230, 230, 230);
 }
+
+
+.zoomTo {
+    display:none;
+    }
