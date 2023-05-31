@@ -23,7 +23,8 @@ require([
 
     const map = new Map({
         basemap: "satellite",
-        ground: "world-elevation"
+        ground: "world-elevation",
+        //infoWindow: popup,
     });
 
 
@@ -51,7 +52,14 @@ require([
                 buttonEnabled: false,
                 breakpoint: false
             }
-        }
+
+        },
+        highlightOptions: {
+            color: [255, 255, 0, 1],//255, 255, 0, 1
+            haloOpacity: 0.0, //0.9
+            fillOpacity: 0.0 //0.2
+          }
+
     });
 
 
@@ -113,22 +121,28 @@ require([
 
     //Trailheads feature layer (lines)
     const trailsLayer = new FeatureLayer({
-        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/MtPulagTrails/FeatureServer",
-        outFields: ["*"],
+        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
+        layerId: 3,
         popupTemplate: {
             title: "Trail Description",
-           content: [
-            {
-                type: "fields",
-                fieldInfos: [
-                    {
-                        fieldName: "Name",
-                        visible: true,
-                    }
-                ]
-            }
-           ]
-        }
+            content: [
+                {
+                    type: "fields",
+                    fieldInfos: [
+                        {
+                            fieldName: "Name",
+                            visible: true,
+                        }
+                    ]
+                },
+                {
+                    type: "attachments"
+                }
+            ]
+        },
+        outFields: ["*"],
+
+
     });
     map.add(trailsLayer);
 
@@ -139,12 +153,35 @@ require([
 
 
     const trailsLayerPt = new FeatureLayer({
-        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/MtPulagTrails_Pt/FeatureServer",
+        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
         renderer: trailPtSymbol,
         labelingInfo: [trailPtLabelClass],
+        layerId: 2,
         outFields: ["*"],
     });
     map.add(trailsLayerPt);
+
+
+    const trailshead = new FeatureLayer({
+        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
+        layerId: 1,
+        outFields: ["*"],
+        elevationInfo: {
+            mode: "relative-to-ground"
+        },
+    });
+    map.add(trailshead);
+
+
+    const mountainPt = new FeatureLayer({
+        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
+        layerId: 0,
+        outFields: ["*"],
+        elevationInfo: {
+            mode: "relative-to-ground"
+        },
+    });
+    map.add(mountainPt);
 
 
     // Zoom to selected layers with tilt
@@ -221,224 +258,273 @@ require([
 
     }
 
-    function openPanel() {
-        document.getElementById("descPanel").style.display = "block";
-    }
+    //function openPanel() {
+    //    document.getElementById("descPanel").style.display = "block";
+    //}
 
-    function closePanel() {
-        document.getElementById("descPanel").style.display = "none";
-    }
+    //function closePanel() {
+    //    document.getElementById("descPanel").style.display = "none";
+    //}
 
 
-    var hikeSelect = document.getElementById("hikeSelect");
 
-    function getValues() {
-        var testArray = [];
+    //Popup
+    function openPopUp() {
         var query = trailsLayer.createQuery();
-        query.outFields = ["Name"];
-        trailsLayer.returnGeometry = true;
-        return trailsLayer.queryFeatures(query).then(function (response) {
-            var stats = response.features;
-            stats.forEach((result, index) => {
-                var attributes = result.attributes;
-                const values = attributes.Name;
-                testArray.push(values);
+        trailsLayer.queryFeatures(query).then(function (response) {
+            view.popup.open({
+                features: [response.features[0]]
+            })
+            let highlights = [];
+            if (highlights.length > 0) {
+                highlights.forEach(function(highlight) {
+                  highlight.remove();
+                });
+                highlights = [];
+            }
+        });
+    }
+
+    function closePopUp() {
+
+        /*trailsLayer.when(function(){
+            view.whenLayerView(trailsLayer).then(function(layerView) {
+              trailLyrView = layerView;
             });
-            return testArray;
-        });
-    }
+          })*/
 
-    function getUniqueValues(values) {
-        var uniqueValues = [];
-        values.forEach(function (item, i) {
-            if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
-                uniqueValues.push(item);
+
+        //var query = trailsLayer.createQuery();
+        //trailsLayer.queryFeatures(query).then(function (results) {
+         //  const test = results.features;
+            
+            let highlights = [];
+            if (highlights.length > 0) {
+                highlights.forEach(function(highlight) {
+                  highlight.remove();
+                });
+                highlights = [];
             }
+
+            
+        //});
+            
+    }
+
+
+var hikeSelect = document.getElementById("hikeSelect");
+
+function getValues() {
+    var testArray = [];
+    var query = trailsLayer.createQuery();
+    query.outFields = ["Name"];
+    trailsLayer.returnGeometry = true;
+    return trailsLayer.queryFeatures(query).then(function (response) {
+        var stats = response.features;
+        stats.forEach((result, index) => {
+            var attributes = result.attributes;
+            const values = attributes.Name;
+            testArray.push(values);
         });
-        return uniqueValues;
-    }
-
-    function addToSelect(values) {
-        hikeSelect.options.length = 0;
-        values.sort();
-        values.unshift('All');
-        values.forEach(function (value) {
-            var option = document.createElement("option");
-            option.text = value;
-            hikeSelect.add(option);
-        });
-    }
-
-    getValues()
-        .then(getUniqueValues)
-        .then(addToSelect)
-
-
-
-
-    hikeSelect.addEventListener("change", selectTrail);
-    function selectTrail(event) {
-        const selectedID = event.target.value;
-
-        if (selectedID === "All") {
-            trailsLayer.definitionExpression = null;
-            trailsLayerPt.definitionExpression = null;
-
-            zoomToLayer(trailsLayer);
-            closePanel();
-
-        } else {
-            trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
-            trailsLayerPt.definitionExpression = "Name = '" + selectedID + "'";
-
-            zoomToLayer(trailsLayer);
-            updateDesc();
-            openPanel();
-        }
-
-    }
-
-
-
-
-    let basemapGallery = new BasemapGallery({
-        view: view
+        return testArray;
     });
+}
 
-    const basemapGalleryExpand = new Expand({
-        view,
-        content: basemapGallery,
-        expandIconClass: "esri-icon-basemap",
-        group: "top-right"
-    });
-    // Add widget to the top right corner of the view
-    view.ui.add(basemapGalleryExpand, {
-        position: "top-right"
-    });
-
-
-
-    // Legend
-    var legend = new Legend({
-        view: view,
-        container: document.getElementById("legendDiv"),
-        layerInfos: [
-            {
-                layer: trailsLayer,
-                title: "Trails"
-            },
-            {
-                layer: trailsLayerPt,
-                title: "Jump-off"
-            }
-        ]
-    });
-
-    var legendExpand = new Expand({
-        view: view,
-        content: legend,
-        expandIconClass: "esri-icon-legend",
-        group: "top-right"
-    });
-    view.ui.add(legendExpand, {
-        position: "top-right"
-    });
-
-
-
-
-
-
-
-
-    //Remove deafult widgets on the left
-    view.ui.empty("top-left");
-    //end
-
-    /*//Add Basemap toggle
-    const toggle = new BasemapToggle({
-        view: view,
-        nextBasemap: "topo-vector"
-    });
-    view.ui.add(toggle, "top-right");*/
-
-
-    //Adding the daylight widget
-    const daylight = new Daylight({
-        view: view,
-        //play the animation twice as fast than the default one
-        playSpeedMultiplier: 2,
-        //disable the timezone selection button
-        visibleElements: {
-            timezone: false
-        }
-    }); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-right");
-    //end
-
-
-    //Compass
-    const compass = new Compass({
-        view: view
-    });
-    view.ui.add(compass, "top-right");
-    //end
-
-
-
-    //Full Screen Logo
-    view.ui.add(
-        new Fullscreen({
-            view: view,
-            element: viewDiv
-        }),
-        "top-right"
-    );//end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    const elevationProfile = new ElevationProfile({
-        view: view,
-        profiles: [{
-            //type: "query", // first profile line samples the ground elevation
-            //source: {
-            //queryElevation(geometry, options) {
-            //return trailsLayer.queryElevation(geometry, { ...options, demResolution: 20 })
-            //}
-            //}
-            //}, {
-            type: "view" // second profile line samples the view and shows building profiles
-        }],
-        // hide the select button
-        // this button can be displayed when there are polylines in the
-        // scene to select and display the elevation profile for
-        visibleElements: {
-            selectButton: true
+function getUniqueValues(values) {
+    var uniqueValues = [];
+    values.forEach(function (item, i) {
+        if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
+            uniqueValues.push(item);
         }
     });
-    //view.ui.add(elevationProfile, "bottom-right");
+    return uniqueValues;
+}
 
-    var elevationProfileExpand = new Expand({
-        view: view,
-        content: elevationProfile,
-        expandIconClass: "esri-icon-visible",
-        group: "top-right"
+function addToSelect(values) {
+    hikeSelect.options.length = 0;
+    values.sort();
+    values.unshift('All');
+    values.forEach(function (value) {
+        var option = document.createElement("option");
+        option.text = value;
+        hikeSelect.add(option);
     });
-    view.ui.add(elevationProfileExpand, "top-right");
+}
 
-    //Remove the ui components
-    view.ui.components = [];
+getValues()
+    .then(getUniqueValues)
+    .then(addToSelect)
+
+
+
+
+hikeSelect.addEventListener("change", selectTrail);
+function selectTrail(event) {
+    const selectedID = event.target.value;
+
+    if (selectedID === "All") {
+        trailsLayer.definitionExpression = null;
+        trailsLayerPt.definitionExpression = null;
+
+        zoomToLayer(trailsLayer);
+        closePopUp();
+
+    } else {
+        trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
+        trailsLayerPt.definitionExpression = "Name = '" + selectedID + "'";
+
+        zoomToLayer(trailsLayer);
+        updateDesc();
+        openPopUp();
+    }
+
+}
+
+
+
+
+let basemapGallery = new BasemapGallery({
+    view: view
+});
+
+const basemapGalleryExpand = new Expand({
+    view,
+    content: basemapGallery,
+    expandIconClass: "esri-icon-basemap",
+    group: "top-left"
+});
+// Add widget to the top right corner of the view
+view.ui.add(basemapGalleryExpand, {
+    position: "top-left"
+});
+
+
+
+// Legend
+var legend = new Legend({
+    view: view,
+    container: document.getElementById("legendDiv"),
+    layerInfos: [
+        {
+            layer: trailsLayer,
+            title: "Trails"
+        },
+        {
+            layer: trailshead,
+            title: "Jump-off"
+        },
+        {
+            layer: mountainPt,
+            title: "Mountain"
+        }
+    ]
+});
+
+var legendExpand = new Expand({
+    view: view,
+    content: legend,
+    expandIconClass: "esri-icon-legend",
+    group: "top-left"
+});
+view.ui.add(legendExpand, {
+    position: "top-left"
+});
+
+
+
+
+
+
+
+
+//Remove deafult widgets on the left
+// view.ui.empty("top-left");
+//end
+
+/*//Add Basemap toggle
+const toggle = new BasemapToggle({
+    view: view,
+    nextBasemap: "topo-vector"
+});
+view.ui.add(toggle, "top-left");*/
+
+
+//Adding the daylight widget
+const daylight = new Daylight({
+    view: view,
+    //play the animation twice as fast than the default one
+    playSpeedMultiplier: 2,
+    //disable the timezone selection button
+    visibleElements: {
+        timezone: false
+    }
+}); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-left");
+//end
+
+
+//Compass
+const compass = new Compass({
+    view: view
+});
+view.ui.add(compass, "top-left");
+//end
+
+
+
+//Full Screen Logo
+view.ui.add(
+    new Fullscreen({
+        view: view,
+        element: viewDiv
+    }),
+    "top-left"
+);//end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const elevationProfile = new ElevationProfile({
+    view: view,
+    profiles: [{
+        //type: "query", // first profile line samples the ground elevation
+        //source: {
+        //queryElevation(geometry, options) {
+        //return trailsLayer.queryElevation(geometry, { ...options, demResolution: 20 })
+        //}
+        //}
+        //}, {
+        type: "view" // second profile line samples the view and shows building profiles
+    }],
+    // hide the select button
+    // this button can be displayed when there are polylines in the
+    // scene to select and display the elevation profile for
+    visibleElements: {
+        selectButton: true
+    }
+});
+//view.ui.add(elevationProfile, "bottom-right");
+
+var elevationProfileExpand = new Expand({
+    view: view,
+    content: elevationProfile,
+    expandIconClass: "esri-icon-visible",
+    group: "top-left"
+});
+view.ui.add(elevationProfileExpand, "top-left");
+
+//Remove the ui components
+view.ui.components = [];
 
 
 
