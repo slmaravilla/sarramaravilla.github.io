@@ -51,6 +51,7 @@ require([
             dockOptions: {
                 buttonEnabled: false,
                 breakpoint: false,
+                collapsed: false,
             }
 
         },
@@ -275,13 +276,7 @@ require([
             view.popup.open({
                 features: [response.features[0]]
             })
-            let highlights = [];
-            if (highlights.length > 0) {
-                highlights.forEach(function(highlight) {
-                  highlight.remove();
-                });
-                highlights = [];
-            }
+            
         });
     }
 
