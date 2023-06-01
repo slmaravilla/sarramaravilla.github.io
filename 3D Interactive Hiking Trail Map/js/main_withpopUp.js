@@ -24,6 +24,7 @@ require([
     const map = new Map({
         basemap: "satellite",
         ground: "world-elevation",
+        //infoWindow: popup,
     });
 
 
@@ -45,6 +46,20 @@ require([
             //disable atmosphere
             atmosphereEnabled: true
         },
+        popup: {
+            dockEnabled: true,
+            dockOptions: {
+                buttonEnabled: false,
+                breakpoint: false,
+                collapsed: false,
+            }
+
+        },
+        highlightOptions: {
+            color: [255, 255, 0, 1],//255, 255, 0, 1
+            haloOpacity: 0.0, //0.9
+            fillOpacity: 0.0 //0.2
+          }
 
     });
 
@@ -109,12 +124,31 @@ require([
     const trailsLayer = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
         layerId: 3,
+        popupTemplate: {
+            title: "Trail Description",
+            content: [
+                {
+                    type: "fields",
+                    fieldInfos: [
+                        {
+                            fieldName: "Name",
+                            visible: true,
+                        }
+                    ]
+                },
+                
+            ]
+        },
         outFields: ["*"],
-        
 
 
     });
     map.add(trailsLayer);
+
+
+
+
+
 
 
     const trailsLayerPt = new FeatureLayer({
@@ -217,7 +251,6 @@ require([
             var stats = response.features[0].attributes;
             const name = stats.Name;
             const length =stats.Length;
-            const elevGain = stats.ElevGain;
             const walktime =stats.Walktime;
             const specs = stats.Specs;
             const diff = stats.Difficulty;
@@ -227,8 +260,7 @@ require([
 
             console.log(name);
             hikeDesc.innerHTML = `<h2>${name}</h2><br>
-                                  Length: <b>${length} km.</b><br>
-                                  Elevation Gain: <b>${elevGain} m.</b><br>
+                                  Elevation Gain: <b>${length} km.</b><br>
                                   Average Walktime: <b>${walktime}</b><br>
                                   Specifications: <b>${specs}</b><br>
                                   Difficulty Level: <b>${diff}</b><br>
@@ -250,6 +282,25 @@ require([
     }
 
 
+
+    //Popup
+    /*function openPopUp() {
+        var query = trailsLayer.createQuery();
+        trailsLayer.queryFeatures(query).then(function (response) {
+            view.popup.open({
+                features: [response.features[0]]
+            })
+            
+        });
+    }
+
+    function closePopUp() {      
+         view.popup.viewModel.set("visible", false);
+    }
+    view.popup.viewModel.includeDefaultActions = false;
+    */
+
+    
 
 
 var hikeSelect = document.getElementById("hikeSelect");
@@ -377,6 +428,16 @@ view.ui.add(legendExpand, {
 
 
 
+//Remove deafult widgets on the left
+// view.ui.empty("top-left");
+//end
+
+/*//Add Basemap toggle
+const toggle = new BasemapToggle({
+    view: view,
+    nextBasemap: "topo-vector"
+});
+view.ui.add(toggle, "top-left");*/
 
 
 //Adding the daylight widget
@@ -410,15 +471,40 @@ view.ui.add(
     "top-left"
 );//end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const elevationProfile = new ElevationProfile({
     view: view,
     profiles: [{
+        //type: "query", // first profile line samples the ground elevation
+        //source: {
+        //queryElevation(geometry, options) {
+        //return trailsLayer.queryElevation(geometry, { ...options, demResolution: 20 })
+        //}
+        //}
+        //}, {
         type: "view" // second profile line samples the view and shows building profiles
     }],
+    // hide the select button
+    // this button can be displayed when there are polylines in the
+    // scene to select and display the elevation profile for
     visibleElements: {
         selectButton: true
     }
 });
+//view.ui.add(elevationProfile, "bottom-right");
 
 var elevationProfileExpand = new Expand({
     view: view,
