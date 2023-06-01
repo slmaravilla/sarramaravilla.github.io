@@ -136,9 +136,7 @@ require([
                         }
                     ]
                 },
-                {
-                    type: "attachments"
-                }
+                
             ]
         },
         outFields: ["*"],
@@ -251,7 +249,7 @@ require([
         var query = trailsLayerPt.createQuery();
         trailsLayerPt.queryFeatures(query).then(function (response) {
             var stats = response.features[0].attributes;
-            const type = stats.RouteType;
+            const type = stats.Name;
 
             console.log(type);
             hikeDesc.innerHTML = `${type}`;
@@ -259,18 +257,18 @@ require([
 
     }
 
-    //function openPanel() {
-    //    document.getElementById("descPanel").style.display = "block";
-    //}
+    function openPanel() {
+        document.getElementById("descPanel").style.display = "block";
+    }
 
-    //function closePanel() {
-    //    document.getElementById("descPanel").style.display = "none";
-    //}
+    function closePanel() {
+        document.getElementById("descPanel").style.display = "none";
+    }
 
 
 
     //Popup
-    function openPopUp() {
+    /*function openPopUp() {
         var query = trailsLayer.createQuery();
         trailsLayer.queryFeatures(query).then(function (response) {
             view.popup.open({
@@ -284,7 +282,7 @@ require([
          view.popup.viewModel.set("visible", false);
     }
     view.popup.viewModel.includeDefaultActions = false;
-    
+    */
 
     
 
@@ -344,7 +342,7 @@ function selectTrail(event) {
         trailsLayerPt.definitionExpression = null;
 
         zoomToLayer(trailsLayer);
-        closePopUp();
+        closePanel();
 
     } else {
         trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
@@ -352,7 +350,7 @@ function selectTrail(event) {
 
         zoomToLayer(trailsLayer);
         updateDesc();
-        openPopUp();
+        openPanel();
     }
 
 }
