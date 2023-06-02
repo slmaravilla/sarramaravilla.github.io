@@ -111,6 +111,11 @@
 
     h2 {
         font-size: 1.5rem;
+        text-align: left;
+        font-size: 1.1vw;
+        padding-top: 0.8em;
+        text-align: center;
+        font-weight: bold;
     }
 
     /* Browser Setting */
@@ -188,24 +193,42 @@
         margin: 15;
     }
 
+
     #station {
-        width: 15vw;
-        height: 50vh;
+        width: 14vw;
+        height: auto;
         align-items: center;
         position: absolute;
-        z-index: 99;
         right: 13;
-        bottom: 3%;
+        bottom: 1%;
         border-color: white;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         background-color: rgb(0, 0, 0, 0.5);
-        font-family: Georgia, 'Times New Roman', Times, serif;
-        color: rgb(255, 255, 255);
-        padding-left: 1%;
+        padding-bottom: 1%;
+        font-family: Arial, Helvetica, sans-serif;
+        color: rgba(194, 194, 194, 0.884);
+
+    }
+
+    #stationTitle {
+        text-align: left;
+        font-size: 1.1vw;
+        padding-top: 0.8em;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    #stationContent {
+        padding-left: 1.5%;
         text-align: left;
         font-size: 0.8vw;
-        padding-top: 2em;
+        padding-top: 0.5em;
+        columns: 2;
+        line-height: 0.85;
+        padding-left: 1em;
     }
+
+
 
     #stationN1,
     #stationN2,
@@ -265,20 +288,21 @@
             <div id="legend-container-sc"></div>
             <!-- Logo -->
             <!--
-        <div id="logo-image">
+         <div id="logo-image">
           <img id="dotr-img" src="https://EijiGorilla.github.io/Symbols/Projec_Logo/DOTr_Logo_nobackground.png">
           <img id="mmsp-img" src="https://EijiGorilla.github.io/Symbols/Projec_Logo/MMSP_Logo_nobackground.png">
           <img id="gcr-img" src="https://EijiGorilla.github.io/Symbols/Projec_Logo/GCR_Logo_nobackground.png">  
-        </div>
-        -->
+         </div>-->
             <img id="train-Operation-schedule"
                 src="https://EijiGorilla.github.io/Symbols/Gallery/Train_Operation_2.png">
         </div>
+
         <div id="station">
-            <div id="stationN2"></div>
-            <div id="stationN1"></div>
-            <div id="stationSC"></div>
+            <div id="stationTitle">NSCR Stations</div>
+            <div id="stationContent"></div>
         </div>
+
+</div>
     </calcite-shell>
 </body>
 <script>
@@ -2801,127 +2825,53 @@
         view.ui.add(compass, "top-left");
 
 
-        const stationNum = [
-            {
-                "category": "Depot",
-                "value": 1
-            },
-            {
-                "category": "CIA Station",
-                "value": 2
-            },
-            {
-                "category": "Clark Station",
-                "value": 3
-            },
-            {
-                "category": "Angeles Station",
-                "value": 4
-            },
-            {
-                "category": "San Fernando Station",
-                "value": 5
-            },
-            {
-                "category": "Apalit Station",
-                "value": 6
-            },
-            {
-                "category": "Calumpit Station",
-                "value": 7
-            },
-            {
-                "category": "Guiguinto Station",
-                "value": 8
-            },
-            {
-                "category": "Balagtas Station",
-                "value": 9
-            },
-            {
-                "category": "Bocaue Station",
-                "value": 10
-            },
-            {
-                "category": "Marilao Station",
-                "value": 11
-            },
-            {
-                "category": "Meycauayan Station",
-                "value": 12
-            },
-            {
-                "category": "Valenzuela Station",
-                "value": 13
-            },
-            {
-                "category": "Caloocan Station",
-                "value": 14
-            },
-            {
-                "category": "Solis Station",
-                "value": 15
-            },
-            {
-                "category": "Depot",
-                "value": 16
-            },
-            {
-                "category": "Depot",
-                "value": 17
-            },
-            {
-                "category": "Depot",
-                "value": 18
-            },
-            {
-                "category": "Depot",
-                "value": 19
-            },
-            {
-                "category": "Depot",
-                "value": 20
-            },
-            {
-                "category": "Depot",
-                "value": 21
-            },
-            {
-                "category": "Depot",
-                "value": 22
-            },
-            {
-                "category": "Depot",
-                "value": 23
-            },
-            {
-                "category": "Depot",
-                "value": 24
-            },
-            {
-                "category": "Depot",
-                "value": 25
-            },
-            {
-                "category": "Depot",
-                "value": 26
-            },
-            {
-                "category": "Depot",
-                "value": 27
-            },
-            {
-                "category": "Depot",
-                "value": 28
-            },
-            {
-                "category": "Depot",
-                "value": 29
-            },
+        const stationArray = [
+            { "category": "CIA", "value": 1 }, { "category": "Clark", "value": 2 },
+            { "category": "Angeles", "value": 3 }, { "category": "San Fernando", "value": 4 },
+            { "category": "Apalit", "value": 5 }, { "category": "Calumpit", "value": 6 },
+            { "category": "Malolos", "value": 7 }, { "category": "Guiguinto", "value": 8 },
+            { "category": "Balagtas", "value": 9 }, { "category": "Bocaue", "value": 10 },
+            { "category": "Marilao", "value": 11 }, { "category": "Meycauayan", "value": 12 },
+            { "category": "Valenzuela", "value": 13 }, { "category": "Caloocan", "value": 14 },
+            { "category": "Solis", "value": 15 }, { "category": "Tutuban", "value": 16 },
+            { "category": "Blumentritt", "value": 17 }, { "category": "España", "value": 18 },
+            { "category": "Sta. Mesa", "value": 19 }, { "category": "Paco", "value": 20 },
+            { "category": "Buendia", "value": 21 }, { "category": "EDSA", "value": 22 },
+            { "category": "Nichols", "value": 23 }, { "category": "FTI", "value": 24 },
+            { "category": "Bicutan", "value": 25 }, { "category": "Sucat", "value": 26 },
+            { "category": "Alabang", "value": 27 }, { "category": "Muntinlupa", "value": 28 },
+            { "category": "San Pedro", "value": 29 }, { "category": "Pacita", "value": 30 },
+            { "category": "Biñan", "value": 31 }, { "category": "Sta. Rosa", "value": 32 },
+            { "category": "Cabuyao", "value": 33 }, { "category": "Banlic", "value": 34 },
+            { "category": "Calamba", "value": 35 }
+        ];
+
+        var stationList = document.getElementById("stationContent");
+        let content = ``;
+        stationArray.forEach(item => {
+            content += `<br>${item.value}. ${item.category}</br>`;
+        });
+        stationList.innerHTML = content;
+
+        console.log(stationList);
 
 
-        ]
 
+        /*const stationExpand = new Expand({
+            view: view,
+            expanded: true,
+            content: stationList
+        });
+
+        view.ui.add(stationExpand, "bottom-right");*/
+
+
+
+
+
+
+
+        /*var stationList = document.getElementById("station");
 
         function stationN2() {
             var list1 = [];
@@ -2956,6 +2906,7 @@
 
         function stationSC(b) {
             var list3 = [];
+            stationList.innerHTML = "";
             var query = scStationLayer.createQuery();
             return scStationLayer.queryFeatures(query).then(function (response) {
                 var stats = response.features;
@@ -2968,20 +2919,16 @@
                 const c = b.concat(list3);
                 console.log(c);
 
-                document.getElementById("station").innerHTML = `<h>NSCR-Ex Stations<h> 
-                                                                    <br> 1. ${c[0]}
-                                                                    <br> 2. ${c[1]}
-                                                                    <br> 3. ${c[3]}
-                                                                    <br> 4. ${c[4]}
-                                                                    <br> 5. ${c[7]}
-                                                                    <br> 6. ${c[2]}
-                                                                    <br> 7. ${c[6]}
-                                                                    <br> 7. ${c[6]}
-                                                                    <br> 7. ${c[6]}
-                                                                    <br> 7. ${c[6]}
-                                                                    <br> 7. ${c[6]}
-                                                                    <br> 7. ${c[6]}
-                                                                    `;
+                var stationName = document.createElement("stationName");
+
+                
+
+
+
+                stationName.innerHTML = `${stationNum}<br> ${c} <br>`;
+
+                stationList.appendChild(stationName);
+                                                                    
             });
 
         }
@@ -2989,7 +2936,7 @@
         stationN2()
             .then(stationN1)
             .then(stationSC)
-
+*/
 
 
 
