@@ -18,8 +18,9 @@ require([
     "esri/widgets/Legend",
     "esri/widgets/Print",
     "esri/widgets/LayerList",
+    "esri/Graphic"
 ], function (esriConfig, Map, BasemapToggle, Daylight, Compass, Expand, Fullscreen, MapView, SceneView, FeatureLayer, ElevationProfile, ElevationLayer, WebMap,
-    Bookmarks, BasemapGallery, LayerList, Legend, Print, LayerList) {
+    Bookmarks, BasemapGallery, LayerList, Legend, Print, LayerList, Graphic) {
 
     const map = new Map({
         basemap: "satellite",
@@ -45,6 +46,12 @@ require([
             //disable atmosphere
             atmosphereEnabled: true
         },
+        popup: {
+            dockOptions: {
+              buttonEnabled: false,
+              breakpoint: false
+            }
+          }
 
     });
 
@@ -113,7 +120,7 @@ require([
             mode: "relative-to-ground"
         },
         outFields: ["*"],
-        
+
 
 
     });
@@ -152,32 +159,55 @@ require([
     map.add(mountainPt);
 
 
+
+    var POIRenderer = {
+        type: "unique-value",
+        uniqueValueInfos: [
+          {
+            value: "PHOTO",
+            label: "Photo Spot",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/Photo_symbol.png",
+                      "#D13470",
+                      20,
+                      "Relocation"
+            )
+          }
+        ]
+      };
+
+
+
+
     const POIs = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
         layerId: 1,
-        outFields: ["*"],
         elevationInfo: {
             mode: "relative-to-ground"
         },
+        renderer: POIRenderer,
         popupTemplate: {
             content: [
-            {
-              type: "media",
-              mediaInfos: [
                 {
-                  title: "{Name}",
-                  type: "image",
-                  caption: "Source: {source}",
-                  value: {
-                    sourceURL: "{imgURL}"
-                  }
-                }
-              ]
-            }
+                    type: "media",
+                    mediaInfos: [
+                        {
+                            title: "{Name}",
+                            type: "image",
+                            caption: "Source: {source}",
+                            value: {
+                                sourceURL: "{imgURL}"
+                            }
+                        }
+                    ]
+                },
             ]
-            }
+        },
+        outFields: ["*"]
     });
     map.add(POIs);
+
+    view.popup.viewModel.includeDefaultActions = false;
 
 
 
@@ -249,9 +279,9 @@ require([
         trailsLayer.queryFeatures(query).then(function (result) {
             var stats = result.features[0].attributes;
             const name = stats.Name;
-            const length =stats.Length;
+            const length = stats.Length;
             const elevGain = stats.ElevGain;
-            const hrs2summit =stats.HoursToSummit;
+            const hrs2summit = stats.HoursToSummit;
             const specs = stats.Specs;
             const diff = stats.Difficulty;
             const trailclass = stats.TrailClass;
@@ -284,188 +314,188 @@ require([
 
 
 
-var hikeSelect = document.getElementById("hikeSelect");
+    var hikeSelect = document.getElementById("hikeSelect");
 
-function getValues() {
-    var testArray = [];
-    var query = trailsLayer.createQuery();
-    query.outFields = ["Name"];
-    trailsLayer.returnGeometry = true;
-    return trailsLayer.queryFeatures(query).then(function (response) {
-        var stats = response.features;
-        stats.forEach((result, index) => {
-            var attributes = result.attributes;
-            const values = attributes.Name;
-            testArray.push(values);
+    function getValues() {
+        var testArray = [];
+        var query = trailsLayer.createQuery();
+        query.outFields = ["Name"];
+        trailsLayer.returnGeometry = true;
+        return trailsLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features;
+            stats.forEach((result, index) => {
+                var attributes = result.attributes;
+                const values = attributes.Name;
+                testArray.push(values);
+            });
+            return testArray;
         });
-        return testArray;
-    });
-}
-
-function getUniqueValues(values) {
-    var uniqueValues = [];
-    values.forEach(function (item, i) {
-        if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
-            uniqueValues.push(item);
-        }
-    });
-    return uniqueValues;
-}
-
-function addToSelect(values) {
-    hikeSelect.options.length = 0;
-    values.sort();
-    values.unshift('All');
-    values.forEach(function (value) {
-        var option = document.createElement("option");
-        option.text = value;
-        hikeSelect.add(option);
-    });
-}
-
-getValues()
-    .then(getUniqueValues)
-    .then(addToSelect)
-
-
-
-
-hikeSelect.addEventListener("change", selectTrail);
-function selectTrail(event) {
-    const selectedID = event.target.value;
-
-    if (selectedID === "All") {
-        trailsLayer.definitionExpression = null;
-        trailsLayerPt.definitionExpression = null;
-        trailshead.definitionExpression = null;
-        POIs.definitionExpression = null;
-
-        zoomToLayer(trailsLayer);
-        closePanel();
-
-    } else {
-        trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
-        trailsLayerPt.definitionExpression = "Name = '" + selectedID + "'";
-        trailshead.definitionExpression = "Trail = '" + selectedID + "'";
-        POIs.definitionExpression = "Trail = '" + selectedID + "'";
-
-        zoomToLayer(trailsLayer);
-        updateDesc();
-        openPanel();
     }
 
-}
-
-
-
-
-let basemapGallery = new BasemapGallery({
-    view: view
-});
-
-const basemapGalleryExpand = new Expand({
-    view,
-    content: basemapGallery,
-    expandIconClass: "esri-icon-basemap",
-    group: "top-left"
-});
-// Add widget to the top right corner of the view
-view.ui.add(basemapGalleryExpand, {
-    position: "top-left"
-});
-
-
-
-// Legend
-var legend = new Legend({
-    view: view,
-    container: document.getElementById("legendDiv"),
-    layerInfos: [
-        {
-            layer: trailsLayer,
-            title: "Trails"
-        },
-        {
-            layer: trailshead,
-            title: "Jump-off"
-        },
-        {
-            layer: mountainPt,
-            title: "Mountain"
-        }
-    ]
-});
-
-var legendExpand = new Expand({
-    view: view,
-    content: legend,
-    expandIconClass: "esri-icon-legend",
-    group: "top-left"
-});
-view.ui.add(legendExpand, {
-    position: "top-left"
-});
-
-
-
-
-
-
-
-
-
-
-//Adding the daylight widget
-const daylight = new Daylight({
-    view: view,
-    //play the animation twice as fast than the default one
-    playSpeedMultiplier: 2,
-    //disable the timezone selection button
-    visibleElements: {
-        timezone: false
+    function getUniqueValues(values) {
+        var uniqueValues = [];
+        values.forEach(function (item, i) {
+            if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
+                uniqueValues.push(item);
+            }
+        });
+        return uniqueValues;
     }
-}); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-left");
-//end
+
+    function addToSelect(values) {
+        hikeSelect.options.length = 0;
+        values.sort();
+        values.unshift('All');
+        values.forEach(function (value) {
+            var option = document.createElement("option");
+            option.text = value;
+            hikeSelect.add(option);
+        });
+    }
+
+    getValues()
+        .then(getUniqueValues)
+        .then(addToSelect)
 
 
-//Compass
-const compass = new Compass({
-    view: view
-});
-view.ui.add(compass, "top-left");
-//end
+
+
+    hikeSelect.addEventListener("change", selectTrail);
+    function selectTrail(event) {
+        const selectedID = event.target.value;
+
+        if (selectedID === "All") {
+            trailsLayer.definitionExpression = null;
+            trailsLayerPt.definitionExpression = null;
+            trailshead.definitionExpression = null;
+            POIs.definitionExpression = null;
+
+            zoomToLayer(trailsLayer);
+            closePanel();
+
+        } else {
+            trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
+            trailsLayerPt.definitionExpression = "Name = '" + selectedID + "'";
+            trailshead.definitionExpression = "Trail = '" + selectedID + "'";
+            POIs.definitionExpression = "Trail = '" + selectedID + "'";
+
+            zoomToLayer(trailsLayer);
+            updateDesc();
+            openPanel();
+        }
+
+    }
 
 
 
-//Full Screen Logo
-view.ui.add(
-    new Fullscreen({
+
+    let basemapGallery = new BasemapGallery({
+        view: view
+    });
+
+    const basemapGalleryExpand = new Expand({
+        view,
+        content: basemapGallery,
+        expandIconClass: "esri-icon-basemap",
+        group: "top-left"
+    });
+    // Add widget to the top right corner of the view
+    view.ui.add(basemapGalleryExpand, {
+        position: "top-left"
+    });
+
+
+
+    // Legend
+    var legend = new Legend({
         view: view,
-        element: viewDiv
-    }),
-    "top-left"
-);//end
+        container: document.getElementById("legendDiv"),
+        layerInfos: [
+            {
+                layer: trailsLayer,
+                title: "Trails"
+            },
+            {
+                layer: trailshead,
+                title: "Jump-off"
+            },
+            {
+                layer: mountainPt,
+                title: "Mountain"
+            }
+        ]
+    });
 
-const elevationProfile = new ElevationProfile({
-    view: view,
-    profiles: [{
-        type: "view" // second profile line samples the view and shows building profiles
-    }],
-    visibleElements: {
-        selectButton: true
-    }
-});
+    var legendExpand = new Expand({
+        view: view,
+        content: legend,
+        expandIconClass: "esri-icon-legend",
+        group: "top-left"
+    });
+    view.ui.add(legendExpand, {
+        position: "top-left"
+    });
 
-var elevationProfileExpand = new Expand({
-    view: view,
-    content: elevationProfile,
-    expandIconClass: "esri-icon-visible",
-    group: "top-left"
-});
-view.ui.add(elevationProfileExpand, "top-left");
 
-//Remove the ui components
-view.ui.components = [];
+
+
+
+
+
+
+
+
+    //Adding the daylight widget
+    const daylight = new Daylight({
+        view: view,
+        //play the animation twice as fast than the default one
+        playSpeedMultiplier: 2,
+        //disable the timezone selection button
+        visibleElements: {
+            timezone: false
+        }
+    }); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-left");
+    //end
+
+
+    //Compass
+    const compass = new Compass({
+        view: view
+    });
+    view.ui.add(compass, "top-left");
+    //end
+
+
+
+    //Full Screen Logo
+    view.ui.add(
+        new Fullscreen({
+            view: view,
+            element: viewDiv
+        }),
+        "top-left"
+    );//end
+
+    const elevationProfile = new ElevationProfile({
+        view: view,
+        profiles: [{
+            type: "view" // second profile line samples the view and shows building profiles
+        }],
+        visibleElements: {
+            selectButton: true
+        }
+    });
+
+    var elevationProfileExpand = new Expand({
+        view: view,
+        content: elevationProfile,
+        expandIconClass: "esri-icon-visible",
+        group: "top-left"
+    });
+    view.ui.add(elevationProfileExpand, "top-left");
+
+    //Remove the ui components
+    view.ui.components = [];
 
 
 
