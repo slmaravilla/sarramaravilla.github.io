@@ -33,7 +33,7 @@ require([
         map: map,
         camera: {
             spatialReference: { latestWkid: 3857, wkid: 102100 },
-            position: [120.88, 16.60, 20000],
+            position: [120.89, 16.62, 35000],
 
         },
         environment: {
@@ -197,7 +197,7 @@ require([
             view.goTo(
                 {
                     target: response.extent,
-                    tilt: 70
+                    tilt: 60
                 }, {
                 speedFactor: .5,
                 //heading: view.camera.heading + 0.2
