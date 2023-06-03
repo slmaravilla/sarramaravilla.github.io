@@ -159,33 +159,12 @@ require([
     map.add(mountainPt);
 
 
-
-    var POIRenderer = {
-        type: "unique-value",
-        uniqueValueInfos: [
-          {
-            value: "PHOTO",
-            label: "Photo Spot",
-            symbol: getUniqueValueSymbol(
-              "https://EijiGorilla.github.io/Symbols/Photo_symbol.png",
-                      "#D13470",
-                      20,
-                      "Relocation"
-            )
-          }
-        ]
-      };
-
-
-
-
     const POIs = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
         layerId: 1,
         elevationInfo: {
             mode: "relative-to-ground"
         },
-        renderer: POIRenderer,
         popupTemplate: {
             content: [
                 {
