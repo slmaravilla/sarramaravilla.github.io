@@ -108,7 +108,10 @@ require([
     //Trailheads feature layer (lines)
     const trailsLayer = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
-        layerId: 3,
+        layerId: 4,
+        elevationInfo: {
+            mode: "relative-to-ground"
+        },
         outFields: ["*"],
         
 
@@ -121,7 +124,7 @@ require([
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
         renderer: trailPtSymbol,
         labelingInfo: [trailPtLabelClass],
-        layerId: 2,
+        layerId: 0,
         outFields: ["*"],
     });
     map.add(trailsLayerPt);
@@ -129,7 +132,7 @@ require([
 
     const trailshead = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
-        layerId: 1,
+        layerId: 3,
         outFields: ["*"],
         elevationInfo: {
             mode: "relative-to-ground"
@@ -140,13 +143,43 @@ require([
 
     const mountainPt = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
-        layerId: 0,
+        layerId: 2,
         outFields: ["*"],
         elevationInfo: {
             mode: "relative-to-ground"
         },
     });
     map.add(mountainPt);
+
+
+    const POIs = new FeatureLayer({
+        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
+        layerId: 1,
+        outFields: ["*"],
+        elevationInfo: {
+            mode: "relative-to-ground"
+        },
+        popupTemplate: {
+            content: [
+            {
+              type: "media",
+              mediaInfos: [
+                {
+                  title: "{Name}",
+                  type: "image",
+                  caption: "Source: {source}",
+                  value: {
+                    sourceURL: "{imgURL}"
+                  }
+                }
+              ]
+            }
+            ]
+            }
+    });
+    map.add(POIs);
+
+
 
 
     // Zoom to selected layers with tilt
@@ -212,30 +245,29 @@ require([
 
     function updateDesc() {
 
-        var query = trailsLayerPt.createQuery();
-        trailsLayerPt.queryFeatures(query).then(function (response) {
-            var stats = response.features[0].attributes;
+        var query = trailsLayer.createQuery();
+        trailsLayer.queryFeatures(query).then(function (result) {
+            var stats = result.features[0].attributes;
             const name = stats.Name;
             const length =stats.Length;
             const elevGain = stats.ElevGain;
-            const walktime =stats.Walktime;
+            const hrs2summit =stats.HoursToSummit;
             const specs = stats.Specs;
             const diff = stats.Difficulty;
             const trailclass = stats.TrailClass;
             const jumpOff = stats.JumpOff;
             const features = stats.Features;
 
-            console.log(name);
+            console.log(features);
             hikeDesc.innerHTML = `<h2>${name}</h2><br>
                                   Length: <b>${length} km.</b><br>
                                   Elevation Gain: <b>${elevGain} m.</b><br>
-                                  Average Walktime: <b>${walktime}</b><br>
+                                  Average Walktime: <b>${hrs2summit}</b><br>
                                   Specifications: <b>${specs}</b><br>
                                   Difficulty Level: <b>${diff}</b><br>
                                   Trail Class: <b>${trailclass}</b><br>
                                   Jump-off Trail: <b>${jumpOff}</b><br>
-                                  Features: <b>${features}</b>
-                                    
+                                  Features: <b>${features}</b> 
                                   `;
         });
 
@@ -305,6 +337,8 @@ function selectTrail(event) {
     if (selectedID === "All") {
         trailsLayer.definitionExpression = null;
         trailsLayerPt.definitionExpression = null;
+        trailshead.definitionExpression = null;
+        POIs.definitionExpression = null;
 
         zoomToLayer(trailsLayer);
         closePanel();
@@ -312,6 +346,8 @@ function selectTrail(event) {
     } else {
         trailsLayer.definitionExpression = "Name = '" + selectedID + "'";
         trailsLayerPt.definitionExpression = "Name = '" + selectedID + "'";
+        trailshead.definitionExpression = "Trail = '" + selectedID + "'";
+        POIs.definitionExpression = "Trail = '" + selectedID + "'";
 
         zoomToLayer(trailsLayer);
         updateDesc();
