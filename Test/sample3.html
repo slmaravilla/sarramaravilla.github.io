@@ -195,15 +195,13 @@
 
 
     #station {
-        width: 14vw;
+        width: 15vw;
         height: auto;
         align-items: center;
         position: absolute;
         right: 13;
-        bottom: 1%;
+        bottom: 0.5%;
         border-color: white;
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        background-color: rgb(0, 0, 0, 0.5);
         padding-bottom: 1%;
         font-family: Arial, Helvetica, sans-serif;
         color: rgba(194, 194, 194, 0.884);
@@ -213,20 +211,32 @@
     #stationTitle {
         text-align: left;
         font-size: 1.1vw;
-        padding-top: 0.8em;
+        padding-top: 0.05em;
         text-align: center;
         font-weight: bold;
     }
 
     #stationContent {
-        padding-left: 1.5%;
-        text-align: left;
+        width: 15vw;
+        align-items: center;
+        color: rgba(194, 194, 194, 0.884);
         font-size: 0.8vw;
-        padding-top: 0.5em;
-        columns: 2;
-        line-height: 0.85;
-        padding-left: 1em;
+        line-height: normal;
     }
+
+
+    h3 {
+        font-size: 1.3vw;
+        text-align: center;
+        font-weight: bold;
+        padding: 0%;
+        margin: 0%;
+
+    }
+
+
+
+
 
 
 
@@ -240,7 +250,7 @@
         color: rgb(255, 255, 255);
         padding-left: 1%;
         text-align: left;
-        font-size: 0.8vw;
+        font-size: 1vw;
         padding-top: 2em;
     }
 </style>
@@ -295,14 +305,25 @@
          </div>-->
             <img id="train-Operation-schedule"
                 src="https://EijiGorilla.github.io/Symbols/Gallery/Train_Operation_2.png">
+
+
+                <calcite-card>
+                    <calcite-label>
+                        <calcite-card id="stationContent"></calcite-card>
+                    </calcite-label>
+                    <calcite-card id="stationContent">
+                </calcite-card>
+
+
+            <calcite-card id="stationContent">
+
+
+
+            </calcite-card>
+
         </div>
 
-        <div id="station">
-            <div id="stationTitle">NSCR Stations</div>
-            <div id="stationContent"></div>
-        </div>
 
-</div>
     </calcite-shell>
 </body>
 <script>
@@ -2849,21 +2870,21 @@
         var stationList = document.getElementById("stationContent");
         let content = ``;
         stationArray.forEach(item => {
-            content += `<br>${item.value}. ${item.category}</br>`;
+            content += `${item.value}. ${item.category}</br>`;
         });
-        stationList.innerHTML = content;
+        stationList.innerHTML = `<h3>NSCR Stations</h3>${content}`;
 
         console.log(stationList);
 
 
 
-        /*const stationExpand = new Expand({
+        const stationExpand = new Expand({
             view: view,
             expanded: true,
             content: stationList
         });
 
-        view.ui.add(stationExpand, "bottom-right");*/
+        view.ui.add(stationExpand, "bottom-right");
 
 
 
