@@ -46,6 +46,11 @@
         padding: 3;
     }
 
+    calcite-card {
+        padding: 0%;
+        margin: 0%;
+    }
+
     b {
         color: orange;
     }
@@ -111,11 +116,6 @@
 
     h2 {
         font-size: 1.5rem;
-        text-align: left;
-        font-size: 1.1vw;
-        padding-top: 0.8em;
-        text-align: center;
-        font-weight: bold;
     }
 
     /* Browser Setting */
@@ -141,31 +141,23 @@
     }
 
     #legend-container-n1 {
-        color: black;
         font-weight: bold;
         width: 100%;
-        background-color: rgb(255, 255, 255, 1);
     }
 
     #legend-container-mmsp {
-        color: black;
         font-weight: bold;
         width: 100%;
-        background-color: rgb(255, 255, 255, 1);
     }
 
     #legend-container-n2 {
-        color: black;
         font-weight: bold;
         width: 100%;
-        background-color: rgb(255, 255, 255, 1);
     }
 
     #legend-container-sc {
-        color: black;
         font-weight: bold;
         width: 100%;
-        background-color: rgb(255, 255, 255, 1);
     }
 
     /*  */
@@ -175,12 +167,18 @@
 
     .sassy-theme .esri-legend .esri-legend__layer-cell--info {
         /*background-color: black;*/
-        color: black;
-        font-size: 1rem;
+        color: "#f7f7f7";
+        font-size: 0.8rem;
     }
 
+    /*
     .sassy-theme .esri-widget--button {
-        color: white;
+      color: white;
+    }
+    */
+
+    .sassy-theme .esri-compass .esri-compass__icon {
+        font-size: 30px;
     }
 
     #train-Operation-schedule {
@@ -191,71 +189,48 @@
         bottom: 0;
         left: 1%;
         margin: 15;
+        /*opacity: 0%;*/
+    }
+
+    #compassDiv {
+        height: 40px;
+        width: 40px;
     }
 
 
-    #station {
-        width: 15vw;
+    #stationContent1 {
+        width: 10vw;
         height: auto;
         align-items: center;
-        position: absolute;
-        right: 13;
-        bottom: 0.5%;
-        border-color: white;
-        padding-bottom: 1%;
-        font-family: Arial, Helvetica, sans-serif;
         color: rgba(194, 194, 194, 0.884);
-
+        font-size: 1.2em;
     }
 
-    #stationTitle {
-        text-align: left;
-        font-size: 1.1vw;
-        padding-top: 0.05em;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    #stationContent {
-        width: 15vw;
+    #stationContent2 {
+        width: 10vw;
+        height: auto;
         align-items: center;
         color: rgba(194, 194, 194, 0.884);
-        font-size: 0.8vw;
-        line-height: normal;
+        font-size: 1.2em;
+        padding-top: 2em;
     }
 
+    #container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 5px;
+
+    }
 
     h3 {
         font-size: 1.3vw;
-        text-align: center;
-        font-weight: bold;
-        padding: 0%;
-        margin: 0%;
-
-    }
-
-
-
-
-
-
-
-    #stationN1,
-    #stationN2,
-    #stationSC {
-        width: auto;
-        height: auto;
-        background-color: rgba(0, 0, 0, 0);
-        font-family: Georgia, 'Times New Roman', Times, serif;
-        color: rgb(255, 255, 255);
-        padding-left: 1%;
         text-align: left;
-        font-size: 1vw;
-        padding-top: 2em;
+        font-weight: bold;
+        margin: 0%;
     }
 </style>
 
-<body class="calcite-theme-dark">
+<body class="sassy-theme">
     <calcite-loader></calcite-loader>
     <calcite-shell content-behind>
         <div id="overviewDiv">
@@ -268,12 +243,14 @@
             </calcite-button>
             <calcite-card id="information"> <!-- original was <calcite-card hidden>-->
                 <calcite-label>
-                    Display Type
+                    Category
                     <calcite-segmented-control id="DisplayType" width="full">
                         <calcite-segmented-control-item id="Alignment" value="alignment"
                             checked>Alignment</calcite-segmented-control-item>
                         <calcite-segmented-control-item id="Progress"
                             value="progress">Progress</calcite-segmented-control-item>
+                        <calcite-segmented-control-item id="Progress2"
+                            value="progress2">Progress2</calcite-segmented-control-item>
                     </calcite-segmented-control>
                 </calcite-label>
                 <calcite-label>
@@ -298,26 +275,24 @@
             <div id="legend-container-sc"></div>
             <!-- Logo -->
             <!--
-         <div id="logo-image">
+        <div id="logo-image">
           <img id="dotr-img" src="https://EijiGorilla.github.io/Symbols/Projec_Logo/DOTr_Logo_nobackground.png">
           <img id="mmsp-img" src="https://EijiGorilla.github.io/Symbols/Projec_Logo/MMSP_Logo_nobackground.png">
           <img id="gcr-img" src="https://EijiGorilla.github.io/Symbols/Projec_Logo/GCR_Logo_nobackground.png">  
-         </div>-->
+        </div>
+        -->
             <img id="train-Operation-schedule"
                 src="https://EijiGorilla.github.io/Symbols/Gallery/Train_Operation_2.png">
-
-
-
-            <div>
-
-
-                <calcite-card id="stationContent1"></calcite-card>
-                
+            <div id="compassDiv"></div>
+            <div id="container">
+                <calcite-card>
+                    <div id="stationContent1"></div>
+                </calcite-card>
+                <calcite-card>
+                    <div id="stationContent2"></div>
+                </calcite-card>
             </div>
-
         </div>
-
-
     </calcite-shell>
 </body>
 <script>
@@ -674,7 +649,12 @@
         }
 
         // Construction Progress symbol
+        const tobeConstructed_color = "#b0c4d8"; //"#d9dc00";
+        const underConstruction_color = "#ffff00"; //#3c6ccc
+        const completedConstruction_color = "#dc4b00";
+
         const construction_lineWidth = "5px";
+
         const lineSymbol_construction = {
             type: "unique-value",  // autocasts as new SimpleLineSymbol(),
             field: "construcStat",
@@ -687,7 +667,7 @@
                     label: "To be Constructed",
                     symbol: {
                         type: "simple-line",
-                        color: "#f2f7f5",
+                        color: tobeConstructed_color,
                         width: construction_lineWidth,
                         style: "solid"
                     }
@@ -697,7 +677,7 @@
                     label: "Under Construction",
                     symbol: {
                         type: "simple-line",
-                        color: "#d9dc00",
+                        color: underConstruction_color,
                         width: construction_lineWidth,
                         style: "solid"
                     }
@@ -707,7 +687,7 @@
                     label: "Completed",
                     symbol: {
                         type: "simple-line",
-                        color: "#ff0000",
+                        color: completedConstruction_color,
                         width: construction_lineWidth,
                         style: "solid"
                     }
@@ -715,45 +695,7 @@
             ]
         };
 
-        const lineSymbol_construction_nscr = {
-            type: "unique-value",  // autocasts as new SimpleLineSymbol(),
-            field: "ConstrucStat",
-            legendOptions: {
-                title: "Construction Status"
-            },
-            uniqueValueInfos: [
-                {
-                    value: "To Be Constructed",
-                    label: "To be Constructed",
-                    symbol: {
-                        type: "simple-line",
-                        color: "#f2f7f5",
-                        width: construction_lineWidth,
-                        style: "solid"
-                    }
-                },
-                {
-                    value: "On-going",
-                    label: "Under Construction",
-                    symbol: {
-                        type: "simple-line",
-                        color: "#d9dc00",
-                        width: construction_lineWidth,
-                        style: "solid"
-                    }
-                },
-                {
-                    value: "Completed",
-                    label: "Completed",
-                    symbol: {
-                        type: "simple-line",
-                        color: "#ff0000",
-                        width: construction_lineWidth,
-                        style: "solid"
-                    }
-                },
-            ]
-        };
+
         // Centerline
         // NSCR
         var n1CenterlineLayer = new FeatureLayer({
@@ -791,7 +733,7 @@
             layerInfos: [
                 {
                     layer: n1CenterlineConstruction,
-                    title: ""
+                    title: "Construction Progress"
                 }
             ]
         });
@@ -964,13 +906,94 @@
 
         // Station point feature
         const minScale = 577790;
+        const minScale_stNumber = minScale + 1000;
         const maxScale = 0;
+        const maxScale_stNumber = 288896;
         const opacity = 1;
+
+        // Station point color
+        // Alignment
         const pointSize = "10px";
         const pointColor = "white";
         const pointOutlineWidth = 1.5;
 
-        const stationPointSymbol_n1 = {
+        const defaultStationPoint_nscr = {
+            symbol: {
+                type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                style: "circle",
+                color: pointColor,
+                size: pointSize,  // pixels
+                outline: {  // autocasts as new SimpleLineSymbol()
+                    color: centerlineProjectColor.nscr_hex,
+                    width: pointOutlineWidth  // points
+                }
+            }
+        }
+
+        const defaultStationPoint_mmsp = {
+            symbol: {
+                type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                style: "circle",
+                color: pointColor,
+                size: pointSize,  // pixels
+                outline: {  // autocasts as new SimpleLineSymbol()
+                    color: centerlineProjectColor.mmsp_hex,
+                    width: pointOutlineWidth  // points
+                }
+            }
+        }
+
+        const stationPointRenderer_construction_nscr = {
+            type: "unique-value",
+            field: "construcStatus",
+            defaultSymbol: defaultStationPoint_nscr,
+            uniqueValueInfos: [
+                {
+                    value: "To Be Constructed",
+                    label: "To Be Constructed",
+                    symbol: {
+                        type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                        style: "circle",
+                        color: tobeConstructed_color,
+                        size: pointSize,  // pixels
+                        outline: {  // autocasts as new SimpleLineSymbol()
+                            color: centerlineProjectColor.nscr_hex,
+                            width: pointOutlineWidth  // points
+                        }
+                    }
+                },
+                {
+                    value: "On-going",
+                    label: "Under Construction",
+                    symbol: {
+                        type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                        style: "circle",
+                        color: underConstruction_color,
+                        size: pointSize,  // pixels
+                        outline: {  // autocasts as new SimpleLineSymbol()
+                            color: centerlineProjectColor.nscr_hex,
+                            width: pointOutlineWidth  // points
+                        }
+                    }
+                },
+                {
+                    value: "Completed",
+                    label: "Completed",
+                    symbol: {
+                        type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                        style: "circle",
+                        color: completedConstruction_color,
+                        size: pointSize,  // pixels
+                        outline: {  // autocasts as new SimpleLineSymbol()
+                            color: centerlineProjectColor.nscr_hex,
+                            width: pointOutlineWidth  // points
+                        }
+                    }
+                },
+            ]
+        }
+
+        const stationPointSymbol_nscr = {
             type: "simple",
             symbol: {
                 type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
@@ -998,35 +1021,7 @@
             }
         };
 
-        const stationPointSymbol_n2 = {
-            type: "simple",
-            symbol: {
-                type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
-                style: "circle",
-                color: pointColor,
-                size: pointSize,  // pixels
-                outline: {  // autocasts as new SimpleLineSymbol()
-                    color: centerlineProjectColor.nscrex_hex,
-                    width: pointOutlineWidth  // points
-                }
-            }
-        };
-
-        const stationPointSymbol_sc = {
-            type: "simple",
-            symbol: {
-                type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
-                style: "circle",
-                color: pointColor,
-                size: pointSize,  // pixels
-                outline: {  // autocasts as new SimpleLineSymbol()
-                    color: centerlineProjectColor.nscrex_hex,
-                    width: pointOutlineWidth  // points
-                }
-            }
-        };
-
-        var labelStation = new LabelClass({
+        var n2LabelStation = new LabelClass({
             symbol: {
                 type: "text",
                 color: centerlineProjectColor.nscrex_hex,
@@ -1045,6 +1040,27 @@
             maxScale: maxScale,
         });
 
+        var n2LabelStation_number = new LabelClass({
+            symbol: {
+                type: "text",
+                color: centerlineProjectColor.nscr_hex,
+                haloColor: "black",
+                haloSize: 0.1,
+                font: {
+                    size: labelStation_fontSize,
+                    //weight: "bold"
+                }
+            },
+            deconflictionStrategy: "none", // show overlapping numbers
+            labelPlacement: "below-left",
+            labelExpressionInfo: {
+                expression: "$feature.station_number"
+            },
+            minScale: minScale_stNumber,
+            maxScale: maxScale_stNumber, //288896
+        });
+
+
         var n2StationLayer = new FeatureLayer({
             portalItem: {
                 id: "590680d19f2e48fdbd8bcddce3aaedb5",
@@ -1057,8 +1073,8 @@
             outFields: ["*"],
             popupEnabled: false,
             definitionExpression: "Station <> 'NCC'",
-            renderer: stationPointSymbol_n2,
-            labelingInfo: [labelStation],
+            renderer: stationPointSymbol_nscr,
+            labelingInfo: [n2LabelStation_number, n2LabelStation], //[n2LabelStation],
             opacity: opacity
         });
         n2StationLayer.listMode = "hide";
@@ -1087,14 +1103,14 @@
             layerInfos: [
                 {
                     layer: n2CenterlineConstruction,
-                    title: ""
+                    title: "Construction Progress"
                 }
             ]
         });
         view.ui.add(legend_construction_n2, "bottom-left");
 
         // SC Station point layer
-        var labelStationSC = new LabelClass({
+        var scLabelStation = new LabelClass({
             symbol: {
                 type: "text",
                 color: centerlineProjectColor.nscrex_hex,
@@ -1113,6 +1129,26 @@
             maxScale: maxScale,
         });
 
+        var scLabelStation_number = new LabelClass({
+            symbol: {
+                type: "text",
+                color: centerlineProjectColor.nscr_hex,
+                haloColor: "black",
+                haloSize: 0.1,
+                font: {
+                    size: labelStation_fontSize,
+                    //weight: "bold"
+                }
+            },
+            deconflictionStrategy: "none", // show overlapping numbers
+            labelPlacement: "below-left",
+            labelExpressionInfo: {
+                expression: "\n$feature.station_number"
+            },
+            minScale: minScale_stNumber,
+            maxScale: maxScale_stNumber, //288896
+        });
+
         var scStationLayer = new FeatureLayer({
             portalItem: {
                 id: "d3926383cf3548569372216edb808996",
@@ -1124,8 +1160,8 @@
             title: "SC Station",
             outFields: ["*"],
             popupEnabled: false,
-            labelingInfo: [labelStationSC],
-            renderer: stationPointSymbol_sc,
+            labelingInfo: [scLabelStation_number, scLabelStation], //[scLabelStation], 
+            renderer: stationPointSymbol_nscr,
             opacity: opacity
         });
         scStationLayer.listMode = "hide";
@@ -1156,7 +1192,7 @@
             layerInfos: [
                 {
                     layer: scCenterlineConstruction,
-                    title: ""
+                    title: "Construction Progress"
                 }
             ]
         });
@@ -1222,6 +1258,26 @@
             maxScale: maxScale,
         });
 
+        var n1LabelStation_number = new LabelClass({
+            symbol: {
+                type: "text",
+                color: centerlineProjectColor.nscr_hex,
+                haloColor: "black",
+                haloSize: 0.1,
+                font: {
+                    size: labelStation_fontSize,
+                    //weight: "bold"
+                }
+            },
+            deconflictionStrategy: "none", // show overlapping numbers
+            labelPlacement: "below-left",
+            labelExpressionInfo: {
+                expression: "$feature.station_number + TextFormatting.NewLine"
+            },
+            minScale: minScale_stNumber,
+            maxScale: maxScale_stNumber, //288896
+        });
+
         var n1StationLayer = new FeatureLayer({
             portalItem: {
                 id: "7d9a8e1f56604535a62992999edb8f6b",
@@ -1233,8 +1289,8 @@
             title: "MMSP Station",
             outFields: ["*"],
             popupEnabled: false,
-            labelingInfo: [n1LabelStation],
-            renderer: stationPointSymbol_n1,
+            labelingInfo: [n1LabelStation_number, n1LabelStation], //[n1LabelStation],
+            renderer: stationPointSymbol_nscr,
             opacity: opacity
         });
         n1StationLayer.listMode = "hide";
@@ -1552,6 +1608,23 @@
             });
         }
 
+        // Get a list of stations for each layer
+        function n1StationQuery() {
+            var query = n1StationLayer.createQuery();
+            query.outFields = ["*"];
+            query.returnGeometry = true;
+
+            n1StationLayer.queryFeatures(query).then(function (response) {
+                var stats = response.features;
+                stats.forEach((item, index) => {
+                    const test = item.attributes.station_number;
+                    console.log(test);
+                });
+
+            })
+        }
+        n1StationQuery();
+
         // Project list
         // Open general progress of pre-constructions
 
@@ -1733,12 +1806,10 @@
         // Initial
         n1Graphics(0, 0);
 
-        function n1GraphicsLayerMove() {
-            //const xoffset = -0.1;
-            //const yoffset = 0;
-            const xoffset_n1 = -0.09;
-            const yoffset_n1 = 0;
+        const xoffset_n1 = -0.09;
+        const yoffset_n1 = 0;
 
+        function n1GraphicsLayerMove(xoffset_n1, yoffset_n1) {
             n1GraphicsLayer_cpLabel.removeAll();
             n1GraphicsLayer.removeAll();
 
@@ -2330,6 +2401,20 @@
             legend_construction_sc.visible = false;
         }
 
+        function stationPointSymbolToConstruction() {
+            {
+                n1StationLayer.renderer = stationPointRenderer_construction_nscr;
+                n2StationLayer.renderer = stationPointRenderer_construction_nscr;
+                scStationLayer.renderer = stationPointRenderer_construction_nscr;
+            }
+        };
+
+        function stationPointSymbolToOriginal() {
+            n1StationLayer.renderer = stationPointSymbol_nscr;
+            n2StationLayer.renderer = stationPointSymbol_nscr;
+            scStationLayer.renderer = stationPointSymbol_nscr;
+        }
+
         alignmentRenderer();
 
         function alignmentRenderer() {
@@ -2362,6 +2447,9 @@
             n1CenterlineConstruction.visible = false;
             n2CenterlineConstruction.visible = false;
             scCenterlineConstruction.visible = false;
+
+            // Station point symbol to default
+            stationPointSymbolToOriginal();
 
             trainScheduleOn();
         }
@@ -2397,25 +2485,28 @@
             n2CenterlineConstruction.visible = true;
             scCenterlineConstruction.visible = true;
 
+            // Station points renderer for construction
+            stationPointSymbolToConstruction();
+
             constructionProgressLegendOn();
         }
 
         function stationLabeFontSizeForProgress2() {
-            labelStation.symbol.font.size = 11;
-            labelStationSC.symbol.font.fize = 11;
+            n2LabelStation.symbol.font.size = 11;
+            scLabelStation.symbol.font.fize = 11;
             n1LabelStation.symbol.font.size = 11;
         }
 
         function stationLabeFontSizeDefault() {
-            labelStation.symbol.font.size = 11.5;
-            labelStationSC.symbol.font.fize = 11.5;
+            n2LabelStation.symbol.font.size = 11.5;
+            scLabelStation.symbol.font.fize = 11.5;
             n1LabelStation.symbol.font.size = 11.5;
         }
 
         const displayType = document.getElementById("DisplayType");
         const projectType = document.getElementById("Project");
 
-        displayType.addEventListener("calciteSegmentedControlChange", async (event) => { sector = event.target.value, filterItems() });
+        displayType.addEventListener("calciteSegmentedControlChange", async (event) => { type = event.target.value, filterItems() });
         projectType.addEventListener("calciteSegmentedControlChange", async (event) => { proj = event.target.value, filterItems() });
 
         const typeDefault = "alignment";
@@ -2450,7 +2541,10 @@
                 mmspCenterlineLayer.visible = false;
                 n1CenterlineLayer.visible = true;
 
-                n1GraphicsLayerMove();
+                // station point symbol to original
+                n1StationLayer.renderer = stationPointSymbol_nscr;
+
+                n1GraphicsLayerMove(xoffset_n1, yoffset_n1);
                 zoomToLayer(n1StationLayer);
 
             } else if (proj === 'mmsp') {
@@ -2487,7 +2581,7 @@
             } else if (proj === 'mcrp') {
 
                 view.rotation = 360;
-                labelStation.labelPlacement = "below-left";
+                n2LabelStation.labelPlacement = "below-left";
                 n2StationLayer.visible = true;
                 scStationLayer.visible = false;
                 mmspStationLayer.visible = false;
@@ -2511,6 +2605,9 @@
                 scCenterlineLayer.visible = false;
                 mmspCenterlineLayer.visible = false;
                 n1CenterlineLayer.visible = false;
+
+                // Station point symbol to default
+                n2StationLayer.renderer = stationPointSymbol_nscr;
 
                 zoomToLayer(n2CenterlineLayer);
                 n2GraphicsLayerMove(xoffset_n2, yoffset_n2);
@@ -2542,6 +2639,9 @@
                 mmspGraphicsLayer_cpLabel.visible = false;
                 n1GraphicsLayer_cpLabel.visible = false;
 
+                // station point symbol to original
+                scStationLayer.renderer = stationPointSymbol_nscr;
+
                 zoomToLayer(scStationLayer);
                 scGraphicsLayerMove(xoffset_sc, yoffset_sc);
                 trainOperationSchedulePositionOthers();
@@ -2554,9 +2654,6 @@
                 n2GraphicsLayerReturnToOriginal();
 
                 trainOperationSchedulePositionOriginal();
-                //view.goTo({
-                //  extent: fixedExtent
-                //});
 
                 //fixedExtent
                 n2StationLayer.visible = true;
@@ -2577,6 +2674,11 @@
                 scGraphicsLayer.visible = true;
                 mmspGraphicsLayer.visible = true;
                 n1GraphicsLayer.visible = true;
+
+                stationPointSymbolToOriginal();
+
+                // station point symbol to original
+                stationLabeFontSizeDefault();
             }
         }
 
@@ -2614,10 +2716,11 @@
                 legend_construction_n2.visible = false;
                 legend_construction_sc.visible = false;
 
+                // station point symbol to original
+                n1StationLayer.renderer = stationPointRenderer_construction_nscr;
+
                 zoomToLayer(n1StationLayer);
-
-                n1GraphicsLayerMove();
-
+                n1GraphicsLayerMove(xoffset_n1, yoffset_n1);
 
             } else if (proj === 'mmsp') {
                 view.rotation = 360;
@@ -2657,7 +2760,7 @@
             } else if (proj === 'mcrp') {
 
                 view.rotation = 360;
-                labelStation.labelPlacement = "below-left";
+                n2LabelStation.labelPlacement = "below-left";
                 n2StationLayer.visible = true;
                 scStationLayer.visible = false;
                 mmspStationLayer.visible = false;
@@ -2685,6 +2788,9 @@
                 // Lenged
                 legend_construction_n2.visible = true;
                 legend_construction_sc.visible = false;
+
+                // Station point renderer for construction status
+                n2StationLayer.renderer = stationPointRenderer_construction_nscr;
 
                 zoomToLayer(n2CenterlineLayer);
                 n2GraphicsLayerMove(xoffset_n2, yoffset_n2);
@@ -2719,6 +2825,9 @@
                 // Lenged
                 legend_construction_n2.visible = false;
                 legend_construction_sc.visible = true;
+
+                // Station point renderer for construction status
+                scStationLayer.renderer = stationPointRenderer_construction_nscr;
 
                 zoomToLayer(scStationLayer);
                 scGraphicsLayerMove(xoffset_sc, yoffset_sc);
@@ -2765,16 +2874,79 @@
                 legend_construction_n2.visible = false;
                 legend_construction_n2.visible = true;
                 legend_construction_sc.visible = false;
+
+                // Station point renderer for construction status
+                stationPointSymbolToConstruction();
+
             }
         }
 
+        function progress2Renderer() {
+            stationLabeFontSizeForProgress2();
+
+            view.rotation = 320;
+            view.center = [120.900000, 14.7332299];
+            view.scale = 282400;
+
+            n2LabelStation.labelPlacement = "above-right";
+            scLabelStation.labelPlacement = "above-right";
+            n1LabelStation.labelPlacement = "above-right";
+
+            n2StationLayer.visible = true;
+            scStationLayer.visible = true;
+            mmspStationLayer.visible = false;
+            n1StationLayer.visible = true;
+
+            n2BreakPointsCP.visible = true;
+            scBreakPointsCP.visible = true;
+            n1BreakPointsCP.visible = true;
+
+            n2GraphicsLayer.visible = true;
+            scGraphicsLayer.visible = true;
+            mmspGraphicsLayer.visible = false;
+            n1GraphicsLayer.visible = true;
+
+            n2GraphicsLayer_cpLabel.visible = false;
+            scGraphicsLayer_cpLabel.visible = false;
+            mmspGraphicsLayer_cpLabel.visible = false;
+            n1GraphicsLayer_cpLabel.visible = false;
+
+            n2CenterlineLayer.visible = false;
+            scCenterlineLayer.visible = false;
+            mmspCenterlineLayer.visible = false;
+            n1CenterlineLayer.visible = false;
+
+            n1CenterlineConstruction.visible = true;
+            n2CenterlineConstruction.visible = true;
+            scCenterlineConstruction.visible = true;
+
+            legend_construction_n1.visible = false;
+            //legend_construction_mmsp.visible = false;
+            legend_construction_n2.visible = true;
+            legend_construction_sc.visible = false;
+
+            // Station point renderer for construction status
+            stationPointSymbolToConstruction();
+
+            n1GraphicsLayerMove(-0.05, 0.10);
+            n2GraphicsLayerMove(-0.20, 0.15);
+            scGraphicsLayerMove(-0.15, 0.4)
+
+            constructionProgressLegendOn();
+
+            //projectType.value = "all";
+        }
 
         function filterItems() {
             const activeSegmentedControlItem_sector = document.querySelector(`calcite-segmented-control-item[value=${typeDefault}]`);
             const activeSegmentedControlItem_project = document.querySelector(`calcite-segmented-control-item[value=${projectDefault}]`);
+            const activeSegmentedControlItem_progress2 = document.querySelector(`calcite-segmented-control-item[value="progress2"]`);
 
             // Select by Sector:
-            if (activeSegmentedControlItem_sector.checked === true) {
+            if (activeSegmentedControlItem_progress2.checked === true) {
+                progress2Renderer();
+
+            } else if (activeSegmentedControlItem_sector.checked === true) {
                 // Order matters: make sure to run 'alignmentRenderer' first
                 // then 'alignmentFilter' function. Otherwise, view orientation will not return to 360 degrees.
                 alignmentRenderer();
@@ -2782,12 +2954,10 @@
 
                 // Filter
                 alignmentFilter();
-
                 trainScheduleOn();
 
             } else if (activeSegmentedControlItem_sector.checked === false) {
                 progressRenderer();
-
                 constructionProgressLegendOn();
 
                 // Filter
@@ -2829,9 +2999,13 @@
 
         view.ui.add("overviewDiv", "top-right");
 
+        // Legend
 
+
+        // Compass
         let compass = new Compass({
-            view: view
+            view: view,
+            container: document.getElementById("compassDiv")
         });
 
         view.ui.add(document.getElementById("alingment-progress-switch"), "bottom-right");
@@ -2849,11 +3023,10 @@
             { "category": "Marilao", "value": 11 }, { "category": "Meycauayan", "value": 12 },
             { "category": "Valenzuela", "value": 13 }, { "category": "Caloocan", "value": 14 },
             { "category": "Solis", "value": 15 }, { "category": "Tutuban", "value": 16 },
-            { "category": "Blumentritt", "value": 17 }
+            { "category": "Blumentritt", "value": 17 },{ "category": "España", "value": 18 }
         ];
 
         const stationArray2 = [
-            { "category": "España", "value": 18 },
             { "category": "Sta. Mesa", "value": 19 }, { "category": "Paco", "value": 20 },
             { "category": "Buendia", "value": 21 }, { "category": "EDSA", "value": 22 },
             { "category": "Nichols", "value": 23 }, { "category": "FTI", "value": 24 },
@@ -2867,105 +3040,27 @@
 
         var stationList1 = document.getElementById("stationContent1");
         var stationList2 = document.getElementById("stationContent2");
+
         let content1 = ``;
-        let content2 = ``;
+
         stationArray1.forEach(item => {
             content1 += `${item.value}. ${item.category}</br>`;
         });
+        stationList1.innerHTML = `<h3>NSCR Stations</h3>${content1}`;
+
+        let content2 = ``;
         stationArray2.forEach(item => {
             content2 += `${item.value}. ${item.category}</br>`;
         });
-        stationList1.innerHTML = `<h3>NSCR Stations</h3>${content1}`;
         stationList2.innerHTML = content2;
-
-        console.log(content1);
-
-
 
         const stationExpand = new Expand({
             view: view,
             expanded: true,
-            content: stationList2
+            content: container
         });
 
         view.ui.add(stationExpand, "bottom-right");
-
-
-
-
-
-
-
-        /*var stationList = document.getElementById("station");
-
-        function stationN2() {
-            var list1 = [];
-            var query = n2StationLayer.createQuery();
-            return n2StationLayer.queryFeatures(query).then(function (response) {
-                var stats = response.features;
-                stats.forEach((result, index) => {
-                    var attributes = result.attributes;
-                    const values = attributes.StnName;
-                    list1.push(values);
-                });
-                return (list1);
-            });
-        }
-
-
-        function stationN1(list1) {
-            var list2 = [];
-            var query = n1StationLayer.createQuery();
-            return n1StationLayer.queryFeatures(query).then(function (response) {
-                var stats = response.features;
-                stats.forEach((result, index) => {
-                    var attributes = result.attributes;
-                    const values = attributes.StnName;
-                    list2.push(values);
-
-                });
-                const b = list1.concat(list2);
-                return (b);
-            });
-        }
-
-        function stationSC(b) {
-            var list3 = [];
-            stationList.innerHTML = "";
-            var query = scStationLayer.createQuery();
-            return scStationLayer.queryFeatures(query).then(function (response) {
-                var stats = response.features;
-                stats.forEach((result, index) => {
-                    var attributes = result.attributes;
-                    const values = attributes.Station;
-                    list3.push(values);
-
-                });
-                const c = b.concat(list3);
-                console.log(c);
-
-                var stationName = document.createElement("stationName");
-
-                
-
-
-
-                stationName.innerHTML = `${stationNum}<br> ${c} <br>`;
-
-                stationList.appendChild(stationName);
-                                                                    
-            });
-
-        }
-
-        stationN2()
-            .then(stationN1)
-            .then(stationSC)
-*/
-
-
-
-
 
     });
 </script>
