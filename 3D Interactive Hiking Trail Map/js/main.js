@@ -1,7 +1,6 @@
 require([
     "esri/config",
     "esri/Map",
-    "esri/widgets/BasemapToggle",
     "esri/widgets/Daylight",
     "esri/widgets/Compass",
     "esri/widgets/Expand",
@@ -19,7 +18,7 @@ require([
     "esri/widgets/Print",
     "esri/widgets/LayerList",
     "esri/Graphic"
-], function (esriConfig, Map, BasemapToggle, Daylight, Compass, Expand, Fullscreen, MapView, SceneView, FeatureLayer, ElevationProfile, ElevationLayer, WebMap,
+], function (esriConfig, Map, Daylight, Compass, Expand, Fullscreen, MapView, SceneView, FeatureLayer, ElevationProfile, ElevationLayer, WebMap,
     Bookmarks, BasemapGallery, LayerList, Legend, Print, LayerList, Graphic) {
 
     const map = new Map({
@@ -27,51 +26,42 @@ require([
         ground: "world-elevation",
     });
 
-
     const view = new SceneView({
         container: "viewDiv",
         map: map,
         camera: {
             spatialReference: { latestWkid: 3857, wkid: 102100 },
             position: [120.89, 16.62, 35000],
-
         },
         environment: {
-            background: {
-                type: "color", // autocasts as new ColorBackground()
-                color: [0, 0, 0, 1]
-            },
-            // disable stars
-            starsEnabled: false,
-            //disable atmosphere
+            starsEnabled: true,
             atmosphereEnabled: true
         },
         popup: {
             dockOptions: {
-              buttonEnabled: false,
-              breakpoint: false
+                buttonEnabled: false,
+                breakpoint: false
             }
-          }
-
+        }
     });
 
 
+    //Label Class for TrailPt
     var trailPtLabelClass = {
         symbol: {
-            type: "label-3d",// autocasts as new LabelSymbol3D()
+            type: "label-3d",
             symbolLayers: [
                 {
-                    type: "text", // autocasts as new TextSymbol3DLayer()
+                    type: "text",
                     material: {
                         color: "orange"
                     },
-                    size: 12,
+                    size: 13,
                     color: "black",
                     haloColor: "black",
                     haloSize: 1,
                     font: {
-                        family: "Ubuntu Mono",
-                        //weight: "bold"
+                        family: "Times New Roman",
                     },
                 }
             ],
@@ -81,7 +71,7 @@ require([
                 minWorldLength: 40
             },
             callout: {
-                type: "line", // autocasts as new LineCallout3D()
+                type: "line",
                 color: "white",
                 size: 0.5,
                 border: {
@@ -92,24 +82,63 @@ require([
         labelPlacement: "above-center",
         labelExpressionInfo: {
             expression: "$feature.Name"
-            //value: "{TEXTSTRING}"
         }
     }
 
-
     let trailPtSymbol = {
-        type: "simple",  // autocasts as new SimpleRenderer()
+        type: "simple",
         symbol: {
-            type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+            type: "simple-marker",
             size: 5,
             color: "white",
-            outline: {  // autocasts as new SimpleLineSymbol()
+            outline: {
                 width: 0.5,
                 color: [0, 0, 0, 0]
             }
         }
     };
 
+
+    //Label Class for the Mountain
+    //Label Class for TrailPt
+    var mountainLabelClass = {
+        symbol: {
+            type: "label-3d",
+            symbolLayers: [
+                {
+                    type: "text",
+                    material: {
+                        color: "white",
+                    },
+                    color: "black",
+                    haloColor: "black",
+                    haloSize: 1,
+                    font: {
+                        family: "Times New Roman",
+                        size: 13,
+                        weight: "bold",
+                    },
+                }
+            ],
+            verticalOffset: {
+                screenLength: 50,
+                maxWorldLength: 300,
+                minWorldLength: 40
+            },
+            callout: {
+                type: "line",
+                color: "white",
+                size: 0.5,
+                border: {
+                    color: "grey"
+                }
+            }
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+            expression: "$feature.Name"
+        }
+    }
 
 
     //Trailheads feature layer (lines)
@@ -120,9 +149,6 @@ require([
             mode: "relative-to-ground"
         },
         outFields: ["*"],
-
-
-
     });
     map.add(trailsLayer);
 
@@ -152,6 +178,7 @@ require([
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
         layerId: 2,
         outFields: ["*"],
+        labelingInfo: [mountainLabelClass],
         elevationInfo: {
             mode: "relative-to-ground"
         },
@@ -200,8 +227,6 @@ require([
                     tilt: 60
                 }, {
                 speedFactor: .5,
-                //heading: view.camera.heading + 0.2
-                //easing: "out-quint"
             },
             ).catch(function (error) {
                 if (error.name != "AbortError") {
@@ -212,48 +237,13 @@ require([
     }
 
 
-
-    ////Adding Camera Fly Through
-    let abort = false;
-    let center = null;
-    function rotate() {
-        if (!view.interacting && !abort) {
-
-            play.style.display = "none";
-            pause.style.display = "block";
-
-            center = center || view.center;
-
-            view.goTo({
-                heading: view.camera.heading + 0.2,
-                center
-            }, { animate: false });
-
-            requestAnimationFrame(rotate);
-        } else {
-            abort = false;
-            center = null;
-            play.style.display = "block";
-            pause.style.display = "none";
-        }
-    }
-    play.onclick = rotate;
-    pause.onclick = function () {
-        abort = true;
-    };
-    //End of Camera Fly Through
-
-
     /*********************
     ****FILTER BY NAME****
     ********************/
 
-
     var hikeDesc = document.getElementById("hikeDesc");
 
-
     function updateDesc() {
-
         var query = trailsLayer.createQuery();
         trailsLayer.queryFeatures(query).then(function (result) {
             var stats = result.features[0].attributes;
@@ -279,7 +269,6 @@ require([
                                   Features: <b>${features}</b> 
                                   `;
         });
-
     }
 
     function openPanel() {
@@ -289,8 +278,6 @@ require([
     function closePanel() {
         document.getElementById("descPanel").style.display = "none";
     }
-
-
 
 
     var hikeSelect = document.getElementById("hikeSelect");
@@ -336,9 +323,6 @@ require([
         .then(getUniqueValues)
         .then(addToSelect)
 
-
-
-
     hikeSelect.addEventListener("change", selectTrail);
     function selectTrail(event) {
         const selectedID = event.target.value;
@@ -371,14 +355,13 @@ require([
     let basemapGallery = new BasemapGallery({
         view: view
     });
-
     const basemapGalleryExpand = new Expand({
         view,
         content: basemapGallery,
         expandIconClass: "esri-icon-basemap",
         group: "top-left"
     });
-    // Add widget to the top right corner of the view
+
     view.ui.add(basemapGalleryExpand, {
         position: "top-left"
     });
@@ -401,9 +384,14 @@ require([
             {
                 layer: mountainPt,
                 title: "Mountain"
+            },
+            {
+                layer: POIs,
+                title: "POI"
             }
         ]
     });
+
 
     var legendExpand = new Expand({
         view: view,
@@ -414,14 +402,6 @@ require([
     view.ui.add(legendExpand, {
         position: "top-left"
     });
-
-
-
-
-
-
-
-
 
 
     //Adding the daylight widget
@@ -445,7 +425,6 @@ require([
     //end
 
 
-
     //Full Screen Logo
     view.ui.add(
         new Fullscreen({
@@ -454,6 +433,7 @@ require([
         }),
         "top-left"
     );//end
+
 
     const elevationProfile = new ElevationProfile({
         view: view,
@@ -473,14 +453,55 @@ require([
     });
     view.ui.add(elevationProfileExpand, "top-left");
 
+
+
+    //Adding Camera Fly Through
+    const play = document.getElementById("play");
+    const pause = document.getElementById("pause");
+    pause.style.display = 'none';
+
+    let abort = false;
+    let center = null;
+    function rotate() {
+        if (!view.interacting && !abort) {
+
+            play.style.display = "none";
+            pause.style.display = "block";
+
+            center = center || view.center;
+
+            view.goTo({
+                heading: view.camera.heading + 0.2,
+                center
+            }, { animate: false });
+
+            requestAnimationFrame(rotate);
+        } else {
+            abort = false;
+            center = null;
+            play.style.display = "block";
+            pause.style.display = "none";
+        }
+    }
+
+    play.addEventListener("click", () => {
+        play.onclick = rotate;
+        pause.onclick = function () {
+            abort = true;
+        };
+    });
+
+    // Animation play button
+    view.ui.add(play, {
+        position: "top-left"
+    });
+
+    view.ui.add(pause, {
+        position: "top-left"
+    });
+
+
     //Remove the ui components
     view.ui.components = [];
-
-
-
-
-
-
-
 
 });
