@@ -142,13 +142,6 @@ require([
 
 
     //Renderer for Mountain
-
-    const verticalOffset = {
-        screenLength: 40,
-        maxWorldLength: 200,
-        minWorldLength: 35
-      };
-
     function getUniqueValueSymbol(name, color) {
         return {
             type: "point-3d",
@@ -158,22 +151,24 @@ require([
                     resource: {
                         href: name
                     },
-                    size: 20,
+                    size: 30,
                     outline: {
                         color: "white",
                         size: 2
                     }
                 }
             ],
-
-            verticalOffset: verticalOffset,
-
+            verticalOffset: {
+                screenLength: 60,
+                maxWorldLength: 400,
+                minWorldLength: 50
+              },
             callout: {
                 type: "line",
                 color: "white",
-                size: 2,
+                size: 0.5,
                 border: {
-                    color: color
+                    color: "grey"
                 }
             }
         };
@@ -186,10 +181,11 @@ require([
         uniqueValueInfos: [
             {
                 value: "Mt. Pulag",
-                symbol: getUniqueValueSymbol("https://EijiGorilla.github.io/Symbols/Photo_symbol.png", "#D13470")
+                symbol: getUniqueValueSymbol("https://sarramaravilla.github.io/3D Interactive Hiking Trail Map/images/mountain_symbol.png", "#D13470")
             }
         ]
     };
+
 
 
     //Trailheads feature layer (lines)
@@ -206,8 +202,8 @@ require([
 
     const trailsLayerPt = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
-        renderer: trailPtSymbol,
-        labelingInfo: [trailPtLabelClass],
+        //renderer: trailPtSymbol,
+        //labelingInfo: [trailPtLabelClass],
         layerId: 0,
         outFields: ["*"],
     });
