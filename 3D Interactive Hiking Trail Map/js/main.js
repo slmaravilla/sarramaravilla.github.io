@@ -46,6 +46,7 @@ require([
     });
 
 
+    
     //Label Class for TrailPt
     var trailPtLabelClass = {
         symbol: {
@@ -98,6 +99,7 @@ require([
             }
         }
     };
+    
 
 
     //Label Class for the Mountain
@@ -114,7 +116,7 @@ require([
                     haloColor: "black",
                     haloSize: 1,
                     font: {
-                        family: "Times New Roman",
+                        family: "Georgia",
                         size: 13,
                         weight: "bold",
                     },
