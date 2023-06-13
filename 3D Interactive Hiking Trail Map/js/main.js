@@ -85,6 +85,7 @@ require([
         }
     }
 
+    //Renderer for TrailPt
     let trailPtSymbol = {
         type: "simple",
         symbol: {
@@ -100,7 +101,6 @@ require([
 
 
     //Label Class for the Mountain
-    //Label Class for TrailPt
     var mountainLabelClass = {
         symbol: {
             type: "label-3d",
@@ -141,6 +141,57 @@ require([
     }
 
 
+    //Renderer for Mountain
+
+    const verticalOffset = {
+        screenLength: 40,
+        maxWorldLength: 200,
+        minWorldLength: 35
+      };
+
+    function getUniqueValueSymbol(name, color) {
+        return {
+            type: "point-3d",
+            symbolLayers: [
+                {
+                    type: "icon",
+                    resource: {
+                        href: name
+                    },
+                    size: 20,
+                    outline: {
+                        color: "white",
+                        size: 2
+                    }
+                }
+            ],
+
+            verticalOffset: verticalOffset,
+
+            callout: {
+                type: "line",
+                color: "white",
+                size: 2,
+                border: {
+                    color: color
+                }
+            }
+        };
+    }
+
+
+    var mountainSymbol = {
+        type: "unique-value",
+        field: "Name",
+        uniqueValueInfos: [
+            {
+                value: "Mt. Pulag",
+                symbol: getUniqueValueSymbol("https://EijiGorilla.github.io/Symbols/Photo_symbol.png", "#D13470")
+            }
+        ]
+    };
+
+
     //Trailheads feature layer (lines)
     const trailsLayer = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
@@ -179,6 +230,7 @@ require([
         layerId: 2,
         outFields: ["*"],
         labelingInfo: [mountainLabelClass],
+        renderer: mountainSymbol,
         elevationInfo: {
             mode: "relative-to-ground"
         },
