@@ -1,25 +1,17 @@
 require([
-    "esri/config",
     "esri/Map",
     "esri/widgets/Daylight",
     "esri/widgets/Compass",
     "esri/widgets/Expand",
     "esri/widgets/Fullscreen",
-    "esri/views/MapView",
     "esri/views/SceneView",
     "esri/layers/FeatureLayer",
     "esri/widgets/ElevationProfile",
-    "esri/layers/ElevationLayer",
-    "esri/WebMap",
-    "esri/widgets/Bookmarks",
     "esri/widgets/BasemapGallery",
-    "esri/widgets/LayerList",
     "esri/widgets/Legend",
-    "esri/widgets/Print",
-    "esri/widgets/LayerList",
     "esri/Graphic"
-], function (esriConfig, Map, Daylight, Compass, Expand, Fullscreen, MapView, SceneView, FeatureLayer, ElevationProfile, ElevationLayer, WebMap,
-    Bookmarks, BasemapGallery, LayerList, Legend, Print, LayerList, Graphic) {
+], function (Map, Daylight, Compass, Expand, Fullscreen, SceneView,
+FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
 
     const map = new Map({
         basemap: "satellite",
@@ -204,8 +196,8 @@ require([
 
     const trailsLayerPt = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
-        //renderer: trailPtSymbol,
-        //labelingInfo: [trailPtLabelClass],
+        renderer: trailPtSymbol,
+        labelingInfo: [trailPtLabelClass],
         layerId: 0,
         outFields: ["*"],
     });
