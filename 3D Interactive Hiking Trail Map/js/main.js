@@ -9,9 +9,8 @@ require([
     "esri/widgets/ElevationProfile",
     "esri/widgets/BasemapGallery",
     "esri/widgets/Legend",
-    "esri/Graphic"
 ], function (Map, Daylight, Compass, Expand, Fullscreen, SceneView,
-FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
+    FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
 
     const map = new Map({
         basemap: "satellite",
@@ -34,11 +33,10 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
                 buttonEnabled: false,
                 breakpoint: false
             }
-        }
+        },
     });
 
 
-    
     //Label Class for TrailPt
     var trailPtLabelClass = {
         symbol: {
@@ -47,7 +45,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
                 {
                     type: "text",
                     material: {
-                        color: "orange"
+                        color: "white"
                     },
                     size: 13,
                     color: "black",
@@ -67,6 +65,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
                 type: "line",
                 color: "white",
                 size: 0.5,
+                offset: 1.0,
                 border: {
                     color: "grey"
                 }
@@ -91,7 +90,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
             }
         }
     };
-    
+
 
 
     //Label Class for the Mountain
@@ -102,14 +101,11 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
                 {
                     type: "text",
                     material: {
-                        color: "white",
+                        color: "#white",
                     },
-                    color: "black",
-                    haloColor: "black",
-                    haloSize: 1,
                     font: {
                         family: "Georgia",
-                        size: 13,
+                        size: 15,
                         weight: "bold",
                     },
                 }
@@ -156,7 +152,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
                 screenLength: 60,
                 maxWorldLength: 400,
                 minWorldLength: 50
-              },
+            },
             callout: {
                 type: "line",
                 color: "white",
@@ -168,7 +164,6 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
         };
     }
 
-
     var mountainSymbol = {
         type: "unique-value",
         field: "Name",
@@ -179,7 +174,6 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
             }
         ]
     };
-
 
 
     //Trailheads feature layer (lines)
@@ -198,7 +192,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
         renderer: trailPtSymbol,
         labelingInfo: [trailPtLabelClass],
-        layerId: 0,
+        layerId: 3,
         outFields: ["*"],
     });
     map.add(trailsLayerPt);
@@ -206,7 +200,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
 
     const trailshead = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
-        layerId: 3,
+        layerId: 2,
         outFields: ["*"],
         elevationInfo: {
             mode: "relative-to-ground"
@@ -217,7 +211,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
 
     const mountainPt = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
-        layerId: 2,
+        layerId: 1,
         outFields: ["*"],
         labelingInfo: [mountainLabelClass],
         renderer: mountainSymbol,
@@ -230,7 +224,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
 
     const POIs = new FeatureLayer({
         url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
-        layerId: 1,
+        layerId: 0,
         elevationInfo: {
             mode: "relative-to-ground"
         },
@@ -365,10 +359,12 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
         .then(getUniqueValues)
         .then(addToSelect)
 
+
+    
+
     hikeSelect.addEventListener("change", selectTrail);
     function selectTrail(event) {
         const selectedID = event.target.value;
-
         if (selectedID === "All") {
             trailsLayer.definitionExpression = null;
             trailsLayerPt.definitionExpression = null;
@@ -447,7 +443,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
 
 
     //Adding the daylight widget
-    const daylight = new Daylight({
+    /*const daylight = new Daylight({
         view: view,
         //play the animation twice as fast than the default one
         playSpeedMultiplier: 2,
@@ -456,7 +452,7 @@ FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
             timezone: false
         }
     }); view.ui.add(new Expand({ content: daylight, view: view, expanded: false }), "top-left");
-    //end
+    //end*/
 
 
     //Compass
