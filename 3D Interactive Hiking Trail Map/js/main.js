@@ -1,6 +1,5 @@
 require([
     "esri/Map",
-    "esri/widgets/Daylight",
     "esri/widgets/Compass",
     "esri/widgets/Expand",
     "esri/widgets/Fullscreen",
@@ -9,7 +8,7 @@ require([
     "esri/widgets/ElevationProfile",
     "esri/widgets/BasemapGallery",
     "esri/widgets/Legend",
-], function (Map, Daylight, Compass, Expand, Fullscreen, SceneView,
+], function (Map, Compass, Expand, Fullscreen, SceneView,
     FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
 
     const map = new Map({
