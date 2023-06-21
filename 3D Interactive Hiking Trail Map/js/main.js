@@ -177,7 +177,7 @@ require([
 
     //Trailheads feature layer (lines)
     const trailsLayer = new FeatureLayer({
-        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
+        url: "https://services8.arcgis.com/Pepo4NIyzp8KLnWc/arcgis/rest/services/Mt_Pulag_Hiking_Data/FeatureServer",
         layerId: 4,
         elevationInfo: {
             mode: "relative-to-ground"
@@ -188,7 +188,7 @@ require([
 
 
     const trailsLayerPt = new FeatureLayer({
-        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
+        url: "https://services8.arcgis.com/Pepo4NIyzp8KLnWc/arcgis/rest/services/Mt_Pulag_Hiking_Data/FeatureServer",
         renderer: trailPtSymbol,
         labelingInfo: [trailPtLabelClass],
         layerId: 3,
@@ -198,7 +198,7 @@ require([
 
 
     const trailshead = new FeatureLayer({
-        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
+        url: "https://services8.arcgis.com/Pepo4NIyzp8KLnWc/arcgis/rest/services/Mt_Pulag_Hiking_Data/FeatureServer",
         layerId: 2,
         outFields: ["*"],
         elevationInfo: {
@@ -209,7 +209,7 @@ require([
 
 
     const mountainPt = new FeatureLayer({
-        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
+        url: "https://services8.arcgis.com/Pepo4NIyzp8KLnWc/arcgis/rest/services/Mt_Pulag_Hiking_Data/FeatureServer",
         layerId: 1,
         outFields: ["*"],
         labelingInfo: [mountainLabelClass],
@@ -222,7 +222,7 @@ require([
 
 
     const POIs = new FeatureLayer({
-        url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/sample/FeatureServer",
+        url: "https://services8.arcgis.com/Pepo4NIyzp8KLnWc/arcgis/rest/services/Mt_Pulag_Hiking_Data/FeatureServer",
         layerId: 0,
         elevationInfo: {
             mode: "relative-to-ground"
