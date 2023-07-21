@@ -8,8 +8,9 @@ require([
     "esri/widgets/ElevationProfile",
     "esri/widgets/BasemapGallery",
     "esri/widgets/Legend",
+    "esri/Graphic",
 ], function (Map, Compass, Expand, Fullscreen, SceneView,
-    FeatureLayer, ElevationProfile, BasemapGallery, Legend) {
+    FeatureLayer, ElevationProfile, BasemapGallery, Legend, Graphic) {
 
     const map = new Map({
         basemap: "satellite",
@@ -177,12 +178,13 @@ require([
 
     //Trailheads feature layer (lines)
     const trailsLayer = new FeatureLayer({
-        url: "https://services8.arcgis.com/Pepo4NIyzp8KLnWc/arcgis/rest/services/Mt_Pulag_Hiking_Data/FeatureServer",
-        layerId: 4,
-        elevationInfo: {
-            mode: "relative-to-ground"
-        },
+        url: "https://services8.arcgis.com/Pepo4NIyzp8KLnWc/arcgis/rest/services/MtPulagTrails/FeatureServer",
+        layerId: 0,
+        //elevationInfo: {
+        //    mode: "relative-to-ground"
+        //},
         outFields: ["*"],
+        hasZ: true,
     });
     map.add(trailsLayer);
 
@@ -471,24 +473,41 @@ require([
         "top-left"
     );//end
 
+    let polylineSymbol = {
+        type: "simple-line",  // autocasts as SimpleLineSymbol()
+        color: [226, 119, 40],
+        width: 4
+      };
+
+    let polylineGraphic = new Graphic({
+        geometry: trailsLayer,
+        symbol: polylineSymbol,
+      });
+      view.graphics.add(polylineGraphic);
 
     const elevationProfile = new ElevationProfile({
         view: view,
+        input: polylineGraphic,
         profiles: [{
             type: "view" // second profile line samples the view and shows building profiles
         }],
         visibleElements: {
-            selectButton: true
+            legend: false,
+            clearButton: false,
+            settingsButton: false,
+            sketchButton: false,
+            selectButton: false,
+            uniformChartScalingToggle: true,
         }
-    });
+    });view.ui.add(elevationProfile, "bottom-left")
 
-    var elevationProfileExpand = new Expand({
+    /*var elevationProfileExpand = new Expand({
         view: view,
         content: elevationProfile,
         expandIconClass: "esri-icon-visible",
         group: "top-left"
     });
-    view.ui.add(elevationProfileExpand, "top-left");
+    view.ui.add(elevationProfileExpand, "top-left");*/
 
 
 

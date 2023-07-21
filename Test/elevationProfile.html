@@ -1,0 +1,132 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>ElevationProfile Widget | Sample | ArcGIS Maps SDK for JavaScript 4.27</title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      .esri-elevation-profile.esri-component.esri-widget--panel {
+        width: 350px !important;
+      }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.27/"></script>
+
+    <script>
+      require(["esri/WebScene", "esri/views/SceneView", "esri/widgets/ElevationProfile",
+               "esri/widgets/ElevationProfile/ElevationProfileLineInput",
+               "esri/Map", "esri/layers/FeatureLayer", "esri/Graphic","esri/widgets/ElevationProfile/ElevationProfileViewModel"], (
+        WebScene,
+        SceneView,
+        ElevationProfile,
+        ElevationProfileLineInput,
+        Map,
+        FeatureLayer,
+        Graphic,
+        ElevationProfileViewModel
+      ) => {
+        var map = new Map({
+        basemap: "hybrid", // "streets-night-vector", basemap
+        ground: "world-elevation",
+    }); 
+
+        // create the scene view
+        const view = new SceneView({
+          container: "viewDiv",
+          viewingMode: "local",
+          map: map,
+          center: [121.15136, 14.76128]
+        });
+        
+        let polyline = {
+          hasZ: true,
+          type: "polyline",  // autocasts as new Polyline()
+            paths: [
+              [121.150783382086, 14.760929177860, 200],
+              [121.256413591281, 14.762395526179, 1000],
+              [121.287877606927, 14.762735112202, 2000]
+            ]
+        };
+        
+        let polylineSymbol = {
+          type: "simple-line",  // autocasts as SimpleLineSymbol()
+          color: [226, 119, 40],
+          width: 4
+        };
+        
+        let polylineAtt = {
+          Name: "Keystone Pipeline",
+          Owner: "TransCanada"
+        };
+        
+        let polylineGraphic = new Graphic({
+          geometry: polyline,
+          symbol: polylineSymbol,
+          attributes: polylineAtt
+        });
+        view.graphics.add(polylineGraphic);
+
+        /*const testLine = new FeatureLayer({
+          portalItem: {
+            id: "ce126e77f7d74411b345ced474188d1e"
+          },
+          title: "testline"
+        });
+        map.add(testLine);*/
+
+        // create the elevation profile widget
+        const elevationProfile = new ElevationProfile({
+          view: view,
+          //input: polylineGraphic,
+          // configure widget with desired profile lines
+          profiles: [
+            {
+              type: "ground" // first profile line samples the ground elevation
+            },
+            {
+              type: "view" // second profile samples the view and shows building profiles
+            },
+            {
+              type: "input",
+              
+            },
+          
+          ],
+          // hide the select button
+          // this button can be displayed when there are polylines in the
+          // scene to select and display the elevation profile for
+          visibleElements: {
+            legend: false,
+            clearButton: false,
+            settingsButton: false,
+            sketchButton: false,
+            selectButton: false,
+            uniformChartScalingToggle: true,
+            
+          }
+        });
+
+        elevationProfile.viewModel.input = polylineGraphic;
+        
+        
+
+        // add the widget to the view
+        view.ui.add(elevationProfile, "top-right");
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
