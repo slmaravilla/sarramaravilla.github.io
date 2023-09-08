@@ -1,0 +1,9 @@
+{
+    "name": "tsc-play",
+    "dependencies": {
+        "typescript": "5.1.6"
+    },
+    "scripts": {
+        "build": "tsc src/product.ts"
+    }
+}

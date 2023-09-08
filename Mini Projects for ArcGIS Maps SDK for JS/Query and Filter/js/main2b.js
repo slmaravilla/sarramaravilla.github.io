@@ -245,18 +245,19 @@ require([
     function filterLotMunicipality() {
 
         function getQuery2Values() {
-            var brgyArray = [];
+            //var brgyArray = [];
             var query2 = isf_layer.createQuery();
             isf_layer.returnGeometry = true;
             return isf_layer.queryFeatures(query2).then (function(response){
                 var featuresQuery2 = response.features;
-                featuresQuery2.forEach((result, index) => {
-                    var attributes = result.attributes;
+                var values = featuresQuery2.map(function(feature) {
+                    return feature.attributes.Barangay;
+                    /*var attributes = result.attributes;
                     const query2Values = attributes.Barangay;
                     brgyArray.push(query2Values);
-                    console.log(query2Values);
+                    console.log(query2Values);*/
                 });
-                return brgyArray;
+                return values;
             });
         }
 
