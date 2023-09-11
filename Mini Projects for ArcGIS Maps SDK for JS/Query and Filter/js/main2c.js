@@ -182,7 +182,7 @@ require([
 
 
     // CREATE TWO DROPDOWN LIST: FILTER BY MUNICIPALITY AND BARANGAY
-    
+
     const muniDropdown = document.getElementById("muniSelect");
     const brgyDropdown = document.getElementById("brgySelect")
 
@@ -192,10 +192,7 @@ require([
     //********** */
 
 
-    
-
-
-    view.when(function () {
+    /*view.when(function () {
         return isf_layer.when(function () {
             var query = isf_layer.createQuery();
             return isf_layer.queryFeatures(query);
@@ -213,9 +210,7 @@ require([
             return feature.attributes.Municipality;
         });
         return values;
-
     }
-
 
     function getUniqueValues(values) {
         var uniqueValues = [];
@@ -237,7 +232,46 @@ require([
             muniDropdown.add(option);
         });
         //return muniExpression(muniDropdown.value);
-    }
+    }*/
+
+    var query = isf_layer.createQuery();
+    query.where = "Municipality IS NOT NULL" + " AND " + "Barangay IS NOT NULL";
+    query.outFields = ['Municipality', 'Barangay'];
+    query.groupByFieldsForStatistics = ['Municipality', 'Barangay'];
+
+    //getting unique values for municipality
+    isf_layer.queryFeatures(query).then(function (response) {
+        var values = response.features.map(function (feature) {
+            muni = feature.attributes.Municipality;
+            barang = feature.attributes.Barangay;
+
+            return Object.assign({
+                municipality: muni,
+                barangay: barang,
+            });
+        });
+
+        const muniSelect = values.map((item) => item.municipality)
+            .filter((municipality, index, emp) =>
+                emp.indexOf(municipality) === index
+            ); console.log(muniSelect);
+        muniSelect.map(function (value) {
+            var option = document.createElement("option");
+        option.text = muniSelect;
+        muniDropdown.add(option);
+        });
+
+
+        let pair = values.filter((val, index) =>
+            values.findIndex((item) =>
+                item.barangay === val.barangay && item.municipality === val.municipality,
+            ) === index,
+        );
+        console.log(pair);
+
+    
+    });
+
 
 
 
@@ -245,8 +279,8 @@ require([
     // Step 4: Query all the features for the 2nd dropdown using the "Barangay" field
     //************* */
 
-    function filterLotMunicipality() {
-
+    /*function filterLotMunicipality() {
+    
         function getQuery2Values() {
             //var brgyArray = [];
             var query2 = isf_layer.createQuery();
@@ -258,12 +292,12 @@ require([
                     /*var attributes = result.attributes;
                     const query2Values = attributes.Barangay;
                     brgyArray.push(query2Values);
-                    console.log(query2Values);*/
+                    console.log(query2Values);
                 });
                 return values;
             });
         }
-
+    
         function getUniqueValues2(values2) {
             var uniqueValues2 = [];
             values2.forEach(function (item, i) {
@@ -272,7 +306,7 @@ require([
                 }
             }); return uniqueValues2;
         }
-
+    
         function addToSelectQuery2(query2Values) {
             brgyDropdown.options.length = 0;
             query2Values.sort();
@@ -283,17 +317,15 @@ require([
                 brgyDropdown.add(option);
             });
         }
-
+    
         //call this function so that 'None' will appear in the barangay dropdown
-
+    
         getQuery2Values()
             .then(getUniqueValues2)
             .then(addToSelectQuery2)
-
+    
     }
-    filterLotMunicipality();
-
-
+    filterLotMunicipality();*/
 
 
     //************* */
