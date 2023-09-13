@@ -101,7 +101,7 @@ require([
 
 
         const buildingLayer = new SceneLayer({
-            url: "https://services3.arcgis.com/PDfv0I40sqpcaZxV/arcgis/rest/services/De_Zalmhaven_Midrise/SceneServer",
+            //url: "https://services3.arcgis.com/PDfv0I40sqpcaZxV/arcgis/rest/services/De_Zalmhaven_Midrise/SceneServer",
             title: "De Zalmhaven Midrise",
             outFields: ["*"],
 

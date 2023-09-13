@@ -1,0 +1,70 @@
+<html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<select id="dropdown-1"></select>
+
+<select id="dropdown-2"></select>
+
+<script>
+    //your json data
+var data = [{
+  "tableName": "data1",
+  "attributes": [{
+      "id": "att1"
+    },
+    {
+      "id": "att"
+    },
+    {
+      "id": "att3"
+    },
+    {
+      "id": "att5"
+    }
+  ]
+}, {
+  "tableName": "data2",
+  "attributes": [{
+      "id": "att"
+    },
+    {
+      "id": "att2"
+    },
+    {
+      "id": "att3"
+    },
+    {
+      "id": "att8"
+    }
+  ]
+}]
+$('#dropdown-1').append('<option selected="true" disabled>Select Data</option>');
+var i = 0;
+$.each(data, function(index, value) {
+  // APPEND OR INSERT DATA TO SELECT ELEMENT.
+  $('#dropdown-1').append('<option value=' + value.tableName + '>' + value.tableName + '</option>');
+
+});
+//on change of 1st dropdown 
+$(document).on('change', '#dropdown-1', function() {
+  var value = $(this).val(); //get value
+
+  //filter json array
+  var attribute = $(data)
+    .filter(function(i, n) {
+      return n.tableName === value;
+    });
+  //empty second dropdown
+  $('#dropdown-2').html("");
+  $('#dropdown-2').append('<option selected="true" disabled>Select attributes</option>');
+  //loop through attribute
+  $.each(attribute[0].attributes, function(index, value) {
+    //append datas
+    $('#dropdown-2').append('<option value=' + value.id + '>' + value.id + '</option>');
+
+
+  })
+})
+</script>
+</html>
+

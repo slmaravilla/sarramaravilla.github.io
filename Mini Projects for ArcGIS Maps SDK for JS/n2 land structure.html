@@ -2795,90 +2795,61 @@
 
         // Dropdown List
         
-        view.when(function (){
-          return lotLayer.when(function () {
-            var query = lotLayer.createQuery();
-            return lotLayer.queryFeatures(query);
+        var query = lotLayer.createQuery();
+        lotLayer.queryFeatures(query).then(function (response) {
+        var values = response.features.map(function (feature) {
+            muni = feature.attributes.Municipality;
+            return Object.assign({
+                municipality: muni,
+            });
         });
-        }) .then(getValues).then(getUniqueValues).then(addToSelect);
+        //get the unique values for municipality
+        const muniSelect = values.map((item) => item.municipality)
+            .filter((municipality, index, emp) =>
+                emp.indexOf(municipality) === index
+            );
 
-        // 1. Get values and return to drop down list
-        // 1.1. Municipality
-        function getValues(response) {
-          var features = response.features;
-          var values = features.map(function (feature) {
-            return feature.attributes.Municipality;
-          });
-          return values;
-        }
-
-        // Return an array of unique values in the 'Municipality' field of the lot Layer
-        function getUniqueValues(values) {
-          var uniqueValues = [];
-
-          values.forEach(function (item, i) {
-            if (
-              (uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) &&
-              item !== ""
-            ) {
-              uniqueValues.push(item);
-            }
-          });
-          return uniqueValues;
-        }
-
-        // Add the unique values to the municipalility select element. this will allow the user
-        // to filter lot layer by municipality.
-        function addToSelect(values) {
-          values.sort();
-          values.unshift("None"); // Add 'None' to the array and place it to the beginning of the array
-          values.forEach(function (value) {
+        //fill the municipality dropdown list
+        muniSelect.map(function (value) {
             var option = document.createElement("option");
             option.text = value;
             municipalSelect.add(option);
-          });
-        }
+        });
+    });
 
         // 1.2. Barangay
         function barangayFilterList(municipalValue) {
 
-          function barangayQuery() {
-            var query = lotLayer.createQuery();
-            return lotLayer.queryFeatures(query).then(function (response) {
-              stats = response.features;
-              var values = stats.map(function(feature){
-                return feature.attributes.Barangay
-              })
-              return values;
+          function getValues() {
+        var query2 = lotLayer.createQuery();
+           return lotLayer.queryFeatures(query2).then(function (response) {
+                var values = response.features.map(function (feature) {
+                    return feature.attributes.Barangay;
+                });
+                return values;
             });
-          }
+        }
+        function uniqueValues (values) {
+            var uniqueValues = [];
+            values.forEach(function (item, i) {
+                if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
+                    uniqueValues.push(item);
+                }
+            }); return uniqueValues;
+        }
 
-          function getUniqueValues2(values2) {
-            var uniqueValues2 = [];
-            values2.forEach(function (item, i) {
-              if (
-                (uniqueValues2.length < 1 ||
-                  uniqueValues2.indexOf(item) === -1) &&
-                item !== ""
-              ) {
-                uniqueValues2.push(item);
-              }
-            });
-            return uniqueValues2;
-          }
-
-          function addToSelectQuery2(query2Values) {
+        function selectbrgy(brgySelect2) {
             barangaySelect.options.length = 0;
-            query2Values.sort();
-            query2Values.unshift("None");
-            query2Values.forEach(function (value) {
-              var option = document.createElement("option");
-              option.text = value;
-              barangaySelect.add(option);
+            brgySelect2.unshift('None');
+            brgySelect2.map(function (value) {
+                var option = document.createElement("option");
+                option.text = value;
+                barangaySelect.add(option);
             });
-          }
-
-          barangayQuery().then(getUniqueValues2).then(addToSelectQuery2);
+        }
+        getValues()
+        .then(uniqueValues)
+        .then(selectbrgy)
         }
         barangayFilterList();
 

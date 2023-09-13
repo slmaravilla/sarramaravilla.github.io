@@ -239,7 +239,8 @@ require([
     query.outFields = ['Municipality', 'Barangay'];
     query.groupByFieldsForStatistics = ['Municipality', 'Barangay'];
 
-    //getting unique values for municipality
+
+    //create the object array
     isf_layer.queryFeatures(query).then(function (response) {
         var values = response.features.map(function (feature) {
             muni = feature.attributes.Municipality;
@@ -251,175 +252,227 @@ require([
             });
         });
 
+        //get the unique values for municipality
         const muniSelect = values.map((item) => item.municipality)
             .filter((municipality, index, emp) =>
                 emp.indexOf(municipality) === index
-            ); console.log(muniSelect);
-        muniSelect.map(function (value) {
-            var option = document.createElement("option");
-        option.text = muniSelect;
-        muniDropdown.add(option);
-        });
+            );
 
+        /*muniSelect.map(function (value) {
+        var option = document.createElement("option");
+        option.text = value;
+        muniDropdown.add(option);
+        });*/
 
         let pair = values.filter((val, index) =>
             values.findIndex((item) =>
                 item.barangay === val.barangay && item.municipality === val.municipality,
-            ) === index,
-        );
-        console.log(pair);
-
-    
-    });
+            ) === index);
 
 
+        const finalArray = muniSelect.map((muni) => {
+            let temp = [];
 
+            //find barangay from each municipality
+            const findBarangay = pair.filter((emp) => emp.municipality === muni);
 
-    //************* */
-    // Step 4: Query all the features for the 2nd dropdown using the "Barangay" field
-    //************* */
-
-    /*function filterLotMunicipality() {
-    
-        function getQuery2Values() {
-            //var brgyArray = [];
-            var query2 = isf_layer.createQuery();
-            isf_layer.returnGeometry = true;
-            return isf_layer.queryFeatures(query2).then (function(response){
-                var featuresQuery2 = response.features;
-                var values = featuresQuery2.map(function(feature) {
-                    return feature.attributes.Barangay;
-                    /*var attributes = result.attributes;
-                    const query2Values = attributes.Barangay;
-                    brgyArray.push(query2Values);
-                    console.log(query2Values);
+            for (let i = 0; i < findBarangay.length; i++) {
+                const barangays = findBarangay[i].barangay;
+                const obj = Object.assign({
+                    name: barangays,
                 });
-                return values;
+                temp.push(obj);
+            }
+            return Object.assign({
+                municipality: muni,
+                barangay: temp.length === 0 ? [{ name: '' }] : temp,
             });
-        }
-    
-        function getUniqueValues2(values2) {
-            var uniqueValues2 = [];
-            values2.forEach(function (item, i) {
-                if ((uniqueValues2.length < 1 || uniqueValues2.indexOf(item) === -1) && item !== "") {
-                    uniqueValues2.push(item);
-                }
-            }); return uniqueValues2;
-        }
-    
-        function addToSelectQuery2(query2Values) {
-            brgyDropdown.options.length = 0;
-            query2Values.sort();
-            query2Values.unshift('None');
-            query2Values.forEach(function (value) {
-                var option = document.createElement("option");
-                option.text = value;
-                brgyDropdown.add(option);
-            });
-        }
-    
-        //call this function so that 'None' will appear in the barangay dropdown
-    
-        getQuery2Values()
-            .then(getUniqueValues2)
-            .then(addToSelectQuery2)
-    
-    }
-    filterLotMunicipality();*/
+        }); console.log(finalArray);
 
+        $('#muniSelect').append('<option selected="true" disabled>Select option</option>');
+        var i = 0;
+        $.each(finalArray, function (index, value) {
+            // APPEND OR INSERT DATA TO SELECT ELEMENT.
+            $('#muniSelect').append('<option value=' + value.municipality + '>' + value.municipality + '</option>');
 
-    //************* */
-    // Step 2: Set the definitionExpression on the feature layer to reflect the selection of the user
-    //************* */
-
-    function muniExpression(newValue) {
-        if (newValue == 'None') {
-            isf_layer.definitionExpression = null;
-        } else {
-            isf_layer.definitionExpression = "Municipality = '" + newValue + "'";
-        }
-        //zoomToLayer(isf_layer);
-        //return queryLotGeometry();
-    }
-
-    function muniBrgyExpression(newValue1, newValue2) {
-        if (newValue1 === undefined && newValue2 === undefined) {
-            isf_layer.definitionExpression = null;
-
-        } else if (newValue1 == 'None' && newValue2 !== 'None') {
-            isf_layer.definitionExpression = "Barangay = '" + newValue2 + "'";
-
-        } else if (newValue1 == 'None' && newValue2 == 'None') {
-            isf_layer.definitionExpression = null;
-
-        } else if (newValue1 !== 'None' && newValue2 == 'None') {
-            isf_layer.definitionExpression = "Municipality = '" + newValue1 + "'";
-
-        } else if (newValue1 !== 'None' && newValue2 !== 'None') {
-            isf_layer.definitionExpression = "Municipality = '" + newValue1 + "'" + " AND " + "Barangay = '" + newValue2 + "'";
-        }
-        return queryLotGeometry();
-    }
-
-
-
-    //**************** */
-    // Step. 3 Get all the geometries of the feature layer. The createQuery() method creates a query object
-    // That repects the definitionExpression of the feature layer
-    //**************** */
-
-
-    function queryLotGeometry() {
-        var lotQuery = isf_layer.createQuery();
-        return isf_layer.queryFeatures(lotQuery).then(function (response) {
-            lotGeometries = response.features.map(function (feature) {
-                return feature.geometry;
-            });
-            return lotGeometries;
         });
-    }
+
+        $(document).on('change', '#muniSelect', function () {
+            var value = $(this).val(); //get value
+
+            //filter json array
+            var attribute = $(finalArray)
+                .filter(function (i, n) {
+                    return n.municipality === value;
+                });
+            //empty second dropdown
+            $('#brgySelect').html("");
+            $('#brgySelect').append('<option selected="true" disabled>Select option</option>');
+            //loop through attribute
+            $.each(attribute[0].barangay, function (index, value) {
+                //append datas
+                $('#brgySelect').append('<option value=' + value.name + '>' + value.name + '</option>');
 
 
-    //*************** */
-    // Step 5: Add EventLister to the dropdown list
-    /**************** */
-
-    muniDropdown.addEventListener("change", function (event) {
-        var municipal = event.target.value;
-
-        muniExpression(municipal);
-        filterLotMunicipality();
-
-        zoomToLayer(isf_layer);
-
-        changeSelected();
+            });
+        });
 
 
-    })
-
-    // this enables the 2nd dropdown to return to "None"
-    // when "None" option is selected in the 1st dropdown
-    const changeSelected = (e) => {
-        const $select = document.querySelector('#brgySelect');
-        $select.value = 'None'
-    };
 
 
-    brgyDropdown.addEventListener("change", function (event) {
-        var municipal = muniDropdown.value;
-        var barangay = event.target.value;
+        });
 
-        muniBrgyExpression(municipal, barangay);
 
-        zoomToLayer(isf_layer);
+
+
+
+
+
+        //************* */
+        // Step 4: Query all the features for the 2nd dropdown using the "Barangay" field
+        //************* */
+
+        /*function filterLotMunicipality() {
+        
+            function getQuery2Values() {
+                //var brgyArray = [];
+                var query2 = isf_layer.createQuery();
+                isf_layer.returnGeometry = true;
+                return isf_layer.queryFeatures(query2).then (function(response){
+                    var featuresQuery2 = response.features;
+                    var values = featuresQuery2.map(function(feature) {
+                        return feature.attributes.Barangay;
+                        /*var attributes = result.attributes;
+                        const query2Values = attributes.Barangay;
+                        brgyArray.push(query2Values);
+                        console.log(query2Values);
+                    });
+                    return values;
+                });
+            }
+        
+            function getUniqueValues2(values2) {
+                var uniqueValues2 = [];
+                values2.forEach(function (item, i) {
+                    if ((uniqueValues2.length < 1 || uniqueValues2.indexOf(item) === -1) && item !== "") {
+                        uniqueValues2.push(item);
+                    }
+                }); return uniqueValues2;
+            }
+        
+            function addToSelectQuery2(query2Values) {
+                brgyDropdown.options.length = 0;
+                query2Values.sort();
+                query2Values.unshift('None');
+                query2Values.forEach(function (value) {
+                    var option = document.createElement("option");
+                    option.text = value;
+                    brgyDropdown.add(option);
+                });
+            }
+        
+            //call this function so that 'None' will appear in the barangay dropdown
+        
+            getQuery2Values()
+                .then(getUniqueValues2)
+                .then(addToSelectQuery2)
+        
+        }
+        filterLotMunicipality();*/
+
+
+        //************* */
+        // Step 2: Set the definitionExpression on the feature layer to reflect the selection of the user
+        //************* */
+
+        function muniExpression(newValue) {
+            if (newValue == 'None') {
+                isf_layer.definitionExpression = null;
+            } else {
+                isf_layer.definitionExpression = "Municipality = '" + newValue + "'";
+            }
+            //zoomToLayer(isf_layer);
+            //return queryLotGeometry();
+        }
+
+        function muniBrgyExpression(newValue1, newValue2) {
+            if (newValue1 === undefined && newValue2 === undefined) {
+                isf_layer.definitionExpression = null;
+
+            } else if (newValue1 == 'None' && newValue2 !== 'None') {
+                isf_layer.definitionExpression = "Barangay = '" + newValue2 + "'";
+
+            } else if (newValue1 == 'None' && newValue2 == 'None') {
+                isf_layer.definitionExpression = null;
+
+            } else if (newValue1 !== 'None' && newValue2 == 'None') {
+                isf_layer.definitionExpression = "Municipality = '" + newValue1 + "'";
+
+            } else if (newValue1 !== 'None' && newValue2 !== 'None') {
+                isf_layer.definitionExpression = "Municipality = '" + newValue1 + "'" + " AND " + "Barangay = '" + newValue2 + "'";
+            }
+            return queryLotGeometry();
+        }
+
+
+
+        //**************** */
+        // Step. 3 Get all the geometries of the feature layer. The createQuery() method creates a query object
+        // That repects the definitionExpression of the feature layer
+        //**************** */
+
+
+        function queryLotGeometry() {
+            var lotQuery = isf_layer.createQuery();
+            return isf_layer.queryFeatures(lotQuery).then(function (response) {
+                lotGeometries = response.features.map(function (feature) {
+                    return feature.geometry;
+                });
+                return lotGeometries;
+            });
+        }
+
+
+        //*************** */
+        // Step 5: Add EventLister to the dropdown list
+        /**************** */
+
+        muniDropdown.addEventListener("change", function (event) {
+            var municipal = event.target.value;
+
+            muniExpression(municipal);
+            //filterLotMunicipality();
+
+            zoomToLayer(isf_layer);
+
+            changeSelected();
+
+
+        })
+
+        // this enables the 2nd dropdown to return to "None"
+        // when "None" option is selected in the 1st dropdown
+        const changeSelected = (e) => {
+            const $select = document.querySelector('#brgySelect');
+            $select.value = 'None'
+        };
+
+
+        brgyDropdown.addEventListener("change", function (event) {
+            var municipal = muniDropdown.value;
+            var barangay = event.target.value;
+
+            muniBrgyExpression(municipal, barangay);
+
+            zoomToLayer(isf_layer);
+        });
+
+        // End of Dropdown list
+
+        // PROGRESS CHART*/
+
+
+
+
+
     });
-
-    // End of Dropdown list
-
-    // PROGRESS CHART
-
-
-
-
-
-});
