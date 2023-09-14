@@ -1,0 +1,2798 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
+  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
+  -->
+<title>N2 Depot Building</title>
+
+<link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/dark/main.css"/>
+<script type="module" src="https://js.arcgis.com/calcite-components/1.4.2/calcite.esm.js"></script>
+<link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.4.2/calcite.css" />
+
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Micro.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
+<script src="https://js.arcgis.com/4.27/"></script>
+
+  </head>
+
+  <style>
+    html,
+    body {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #applicationDiv {
+      display: flex;
+      flex-wrap: wrap;
+      height: 90vh;
+      padding: 10px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .container {
+        display: grid;
+        border: solid 2.5px gray;
+        flex-wrap: wrap;
+      height: 90vh;
+      width: 100%;
+      box-sizing: border-box;
+        grid-template-columns: 4fr 1.25fr;
+        border-right: 0;
+    }
+
+    #headerTitleDiv {
+      font-size: 2vw;
+      vertical-align: middle;
+      padding-top: 3px;
+      z-index: 99;
+      position: absolute;
+      left: 17;
+      top: 18;
+      color: white;
+    }
+
+
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 99%;
+      width: 100%;
+      background-color: black;
+      flex: 1 1 auto;
+      order: 1;
+      overflow: hidden;
+    }
+
+    #selectedBuildingDiv {
+      position: absolute;
+      z-index: 99;
+      top: 130;
+      left: 30;
+      color: orange;
+      font-size: 2.3rem;
+
+    }
+
+    #dateDiv {
+      color: rgb(0, 197, 255);
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      text-align: left;
+      font-weight: normal;
+      font-size: 1vw;
+      padding-top: 2%;
+      margin: 0;
+      z-index:1;
+      top: 30;
+      left: 30;
+      position: fixed;
+    }
+
+    #chartPanel {
+      background: rgb(0, 0, 0, 0);
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      height: 10vh;
+    }
+
+    .labelStFraming,
+    .labelStFoundation,
+    .labelStColumn,
+    .labelRoofs,
+    .labelFloors,
+    .labelWalls,
+    .labelColumns,
+    .labelOthers {
+      color: white;
+      font-size: 1.3vw;
+      margin: 0;
+      padding-top: 5;
+      float: right;
+      background-color: rgb(0, 0, 0, 0);
+      height: 4vh;
+      text-align: center;
+    }
+
+    #labelTotalDiv {
+      color: white;
+      font-size: 1.5vw;
+      width: 100%;
+      height: 5vh;
+      padding-top: 6;
+      text-align: center;
+    }
+
+    #boxStFoundation {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color: rgb(0,0,0,0.5);
+      bottom: 2%;
+      left: 0.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxStColumn {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color: rgb(0,0,0,0.5);
+      bottom: 2%;
+      left: 11.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+
+    #boxStFraming {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color: rgb(0,0,0,0.5);
+      bottom: 2%;
+      left: 22.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxRoofs {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color: rgb(0,0,0,0.5);
+      bottom: 2%;
+      left: 33.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxFloors {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color: rgb(0,0,0,0.5);
+      bottom: 2%;
+      left: 44.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxWalls {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color: rgb(0,0,0,0.5);
+      bottom: 2%;
+      left: 55.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxColumns {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color: rgb(0,0,0,0.5);
+      bottom: 2%;
+      left: 66.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxOthers {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color: rgb(0,0,0,0.5);
+      bottom: 2%;
+      left: 77.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxTotal {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color: rgb(0,0,0,0.5);
+      bottom: 2%;
+      left: 88.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #chartStFramingDiv,
+    #chartStFoundationDiv,
+    #chartStColumnDiv,
+    #chartRoofsDiv,
+    #chartFloorsDiv,
+    #chartOthersDiv,
+    #chartWallsDiv,
+    #chartColumnsDiv {
+      padding-top: 2%;
+      background-color: rgb(0,0,0,0);
+      width: 10vw;
+      height: 11vh;
+
+    }
+
+    #totalProgressDiv {
+      color: rgb(0, 197, 255);
+      font-size: 2.5vw;
+      width: 100%;
+      height: 6vh;
+      padding-top: 3;
+      text-align: center;
+    }
+
+
+    #optionsDiv {
+      font-size: 1.8vw;
+      font-weight: normal;
+      text-align: center;
+      vertical-align: middle;
+      color: white;
+      padding-top: 5%;
+      line-height: 0.3;
+      opacity: 0.8;
+      height: 13vh;
+    }
+
+    p {
+      color: rgb(0, 197, 255);
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+      width: auto;
+      vertical-align: text-bottom;
+      padding: 3px;
+      margin-top: 10px;
+    }
+
+    b {
+      color: orange;
+    }
+
+    h2 {
+      font-weight: 400;
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      font-style: normal;
+      font-size: 1.9vw;
+      color: white;
+      padding:3px;
+      margin: 0px;
+      vertical-align: text-top;
+    }
+
+    img {
+      padding: 0;
+      margin: 0;
+    }
+
+    h4 {
+      color: rgb(0, 197, 255);
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      text-align: left;
+      font-weight: normal;
+      font-size: 1.1vw;
+      padding-top: 20px;
+      margin: 0;
+      width: 160px;
+      vertical-align: text-bottom;
+    }
+
+    h5 {
+      color: rgb(0, 197, 255);
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+      padding: 3;
+      margin: 10;
+    }
+
+    h6 {
+      color: rgb(0, 197, 255);
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      text-align: center;
+      font-weight: normal;
+      font-size: 45px;
+      margin-top: 30px;
+      padding: 0px 0px 5px 0px;
+      }
+
+    #totalProgress {
+      padding-top: 10%;
+      color: rgb(0, 197, 255);
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      text-align: center;
+      font-weight: normal;
+      font-size: 3.2vw;
+    }
+
+    #menu {
+      padding: 3px 3px 3px 3px;
+      background-color: rgb(0,0,0,0.3);
+      color: white;
+    }
+
+    ::-webkit-scrollbar {
+    display: none;
+    }
+
+    .cpButtonClass {
+        font-style: normal;
+        font-size: 14px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        color: white;
+        text-align: center;
+        margin: 30px 0px 20px 0px;
+        padding: 0px 0px 10px 0px;
+        }
+
+        .esri-layer-list__item-toggle-icon,
+    .esri-layer-list__item-title {
+    color: white;
+    }
+
+    .sassy-theme .esri-menu,
+    .sassy-theme .esri-popup__main-container,
+    .sassy-theme .esri-popup .esri-popup__pointer-direction,
+    .sassy-theme .esri-popup .esri-popup__button,
+    .sassy-theme .esri-button,
+    .sassy-theme .esri-input,
+    .sassy-theme .esri-legend,
+    .sassy-theme .esri-layer-list,
+    .sassy-theme .esri-widget a {
+      background-color: rgb(0, 0, 0, 0.7);
+      color: #fff;
+    }
+  </style>
+
+  <body class="sassy-theme">
+    <div id="viewDiv">
+      <div id="selectedBuildingDiv"></div>
+        <div id="dateDiv"></div>
+        <div id="headerTitleDiv">N2 DEPOT BUILDING</div>
+        <div id="boxStFoundation">
+            <label class="labelStFoundation">St.Foundation</label>
+            <div id="chartPanel">
+                <div id="chartStFoundationDiv"></div>
+            </div>
+        </div>
+          <div id="boxStColumn">
+                <label class="labelStColumn">St.Column</label>
+                <div id="chartPanel">
+                  <div id="chartStColumnDiv"></div>
+              </div>
+          </div>
+          <div id="boxStFraming">
+                <label class="labelStFraming">St.Framing</label>
+                <div id="chartPanel">
+                  <div id="chartStFramingDiv"></div>
+              </div>
+          </div>
+          <div id="boxRoofs">
+                <label class="labelRoofs">Roofs</label>
+                <div id="chartPanel">
+                  <div id="chartRoofsDiv"></div>
+              </div>
+          </div>
+          <div id="boxFloors">
+                <label class="labelFloors">Floors</label>
+                <div id="chartPanel">
+                  <div id="chartFloorsDiv"></div>
+              </div>
+          </div>
+          <div id="boxWalls">
+                <label class="labelWalls">Walls</label>
+                <div id="chartPanel">
+                  <div id="chartWallsDiv"></div>
+              </div>
+          </div>
+          <div id="boxColumns">
+                <label class="labelColumns">Columns</label>
+                <div id="chartPanel">
+                  <div id="chartColumnsDiv"></div>
+              </div>
+          </div>
+          <div id="boxOthers">
+                <label class="labelOthers">Others</label>
+                <div id="chartPanel">
+                  <div id="chartOthersDiv"></div>
+              </div>
+          </div>
+          <div id="boxTotal">
+                <div id="labelTotalDiv">TOTAL</div>
+                <div id="totalProgressDiv"></div>
+          </div>
+          <div id="menu" class="esri-widget">
+            <input type="checkbox" id="opacityInput" unchecked />
+            <label for="opacityInput">See through ground</label>
+          </div>
+  </div>
+  </body>
+
+  <script>
+    require([
+  "esri/Basemap",
+  "esri/Map",
+  "esri/views/MapView",
+  "esri/views/SceneView",
+  "esri/layers/FeatureLayer",
+  "esri/layers/support/FeatureFilter",
+  "esri/layers/SceneLayer",
+  "esri/layers/Layer",
+  "esri/layers/TileLayer",
+  "esri/layers/VectorTileLayer",
+  "esri/layers/support/LabelClass",
+  "esri/symbols/LabelSymbol3D",
+  "esri/WebMap",
+  "esri/WebScene",
+  "esri/portal/PortalItem",
+  "esri/portal/Portal",
+  "esri/widgets/TimeSlider",
+  "esri/widgets/Legend",
+  "esri/widgets/LayerList",
+  "esri/widgets/Fullscreen",
+  "esri/rest/geometryService",
+  "esri/rest/support/Query",
+  "esri/rest/support/StatisticDefinition",
+  "esri/symbols/WebStyleSymbol",
+  "esri/TimeExtent",
+  "esri/widgets/Expand",
+  "esri/widgets/Editor",
+  "esri/renderers/UniqueValueRenderer",
+  "esri/widgets/support/DatePicker",
+  "esri/widgets/FeatureTable",
+  "esri/widgets/Compass",
+  "esri/layers/ElevationLayer",
+  "esri/Ground",
+  "esri/widgets/Search",
+  "esri/widgets/BasemapGallery",
+], function(Basemap, Map, MapView, SceneView, 
+            FeatureLayer, FeatureFilter,
+            SceneLayer, Layer, TileLayer, VectorTileLayer,
+            LabelClass, LabelSymbol3D, WebMap,
+            WebScene, PortalItem, Portal,
+            TimeSlider, Legend, LayerList, Fullscreen,
+            geometryService, Query,
+            StatisticDefinition, WebStyleSymbol,
+            TimeExtent, Expand, Editor, UniqueValueRenderer, DatePicker,
+            FeatureTable, Compass, ElevationLayer, Ground, Search, BasemapGallery) {
+
+let chartLayerView;
+////////////////////////////////////////////////////
+
+// Add custom DEM to the default elevation layer of esri
+const worldElevation = new ElevationLayer({
+  url: "//elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"
+  });
+
+  var map = new Map({
+        basemap: "satellite",//basemap, // "streets-night-vector", 
+        ground: "world-elevation"
+  }); 
+   
+  var view = new SceneView({
+      map: map,
+      container: "viewDiv",
+      viewingMode: "local",
+      camera: {
+          position: {
+              x: 120.565000,
+              y: 15.210,
+              z: 750
+              },
+              tilt: 65
+              },
+      environment: {
+          background: {
+              type: "color", // autocasts as new ColorBackground()
+              color: [0, 0, 0, 1]
+              },
+              // disable stars
+              starsEnabled: false,
+              //disable atmosphere
+              atmosphereEnabled: false
+              }
+  });
+
+  view.ui.components = [];
+
+  //
+  function shiftCamera(deg) {
+    var camera = view.camera.clone();
+    camera.position.longitude += deg;
+    return camera;
+  }
+
+  function catchAbortError(error) {
+    if (error.name != "AbortError") {
+      console.error(error);
+    }
+  }
+
+  // Setup UI
+
+  var headerTitleDiv = document.getElementById("headerTitleDiv");
+
+
+//*******************************//
+// Label Class Property Settings //
+//*******************************//
+// Chainage Label
+var labelChainage = new LabelClass({
+labelExpressionInfo: {expression: "$feature.KmSpot"},
+symbol: {
+type: "text",
+color: [85, 255, 0],
+size: 25
+}
+});
+
+// Station Label
+var labelClass = new LabelClass({
+    symbol: {
+      type: "label-3d",// autocasts as new LabelSymbol3D()
+      symbolLayers: [
+        {
+          type: "text", // autocasts as new TextSymbol3DLayer()
+          material: {
+            color: "white"
+          },
+          size: 15,
+          color: "black",
+          haloColor: "black",
+          haloSize: 1,
+          font: {
+            family: "Ubuntu Mono",
+            //weight: "bold"
+          },
+        }
+      ],
+      verticalOffset: {
+        screenLength: 40,
+        maxWorldLength: 100,
+        minWorldLength: 20
+      },
+
+    },
+    labelPlacement: "above-center",
+    labelExpressionInfo: {
+      expression: 'DefaultValue($feature.Station, "no data")'
+      //value: "{TEXTSTRING}"
+  }
+  });
+
+
+// Labeling Building spot
+var buildingSpotLabelClass = {
+symbol: {
+    type: "label-3d",// autocasts as new LabelSymbol3D()
+    symbolLayers: [
+      {
+        type: "text", // autocasts as new TextSymbol3DLayer()
+        material: {
+          color: "orange"
+        },
+        size: 12,
+        color: "black",
+        haloColor: "black",
+        haloSize: 1,
+        font: {
+          family: "Ubuntu Mono",
+          //weight: "bold"
+        },
+      }
+    ],
+    verticalOffset: {
+      screenLength: 50,
+      maxWorldLength: 300,
+      minWorldLength: 40
+    },
+    callout: {
+      type: "line", // autocasts as new LineCallout3D()
+      color: "white",
+      size: 0.5,
+      border: {
+        color: "grey"
+      }
+    }
+  },
+  labelPlacement: "above-center",
+  labelExpressionInfo: {
+    expression: "$feature.Name"
+    //value: "{TEXTSTRING}"
+}
+}
+
+//*****************************//
+//      Renderer Settings      //
+//*****************************// 
+// Building location
+let buildingSpotSymbol = {
+type: "simple",  // autocasts as new SimpleRenderer()
+symbol: {
+type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+size: 5,
+color: "white",
+outline: {  // autocasts as new SimpleLineSymbol()
+width: 0.5,
+color: [0, 0, 0, 0]
+}
+}
+};
+
+// Chainage symbol
+var chainageRenderer = {
+type: "simple",
+symbol: {
+type: "simple-marker",
+size: 5,
+color: [255, 255, 255, 0.9],
+outline: {
+  width: 0.2,
+  color: "black"
+}
+}
+};
+
+// Station Symbol
+  function stationsSymbol(name) {
+    return {
+      type: "web-style", // autocasts as new WebStyleSymbol()
+      name: name,
+      styleName: "EsriIconsStyle"//EsriRealisticTransportationStyle, EsriIconsStyle
+    };
+  }
+
+  // Station Renderer
+  var stationsRenderer = {
+    type: "unique-value", // autocasts as new UniqueValueRenderer()
+    field: "Station",
+    defaultSymbol: stationsSymbol("Train"),//Backhoe, Train
+  };
+
+
+// Legend Color for Structure Layer
+// 0.1: more transparent, 0.9: not transparent 
+  const colors = {
+    1: [225, 225, 225, 0.1], // To be Constructed (white)
+    2: [130, 130, 130, 0.5], // Under Construction
+    3: [255, 0, 0, 0.8], // Delayed
+    4: [0, 112, 255, 0.8], // Pile/Pile Cap
+    5: [0, 112, 255, 0.8], // Beam
+    6: [0, 112, 255, 0.8], // Column
+    7: [0, 112, 255, 0.8], // Slab
+    8: [0, 112, 255, 0.8], // Roof
+  };
+
+//*******************************//
+// Import Layers                 //
+//*******************************//
+var buildingLocation = new FeatureLayer({
+portalItem: {
+  id: "c15d7cdc13cc4d64875e7a772cb41d71",
+  portal: {
+      url: "https://gis.railway-sector.com/portal"
+  }
+},
+elevationInfo: {
+mode: "relative-to-ground"
+},
+title: "Building Spot",
+renderer: buildingSpotSymbol,
+labelingInfo: [buildingSpotLabelClass],
+popupEnabled: false,
+outFields: ["*"]
+});
+map.add(buildingLocation);
+
+// Centerline and chainage
+var chainageLayer = new FeatureLayer ({
+portalItem: {
+id: "590680d19f2e48fdbd8bcddce3aaedb5",
+portal: {
+            url: "https://gis.railway-sector.com/portal"
+          } 
+},
+layerId: 5,
+title: "Chainage",
+elevationInfo: {
+mode: "relative-to-ground"
+},
+labelingInfo: [labelChainage],
+renderer: chainageRenderer,
+outFields: ["*"],
+popupEnabled: false
+
+});
+//chainageLayer.listMode = "hide";
+map.add(chainageLayer, 1);
+
+// ROW //
+var rowLayer = new FeatureLayer ({
+portalItem: {
+id: "590680d19f2e48fdbd8bcddce3aaedb5",
+portal: {
+            url: "https://gis.railway-sector.com/portal"
+          }   
+},
+layerId: 1,
+title: "ROW",
+popupEnabled: false
+});
+map.add(rowLayer,2);
+
+// Station
+var stationLayer = new SceneLayer({
+portalItem: {
+          id: "207cb34b8a324b40985b5805862c4b29",
+          portal: {
+            url: "https://gis.railway-sector.com/portal"
+          }
+      },
+       labelingInfo: [labelClass],
+       renderer: stationsRenderer,
+       elevationInfo: {
+           // this elevation mode will place points on top of
+           // buildings or other SceneLayer 3D objects
+           mode: "relative-to-ground"
+           }
+       //definitionExpression: "Extension = 'N2'"
+        //screenSizePerspectiveEnabled: false, // gives constant size regardless of zoom
+  });
+  stationLayer.listMode = "hide";
+  map.add(stationLayer, 0);
+
+
+// Station structures
+  var structureLayer = new SceneLayer({ //structureLayer
+    portalItem: {
+      id: "657134597b0f4f2095ce3485d2ea05cf",
+      portal: {
+        url: "https://gis.railway-sector.com/portal"
+      }
+    },
+    popupTemplate: {
+title: "<h5>{Status}</h5>",
+lastEditInfoEnabled: false,
+returnGeometry: true,
+content: [
+ {
+   type: "fields",
+   fieldInfos: [
+     {
+       fieldName: "StructureType",
+       label: "Structure Type"
+     },
+     {
+       fieldName: "StructureLevel",
+       label: "Structure Level"
+     },
+     {
+       fieldName: "Type",
+       label: "Type of Structure"
+     },
+     {
+       fieldName: "SubType",
+       label: "Subtype of Structure",
+     }
+   ]
+ }
+]
+},
+      elevationInfo: {
+          mode: "absolute-height",
+          offset: 0
+      },
+      title: "Station Structure"
+      // when filter using date, example below. use this format
+      //definitionExpression: "EndDate = date'2020-6-3'"
+  });
+  structureLayer.listMode = "hide";
+  map.add(structureLayer, 1);
+
+  function renderStructureLayer() {
+    const renderer = new UniqueValueRenderer({
+      field: "Status"
+    });
+
+    for (let property in colors) {
+      if (colors.hasOwnProperty(property)) {
+        renderer.addUniqueValueInfo({
+          value: property,
+          symbol: {
+            type: "mesh-3d",
+            symbolLayers: [
+              {
+                type: "fill",
+                material: {
+                  color: colors[property],
+                  colorMixMode: "replace"
+                },
+                edges: {
+                  type: "solid", // autocasts as new SolidEdges3D()
+                  color: [225, 225, 225, 0.3]
+                  }
+              }
+            ]
+           }
+        });
+      }
+    }
+
+    structureLayer.renderer = renderer;
+  }
+
+  renderStructureLayer();
+
+// Radio Button Selection //        
+// Selection of 'D-Wall' or 'Station Box' only for visualization (not chart)
+
+//*******************************//
+//      Progress Chart           //
+//*******************************//
+
+// Total progress //
+function perBuildingProgress() {
+var total_complete = {
+onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+outStatisticFieldName: "total_complete",
+statisticType: "sum"
+};
+
+var total_obs = {
+onStatisticField: "Status",
+outStatisticFieldName: "total_obs",
+statisticType: "count"
+};
+var query = structureLayer.createQuery();
+query.outStatistics = [total_complete, total_obs];
+query.returnGeometry = true;
+structureLayer.queryFeatures(query).then(function(response) {
+var stats = response.features[0].attributes;
+
+const total_complete = stats.total_complete;
+const total_obs = stats.total_obs;
+document.getElementById("totalProgressDiv").innerHTML = ((total_complete/total_obs)*100).toFixed(1) + " %";
+});
+}
+
+
+/* Function for zooming to selected layers */
+function zoomToLayer(layer) {
+return layer.queryExtent().then(function(response) {
+view.goTo(response.extent, { //response.extent
+speedFactor: 2
+}).catch(function(error) {
+if (error.name != "AbortError") {
+  console.error(error);
+}
+});
+});
+}
+
+const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+function getEditedDateValue() {
+  var tempDates = [];
+
+  var query = structureLayer.createQuery();
+  query.fields = ["last_edited_date"];
+  query.where = "last_edited_date IS NOT NULL";
+  return structureLayer.queryFeatures(query).then(function(response) {
+    var stats = response.features;
+    stats.forEach((result, index) => {
+      var attributes = result.attributes;
+      const dates = attributes.last_edited_date;
+      tempDates.push(dates);
+    });
+    const lastDate = Math.max(...tempDates);
+    const lastEdit = new Date(lastDate);
+    const yyyy = lastEdit.getFullYear();
+    const mm = month[lastEdit.getMonth()];
+    const dd = lastEdit.getDate();
+    const lastEditedDate = `As of ${mm} ${dd}, ${yyyy}`;
+    document.getElementById("dateDiv").innerHTML = lastEditedDate;
+  });
+}
+getEditedDateValue();
+  
+// Create Bar chart to show progress of station structure
+am5.ready(function() {
+  // 1. structural foundation
+  var root = am5.Root.new("chartStFoundationDiv");
+  root._logo.dispose();
+
+  var myTheme = am5.Theme.new(root);
+      myTheme.rule("Grid", ["base"]).setAll({
+          strokeOpacity: 0,
+      });
+
+  function chartStFoundation() {
+    root.container.children.clear();
+
+    var total_stFoundation_tobec = {
+    onStatisticField: "CASE WHEN (Type = 1 and Status = 1) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_stFoundation_tobec",
+    statisticType: "sum"
+    };
+
+    var total_stColumn_comp = {
+    onStatisticField: "CASE WHEN (Type = 1 and Status = 4) THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_stColumn_comp",
+    statisticType: "sum"  
+    };
+
+    var query = structureLayer.createQuery();
+    query.outStatistics = [total_stFoundation_tobec, total_stColumn_comp];
+    query.returnGeometry = true;
+
+    structureLayer.queryFeatures(query).then(function(response) {
+      var stats = response.features[0].attributes;
+
+      const foundation_tobec = stats.total_stFoundation_tobec;
+      const foundation_comp = stats.total_stColumn_comp;
+
+      // Set themes
+      // https://www.amcharts.com/docs/v5/concepts/themes/
+      root.setThemes([
+        am5themes_Animated.new(root),
+        am5themes_Responsive.new(root),
+        MyTheme.new(root)
+      ]);
+
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      var chart = root.container.children.push(am5xy.XYChart.new(root, {
+        panX: false,
+        panY: false,
+        layout: root.verticalLayout,
+        marginTop: marginTop,
+        marginLeft: marginLeft,
+        marginRight: marginRight,
+        marginBottom: marginBottom,
+        paddingTop: paddingTop,
+        paddingLeft: paddingLeft,
+        paddingRight: paddingRight,
+        paddingBottom: paddingBottom
+      }));
+
+    console.log(foundation_comp);
+
+    var data = [
+      {
+        "category": "St. Foundation",
+        "comp": foundation_comp,
+        "incomp": foundation_tobec
+      },
+    ];
+
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      var yRenderer = am5xy.AxisRendererY.new(root, {});
+      var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root, {
+        categoryField: "category",
+        visible: false, // disable axis label
+        renderer: yRenderer,
+        tooltip: am5.Tooltip.new(root, {})
+      }));
+
+      yRenderer.grid.template.setAll({
+        location: 1
+      });
+
+      yAxis.data.setAll(data);
+
+      var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
+        min: 0,
+        max: 100,
+        strictMinMax: true,
+        numberFormat: xAxisNumberFormat,
+        calculateTotals: true,
+        visible: false, // disable axis label
+        renderer: am5xy.AxisRendererX.new(root, {
+          strokeOpacity: 0.1
+        })
+      }));
+
+      // Add series
+      
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+      function makeSeries(name, fieldName) {
+        var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+          name: name,
+          stacked: true,
+          xAxis: xAxis,
+          yAxis: yAxis,
+          baseAxis: yAxis,
+          valueXField: fieldName,
+          valueXShow: "valueXTotalPercent",
+          categoryYField: "category",
+        }));
+
+        series.columns.template.setAll({
+          tooltipText: "{name}, {categoryX}: {valueY}",
+          width: am5.percent(30),
+          tooltipY: 0
+        });
+
+        var tooltip = am5.Tooltip.new(root, {
+          getFillFromSprite: true,
+          labelText: "[bold][fontSize:16px]{name}: {valueX}"
+        });
+
+        tooltip.get("background").setAll({
+          fillOpacity: 0.8,
+          strokeOpacity: 0,
+          //width: am5.percent(10)
+        });
+
+        series.set("tooltip", tooltip);
+        series.data.setAll(data);
+
+        // Make stuff animate on load
+        // https://www.amcharts.com/docs/v5/concepts/animations/
+        series.appear();
+
+        series.bullets.push(function() {
+          return am5.Bullet.new(root, {
+            sprite: am5.Label.new(root, {
+              text: foundation_comp == 0 ? "" : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+              fill: root.interfaceColors.get("alternativeText"),
+              opacity: fieldName == "incomp" ? 0 : 1,
+              fontSize: seriesBulletLabelFontSize,
+              centerY: am5.p50,
+              centerX: am5.p50,
+              populateText: true
+            })
+          });
+        });
+
+        series.columns.template.events.on("click", function(ev) {
+          const selectedStatus = fieldName == 'incomp' ? 1 : 4;
+            
+            var highlight = null;
+            // Update layerView based on viaduct components being selected
+            view.whenLayerView(structureLayer).then(function (structureLayerView) {
+              structureLayerView.filter = {
+                    where: "Type = 1" + " AND " +  "Status = " + selectedStatus
+                    //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'" 
+                };
+                
+                structureLayerView.queryFeatures().then(function(results) {
+                    const ggg = results.features;
+                    const rowN = ggg.length;
+                    
+                    // Extract and obtain OBJECTID
+                    let objID = [];
+                    for (var i=0; i< rowN; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                    }
+                    
+                    if (highlight) {
+                      highlightSelect.remove();
+                    }
+                    highlight = structureLayerView.highlight(objID);
+
+                    // Reset selection by clicking anywhere on the map
+                    view.on("click", function() {
+                      structureLayerView.filter = null;
+                        highlight.remove();
+                    });
+                });
+            }); // whenLayerView
+          });// End of filterByChart
+
+      }
+
+      makeSeries("Complete", "comp");
+      makeSeries("Incomplete", "incomp");
+
+      chart.appear(1000, 100);
+  }); // end of queryFeatures
+  } // End of Chart
+
+// 2. Structural Column
+var root2 = am5.Root.new("chartStColumnDiv");
+root2._logo.dispose();
+
+var myTheme = am5.Theme.new(root2);
+    myTheme.rule("Grid", ["base"]).setAll({
+        strokeOpacity: 0,
+    });
+
+function chartStColumn() {
+  root2.container.children.clear();
+
+  var total_stColumn_tobec = {
+  onStatisticField: "CASE WHEN (Type = 2 and Status = 1) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_stColumn_tobec",
+  statisticType: "sum"
+  };
+
+  var total_stColumn_comp = {
+  onStatisticField: "CASE WHEN (Type = 2 and Status = 4) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_stColumn_comp",
+  statisticType: "sum"  
+  };
+
+  var query = structureLayer.createQuery();
+  query.outStatistics = [total_stColumn_tobec, total_stColumn_comp];
+  query.returnGeometry = true;
+
+  structureLayer.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    const column_tobec = stats.total_stColumn_tobec;
+    const column_comp = stats.total_stColumn_comp;
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root2.setThemes([
+      am5themes_Animated.new(root2),
+      am5themes_Responsive.new(root2),
+      MyTheme.new(root2)
+    ]);
+
+    // Create chart
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/
+    var chart = root2.container.children.push(am5xy.XYChart.new(root2, {
+      panX: false,
+      panY: false,
+      layout: root2.verticalLayout,
+      marginTop: marginTop,
+      marginLeft: marginLeft,
+      marginRight: marginRight,
+      marginBottom: marginBottom,
+      paddingTop: paddingTop,
+      paddingLeft: paddingLeft,
+      paddingRight: paddingRight,
+      paddingBottom: paddingBottom
+    }));
+
+  console.log(column_comp);
+
+  var data = [
+    {
+      "category": "St. Column",
+      "comp": column_comp,
+      "incomp": column_tobec
+    },
+  ];
+
+    // Create axes
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+    var yRenderer = am5xy.AxisRendererY.new(root2, {});
+    var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root2, {
+      categoryField: "category",
+      visible: false, // disable axis label
+      renderer: yRenderer,
+      tooltip: am5.Tooltip.new(root2, {})
+    }));
+
+    yRenderer.grid.template.setAll({
+      location: 1
+    });
+
+    yAxis.data.setAll(data);
+
+    var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root2, {
+      min: 0,
+      max: 100,
+      strictMinMax: true,
+      numberFormat: xAxisNumberFormat,
+      calculateTotals: true,
+      visible: false, // disable axis label
+      renderer: am5xy.AxisRendererX.new(root2, {
+        strokeOpacity: 0.1
+      })
+    }));
+
+    // Add series
+    
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+    function makeSeries(name, fieldName) {
+      var series = chart.series.push(am5xy.ColumnSeries.new(root2, {
+        name: name,
+        stacked: true,
+        xAxis: xAxis,
+        yAxis: yAxis,
+        baseAxis: yAxis,
+        valueXField: fieldName,
+        valueXShow: "valueXTotalPercent",
+        categoryYField: "category",
+      }));
+
+      series.columns.template.setAll({
+        tooltipText: "{name}, {categoryX}: {valueY}",
+        width: am5.percent(30),
+        tooltipY: 0
+      });
+
+      var tooltip = am5.Tooltip.new(root2, {
+        getFillFromSprite: true,
+        labelText: "[bold][fontSize:16px]{name}: {valueX}"
+      });
+
+      tooltip.get("background").setAll({
+        fillOpacity: 0.8,
+        strokeOpacity: 0,
+        //width: am5.percent(10)
+      });
+
+      series.set("tooltip", tooltip);
+      series.data.setAll(data);
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      series.appear();
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root2, {
+          sprite: am5.Label.new(root2, {
+            text: column_comp == 0 ? "" : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+            fill: root2.interfaceColors.get("alternativeText"),
+            opacity: fieldName == "incomp" ? 0 : 1,
+            fontSize: seriesBulletLabelFontSize,
+            centerY: am5.p50,
+            centerX: am5.p50,
+            populateText: true
+          })
+        });
+      });
+
+      series.columns.template.events.on("click", function(ev) {
+        const selectedStatus = fieldName == 'incomp' ? 1 : 4;
+          
+          var highlight = null;
+          // Update layerView based on viaduct components being selected
+          view.whenLayerView(structureLayer).then(function (structureLayerView) {
+            structureLayerView.filter = {
+                  where: "Type = 2" + " AND " +  "Status = " + selectedStatus
+                  //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'" 
+              };
+              
+              structureLayerView.queryFeatures().then(function(results) {
+                  const ggg = results.features;
+                  const rowN = ggg.length;
+                  
+                  // Extract and obtain OBJECTID
+                  let objID = [];
+                  for (var i=0; i< rowN; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                  }
+                  
+                  if (highlight) {
+                    highlightSelect.remove();
+                  }
+                  highlight = structureLayerView.highlight(objID);
+
+                  // Reset selection by clicking anywhere on the map
+                  view.on("click", function() {
+                    structureLayerView.filter = null;
+                      highlight.remove();
+                  });
+              });
+          }); // whenLayerView
+        });// End of filterByChart
+
+    }
+
+    makeSeries("Complete", "comp");
+    makeSeries("Incomplete", "incomp");
+
+    chart.appear(1000, 100);
+}); // end of queryFeatures
+} // End of Chart
+
+// 3. Structural Framing
+var root3 = am5.Root.new("chartStFramingDiv");
+root3._logo.dispose();
+
+var myTheme = am5.Theme.new(root3);
+    myTheme.rule("Grid", ["base"]).setAll({
+        strokeOpacity: 0,
+    });
+
+function chartStFraming() {
+  root3.container.children.clear();
+
+  var total_stFraming_tobec = {
+  onStatisticField: "CASE WHEN (Type = 3 and Status = 1) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_stFraming_tobec",
+  statisticType: "sum"
+  };
+
+  var total_stFraming_comp = {
+  onStatisticField: "CASE WHEN (Type = 3 and Status = 4) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_stFraming_comp",
+  statisticType: "sum"  
+  };
+
+  var query = structureLayer.createQuery();
+  query.outStatistics = [total_stFraming_tobec, total_stFraming_comp];
+  query.returnGeometry = true;
+
+  structureLayer.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    const framing_tobec = stats.total_stFraming_tobec;
+    const framing_comp = stats.total_stFraming_comp;
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root3.setThemes([
+      am5themes_Animated.new(root3),
+      am5themes_Responsive.new(root3),
+      MyTheme.new(root3)
+    ]);
+
+    // Create chart
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/
+    var chart = root3.container.children.push(am5xy.XYChart.new(root3, {
+      panX: false,
+      panY: false,
+      layout: root3.verticalLayout,
+      marginTop: marginTop,
+      marginLeft: marginLeft,
+      marginRight: marginRight,
+      marginBottom: marginBottom,
+      paddingTop: paddingTop,
+      paddingLeft: paddingLeft,
+      paddingRight: paddingRight,
+      paddingBottom: paddingBottom
+    }));
+
+  console.log(framing_comp);
+
+  var data = [
+    {
+      "category": "St. Framing",
+      "comp": framing_comp,
+      "incomp": framing_tobec
+    },
+  ];
+
+    // Create axes
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+    var yRenderer = am5xy.AxisRendererY.new(root3, {});
+    var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root3, {
+      categoryField: "category",
+      visible: false, // disable axis label
+      renderer: yRenderer,
+      tooltip: am5.Tooltip.new(root3, {})
+    }));
+
+    yRenderer.grid.template.setAll({
+      location: 1
+    });
+
+    yAxis.data.setAll(data);
+
+    var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root3, {
+      min: 0,
+      max: 100,
+      strictMinMax: true,
+      numberFormat: xAxisNumberFormat,
+      calculateTotals: true,
+      visible: false, // disable axis label
+      renderer: am5xy.AxisRendererX.new(root3, {
+        strokeOpacity: 0.1
+      })
+    }));
+
+    // Add series
+    
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+    function makeSeries(name, fieldName) {
+      var series = chart.series.push(am5xy.ColumnSeries.new(root3, {
+        name: name,
+        stacked: true,
+        xAxis: xAxis,
+        yAxis: yAxis,
+        baseAxis: yAxis,
+        valueXField: fieldName,
+        valueXShow: "valueXTotalPercent",
+        categoryYField: "category",
+      }));
+
+      series.columns.template.setAll({
+        tooltipText: "{name}, {categoryX}: {valueY}",
+        width: am5.percent(30),
+        tooltipY: 0
+      });
+
+      var tooltip = am5.Tooltip.new(root3, {
+        getFillFromSprite: true,
+        labelText: "[bold][fontSize:16px]{name}: {valueX}"
+      });
+
+      tooltip.get("background").setAll({
+        fillOpacity: 0.8,
+        strokeOpacity: 0,
+        //width: am5.percent(10)
+      });
+
+      series.set("tooltip", tooltip);
+      series.data.setAll(data);
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      series.appear();
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root3, {
+          sprite: am5.Label.new(root3, {
+            text: framing_comp == 0 ? "" : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+            fill: root3.interfaceColors.get("alternativeText"),
+            opacity: fieldName == "incomp" ? 0 : 1,
+            fontSize: seriesBulletLabelFontSize,
+            centerY: am5.p50,
+            centerX: am5.p50,
+            populateText: true
+          })
+        });
+      });
+
+      series.columns.template.events.on("click", function(ev) {
+        const selectedStatus = fieldName == 'incomp' ? 1 : 4;
+          
+          var highlight = null;
+          // Update layerView based on viaduct components being selected
+          view.whenLayerView(structureLayer).then(function (structureLayerView) {
+            structureLayerView.filter = {
+                  where: "Type = 3" + " AND " +  "Status = " + selectedStatus
+                  //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'" 
+              };
+              
+              structureLayerView.queryFeatures().then(function(results) {
+                  const ggg = results.features;
+                  const rowN = ggg.length;
+                  
+                  // Extract and obtain OBJECTID
+                  let objID = [];
+                  for (var i=0; i< rowN; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                  }
+                  
+                  if (highlight) {
+                    highlightSelect.remove();
+                  }
+                  highlight = structureLayerView.highlight(objID);
+
+                  // Reset selection by clicking anywhere on the map
+                  view.on("click", function() {
+                    structureLayerView.filter = null;
+                      highlight.remove();
+                  });
+              });
+          }); // whenLayerView
+        });// End of filterByChart
+
+    }
+
+    makeSeries("Complete", "comp");
+    makeSeries("Incomplete", "incomp");
+
+    chart.appear(1000, 100);
+}); // end of queryFeatures
+} // End of Chart
+
+// 4. Roofs
+var root4 = am5.Root.new("chartRoofsDiv");
+root4._logo.dispose();
+
+var myTheme = am5.Theme.new(root4);
+    myTheme.rule("Grid", ["base"]).setAll({
+        strokeOpacity: 0,
+    });
+
+function chartRoofs() {
+  root4.container.children.clear();
+
+  var total_roofs_tobec = {
+  onStatisticField: "CASE WHEN (Type = 4 and Status = 1) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_roofs_tobec",
+  statisticType: "sum"
+  };
+
+  var total_roofs_comp = {
+  onStatisticField: "CASE WHEN (Type = 4 and Status = 4) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_roofs_comp",
+  statisticType: "sum"  
+  };
+
+  var query = structureLayer.createQuery();
+  query.outStatistics = [total_roofs_tobec, total_roofs_comp];
+  query.returnGeometry = true;
+
+  structureLayer.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    const roofs_tobec = stats.total_roofs_tobec;
+    const roofs_comp = stats.total_roofs_comp;
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root4.setThemes([
+      am5themes_Animated.new(root4),
+      am5themes_Responsive.new(root4),
+      MyTheme.new(root4)
+    ]);
+
+    // Create chart
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/
+    var chart = root4.container.children.push(am5xy.XYChart.new(root4, {
+      panX: false,
+      panY: false,
+      layout: root4.verticalLayout,
+      marginTop: marginTop,
+      marginLeft: marginLeft,
+      marginRight: marginRight,
+      marginBottom: marginBottom,
+      paddingTop: paddingTop,
+      paddingLeft: paddingLeft,
+      paddingRight: paddingRight,
+      paddingBottom: paddingBottom
+    }));
+
+  console.log(roofs_comp);
+
+  var data = [
+    {
+      "category": "Roofs",
+      "comp": roofs_comp,
+      "incomp": roofs_tobec
+    },
+  ];
+
+    // Create axes
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+    var yRenderer = am5xy.AxisRendererY.new(root4, {});
+    var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root4, {
+      categoryField: "category",
+      visible: false, // disable axis label
+      renderer: yRenderer,
+      tooltip: am5.Tooltip.new(root4, {})
+    }));
+
+    yRenderer.grid.template.setAll({
+      location: 1
+    });
+
+    yAxis.data.setAll(data);
+
+    var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root4, {
+      min: 0,
+      max: 100,
+      strictMinMax: true,
+      numberFormat: xAxisNumberFormat,
+      calculateTotals: true,
+      visible: false, // disable axis label
+      renderer: am5xy.AxisRendererX.new(root4, {
+        strokeOpacity: 0.1
+      })
+    }));
+
+    // Add series
+    
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+    function makeSeries(name, fieldName) {
+      var series = chart.series.push(am5xy.ColumnSeries.new(root4, {
+        name: name,
+        stacked: true,
+        xAxis: xAxis,
+        yAxis: yAxis,
+        baseAxis: yAxis,
+        valueXField: fieldName,
+        valueXShow: "valueXTotalPercent",
+        categoryYField: "category",
+      }));
+
+      series.columns.template.setAll({
+        tooltipText: "{name}, {categoryX}: {valueY}",
+        width: am5.percent(30),
+        tooltipY: 0
+      });
+
+      var tooltip = am5.Tooltip.new(root4, {
+        getFillFromSprite: true,
+        labelText: "[bold][fontSize:16px]{name}: {valueX}"
+      });
+
+      tooltip.get("background").setAll({
+        fillOpacity: 0.8,
+        strokeOpacity: 0,
+        //width: am5.percent(10)
+      });
+
+      series.set("tooltip", tooltip);
+      series.data.setAll(data);
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      series.appear();
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root4, {
+          sprite: am5.Label.new(root4, {
+            text: roofs_comp == 0 ? "" : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+            fill: root4.interfaceColors.get("alternativeText"),
+            opacity: fieldName == "incomp" ? 0 : 1,
+            fontSize: seriesBulletLabelFontSize,
+            centerY: am5.p50,
+            centerX: am5.p50,
+            populateText: true
+          })
+        });
+      });
+
+      series.columns.template.events.on("click", function(ev) {
+        const selectedStatus = fieldName == 'incomp' ? 1 : 4;
+          
+          var highlight = null;
+          // Update layerView based on viaduct components being selected
+          view.whenLayerView(structureLayer).then(function (structureLayerView) {
+            structureLayerView.filter = {
+                  where: "Type = 4" + " AND " +  "Status = " + selectedStatus
+                  //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'" 
+              };
+              
+              structureLayerView.queryFeatures().then(function(results) {
+                  const ggg = results.features;
+                  const rowN = ggg.length;
+                  
+                  // Extract and obtain OBJECTID
+                  let objID = [];
+                  for (var i=0; i< rowN; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                  }
+                  
+                  if (highlight) {
+                    highlightSelect.remove();
+                  }
+                  highlight = structureLayerView.highlight(objID);
+
+                  // Reset selection by clicking anywhere on the map
+                  view.on("click", function() {
+                    structureLayerView.filter = null;
+                      highlight.remove();
+                  });
+              });
+          }); // whenLayerView
+        });// End of filterByChart
+
+    }
+
+    makeSeries("Complete", "comp");
+    makeSeries("Incomplete", "incomp");
+
+    chart.appear(1000, 100);
+}); // end of queryFeatures
+} // End of Chart
+
+// 4. Floors
+var root5 = am5.Root.new("chartFloorsDiv");
+root5._logo.dispose();
+
+var myTheme = am5.Theme.new(root5);
+    myTheme.rule("Grid", ["base"]).setAll({
+        strokeOpacity: 0,
+    });
+
+function chartFloors() {
+  root5.container.children.clear();
+
+  var total_floors_tobec = {
+  onStatisticField: "CASE WHEN (Type = 5 and Status = 1) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_floors_tobec",
+  statisticType: "sum"
+  };
+
+  var total_floors_comp = {
+  onStatisticField: "CASE WHEN (Type = 5 and Status = 4) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_floors_comp",
+  statisticType: "sum"  
+  };
+
+  var query = structureLayer.createQuery();
+  query.outStatistics = [total_floors_tobec, total_floors_comp];
+  query.returnGeometry = true;
+
+  structureLayer.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    const floors_tobec = stats.total_floors_tobec;
+    const floors_comp = stats.total_floors_comp;
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root5.setThemes([
+      am5themes_Animated.new(root5),
+      am5themes_Responsive.new(root5),
+      MyTheme.new(root5)
+    ]);
+
+    // Create chart
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/
+    var chart = root5.container.children.push(am5xy.XYChart.new(root5, {
+      panX: false,
+      panY: false,
+      layout: root5.verticalLayout,
+      marginTop: marginTop,
+      marginLeft: marginLeft,
+      marginRight: marginRight,
+      marginBottom: marginBottom,
+      paddingTop: paddingTop,
+      paddingLeft: paddingLeft,
+      paddingRight: paddingRight,
+      paddingBottom: paddingBottom
+    }));
+
+  console.log(floors_comp);
+
+  var data = [
+    {
+      "category": "Floors",
+      "comp": floors_comp,
+      "incomp": floors_tobec
+    },
+  ];
+
+    // Create axes
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+    var yRenderer = am5xy.AxisRendererY.new(root5, {});
+    var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root5, {
+      categoryField: "category",
+      visible: false, // disable axis label
+      renderer: yRenderer,
+      tooltip: am5.Tooltip.new(root5, {})
+    }));
+
+    yRenderer.grid.template.setAll({
+      location: 1
+    });
+
+    yAxis.data.setAll(data);
+
+    var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root5, {
+      min: 0,
+      max: 100,
+      strictMinMax: true,
+      numberFormat: xAxisNumberFormat,
+      calculateTotals: true,
+      visible: false, // disable axis label
+      renderer: am5xy.AxisRendererX.new(root5, {
+        strokeOpacity: 0.1
+      })
+    }));
+
+    // Add series
+    
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+    function makeSeries(name, fieldName) {
+      var series = chart.series.push(am5xy.ColumnSeries.new(root5, {
+        name: name,
+        stacked: true,
+        xAxis: xAxis,
+        yAxis: yAxis,
+        baseAxis: yAxis,
+        valueXField: fieldName,
+        valueXShow: "valueXTotalPercent",
+        categoryYField: "category",
+      }));
+
+      series.columns.template.setAll({
+        tooltipText: "{name}, {categoryX}: {valueY}",
+        width: am5.percent(30),
+        tooltipY: 0
+      });
+
+      var tooltip = am5.Tooltip.new(root5, {
+        getFillFromSprite: true,
+        labelText: "[bold][fontSize:16px]{name}: {valueX}"
+      });
+
+      tooltip.get("background").setAll({
+        fillOpacity: 0.8,
+        strokeOpacity: 0,
+        //width: am5.percent(10)
+      });
+
+      series.set("tooltip", tooltip);
+      series.data.setAll(data);
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      series.appear();
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root5, {
+          sprite: am5.Label.new(root5, {
+            text: floors_comp == 0 ? "" : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+            fill: root5.interfaceColors.get("alternativeText"),
+            opacity: fieldName == "incomp" ? 0 : 1,
+            fontSize: seriesBulletLabelFontSize,
+            centerY: am5.p50,
+            centerX: am5.p50,
+            populateText: true
+          })
+        });
+      });
+
+      series.columns.template.events.on("click", function(ev) {
+        const selectedStatus = fieldName == 'incomp' ? 1 : 4;
+          
+          var highlight = null;
+          // Update layerView based on viaduct components being selected
+          view.whenLayerView(structureLayer).then(function (structureLayerView) {
+            structureLayerView.filter = {
+                  where: "Type = 5" + " AND " +  "Status = " + selectedStatus
+                  //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'" 
+              };
+              
+              structureLayerView.queryFeatures().then(function(results) {
+                  const ggg = results.features;
+                  const rowN = ggg.length;
+                  
+                  // Extract and obtain OBJECTID
+                  let objID = [];
+                  for (var i=0; i< rowN; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                  }
+                  
+                  if (highlight) {
+                    highlightSelect.remove();
+                  }
+                  highlight = structureLayerView.highlight(objID);
+
+                  // Reset selection by clicking anywhere on the map
+                  view.on("click", function() {
+                    structureLayerView.filter = null;
+                      highlight.remove();
+                  });
+              });
+          }); // whenLayerView
+        });// End of filterByChart
+
+    }
+
+    makeSeries("Complete", "comp");
+    makeSeries("Incomplete", "incomp");
+
+    chart.appear(1000, 100);
+}); // end of queryFeatures
+} // End of Chart
+
+// 5. Walls
+var root6 = am5.Root.new("chartWallsDiv");
+root6._logo.dispose();
+
+var myTheme = am5.Theme.new(root6);
+    myTheme.rule("Grid", ["base"]).setAll({
+        strokeOpacity: 0,
+    });
+
+function chartWalls() {
+  root6.container.children.clear();
+
+  var total_walls_tobec = {
+  onStatisticField: "CASE WHEN (Type = 6 and Status = 1) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_walls_tobec",
+  statisticType: "sum"
+  };
+
+  var total_walls_comp = {
+  onStatisticField: "CASE WHEN (Type = 6 and Status = 4) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_walls_comp",
+  statisticType: "sum"  
+  };
+
+  var query = structureLayer.createQuery();
+  query.outStatistics = [total_walls_tobec, total_walls_comp];
+  query.returnGeometry = true;
+
+  structureLayer.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    const walls_tobec = stats.total_walls_tobec;
+    const walls_comp = stats.total_walls_comp;
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root6.setThemes([
+      am5themes_Animated.new(root6),
+      am5themes_Responsive.new(root6),
+      MyTheme.new(root6)
+    ]);
+
+    // Create chart
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/
+    var chart = root6.container.children.push(am5xy.XYChart.new(root6, {
+      panX: false,
+      panY: false,
+      layout: root6.verticalLayout,
+      marginTop: marginTop,
+      marginLeft: marginLeft,
+      marginRight: marginRight,
+      marginBottom: marginBottom,
+      paddingTop: paddingTop,
+      paddingLeft: paddingLeft,
+      paddingRight: paddingRight,
+      paddingBottom: paddingBottom
+    }));
+
+  console.log(walls_comp);
+
+  var data = [
+    {
+      "category": "Walls",
+      "comp": walls_comp,
+      "incomp": walls_tobec
+    },
+  ];
+
+    // Create axes
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+    var yRenderer = am5xy.AxisRendererY.new(root6, {});
+    var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root6, {
+      categoryField: "category",
+      visible: false, // disable axis label
+      renderer: yRenderer,
+      tooltip: am5.Tooltip.new(root6, {})
+    }));
+
+    yRenderer.grid.template.setAll({
+      location: 1
+    });
+
+    yAxis.data.setAll(data);
+
+    var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root6, {
+      min: 0,
+      max: 100,
+      strictMinMax: true,
+      numberFormat: xAxisNumberFormat,
+      calculateTotals: true,
+      visible: false, // disable axis label
+      renderer: am5xy.AxisRendererX.new(root6, {
+        strokeOpacity: 0.1
+      })
+    }));
+
+    // Add series
+    
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+    function makeSeries(name, fieldName) {
+      var series = chart.series.push(am5xy.ColumnSeries.new(root6, {
+        name: name,
+        stacked: true,
+        xAxis: xAxis,
+        yAxis: yAxis,
+        baseAxis: yAxis,
+        valueXField: fieldName,
+        valueXShow: "valueXTotalPercent",
+        categoryYField: "category",
+      }));
+
+      series.columns.template.setAll({
+        tooltipText: "{name}, {categoryX}: {valueY}",
+        width: am5.percent(30),
+        tooltipY: 0
+      });
+
+      var tooltip = am5.Tooltip.new(root6, {
+        getFillFromSprite: true,
+        labelText: "[bold][fontSize:16px]{name}: {valueX}"
+      });
+
+      tooltip.get("background").setAll({
+        fillOpacity: 0.8,
+        strokeOpacity: 0,
+        //width: am5.percent(10)
+      });
+
+      series.set("tooltip", tooltip);
+      series.data.setAll(data);
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      series.appear();
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root6, {
+          sprite: am5.Label.new(root6, {
+            text: walls_comp == 0 ? "" : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+            fill: root6.interfaceColors.get("alternativeText"),
+            opacity: fieldName == "incomp" ? 0 : 1,
+            fontSize: seriesBulletLabelFontSize,
+            centerY: am5.p50,
+            centerX: am5.p50,
+            populateText: true
+          })
+        });
+      });
+
+      series.columns.template.events.on("click", function(ev) {
+        const selectedStatus = fieldName == 'incomp' ? 1 : 4;
+          
+          var highlight = null;
+          // Update layerView based on viaduct components being selected
+          view.whenLayerView(structureLayer).then(function (structureLayerView) {
+            structureLayerView.filter = {
+                  where: "Type = 6" + " AND " +  "Status = " + selectedStatus
+                  //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'" 
+              };
+              
+              structureLayerView.queryFeatures().then(function(results) {
+                  const ggg = results.features;
+                  const rowN = ggg.length;
+                  
+                  // Extract and obtain OBJECTID
+                  let objID = [];
+                  for (var i=0; i< rowN; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                  }
+                  
+                  if (highlight) {
+                    highlightSelect.remove();
+                  }
+                  highlight = structureLayerView.highlight(objID);
+
+                  // Reset selection by clicking anywhere on the map
+                  view.on("click", function() {
+                    structureLayerView.filter = null;
+                      highlight.remove();
+                  });
+              });
+          }); // whenLayerView
+        });// End of filterByChart
+
+    }
+
+    makeSeries("Complete", "comp");
+    makeSeries("Incomplete", "incomp");
+
+    chart.appear(1000, 100);
+}); // end of queryFeatures
+} // End of Chart
+
+// 6. Columns
+var root7 = am5.Root.new("chartColumnsDiv");
+root7._logo.dispose();
+
+var myTheme = am5.Theme.new(root7);
+    myTheme.rule("Grid", ["base"]).setAll({
+        strokeOpacity: 0,
+    });
+
+function chartColumns() {
+  root7.container.children.clear();
+
+  var total_columns_tobec = {
+  onStatisticField: "CASE WHEN (Type = 7 and Status = 1) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_columns_tobec",
+  statisticType: "sum"
+  };
+
+  var total_columns_comp = {
+  onStatisticField: "CASE WHEN (Type = 7 and Status = 4) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_columns_comp",
+  statisticType: "sum"  
+  };
+
+  var query = structureLayer.createQuery();
+  query.outStatistics = [total_columns_tobec, total_columns_comp];
+  query.returnGeometry = true;
+
+  structureLayer.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    const columns_tobec = stats.total_columns_tobec;
+    const columns_comp = stats.total_columns_comp;
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root7.setThemes([
+      am5themes_Animated.new(root7),
+      am5themes_Responsive.new(root7),
+      MyTheme.new(root7)
+    ]);
+
+    // Create chart
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/
+    var chart = root7.container.children.push(am5xy.XYChart.new(root7, {
+      panX: false,
+      panY: false,
+      layout: root7.verticalLayout,
+      marginTop: marginTop,
+      marginLeft: marginLeft,
+      marginRight: marginRight,
+      marginBottom: marginBottom,
+      paddingTop: paddingTop,
+      paddingLeft: paddingLeft,
+      paddingRight: paddingRight,
+      paddingBottom: paddingBottom
+    }));
+
+  console.log(columns_comp);
+
+  var data = [
+    {
+      "category": "Columns",
+      "comp": columns_comp,
+      "incomp": columns_tobec
+    },
+  ];
+
+    // Create axes
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+    var yRenderer = am5xy.AxisRendererY.new(root7, {});
+    var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root7, {
+      categoryField: "category",
+      visible: false, // disable axis label
+      renderer: yRenderer,
+      tooltip: am5.Tooltip.new(root7, {})
+    }));
+
+    yRenderer.grid.template.setAll({
+      location: 1
+    });
+
+    yAxis.data.setAll(data);
+
+    var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root7, {
+      min: 0,
+      max: 100,
+      strictMinMax: true,
+      numberFormat: xAxisNumberFormat,
+      calculateTotals: true,
+      visible: false, // disable axis label
+      renderer: am5xy.AxisRendererX.new(root7, {
+        strokeOpacity: 0.1
+      })
+    }));
+
+    // Add series
+    
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+    function makeSeries(name, fieldName) {
+      var series = chart.series.push(am5xy.ColumnSeries.new(root7, {
+        name: name,
+        stacked: true,
+        xAxis: xAxis,
+        yAxis: yAxis,
+        baseAxis: yAxis,
+        valueXField: fieldName,
+        valueXShow: "valueXTotalPercent",
+        categoryYField: "category",
+      }));
+
+      series.columns.template.setAll({
+        tooltipText: "{name}, {categoryX}: {valueY}",
+        width: am5.percent(30),
+        tooltipY: 0
+      });
+
+      var tooltip = am5.Tooltip.new(root7, {
+        getFillFromSprite: true,
+        labelText: "[bold][fontSize:16px]{name}: {valueX}"
+      });
+
+      tooltip.get("background").setAll({
+        fillOpacity: 0.8,
+        strokeOpacity: 0,
+        //width: am5.percent(10)
+      });
+
+      series.set("tooltip", tooltip);
+      series.data.setAll(data);
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      series.appear();
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root7, {
+          sprite: am5.Label.new(root7, {
+            text: columns_comp == 0 ? "" : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+            fill: root7.interfaceColors.get("alternativeText"),
+            opacity: fieldName == "incomp" ? 0 : 1,
+            fontSize: seriesBulletLabelFontSize,
+            centerY: am5.p50,
+            centerX: am5.p50,
+            populateText: true
+          })
+        });
+      });
+
+      series.columns.template.events.on("click", function(ev) {
+        const selectedStatus = fieldName == 'incomp' ? 1 : 4;
+          
+          var highlight = null;
+          // Update layerView based on viaduct components being selected
+          view.whenLayerView(structureLayer).then(function (structureLayerView) {
+            structureLayerView.filter = {
+                  where: "Type = 7" + " AND " +  "Status = " + selectedStatus
+                  //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'" 
+              };
+              
+              structureLayerView.queryFeatures().then(function(results) {
+                  const ggg = results.features;
+                  const rowN = ggg.length;
+                  
+                  // Extract and obtain OBJECTID
+                  let objID = [];
+                  for (var i=0; i< rowN; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                  }
+                  
+                  if (highlight) {
+                    highlightSelect.remove();
+                  }
+                  highlight = structureLayerView.highlight(objID);
+
+                  // Reset selection by clicking anywhere on the map
+                  view.on("click", function() {
+                    structureLayerView.filter = null;
+                      highlight.remove();
+                  });
+              });
+          }); // whenLayerView
+        });// End of filterByChart
+
+    }
+
+    makeSeries("Complete", "comp");
+    makeSeries("Incomplete", "incomp");
+
+    chart.appear(1000, 100);
+}); // end of queryFeatures
+} // End of Chart
+
+// 7. Others
+var root8 = am5.Root.new("chartOthersDiv");
+root8._logo.dispose();
+
+var myTheme = am5.Theme.new(root8);
+    myTheme.rule("Grid", ["base"]).setAll({
+        strokeOpacity: 0,
+    });
+
+function chartOthers() {
+  root8.container.children.clear();
+
+  var total_others_tobec = {
+  onStatisticField: "CASE WHEN (Type = 8 and Status = 1) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_others_tobec",
+  statisticType: "sum"
+  };
+
+  var total_others_comp = {
+  onStatisticField: "CASE WHEN (Type = 8 and Status = 4) THEN 1 ELSE 0 END",
+  outStatisticFieldName: "total_others_comp",
+  statisticType: "sum"  
+  };
+
+  var query = structureLayer.createQuery();
+  query.outStatistics = [total_others_tobec, total_others_comp];
+  query.returnGeometry = true;
+
+  structureLayer.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+
+    const others_tobec = stats.total_others_tobec;
+    const others_comp = stats.total_others_comp;
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root8.setThemes([
+      am5themes_Animated.new(root8),
+      am5themes_Responsive.new(root8),
+      MyTheme.new(root8)
+    ]);
+
+    // Create chart
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/
+    var chart = root8.container.children.push(am5xy.XYChart.new(root8, {
+      panX: false,
+      panY: false,
+      layout: root8.verticalLayout,
+      marginTop: marginTop,
+      marginLeft: marginLeft,
+      marginRight: marginRight,
+      marginBottom: marginBottom,
+      paddingTop: paddingTop,
+      paddingLeft: paddingLeft,
+      paddingRight: paddingRight,
+      paddingBottom: paddingBottom
+    }));
+
+  var data = [
+    {
+      "category": "Others",
+      "comp": others_comp,
+      "incomp": others_tobec
+    },
+  ];
+
+    // Create axes
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+    var yRenderer = am5xy.AxisRendererY.new(root8, {});
+    var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root8, {
+      categoryField: "category",
+      visible: false, // disable axis label
+      renderer: yRenderer,
+      tooltip: am5.Tooltip.new(root8, {})
+    }));
+
+    yRenderer.grid.template.setAll({
+      location: 1
+    });
+
+    yAxis.data.setAll(data);
+
+    var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root8, {
+      min: 0,
+      max: 100,
+      strictMinMax: true,
+      numberFormat: xAxisNumberFormat,
+      calculateTotals: true,
+      visible: false, // disable axis label
+      renderer: am5xy.AxisRendererX.new(root8, {
+        strokeOpacity: 0.1
+      })
+    }));
+
+    // Add series
+    
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+    function makeSeries(name, fieldName) {
+      var series = chart.series.push(am5xy.ColumnSeries.new(root8, {
+        name: name,
+        stacked: true,
+        xAxis: xAxis,
+        yAxis: yAxis,
+        baseAxis: yAxis,
+        valueXField: fieldName,
+        valueXShow: "valueXTotalPercent",
+        categoryYField: "category",
+      }));
+
+      series.columns.template.setAll({
+        tooltipText: "{name}, {categoryX}: {valueY}",
+        width: am5.percent(30),
+        tooltipY: 0
+      });
+
+      var tooltip = am5.Tooltip.new(root8, {
+        getFillFromSprite: true,
+        labelText: "[bold][fontSize:16px]{name}: {valueX}"
+      });
+
+      tooltip.get("background").setAll({
+        fillOpacity: 0.8,
+        strokeOpacity: 0,
+        //width: am5.percent(10)
+      });
+
+      series.set("tooltip", tooltip);
+      series.data.setAll(data);
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      series.appear();
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root8, {
+          sprite: am5.Label.new(root8, {
+            text: others_comp == 0 ? "" : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+            fill: root8.interfaceColors.get("alternativeText"),
+            opacity: fieldName == "incomp" ? 0 : 1,
+            fontSize: seriesBulletLabelFontSize,
+            centerY: am5.p50,
+            centerX: am5.p50,
+            populateText: true
+          })
+        });
+      });
+
+      series.columns.template.events.on("click", function(ev) {
+        const selectedStatus = fieldName == 'incomp' ? 1 : 4;
+          
+          var highlight = null;
+          // Update layerView based on viaduct components being selected
+          view.whenLayerView(structureLayer).then(function (structureLayerView) {
+            structureLayerView.filter = {
+                  where: "Type = 8" + " AND " +  "Status = " + selectedStatus
+                  //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'" 
+              };
+              
+              structureLayerView.queryFeatures().then(function(results) {
+                  const ggg = results.features;
+                  const rowN = ggg.length;
+                  
+                  // Extract and obtain OBJECTID
+                  let objID = [];
+                  for (var i=0; i< rowN; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                  }
+                  
+                  if (highlight) {
+                    highlightSelect.remove();
+                  }
+                  highlight = structureLayerView.highlight(objID);
+
+                  // Reset selection by clicking anywhere on the map
+                  view.on("click", function() {
+                    structureLayerView.filter = null;
+                      highlight.remove();
+                  });
+              });
+          }); // whenLayerView
+        });// End of filterByChart
+
+    }
+
+    makeSeries("Complete", "comp");
+    makeSeries("Incomplete", "incomp");
+
+    chart.appear(1000, 100);
+}); // end of queryFeatures
+} // End of Chart
+
+
+const selectedBuildingDiv = document.getElementById("selectedBuildingDiv");
+
+// Default selection = 'None'
+structureLayer.definitionExpression = "Name = 'LRS'";
+perBuildingProgress();
+chartStFoundation();
+chartStColumn();
+chartStFraming();
+chartRoofs();
+chartFloors();
+chartWalls();
+chartColumns();
+chartOthers();
+zoomToLayer(structureLayer);
+selectedBuildingDiv.innerHTML = "LRS";
+
+
+// click the label and display selected bulidng
+view.when(function() {
+    view.on("click", function(event) {
+        view.hitTest(event).then(function(response) {
+            const feature = response.results[0].graphic.attributes.Name;
+            structureLayer.definitionExpression = "Name = '" + feature + "'";
+            selectedBuildingDiv.innerHTML = feature;
+
+            zoomToLayer(structureLayer);
+            perBuildingProgress();
+            chartStFoundation();
+            chartStColumn();
+            chartStFraming();
+            chartRoofs();
+            chartFloors();
+            chartWalls();
+            chartColumns();
+            chartOthers();
+        })
+    })
+});
+
+  // Chart
+  const marginTop = 0;
+  const marginLeft = 0;
+  const marginRight = 0;
+  const marginBottom = 0;
+  const paddingTop = 0;
+  const paddingLeft = 5;
+  const paddingRight = 5;
+  const paddingBottom = 15;
+
+  const xAxisNumberFormat = "#'%'";
+  const seriesBulletLabelFontSize = "0.5em";
+
+  // series line fill pattern
+  const linePatternColorComplete = "#70AD47";
+  const linePatternColorOpacityComplete = 0;
+  const linePatternFillOpacityComplete = 0;
+
+  const linePatternColorOpacityIncomplet = 0;
+  const linePatternFillOpacityIncomplet = 1;
+  const linePatternStrokeOpacityIncomplet = 0;
+
+  class MyTheme extends am5.Theme {
+      setupDefaultRules() {
+        var theme = this;
+
+        this.patterns = [
+          am5.LinePattern.new(this._root, {
+            color: am5.color(linePatternColorComplete),
+            colorOpacity: linePatternColorOpacityComplete,
+            fillOpacity: linePatternFillOpacityComplete,
+          }),
+
+          am5.LinePattern.new(this._root, {
+            colorOpacity: linePatternColorOpacityIncomplet,
+            fillOpacity: linePatternFillOpacityIncomplet,
+            strokeOpacity: linePatternStrokeOpacityIncomplet,
+          }),
+        ];
+
+        this.currentPattern = 0;
+        this.rule("RoundedRectangle").setAll({
+          fillOpacity: 1
+        });
+
+        this.rule("RoundedRectangle").setup = function(target) {
+          target.set("fillPattern", theme.patterns[theme.currentPattern]);
+          theme.currentPattern++;
+          if (theme.currentPattern == theme.patterns.length) {
+            theme.currentPattern = 0;
+          }
+        };
+      }
+    }
+
+
+
+}); // End of am4Core.ready()
+
+
+///////////////////////////////////////////////
+// LayerList and Add legend to the LayerList
+  // On-off feature layer tab
+  var layerList = new LayerList({
+      view: view,
+      listItemCreatedFunction: function(event) {
+        const item = event.item;
+        if (item.title === "Chainage"){
+          item.visible = false
+        }
+      }
+    });
+/*
+    view.ui.add(layerList, {
+      position: "bottom-left"
+    });
+*/
+
+// Search
+var searchWidget = new Search({
+view: view,
+locationEnabled: false,
+includeDefaultSources: false,
+sources: [
+{
+layer: buildingLocation,
+searchFields: ["Name", "LAYER"],
+displayField: "Name",
+exactMatch: false,
+outFields: ["Name"],
+name: "Building Name",
+placeholder: "Building Name"
+}
+]
+});
+view.ui.add(searchWidget, "top-right");
+//
+
+// Legend
+var legend = new Legend({
+view: view,
+container: document.getElementById("legendDiv"),
+layerInfos: [
+{
+layer: rowLayer,
+title: "PROW"
+},
+{
+layer: chainageLayer,
+title: "chainage"
+}
+]
+});
+
+var legendExpand = new Expand({
+view: view,
+content: legend,
+expandIconClass: "esri-icon-legend",
+group: "top-right"
+});
+view.ui.add(legendExpand, {
+position: "top-right"
+});
+
+
+// Layer List
+var layerListExpand = new Expand ({
+      view: view,
+      content: layerList,
+      expandIconClass: "esri-icon-visible",
+      group: "top-right"
+  });
+  view.ui.add(layerListExpand, {
+      position: "top-right"
+  });
+
+  view.ui.empty("top-left");
+
+  // Compass
+  var compass = new Compass({
+    view: view});
+    // adds the compass to the top left corner of the MapView
+  view.ui.add(compass, "top-right");
+
+  // See-through-Ground        
+    view.when(function() {
+    // allow navigation above and below the ground
+    map.ground.navigationConstraint = {
+      type: "none"
+    };
+    // the webscene has no basemap, so set a surfaceColor on the ground
+    map.ground.surfaceColor = "#fff";
+    // to see through the ground, set the ground opacity to 0.4
+    map.ground.opacity = 0.5;
+  });
+    
+  // Full screen logo
+  view.ui.add(
+      new Fullscreen({
+          view: view,
+          element: viewDiv
+      }),
+      "top-right"
+  );
+
+  // Basemap Gallery
+  let basemapGallery = new BasemapGallery({
+    view: view
+  });
+
+  const basemapGalleryExpand = new Expand({
+    view,
+    content: basemapGallery,
+    expandIconClass: "esri-icon-basemap",
+    group: "top-right"
+  });
+  // Add widget to the top right corner of the view
+  view.ui.add(basemapGalleryExpand, {
+    position: "top-right"
+  });
+
+  // Instruction widget
+  const instructionsExpand = new Expand({
+    expandIconClass: "esri-icon-question",
+    expandTooltip: "How to use this web app",
+    view: view,
+    expanded: true,
+    content: `
+    <div class="esri-widget" style='width:200px; padding:10px;'>
+    <b>Click</b> the callout depot names to zoom and update the progress chart.</div>
+    `
+  });
+  view.ui.add(instructionsExpand, "top-right");
+
+  // Close the 'help' popup when view is focused
+      view.watch("focused", (isFocused) => {
+        if (isFocused) {
+          instructionsExpand.expanded = false;
+        }
+      });
+  
+  // See through Gound
+  document
+    .getElementById("opacityInput")
+    .addEventListener("change", function(event) {
+      map.ground.opacity = event.target.checked ? 0.1 : 0.6;
+    });
+
+  view.ui.add("menu", "top-right");
+
+
+
+});
+  </script>
+</html>

@@ -1,0 +1,2983 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
+  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
+  -->
+    <title>N2 Environment Monitoring</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.27/esri/themes/dark/main.css"
+    />
+    <script
+      type="module"
+      src="https://js.arcgis.com/calcite-components/1.4.2/calcite.esm.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://js.arcgis.com/calcite-components/1.4.2/calcite.css"
+    />
+
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Micro.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
+    <!-- Resources -->
+    <script src="https://js.arcgis.com/4.27/"></script>
+  </head>
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 99%;
+      width: 100%;
+    }
+
+    #headerTitleDiv {
+      font-size: 2vw;
+      vertical-align: middle;
+      padding-top: 3px;
+      z-index: 99;
+      position: absolute;
+      left: 17;
+      top: 18;
+      color: white;
+    }
+
+    #item-description {
+      padding: 0.5rem;
+    }
+
+    #item-description b {
+      color: orange;
+    }
+
+    calcite-action {
+      position: fixed;
+      z-index: 1;
+      top: 230;
+      right: 15;
+    }
+
+    calcite-panel {
+      position: fixed;
+      z-index: 1;
+      top: 20%;
+      right: 20%;
+      width: 30%;
+      height: 40%;
+    }
+
+    .dateDiv {
+      color: rgb(0, 197, 255);
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+        sans-serif;
+      text-align: left;
+      font-weight: normal;
+      font-size: 1.1vw;
+      padding-top: 2%;
+      margin: 0;
+      z-index: 99;
+      top: 55;
+      left: 30;
+      position: absolute;
+    }
+
+    .img {
+      float: left;
+      padding-left: 7;
+      padding-top: 1%;
+    }
+
+    img {
+      width: 35;
+      height: 35;
+    }
+
+    .labelSurfaceWater,
+    .labelGroundWater,
+    .labelSoilWater,
+    .labelAirQuality,
+    .labelVibration,
+    .labelNoise {
+      color: white;
+      font-size: 1.1vw;
+      width: 8vw;
+      margin: 0;
+      padding-top: 7;
+      float: right;
+      padding-left: 3;
+    }
+
+    #labelTotalDiv {
+      color: red;
+      font-size: 1.1vw;
+      font-weight: bold;
+      width: 100%;
+      height: 3.5vh;
+      padding-top: 6;
+      text-align: center;
+    }
+
+    #boxSurfaceWater {
+      position: absolute;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 2.2%;
+      left: 0.5%;
+      color: white;
+      font-size: 2vw;
+      text-align: center;
+      --ratio: calc(4 / 2);
+      /* put the aspect ratio width to height you want */
+      --h: min(calc(12vw / var(--ratio)), 13vh);
+      height: var(--h);
+      width: calc(var(--h) * var(--ratio));
+    }
+
+    #boxGroundWater {
+      position: absolute;
+      z-index: 99;
+      width: 12%;
+      height: 13vh;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 2.2%;
+      left: 13%;
+      color: white;
+      font-size: 2vw;
+      text-align: center;
+      --ratio: calc(4 / 2);
+      /* put the aspect ratio width to height you want */
+      --h: min(calc(12vw / var(--ratio)), 13vh);
+      height: var(--h);
+      width: calc(var(--h) * var(--ratio));
+    }
+
+    #boxSoilWater {
+      position: absolute;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 2.2%;
+      left: 25.5%;
+      color: white;
+      font-size: 2vw;
+      text-align: center;
+      --ratio: calc(4 / 2);
+      /* put the aspect ratio width to height you want */
+      --h: min(calc(12vw / var(--ratio)), 13vh);
+      height: var(--h);
+      width: calc(var(--h) * var(--ratio));
+    }
+
+    #boxAirQuality {
+      position: absolute;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 2.2%;
+      left: 38%;
+      color: white;
+      font-size: 2vw;
+      text-align: center;
+      --ratio: calc(4 / 2);
+      /* put the aspect ratio width to height you want */
+      --h: min(calc(12vw / var(--ratio)), 13vh);
+      height: var(--h);
+      width: calc(var(--h) * var(--ratio));
+    }
+
+    #boxVibration {
+      position: absolute;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 2.2%;
+      left: 50.5%;
+      color: white;
+      font-size: 2vw;
+      text-align: center;
+      --ratio: calc(4 / 2);
+      /* put the aspect ratio width to height you want */
+      --h: min(calc(12vw / var(--ratio)), 13vh);
+      height: var(--h);
+      width: calc(var(--h) * var(--ratio));
+    }
+
+    #boxNoise {
+      position: absolute;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 2.2%;
+      left: 63%;
+      color: white;
+      font-size: 2vw;
+      text-align: center;
+      --ratio: calc(4 / 2);
+      /* put the aspect ratio width to height you want */
+      --h: min(calc(12vw / var(--ratio)), 13vh);
+      height: var(--h);
+      width: calc(var(--h) * var(--ratio));
+    }
+
+    #boxTotal {
+      position: absolute;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 2.2%;
+      left: 75.5%;
+      color: white;
+      font-size: 2vw;
+      text-align: center;
+      --ratio: calc(4 / 2);
+      /* put the aspect ratio width to height you want */
+      --h: min(calc(12vw / var(--ratio)), 13vh);
+      height: var(--h);
+      width: calc(var(--h) * var(--ratio));
+    }
+
+    #chartSurfaceWaterDiv,
+    #chartGroundWaterDiv,
+    #chartSoilWaterDiv,
+    #chartAirQualityDiv,
+    #chartVibrationDiv,
+    #chartNoiseDiv {
+      position: absolute;
+      width: 100%;
+      height: 75%;
+      padding: 0;
+      margin-top: 0;
+      z-index: 99;
+      left: 0;
+      background-color: rgb(0, 0, 0, 0);
+    }
+
+    #totalProgressDiv {
+      color: red;
+      font-size: 2.5vw;
+      width: 100%;
+      background-color: rgb(0, 0, 0, 0);
+      text-align: center;
+    }
+
+    p {
+      font-size: 0.8vw;
+      width: auto;
+      vertical-align: text-bottom;
+      padding: 0;
+      margin-top: 0;
+    }
+
+    b {
+      color: orange;
+      font-size: "1vw";
+    }
+
+    h2 {
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+        sans-serif;
+      font-style: normal;
+      color: white;
+      padding: 3px;
+      margin: 0px;
+      width: 480px;
+      vertical-align: text-top;
+      font-size: 1.8vw;
+    }
+
+    h4 {
+      color: rgb(0, 197, 255);
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+        sans-serif;
+      text-align: left;
+      font-weight: normal;
+      font-size: 1vw;
+      padding-top: 20px;
+      margin: 0;
+      width: 200px;
+      vertical-align: text-bottom;
+    }
+
+    h5 {
+      color: rgb(0, 197, 255);
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+        sans-serif;
+      text-align: left;
+      font-weight: normal;
+      font-size: 14px;
+      padding: 0;
+      margin: 0;
+    }
+
+    .esri-layer-list__item-toggle-icon,
+    .esri-layer-list__item-title {
+      color: white;
+    }
+
+    .sassy-theme .esri-popup__header-title {
+      width: 17vw;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .sassy-theme .esri-menu,
+    .sassy-theme .esri-button,
+    .sassy-theme .esri-input,
+    .sassy-theme .esri-legend,
+    .sassy-theme .esri-layer-list,
+    .sassy-theme .esri-widget a {
+      background-color: rgb(0, 0, 0, 0.7);
+      color: #fff;
+    }
+
+    .sassy-theme .esri-popup__main-container,
+    .sassy-theme .esri-popup .esri-popup__pointer-direction,
+    .sassy-theme .esri-popup .esri-popup__button {
+      background-color: rgb(0, 0, 0, 0.7);
+      color: #fff;
+    }
+
+    .sassy-theme .esri-legend__layer-caption {
+      display: none;
+    }
+
+    /* Browser Setting */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+  <body class="sassy-theme">
+    <calcite-loader></calcite-loader>
+    <calcite-shell content-behind>
+      <div id="viewDiv">
+        <div class="dateDiv">As of July 24, 2023</div>
+        <div id="headerTitleDiv">N2 ENVIRONMENT MONITORING</div>
+        <div id="boxSurfaceWater">
+          <div class="img">
+            <img
+              id="surfacewaterLogo"
+              src="https://EijiGorilla.github.io/Symbols/Water_drop.png"
+            />
+            <label class="labelSurfaceWater">Surface Water</label>
+            <div id="chartPanel">
+              <div id="chartSurfaceWaterDiv"></div>
+            </div>
+          </div>
+        </div>
+        <div id="boxGroundWater">
+          <div class="img">
+            <img
+              id="groundwaterLogo"
+              src="https://EijiGorilla.github.io/Symbols/Groundwater_Logo.png"
+            />
+            <label class="labelGroundWater">Ground Water</label>
+            <div id="chartPanel">
+              <div id="chartGroundWaterDiv"></div>
+            </div>
+          </div>
+        </div>
+        <div id="boxSoilWater">
+          <div class="img">
+            <img
+              id="soilwaterLogo"
+              src="https://EijiGorilla.github.io/Symbols/Soil_Water_Logo.png"
+            />
+            <label class="labelSoilWater">Soil Water</label>
+            <div id="chartPanel">
+              <div id="chartSoilWaterDiv"></div>
+            </div>
+          </div>
+        </div>
+        <div id="boxAirQuality">
+          <div class="img">
+            <img
+              id="airqualityLogo"
+              src="https://EijiGorilla.github.io/Symbols/Air_Quality_Logo.png"
+            />
+            <label class="labelAirQuality">Air Quality</label>
+            <div id="chartPanel">
+              <div id="chartAirQualityDiv"></div>
+            </div>
+          </div>
+        </div>
+        <div id="boxVibration">
+          <div class="img">
+            <img
+              id="vibrationLogo"
+              src="https://EijiGorilla.github.io/Symbols/Vibration_Logo.png"
+            />
+            <label class="labelVibration">Vibration</label>
+            <div id="chartPanel">
+              <div id="chartVibrationDiv"></div>
+            </div>
+          </div>
+        </div>
+        <div id="boxNoise">
+          <div class="img">
+            <img
+              id="noiseLogo"
+              src="https://EijiGorilla.github.io/Symbols/Noise_Logo.png"
+            />
+            <label class="labelNoise">Noise</label>
+            <div id="chartPanel">
+              <div id="chartNoiseDiv"></div>
+            </div>
+          </div>
+        </div>
+        <div id="boxTotal">
+          <div id="labelTotalDiv">TOTAL EXCEEDING</div>
+          <div id="totalProgressDiv"></div>
+        </div>
+      </div>
+    </calcite-shell>
+  </body>
+  <script>
+    require([
+      "esri/Basemap",
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/views/SceneView",
+      "esri/layers/FeatureLayer",
+      "esri/layers/support/FeatureFilter",
+      "esri/layers/SceneLayer",
+      "esri/layers/Layer",
+      "esri/layers/TileLayer",
+      "esri/layers/VectorTileLayer",
+      "esri/layers/support/LabelClass",
+      "esri/symbols/LabelSymbol3D",
+      "esri/WebMap",
+      "esri/WebScene",
+      "esri/portal/PortalItem",
+      "esri/portal/Portal",
+      "esri/widgets/Legend",
+      "esri/widgets/LayerList",
+      "esri/widgets/Fullscreen",
+      "esri/rest/geometryService",
+      "esri/rest/support/Query",
+      "esri/rest/support/StatisticDefinition",
+      "esri/symbols/WebStyleSymbol",
+      "esri/widgets/Expand",
+      "esri/widgets/Editor",
+      "esri/renderers/UniqueValueRenderer",
+      "esri/layers/support/Sublayer",
+      "esri/widgets/Search",
+      "esri/widgets/Compass",
+    ], function (
+      Basemap,
+      Map,
+      MapView,
+      SceneView,
+      FeatureLayer,
+      FeatureFilter,
+      SceneLayer,
+      Layer,
+      TileLayer,
+      VectorTileLayer,
+      LabelClass,
+      LabelSymbol3D,
+      WebMap,
+      WebScene,
+      PortalItem,
+      Portal,
+      Legend,
+      LayerList,
+      Fullscreen,
+      geometryService,
+      Query,
+      StatisticDefinition,
+      WebStyleSymbol,
+      Expand,
+      Editor,
+      UniqueValueRenderer,
+      Sublayer,
+      Search,
+      Compass
+    ) {
+      let chartLayerView;
+      const features = [];
+
+      //******************************//
+      // Basemap and Scenview Setting //
+      //******************************//
+      var basemap = new Basemap({
+        baseLayers: [
+          new VectorTileLayer({
+            portalItem: {
+              id: "8a9ef2a144e8423786f6139408ac3424", // 3a62040541b84f528da3ac7b80cf4a63
+            },
+          }),
+        ],
+      });
+
+      var map = new Map({
+        basemap: basemap, // "streets-night-vector",
+        ground: "world-elevation",
+      });
+      //map.ground.surfaceColor = "#FFFF";
+      //map.ground.opacity = 0.5;
+
+      var view = new SceneView({
+        map: map,
+        container: "viewDiv",
+        viewingMode: "local",
+        camera: {
+          position: {
+            x: 120.5793,
+            y: 15.18,
+            z: 500,
+          },
+          tilt: 65,
+        },
+        environment: {
+          background: {
+            type: "color", // autocasts as new ColorBackground()
+            color: [0, 0, 0, 1],
+          },
+          // disable stars
+          starsEnabled: false,
+          //disable atmosphere
+          atmosphereEnabled: false,
+        },
+      });
+
+      view.ui.components = [];
+
+      // OpenStreetMap 3D Buildings
+      let osmSymbol = {
+        type: "mesh-3d",
+        symbolLayers: [
+          {
+            type: "fill",
+            material: {
+              color: [74, 80, 87, 0.5],
+              colorMixMode: "replace",
+            },
+            edges: {
+              type: "solid", // autocasts as new SolidEdges3D()
+              color: [225, 225, 225, 0.3],
+            },
+          },
+        ],
+      };
+
+      var osm3D = new SceneLayer({
+        portalItem: {
+          id: "ca0470dbbddb4db28bad74ed39949e25",
+        },
+        title: "OpenStreetMap 3D Buildings",
+      });
+      map.add(osm3D);
+      osm3D.renderer = {
+        type: "simple",
+        symbol: osmSymbol,
+      };
+
+      function shiftCamera(deg) {
+        var camera = view.camera.clone();
+        camera.position.longitude += deg;
+        return camera;
+      }
+
+      function catchAbortError(error) {
+        if (error.name != "AbortError") {
+          console.error(error);
+        }
+      }
+      // Setup UI
+      var headerTitleDiv = document.getElementById("headerTitleDiv");
+
+      //*******************************//
+      // Label Class Property Settings //
+      //*******************************//
+      // Chainage Label
+      var labelChainage = new LabelClass({
+        labelExpressionInfo: { expression: "$feature.KmSpot" },
+        symbol: {
+          type: "text",
+          color: [85, 255, 0],
+          size: 25,
+        },
+      });
+
+      // Station Label
+      var labelClass = new LabelClass({
+        symbol: {
+          type: "label-3d", // autocasts as new LabelSymbol3D()
+          symbolLayers: [
+            {
+              type: "text", // autocasts as new TextSymbol3DLayer()
+              material: {
+                color: [0, 197, 255],
+              },
+              size: 10,
+              color: "black",
+              haloColor: "black",
+              haloSize: 1,
+              font: {
+                family: "Ubuntu Mono",
+                //weight: "bold"
+              },
+            },
+          ],
+          verticalOffset: {
+            screenLength: 40,
+            maxWorldLength: 100,
+            minWorldLength: 20,
+          },
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          expression: 'DefaultValue($feature.Station, "no data")',
+          //value: "{TEXTSTRING}"
+        },
+      });
+
+      // Utility Point Label
+      var labelMonitor = {
+        type: "label-3d", // autocasts as new LabelSymbol3D()
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          value: "{Type}",
+        },
+        symbolLayers: [
+          {
+            type: "text", // autocasts as new TextSymbol3DLayer()
+            material: {
+              color: "black",
+            },
+            halo: {
+              color: [255, 255, 255, 0.7],
+              size: 2,
+            },
+            size: 10,
+          },
+        ],
+      };
+
+      //*****************************//
+      // 3D Web Symbo Style Settings //
+      //*****************************//
+      /* Company and Utilty Relocation Status Symbols with Callout */
+      var verticalOffsetExisting = {
+        screenLength: 10,
+        maxWorldLength: 10,
+        minWorldLength: 15,
+      };
+
+      var verticalOffsetRelocation = {
+        screenLength: 100,
+        maxWorldLength: 500,
+        minWorldLength: 10,
+      };
+
+      // Function that automatically creates the symbol for the points of interest
+      function getUniqueValueSymbol(name, color, sizeS, util) {
+        // The point symbol is visualized with an icon symbol. To clearly see the location of the point
+        // we displace the icon vertically and add a callout line. The line connects the offseted symbol with the location
+        // of the point feature.
+        if (util == "Existing") {
+          return {
+            type: "point-3d", // autocasts as new PointSymbol3D()
+            symbolLayers: [
+              {
+                type: "icon", // autocasts as new IconSymbol3DLayer()
+                resource: {
+                  href: name,
+                },
+                size: sizeS,
+                outline: {
+                  color: "white",
+                  size: 2,
+                },
+              },
+            ],
+
+            verticalOffset: verticalOffsetExisting,
+            callout: {
+              type: "line", // autocasts as new LineCallout3D()
+              color: "grey",
+              size: 0.4,
+              border: {
+                color: "grey",
+              },
+            },
+          };
+        } else {
+          return {
+            type: "point-3d", // autocasts as new PointSymbol3D()
+            symbolLayers: [
+              {
+                type: "icon", // autocasts as new IconSymbol3DLayer()
+                resource: {
+                  href: name,
+                },
+                size: sizeS,
+                outline: {
+                  color: "white",
+                  size: 2,
+                },
+              },
+            ],
+            verticalOffset: verticalOffsetRelocation,
+
+            callout: {
+              type: "line", // autocasts as new LineCallout3D()
+              color: "white",
+              size: 1,
+              border: {
+                color: "grey",
+              },
+            },
+          };
+        }
+      }
+
+      //*****************************//
+      //      Renderer Settings      //
+      //*****************************//
+      // Esri Icon Symbol
+      function IconSymbol(name) {
+        return {
+          type: "web-style", // autocasts as new WebStyleSymbol()
+          name: name,
+          styleName: "EsriIconsStyle", //EsriRealisticTransportationStyle, EsriIconsStyle
+        };
+      }
+
+      // Chainage symbol
+      var chainageRenderer = {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          size: 5,
+          color: [255, 255, 255, 0.9],
+          outline: {
+            width: 0.2,
+            color: "black",
+          },
+        },
+      };
+
+      // Station
+      var stationsRenderer = {
+        type: "unique-value", // autocasts as new UniqueValueRenderer()
+        field: "Name",
+        defaultSymbol: IconSymbol("Train"), //Backhoe, Train
+      };
+
+      /// Symbol for monitoring points color on the ground
+      var monitorSymbolRenderer = {
+        type: "unique-value", // autocasts as new UniqueValueRenderer()
+        valueExpression:
+          "When($feature.Type == 1, 'Noise', $feature.Status == 2, 'Vibration', $feature.Status == 3, 'Air Quality', \
+                            $feature.Type == 4, 'Soil Water', $feature.Type == 5, 'Groundwater', \
+                            $feature.Type==6, 'Surface Water', $feature.Type)",
+        //field: "Company",
+        uniqueValueInfos: [
+          {
+            value: "Noise",
+            symbol: {
+              type: "simple-marker",
+              color: "blue",
+              size: 4,
+              outline: {
+                width: 0.2,
+                color: "black",
+              },
+            },
+          },
+          {
+            value: "Vibration",
+            symbol: {
+              type: "simple-marker",
+              color: "gray",
+              size: 4,
+              outline: {
+                width: 0.2,
+                color: "black",
+              },
+            },
+          },
+          {
+            value: "Air Quality",
+            symbol: {
+              type: "simple-marker",
+              color: "gray",
+              size: 4,
+              outline: {
+                width: 0.2,
+                color: "black",
+              },
+            },
+          },
+          {
+            value: "Soil Water",
+            symbol: {
+              type: "simple-marker",
+              color: "brown",
+              size: 4,
+              outline: {
+                width: 0.2,
+                color: "black",
+              },
+            },
+          },
+          {
+            value: "Groundwater",
+            symbol: {
+              type: "simple-marker",
+              color: "purple",
+              size: 4,
+              outline: {
+                width: 0.2,
+                color: "black",
+              },
+            },
+          },
+          {
+            value: "Surface Water",
+            symbol: {
+              type: "simple-marker",
+              color: "orange",
+              size: 4,
+              outline: {
+                width: 0.2,
+                color: "black",
+              },
+            },
+          },
+        ],
+      };
+
+      /// Symbol for monitoring point symbols above ground
+      var monitorStatusSymbolRenderer = {
+        type: "unique-value", // autocasts as new UniqueValueRenderer()
+        valueExpression:
+          "When($feature.Status == 1, 'No Data', $feature.Status == 2, 'Normal', $feature.Status == 3, 'Exceeds', $feature.Status)",
+        //field: "Company",
+        uniqueValueInfos: [
+          {
+            value: "No Data",
+            label: "No Data",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/No_Data_textLogo.png",
+              "#D13470",
+              80,
+              "Relocation" // this does not matter
+            ),
+          },
+          {
+            value: "Normal",
+            label: "Normal",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png",
+              "#D13470",
+              20,
+              "Relocation" // this does not matter
+            ),
+          },
+          {
+            value: "Exceeds",
+            label: "Exceeded",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/3D_Web_Style/Warning_Symbol.svg",
+              "#D13470",
+              35,
+              "Relocation"
+            ),
+          },
+        ],
+      };
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////
+
+      //*****************************//
+      //      Layer Import           //
+      //*****************************//
+
+      // Centerline and chainage
+      var chainageLayer = new FeatureLayer({
+        portalItem: {
+          id: "590680d19f2e48fdbd8bcddce3aaedb5",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 5,
+        title: "Chainage",
+        elevationInfo: {
+          mode: "relative-to-ground",
+        },
+        labelingInfo: [labelChainage],
+        renderer: chainageRenderer,
+        outFields: ["*"],
+        popupEnabled: false,
+      });
+      //chainageLayer.listMode = "hide";
+      map.add(chainageLayer, 1);
+
+      // ROW //
+      var rowLayer = new FeatureLayer({
+        portalItem: {
+          id: "590680d19f2e48fdbd8bcddce3aaedb5",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 1,
+        title: "ROW",
+        definitionExpression: "Extension = 'N2'",
+        popupEnabled: false,
+      });
+      map.add(rowLayer, 2);
+
+      // Station
+      var stationLayer = new SceneLayer({
+        portalItem: {
+          id: "207cb34b8a324b40985b5805862c4b29",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        labelingInfo: [labelClass],
+        renderer: stationsRenderer,
+        elevationInfo: {
+          // this elevation mode will place points on top of
+          // buildings or other SceneLayer 3D objects
+          mode: "relative-to-ground",
+        },
+        // definitionExpression: "Extension = 'N2'"
+        //screenSizePerspectiveEnabled: false, // gives constant size regardless of zoom
+      });
+      stationLayer.listMode = "hide";
+      map.add(stationLayer, 0);
+
+      var monitorPt = new FeatureLayer({
+        portalItem: {
+          id: "3fc4f2f99adb4ef3b7f5c82f422731cd",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        title: "Environment Monitoring Points",
+        elevationInfo: {
+          mode: "relative-to-scene",
+          unit: "meters",
+          //offset: 0
+        },
+        outFields: ["*"],
+        renderer: monitorSymbolRenderer,
+        popupEnabled: false,
+      });
+      monitorPt.listMode = "hide";
+      map.add(monitorPt);
+
+      var monitorPt1 = new FeatureLayer({
+        portalItem: {
+          id: "3fc4f2f99adb4ef3b7f5c82f422731cd",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        title: "Environment Monitoring Points",
+        elevationInfo: {
+          mode: "relative-to-scene",
+          unit: "meters",
+          //offset: 0
+        },
+        outFields: ["*"],
+        renderer: monitorStatusSymbolRenderer,
+        labelingInfo: [labelMonitor],
+        popupTemplate: {
+          title: "<h5>{Type}</h5>",
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "StationNo",
+                  label: "Station No.",
+                },
+                {
+                  fieldName: "Location",
+                },
+                {
+                  fieldName: "Status",
+                  label: "<h5>Status</h5>",
+                },
+                {
+                  fieldName: "Remarks",
+                },
+              ],
+            },
+          ],
+        },
+      });
+      monitorPt1.listMode = "hide";
+      map.add(monitorPt1);
+
+      /////////////////////////////////////////////////////////////////////////////////////
+      //*******************************//
+      //      Progress Chart           //
+      //*******************************//
+      /* Function for zooming to selected layers */
+      function zoomToLayer(layer) {
+        return layer.queryExtent().then(function (response) {
+          view
+            .goTo(response.extent, {
+              //response.extent
+              speedFactor: 2,
+            })
+            .catch(function (error) {
+              if (error.name != "AbortError") {
+                console.error(error);
+              }
+            });
+        });
+      }
+
+      var highlightSelect;
+      const totalProgressDiv = document.getElementById("totalProgressDiv");
+      // Start of am4core
+      am5.ready(function () {
+        const chartSurfaceWaterDiv = document.getElementById(
+          "chartSurfaceWaterDiv"
+        );
+        const chartGroundWaterDiv = document.getElementById(
+          "chartGroundWaterDiv"
+        );
+        const chartSoilWaterDiv = document.getElementById("chartSoilWaterDiv");
+        const chartAirQualityDiv =
+          document.getElementById("chartAirQualityDiv");
+        const chartVibrationDiv = document.getElementById("chartVibrationDiv");
+        const chartNoiseDiv = document.getElementById("chartNoiseDiv");
+
+        const marginTop = 0;
+        const marginLeft = 0;
+        const marginRight = 0;
+        const marginBottom = 0;
+        const paddingTop = 0;
+        const paddingLeft = 5;
+        const paddingRight = 5;
+        const paddingBottom = 15;
+
+        const xAxisNumberFormat = "#'%'";
+        const seriesBulletLabelFontSize = "1.3em";
+        const seriesBulletLabelFontColorExceed = am5.color("#ff0000");
+        const seriesBulletLabelFontColorNormal = am5.color("#32CD32");
+        const seriesColumnsWidth = 300;
+
+        // Tooltip
+        const tooltip_dx = 30;
+        const tooltip_dy = -15;
+        const tooltip_label = "[bold][fontSize:18.5px]Total Stations: ";
+
+        // series line fill pattern
+        const linePatternColorComplete = "#70AD47";
+        const linePatternColorOpacityComplete = 0;
+        const linePatternFillOpacityComplete = 0;
+
+        const linePatternColorOpacityIncomplet = 0;
+        const linePatternFillOpacityIncomplet = 1;
+        const linePatternStrokeOpacityIncomplet = 0;
+
+        // Chart Icon properties
+        const chartIconWidth = 30;
+        const chartIconHeight = 30;
+        const chartIconPositionX = 20;
+        const chartPaddingRightIconLabel = 0;
+
+        // 1. Surface Water
+        var root_water = am5.Root.new("chartSurfaceWaterDiv");
+        root_water._logo.dispose();
+
+        function chartSurfaceWater() {
+          root_water.container.children.clear();
+          var total_surfacewater_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 6 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_surfacewater_exceed",
+            statisticType: "sum",
+          };
+
+          var total_surfacewater_normal = {
+            onStatisticField:
+              "CASE WHEN (Type = 6 and Status = 2) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_surfacewater_normal",
+            statisticType: "sum",
+          };
+
+          var query = monitorPt.createQuery();
+          query.outStatistics = [
+            total_surfacewater_exceed,
+            total_surfacewater_normal,
+          ];
+          query.returnGeometry = true;
+
+          monitorPt.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const surfacewater_exceed = stats.total_surfacewater_exceed;
+            const surfacewater_normal = stats.total_surfacewater_normal;
+            const total = surfacewater_exceed + surfacewater_normal;
+
+            /*
+              const okLogo = document.getElementById("logoFail_surfacewater");
+              if (total != 0 && surfacewater_exceed === 0) {
+                okLogo.src =
+                  "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png";
+                okLogo.style.width = 25;
+                okLogo.style.height = 25;
+              } else if (total === 0) {
+                okLogo.style.display = "none";
+              }
+              */
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root_water.setThemes([
+              am5themes_Animated.new(root_water),
+              am5themes_Responsive.new(root_water),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root_water.container.children.push(
+              am5xy.XYChart.new(root_water, {
+                panX: false,
+                panY: false,
+                layout: root_water.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            if (total === 0) {
+              var data = [
+                {
+                  category: "Surface Water",
+                  //"exceed": surfacewater_exceed
+                  dummy: surfacewater_exceed,
+                  icon: "",
+                },
+              ];
+            } else if (surfacewater_exceed === 0) {
+              var data = [
+                {
+                  category: "Surface Water",
+                  //"exceed": surfacewater_exceed
+                  dummy: surfacewater_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png",
+                },
+              ];
+            } else {
+              var data = [
+                {
+                  category: "Surface Water",
+                  //"exceed": surfacewater_exceed
+                  dummy: surfacewater_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/3D_Web_Style/Warning_Symbol.svg",
+                },
+              ];
+            }
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root_water, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root_water, {
+                categoryField: "category",
+                //visible: false, // disable axis label
+                renderer: yRenderer,
+                bullet: function (root_water, axis, dataItem) {
+                  return am5xy.AxisBullet.new(root_water, {
+                    location: 0.5,
+                    sprite: am5.Picture.new(root_water, {
+                      width: chartIconWidth,
+                      height: chartIconHeight,
+                      centerY: am5.p50,
+                      centerX: am5.p50,
+                      x: chartIconPositionX,
+                      src: dataItem.dataContext.icon,
+                    }),
+                  });
+                },
+                tooltip: am5.Tooltip.new(root_water, {}),
+              })
+            );
+
+            yRenderer.labels.template.setAll({
+              paddingRight: 45,
+            });
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            // Label properties Y axis
+            yAxis.get("renderer").labels.template.setAll({
+              //maxWidth: 150,
+              fontSize: "0em",
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root_water, {
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                //calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root_water, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+            let arrLviews = [];
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root_water, {
+                  name: name,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  //valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                })
+              );
+
+              series.columns.template.setAll({
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: seriesColumnsWidth,
+                tooltipY: 0,
+                //strokeWidth: 3,
+                strokeOpacity: 0,
+                //fill: am5.color("#ffffff"),
+                fillOpacity: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root_water, {
+                getFillFromSprite: true,
+                scale: 0.7,
+                fontSize: "0.5em",
+                dx: tooltip_dx,
+                dy: tooltip_dy,
+                labelText: tooltip_label + total,
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root_water, {
+                  sprite: am5.Label.new(root_water, {
+                    text: total == 0 ? "--" : "{valueX}",
+                    fill:
+                      surfacewater_exceed == 0
+                        ? seriesBulletLabelFontColorNormal
+                        : seriesBulletLabelFontColorExceed,
+                    opacity: 1,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                const selectedStatus = 3;
+                const sqlExpression =
+                  "Type = 6" + " AND " + "Status = " + selectedStatus;
+                var highlight = null;
+                // Point 1:
+                view.when(function () {
+                  view.whenLayerView(monitorPt1).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    var query = monitorPt1.createQuery();
+                    query.where = sqlExpression;
+
+                    //testUtilPt1.definitionExpression = sqlExpression;
+                    monitorPt1.queryFeatures(query).then(function (results) {
+                      const ggg = results.features;
+                      const rowN = ggg.length;
+
+                      let objID = [];
+                      for (var i = 0; i < rowN; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                      }
+
+                      var queryExt = new Query({
+                        objectIds: objID,
+                      });
+
+                      monitorPt1.queryExtent(queryExt).then(function (result) {
+                        if (result.extent) {
+                          view.goTo(result.extent);
+                        }
+                      });
+
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      highlightSelect = layerView.highlight(objID);
+
+                      view.on("click", function () {
+                        highlightSelect.remove();
+                      });
+
+                      view.on("click", function () {
+                        layerView.filter = null;
+                      });
+                    }); // end of query features
+                  }); // end of when layerview
+
+                  // Point: 2
+                  view.whenLayerView(monitorPt).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                    });
+                  }); // end of when layerview
+
+                  // Query view using exceediled arrays
+                  for (var i = 0; i < arrLviews.length; i++) {
+                    arrLviews[i].filter = {
+                      where: sqlExpression,
+                    };
+                  }
+                });
+              }); // End of filterByChart
+            }
+            makeSeries("Dummy", "dummy");
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        }
+        chartSurfaceWater();
+
+        // 2. Ground Water
+        var root_gwater = am5.Root.new("chartGroundWaterDiv");
+        root_gwater._logo.dispose();
+
+        function chartGroundWater() {
+          root_gwater.container.children.clear();
+          var total_groundwater_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 5 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_groundwater_exceed",
+            statisticType: "sum",
+          };
+
+          var total_groundwater_normal = {
+            onStatisticField:
+              "CASE WHEN (Type = 5 and Status = 2) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_groundwater_normal",
+            statisticType: "sum",
+          };
+
+          var query = monitorPt.createQuery();
+          query.outStatistics = [
+            total_groundwater_exceed,
+            total_groundwater_normal,
+          ];
+          query.returnGeometry = true;
+
+          monitorPt.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const groundwater_exceed = stats.total_groundwater_exceed;
+            const groundwater_normal = stats.total_groundwater_normal;
+            const total = groundwater_exceed + groundwater_normal;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root_gwater.setThemes([
+              am5themes_Animated.new(root_gwater),
+              am5themes_Responsive.new(root_gwater),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root_gwater.container.children.push(
+              am5xy.XYChart.new(root_gwater, {
+                panX: false,
+                panY: false,
+                layout: root_gwater.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            if (total === 0) {
+              var data = [
+                {
+                  category: "Ground Water",
+                  //"exceed": groundwater_exceed
+                  dummy: groundwater_exceed,
+                  icon: "",
+                },
+              ];
+            } else if (groundwater_exceed === 0) {
+              var data = [
+                {
+                  category: "Ground Water",
+                  //"exceed": groundwater_exceed
+                  dummy: groundwater_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png",
+                },
+              ];
+            } else {
+              var data = [
+                {
+                  category: "Ground Water",
+                  //"exceed": groundwater_exceed
+                  dummy: groundwater_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/3D_Web_Style/Warning_Symbol.svg",
+                },
+              ];
+            }
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root_gwater, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root_gwater, {
+                categoryField: "category",
+                //visible: false, // disable axis label
+                renderer: yRenderer,
+                bullet: function (root_gwater, axis, dataItem) {
+                  return am5xy.AxisBullet.new(root_gwater, {
+                    location: 0.5,
+                    sprite: am5.Picture.new(root_gwater, {
+                      width: chartIconWidth,
+                      height: chartIconHeight,
+                      centerY: am5.p50,
+                      centerX: am5.p50,
+                      x: chartIconPositionX,
+                      src: dataItem.dataContext.icon,
+                    }),
+                  });
+                },
+                tooltip: am5.Tooltip.new(root_gwater, {}),
+              })
+            );
+
+            yRenderer.labels.template.setAll({
+              paddingRight: 45,
+            });
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            // Label properties Y axis
+            yAxis.get("renderer").labels.template.setAll({
+              //maxWidth: 150,
+              fontSize: "0em",
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root_gwater, {
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                //calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root_gwater, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+            let arrLviews = [];
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root_gwater, {
+                  name: name,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  //valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                })
+              );
+
+              series.columns.template.setAll({
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: seriesColumnsWidth,
+                tooltipY: 0,
+                //strokeWidth: 3,
+                strokeOpacity: 0,
+                //fill: am5.color("#ffffff"),
+                fillOpacity: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root_gwater, {
+                getFillFromSprite: true,
+                scale: 0.7,
+                fontSize: "0.5em",
+                dx: tooltip_dx,
+                dy: tooltip_dy,
+                labelText: tooltip_label + total,
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root_gwater, {
+                  sprite: am5.Label.new(root_gwater, {
+                    text: total == 0 ? "--" : "{valueX}", //"{valueX}",
+                    fill:
+                      groundwater_exceed == 0
+                        ? seriesBulletLabelFontColorNormal
+                        : seriesBulletLabelFontColorExceed,
+                    opacity: 1,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                const selectedStatus = 3;
+
+                var highlight = null;
+                // Point 1:
+                view.when(function () {
+                  view.whenLayerView(monitorPt1).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    //testUtilPt1.definitionExpression = sqlExpression;
+                    monitorPt1.queryFeatures().then(function (results) {
+                      const ggg = results.features;
+                      const rowN = ggg.length;
+
+                      let objID = [];
+                      for (var i = 0; i < rowN; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                      }
+
+                      var queryExt = new Query({
+                        objectIds: objID,
+                      });
+
+                      monitorPt1.queryExtent(queryExt).then(function (result) {
+                        if (result.extent) {
+                          view.goTo(result.extent);
+                        }
+                      });
+
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      highlightSelect = layerView.highlight(objID);
+
+                      view.on("click", function () {
+                        highlightSelect.remove();
+                      });
+
+                      view.on("click", function () {
+                        layerView.filter = null;
+                      });
+                    }); // end of query features
+                  }); // end of when layerview
+
+                  // Point: 2
+                  view.whenLayerView(monitorPt).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                    });
+                  }); // end of when layerview
+
+                  // Query view using exceediled arrays
+                  for (var i = 0; i < arrLviews.length; i++) {
+                    arrLviews[i].filter = {
+                      where:
+                        "Type = 5" + " AND " + "Status = " + selectedStatus,
+                    };
+                  }
+                });
+              }); // End of filterByChart
+            }
+
+            makeSeries("Dummy", "dummy");
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        }
+        chartGroundWater();
+
+        // 3. Soil Water
+        var root_swater = am5.Root.new("chartSoilWaterDiv");
+        root_swater._logo.dispose();
+
+        function chartSoilWater() {
+          root_swater.container.children.clear();
+          var total_soilwater_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 4 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_soilwater_exceed",
+            statisticType: "sum",
+          };
+
+          var total_soilwater_normal = {
+            onStatisticField:
+              "CASE WHEN (Type = 4 and Status = 2) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_soilwater_normal",
+            statisticType: "sum",
+          };
+
+          var query = monitorPt.createQuery();
+          query.outStatistics = [
+            total_soilwater_exceed,
+            total_soilwater_normal,
+          ];
+          query.returnGeometry = true;
+
+          monitorPt.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const soilwater_exceed = stats.total_soilwater_exceed;
+            const soilwater_normal = stats.total_soilwater_normal;
+            const total = soilwater_exceed + soilwater_normal;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root_swater.setThemes([
+              am5themes_Animated.new(root_swater),
+              am5themes_Responsive.new(root_swater),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root_swater.container.children.push(
+              am5xy.XYChart.new(root_swater, {
+                panX: false,
+                panY: false,
+                layout: root_swater.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            if (total === 0) {
+              var data = [
+                {
+                  category: "Soil Water",
+                  //"exceed": soilwater_exceed
+                  dummy: soilwater_exceed,
+                  icon: "",
+                },
+              ];
+            } else if (soilwater_exceed === 0) {
+              var data = [
+                {
+                  category: "Soil Water",
+                  //"exceed": soilwater_exceed
+                  dummy: soilwater_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png",
+                },
+              ];
+            } else {
+              var data = [
+                {
+                  category: "Soil Water",
+                  //"exceed": soilwater_exceed
+                  dummy: soilwater_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/3D_Web_Style/Warning_Symbol.svg",
+                },
+              ];
+            }
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root_swater, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root_swater, {
+                categoryField: "category",
+                //visible: false, // disable axis label
+                renderer: yRenderer,
+                bullet: function (root_swater, axis, dataItem) {
+                  return am5xy.AxisBullet.new(root_swater, {
+                    location: 0.5,
+                    sprite: am5.Picture.new(root_swater, {
+                      width: chartIconWidth,
+                      height: chartIconHeight,
+                      centerY: am5.p50,
+                      centerX: am5.p50,
+                      x: chartIconPositionX,
+                      src: dataItem.dataContext.icon,
+                    }),
+                  });
+                },
+                tooltip: am5.Tooltip.new(root_swater, {}),
+              })
+            );
+
+            yRenderer.labels.template.setAll({
+              paddingRight: 45,
+            });
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            // Label properties Y axis
+            yAxis.get("renderer").labels.template.setAll({
+              //maxWidth: 150,
+              fontSize: "0em",
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root_swater, {
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                //calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root_swater, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+            let arrLviews = [];
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root_swater, {
+                  name: name,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  //valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                })
+              );
+
+              series.columns.template.setAll({
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: seriesColumnsWidth,
+                tooltipY: 0,
+                //strokeWidth: 3,
+                strokeOpacity: 0,
+                //fill: am5.color("#ffffff"),
+                fillOpacity: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root_swater, {
+                getFillFromSprite: true,
+                scale: 0.7,
+                fontSize: "0.5em",
+                dx: tooltip_dx,
+                dy: tooltip_dy,
+                labelText: tooltip_label + total,
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root_swater, {
+                  sprite: am5.Label.new(root_swater, {
+                    text: total == 0 ? "--" : "{valueX}",
+                    fill:
+                      soilwater_exceed == 0
+                        ? seriesBulletLabelFontColorNormal
+                        : seriesBulletLabelFontColorExceed,
+                    opacity: 1,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                const selectedStatus = 3;
+
+                var highlight = null;
+                // Point 1:
+                view.when(function () {
+                  view.whenLayerView(monitorPt1).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    //testUtilPt1.definitionExpression = sqlExpression;
+                    monitorPt1.queryFeatures().then(function (results) {
+                      const ggg = results.features;
+                      const rowN = ggg.length;
+
+                      let objID = [];
+                      for (var i = 0; i < rowN; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                      }
+
+                      var queryExt = new Query({
+                        objectIds: objID,
+                      });
+
+                      monitorPt1.queryExtent(queryExt).then(function (result) {
+                        if (result.extent) {
+                          view.goTo(result.extent);
+                        }
+                      });
+
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      highlightSelect = layerView.highlight(objID);
+
+                      view.on("click", function () {
+                        highlightSelect.remove();
+                      });
+
+                      view.on("click", function () {
+                        layerView.filter = null;
+                      });
+                    }); // end of query features
+                  }); // end of when layerview
+
+                  // Point: 2
+                  view.whenLayerView(monitorPt).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                    });
+                  }); // end of when layerview
+
+                  // Query view using exceediled arrays
+                  for (var i = 0; i < arrLviews.length; i++) {
+                    arrLviews[i].filter = {
+                      where:
+                        "Type = 4" + " AND " + "Status = " + selectedStatus,
+                    };
+                  }
+                });
+              }); // End of filterByChart
+            }
+
+            makeSeries("Dummy", "dummy");
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        }
+        chartSoilWater();
+
+        // 4. Air Quality
+        var root_air = am5.Root.new("chartAirQualityDiv");
+        root_air._logo.dispose();
+
+        function chartAirQuality() {
+          root_air.container.children.clear();
+          var total_airquality_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 3 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_airquality_exceed",
+            statisticType: "sum",
+          };
+
+          var total_airquality_normal = {
+            onStatisticField:
+              "CASE WHEN (Type = 3 and Status = 2) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_airquality_normal",
+            statisticType: "sum",
+          };
+
+          var query = monitorPt.createQuery();
+          query.outStatistics = [
+            total_airquality_exceed,
+            total_airquality_normal,
+          ];
+          query.returnGeometry = true;
+
+          monitorPt.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const airquality_exceed = stats.total_airquality_exceed;
+            const airquality_normal = stats.total_airquality_normal;
+            const total = airquality_exceed + airquality_normal;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root_air.setThemes([
+              am5themes_Animated.new(root_air),
+              am5themes_Responsive.new(root_air),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root_air.container.children.push(
+              am5xy.XYChart.new(root_air, {
+                panX: false,
+                panY: false,
+                layout: root_air.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            if (total === 0) {
+              var data = [
+                {
+                  category: "Air Quality",
+                  //"exceed": airquality_exceed
+                  dummy: airquality_exceed,
+                  icon: "",
+                },
+              ];
+            } else if (airquality_exceed === 0) {
+              var data = [
+                {
+                  category: "Air Quality",
+                  //"exceed": airquality_exceed
+                  dummy: airquality_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png",
+                },
+              ];
+            } else {
+              var data = [
+                {
+                  category: "Air Quality",
+                  //"exceed": airquality_exceed
+                  dummy: airquality_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/3D_Web_Style/Warning_Symbol.svg",
+                },
+              ];
+            }
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root_air, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root_air, {
+                categoryField: "category",
+                //visible: false, // disable axis label
+                renderer: yRenderer,
+                bullet: function (root_air, axis, dataItem) {
+                  return am5xy.AxisBullet.new(root_air, {
+                    location: 0.5,
+                    sprite: am5.Picture.new(root_air, {
+                      width: chartIconWidth,
+                      height: chartIconHeight,
+                      centerY: am5.p50,
+                      centerX: am5.p50,
+                      x: chartIconPositionX,
+                      src: dataItem.dataContext.icon,
+                    }),
+                  });
+                },
+                tooltip: am5.Tooltip.new(root_air, {}),
+              })
+            );
+
+            yRenderer.labels.template.setAll({
+              paddingRight: 45,
+            });
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            // Label properties Y axis
+            yAxis.get("renderer").labels.template.setAll({
+              //maxWidth: 350,
+              fontSize: "0em",
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root_air, {
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                //calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root_air, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+            let arrLviews = [];
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root_air, {
+                  name: name,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  //valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                })
+              );
+
+              series.columns.template.setAll({
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: seriesColumnsWidth,
+                tooltipY: 0,
+                //strokeWidth: 3,
+                strokeOpacity: 0,
+                //fill: am5.color("#ffffff"),
+                fillOpacity: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root_air, {
+                getFillFromSprite: true,
+                scale: 0.7,
+                fontSize: "0.5em",
+                dx: tooltip_dx,
+                dy: tooltip_dy,
+                labelText: tooltip_label + total,
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root_air, {
+                  sprite: am5.Label.new(root_air, {
+                    text: total == 0 ? "--" : "{valueX}",
+                    fill:
+                      airquality_exceed == 0
+                        ? seriesBulletLabelFontColorNormal
+                        : seriesBulletLabelFontColorExceed,
+                    opacity: 1,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.percent(-100),
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                const selectedStatus = 3;
+
+                var highlight = null;
+                // Point 1:
+                view.when(function () {
+                  view.whenLayerView(monitorPt1).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    //testUtilPt1.definitionExpression = sqlExpression;
+                    monitorPt1.queryFeatures().then(function (results) {
+                      const ggg = results.features;
+                      const rowN = ggg.length;
+
+                      let objID = [];
+                      for (var i = 0; i < rowN; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                      }
+
+                      var queryExt = new Query({
+                        objectIds: objID,
+                      });
+
+                      monitorPt1.queryExtent(queryExt).then(function (result) {
+                        if (result.extent) {
+                          view.goTo(result.extent);
+                        }
+                      });
+
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      highlightSelect = layerView.highlight(objID);
+
+                      view.on("click", function () {
+                        highlightSelect.remove();
+                      });
+
+                      view.on("click", function () {
+                        layerView.filter = null;
+                      });
+                    }); // end of query features
+                  }); // end of when layerview
+
+                  // Point: 2
+                  view.whenLayerView(monitorPt).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                    });
+                  }); // end of when layerview
+
+                  // Query view using exceediled arrays
+                  for (var i = 0; i < arrLviews.length; i++) {
+                    arrLviews[i].filter = {
+                      where:
+                        "Type = 3" + " AND " + "Status = " + selectedStatus,
+                    };
+                  }
+                });
+              }); // End of filterByChart
+            }
+
+            makeSeries("Dummy", "dummy");
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        }
+        chartAirQuality();
+
+        // 5. Vibration
+        var root_vib = am5.Root.new("chartVibrationDiv");
+        root_vib._logo.dispose();
+
+        function chartVibration() {
+          root_vib.container.children.clear();
+          var total_vibration_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 2 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_vibration_exceed",
+            statisticType: "sum",
+          };
+
+          var total_vibration_normal = {
+            onStatisticField:
+              "CASE WHEN (Type = 2 and Status = 2) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_vibration_normal",
+            statisticType: "sum",
+          };
+
+          var query = monitorPt.createQuery();
+          query.outStatistics = [
+            total_vibration_exceed,
+            total_vibration_normal,
+          ];
+          query.returnGeometry = true;
+
+          monitorPt.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const vibration_exceed = stats.total_vibration_exceed;
+            const vibration_normal = stats.total_vibration_normal;
+            const total = vibration_exceed + vibration_normal;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root_vib.setThemes([
+              am5themes_Animated.new(root_vib),
+              am5themes_Responsive.new(root_vib),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root_vib.container.children.push(
+              am5xy.XYChart.new(root_vib, {
+                panX: false,
+                panY: false,
+                layout: root_vib.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            if (total === 0) {
+              var data = [
+                {
+                  category: "Vibration",
+                  //"exceed": vibration_exceed
+                  dummy: vibration_exceed,
+                  icon: "",
+                },
+              ];
+            } else if (vibration_exceed === 0) {
+              var data = [
+                {
+                  category: "Vibration",
+                  //"exceed": vibration_exceed
+                  dummy: vibration_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png",
+                },
+              ];
+            } else {
+              var data = [
+                {
+                  category: "Vibration",
+                  //"exceed": vibration_exceed
+                  dummy: vibration_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/3D_Web_Style/Warning_Symbol.svg",
+                },
+              ];
+            }
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root_vib, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root_vib, {
+                categoryField: "category",
+                //visible: false, // disable axis label
+                renderer: yRenderer,
+                bullet: function (root_vib, axis, dataItem) {
+                  return am5xy.AxisBullet.new(root_vib, {
+                    location: 0.5,
+                    sprite: am5.Picture.new(root_vib, {
+                      width: chartIconWidth,
+                      height: chartIconHeight,
+                      centerY: am5.p50,
+                      centerX: am5.p50,
+                      x: chartIconPositionX,
+                      src: dataItem.dataContext.icon,
+                    }),
+                  });
+                },
+                tooltip: am5.Tooltip.new(root_vib, {}),
+              })
+            );
+
+            yRenderer.labels.template.setAll({
+              paddingRight: 45,
+            });
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            // Label properties Y axis
+            yAxis.get("renderer").labels.template.setAll({
+              //maxWidth: 150,
+              fontSize: "0em",
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root_vib, {
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                //calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root_vib, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+            let arrLviews = [];
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root_vib, {
+                  name: name,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  //valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                })
+              );
+
+              series.columns.template.setAll({
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: seriesColumnsWidth,
+                tooltipY: 0,
+                //strokeWidth: 3,
+                strokeOpacity: 0,
+                //fill: am5.color("#ffffff"),
+                fillOpacity: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root_vib, {
+                getFillFromSprite: true,
+                scale: 0.7,
+                fontSize: "0.5em",
+                dx: tooltip_dx,
+                dy: tooltip_dy,
+                labelText: tooltip_label + total,
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root_vib, {
+                  sprite: am5.Label.new(root_vib, {
+                    text: total == 0 ? "--" : "{valueX}",
+                    fill:
+                      vibration_exceed == 0
+                        ? seriesBulletLabelFontColorNormal
+                        : seriesBulletLabelFontColorExceed,
+                    opacity: 1,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                const selectedStatus = 3;
+
+                var highlight = null;
+                // Point 1:
+                view.when(function () {
+                  view.whenLayerView(monitorPt1).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    //testUtilPt1.definitionExpression = sqlExpression;
+                    monitorPt1.queryFeatures().then(function (results) {
+                      const ggg = results.features;
+                      const rowN = ggg.length;
+
+                      let objID = [];
+                      for (var i = 0; i < rowN; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                      }
+
+                      var queryExt = new Query({
+                        objectIds: objID,
+                      });
+
+                      monitorPt1.queryExtent(queryExt).then(function (result) {
+                        if (result.extent) {
+                          view.goTo(result.extent);
+                        }
+                      });
+
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      highlightSelect = layerView.highlight(objID);
+
+                      view.on("click", function () {
+                        highlightSelect.remove();
+                      });
+
+                      view.on("click", function () {
+                        layerView.filter = null;
+                      });
+                    }); // end of query features
+                  }); // end of when layerview
+
+                  // Point: 2
+                  view.whenLayerView(monitorPt).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                    });
+                  }); // end of when layerview
+
+                  // Query view using exceediled arrays
+                  for (var i = 0; i < arrLviews.length; i++) {
+                    arrLviews[i].filter = {
+                      where:
+                        "Type = 2" + " AND " + "Status = " + selectedStatus,
+                    };
+                  }
+                });
+              }); // End of filterByChart
+            }
+
+            makeSeries("Dummy", "dummy");
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        }
+        chartVibration();
+
+        // 6. Noise
+        var root_noise = am5.Root.new("chartNoiseDiv");
+        root_noise._logo.dispose();
+
+        function chartNoise() {
+          root_noise.container.children.clear();
+          var total_noise_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 1 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_noise_exceed",
+            statisticType: "sum",
+          };
+
+          var total_noise_normal = {
+            onStatisticField:
+              "CASE WHEN (Type = 1 and Status = 2) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_noise_normal",
+            statisticType: "sum",
+          };
+
+          var query = monitorPt.createQuery();
+          query.outStatistics = [total_noise_exceed, total_noise_normal];
+          query.returnGeometry = true;
+
+          monitorPt.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const noise_exceed = stats.total_noise_exceed;
+            const noise_normal = stats.total_noise_normal;
+            const total = noise_exceed + noise_normal;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root_noise.setThemes([
+              am5themes_Animated.new(root_noise),
+              am5themes_Responsive.new(root_noise),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root_noise.container.children.push(
+              am5xy.XYChart.new(root_noise, {
+                panX: false,
+                panY: false,
+                layout: root_noise.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            if (total === 0) {
+              var data = [
+                {
+                  category: "Noise",
+                  //"exceed": noise_exceed
+                  dummy: noise_exceed,
+                  icon: "",
+                },
+              ];
+            } else if (noise_exceed === 0) {
+              var data = [
+                {
+                  category: "Noise",
+                  //"exceed": noise_exceed
+                  dummy: noise_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png",
+                },
+              ];
+            } else {
+              var data = [
+                {
+                  category: "Noise",
+                  //"exceed": noise_exceed
+                  dummy: noise_exceed,
+                  icon: "https://EijiGorilla.github.io/Symbols/3D_Web_Style/Warning_Symbol.svg",
+                },
+              ];
+            }
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root_noise, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root_noise, {
+                categoryField: "category",
+                //visible: false, // disable axis label
+                renderer: yRenderer,
+                bullet: function (root_noise, axis, dataItem) {
+                  return am5xy.AxisBullet.new(root_noise, {
+                    location: 0.5,
+                    sprite: am5.Picture.new(root_noise, {
+                      width: chartIconWidth,
+                      height: chartIconHeight,
+                      centerY: am5.p50,
+                      centerX: am5.p50,
+                      x: chartIconPositionX,
+                      src: dataItem.dataContext.icon,
+                    }),
+                  });
+                },
+                tooltip: am5.Tooltip.new(root_noise, {}),
+              })
+            );
+
+            yRenderer.labels.template.setAll({
+              paddingRight: 45,
+            });
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            // Label properties Y axis
+            yAxis.get("renderer").labels.template.setAll({
+              //maxWidth: 150,
+              fontSize: "0em",
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root_noise, {
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                //calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root_noise, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+            let arrLviews = [];
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root_noise, {
+                  name: name,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  //valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                })
+              );
+
+              series.columns.template.setAll({
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: seriesColumnsWidth,
+                tooltipY: 0,
+                //strokeWidth: 3,
+                strokeOpacity: 0,
+                //fill: am5.color("#ffffff"),
+                fillOpacity: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root_noise, {
+                getFillFromSprite: true,
+                scale: 0.7,
+                fontSize: "0.5em",
+                dx: tooltip_dx,
+                dy: tooltip_dy,
+                labelText: tooltip_label + total,
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root_noise, {
+                  sprite: am5.Label.new(root_noise, {
+                    text: total == 0 ? "--" : "{valueX}",
+                    fill:
+                      noise_exceed == 0
+                        ? seriesBulletLabelFontColorNormal
+                        : seriesBulletLabelFontColorExceed,
+                    opacity: 1,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                const selectedStatus = 3;
+
+                var highlight = null;
+                // Point 1:
+                view.when(function () {
+                  view.whenLayerView(monitorPt1).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    //testUtilPt1.definitionExpression = sqlExpression;
+                    monitorPt1.queryFeatures().then(function (results) {
+                      const ggg = results.features;
+                      const rowN = ggg.length;
+
+                      let objID = [];
+                      for (var i = 0; i < rowN; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                      }
+
+                      var queryExt = new Query({
+                        objectIds: objID,
+                      });
+
+                      monitorPt1.queryExtent(queryExt).then(function (result) {
+                        if (result.extent) {
+                          view.goTo(result.extent);
+                        }
+                      });
+
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      highlightSelect = layerView.highlight(objID);
+
+                      view.on("click", function () {
+                        highlightSelect.remove();
+                      });
+
+                      view.on("click", function () {
+                        layerView.filter = null;
+                      });
+                    }); // end of query features
+                  }); // end of when layerview
+
+                  // Point: 2
+                  view.whenLayerView(monitorPt).then(function (layerView) {
+                    arrLviews.push(layerView);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                    });
+                  }); // end of when layerview
+
+                  // Query view using exceediled arrays
+                  for (var i = 0; i < arrLviews.length; i++) {
+                    arrLviews[i].filter = {
+                      where:
+                        "Type = 1" + " AND " + "Status = " + selectedStatus,
+                    };
+                  }
+                });
+              }); // End of filterByChart
+            }
+
+            makeSeries("Dummy", "dummy");
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        }
+        chartNoise();
+
+        // Total number of exceeded measurements
+        function totalExceedingCount() {
+          var total_noise_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 1 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_noise_exceed",
+            statisticType: "sum",
+          };
+
+          var total_vibration_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 2 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_vibration_exceed",
+            statisticType: "sum",
+          };
+
+          var total_airquality_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 3 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_airquality_exceed",
+            statisticType: "sum",
+          };
+
+          var total_soilwater_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 4 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_soilwater_exceed",
+            statisticType: "sum",
+          };
+
+          var total_groundwater_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 5 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_groundwater_exceed",
+            statisticType: "sum",
+          };
+
+          var total_surfacewater_exceed = {
+            onStatisticField:
+              "CASE WHEN (Type = 6 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_surfacewater_exceed",
+            statisticType: "sum",
+          };
+
+          var query = monitorPt.createQuery();
+          query.outStatistics = [
+            total_noise_exceed,
+            total_vibration_exceed,
+            total_airquality_exceed,
+            total_soilwater_exceed,
+            total_groundwater_exceed,
+            total_surfacewater_exceed,
+          ];
+          query.returnGeometry = true;
+
+          monitorPt.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const totalExceeding =
+              stats.total_noise_exceed +
+              stats.total_vibration_exceed +
+              stats.total_airquality_exceed +
+              stats.total_soilwater_exceed +
+              stats.total_groundwater_exceed +
+              stats.total_surfacewater_exceed;
+
+            totalProgressDiv.innerHTML = totalExceeding;
+          });
+        }
+        totalExceedingCount();
+      }); // End of am4core.ready
+
+      /////////////////////////////////////////////////////////////////////////////////////
+      /*
+    view.when(function () {
+        view.popup.autoOpenEnabled = true; //disable popups
+
+        // Create the Editor
+        let editor = new Editor({
+          view: view
+        });
+
+        // Add widget to top-right of the view
+        view.ui.add(editor, "bottom-right");
+      });
+      */
+      // LayerList and Add legend to the LayerList
+      // On-off feature layer tab
+      var layerList = new LayerList({
+        view: view,
+        listItemCreatedFunction: function (event) {
+          const item = event.item;
+          if (
+            item.title === "Chainage" ||
+            item.title === "OpenStreetMap 3D Buildings"
+          ) {
+            item.visible = false;
+          }
+        },
+      });
+      /*
+        view.ui.add(layerList, {
+          position: "bottom-left"
+        });
+    */
+      var legend = new Legend({
+        view: view,
+        container: document.getElementById("legendDiv"),
+        layerInfos: [
+          {
+            layer: monitorPt,
+            title: "Monitoring Indicators",
+          },
+          {
+            layer: monitorPt1,
+            title: "Survey Results",
+          },
+        ],
+      });
+
+      // Compass
+      var compass = new Compass({
+        view: view,
+      });
+      // adds the compass to the top left corner of the MapView
+      view.ui.add(compass, "top-right");
+
+      var layerListExpand = new Expand({
+        view: view,
+        content: layerList,
+        expandIconClass: "esri-icon-visible",
+        group: "top-right",
+      });
+      view.ui.add(layerListExpand, {
+        position: "top-right",
+      });
+      // End of LayerList
+
+      view.ui.empty("top-left");
+
+      // Full screen logo
+      view.ui.add(
+        new Fullscreen({
+          view: view,
+          element: viewDiv,
+        }),
+        "top-right"
+      );
+
+      var legendExpand = new Expand({
+        view: view,
+        content: legend,
+        expandIconClass: "esri-icon-legend",
+        group: "top-right",
+      });
+      view.ui.add(legendExpand, {
+        position: "top-right",
+      });
+
+      // See-through-Ground
+      view.when(function () {
+        // allow navigation above and below the ground
+        map.ground.navigationConstraint = {
+          type: "none",
+        };
+        // the webscene has no basemap, so set a surfaceColor on the ground
+        map.ground.surfaceColor = "#fff";
+        // to see through the ground, set the ground opacity to 0.4
+        map.ground.opacity = 0.9; //
+      });
+
+      // Instruction widget
+      const instructionsExpand = new Expand({
+        expandIconClass: "esri-icon-question",
+        expandTooltip: "How to use this web app",
+        view: view,
+        expanded: true,
+        content: `
+      <div class="esri-widget" style='width:200px; padding:10px;'>
+        <p>1. <b>Chart</b> shows the number of monitoring stations where a measurement exceeded the allowable threshold value</p>
+        <p>2. <b>Click</b> the value in the chart to zoom in the corresponding stations.
+      </div>
+      `,
+      });
+      view.ui.add(instructionsExpand, "top-right");
+
+      //*****************************//
+      //      Search Widget          //
+      //*****************************//
+      var searchWidget = new Search({
+        view: view,
+        locationEnabled: false,
+        allPlaceholder: "Chainage",
+        includeDefaultSources: false,
+        sources: [
+          {
+            layer: chainageLayer,
+            searchFields: ["KmSpot"],
+            displayField: "KmSpot",
+            exactMatch: false,
+            outFields: ["*"],
+            zoomScale: 1000,
+            name: "Main KM",
+            placeholder: "example: 80 + 400",
+          },
+        ],
+      });
+
+      const searchExpand = new Expand({
+        view: view,
+        content: searchWidget,
+        expandIconClass: "esri-icon-search",
+        group: "top-right",
+      });
+      view.ui.add(searchExpand, {
+        position: "top-right",
+      });
+      searchExpand.watch("expanded", function () {
+        if (!searchExpand.expanded) {
+          searchWidget.searchTerm = null;
+        }
+      });
+    });
+  </script>
+</html>
