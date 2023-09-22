@@ -41,7 +41,8 @@ require([
     "esri/Ground",
     "esri/layers/GraphicsLayer",
     "esri/widgets/Search",
-    "esri/widgets/BasemapToggle"
+    "esri/widgets/BasemapToggle",
+    "esri/widgets/Print",
 ], function (Basemap, Map, MapView, SceneView,
     FeatureLayer, FeatureFilter,
     SceneLayer, Layer, TileLayer, VectorTileLayer,
@@ -52,7 +53,7 @@ require([
     StatisticDefinition, WebStyleSymbol,
     TimeExtent, Expand, Editor, UniqueValueRenderer, DatePicker,
     FeatureTable, Compass, ElevationLayer, Ground,
-    GraphicsLayer, Search, BasemapToggle) {
+    GraphicsLayer, Search, BasemapToggle, Print) {
 
 
 
@@ -70,6 +71,18 @@ require([
         //center: [120.57930, 15.100],
         zoom: 10,
     });
+
+    view.when(() => {
+        const print = new Print({
+          view: view,
+          // specify your own print service
+          printServiceUrl:
+            "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+        });
+
+        // Add widget to the top right corner of the view
+        view.ui.add(print, "bottom-right");
+      });
 
 
 

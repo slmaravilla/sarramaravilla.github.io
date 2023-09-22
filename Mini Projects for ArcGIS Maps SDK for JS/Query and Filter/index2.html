@@ -6,43 +6,55 @@
     <title>Query and Filter: Two Dropdown List</title>
 
     <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/dark/main.css">
-
+    <link rel="stylesheet" href="https://js.arcgis.com/calcite-components/1.8.0/calcite.css" />
     <link rel="stylesheet" href="./css/main.css">
 
     <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
     <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
-    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>   
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
     <script src="https://js.arcgis.com/4.27/"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="./js/main2c.js"></script>
+    <script src="https://js.arcgis.com/calcite-components/1.8.0/calcite.esm.js" type="module"></script>
+    <script src="./js/main2f.js"></script>
 
 </head>
 
-<body>
-    <div id="viewDiv">
-        <div id="headerTitleDiv">Status for ISF Relocation (N2)</div>
-        <div id="dateDiv"></div>
+<body class="calcite-mode-dark">
+    <calcite-loader></calcite-loader>
+    <calcite-shell content-behind>
+        <div slot="header" id="header">
+            <h2 id="header-title"> N2 LAND ACQUISITION</h2>
+            <div id="dateDiv"></div>
 
-        <div id="progressPanel">
-            <div id="chartTitleDiv">Status of Relocation</div>
-            <div id="chartdiv"></div>
-            <div id="boxNLO">
-                <div id="labelNLO">Number of NLO</div>
+            <div class="esri-widget" id="dropdownDiv">
+                <label for="sel-options">Municipality:
+                    <select id="muniSelect" class="esri-widget" class="esri-widget" width="150"
+                        style="width: 120px"></select>
+                </label>
+                <label for="sel-options">Barangay:
+                    <select id="brgySelect" class="esri-widget" width="150" style="width: 120px"></select>
+                </label>
             </div>
         </div>
 
-        <div class="esri-widget" id="dropdownDiv">
-            <label for="sel-options">Municipality:</label>
-            <select id="muniSelect" class="esri-widget" class="esri-widget" width = "150" style="width: 120px" >
-            </select>
-            <label for="sel-options">Barangay:</label>
-            <select id="brgySelect" class="esri-widget" width = "150" style="width: 120px">
-            </select>
-        </div>
+        <calcite-shell-panel slot="panel-start" display-mode="float">
+            <calcite-action-bar slot="action-bar">
+                <calcite-action data-action-id="layers" icon="layers" text="Layers"></calcite-action>
+                <calcite-action data-action-id="basemaps" icon="basemap" text="Basemaps"></calcite-action>
+            </calcite-action-bar>
 
-    </div>
 
+            <!-- Map-specific panels (each one provides a div for ArcGIS Maps SDK for JavaScript widgets) -->
+            <calcite-panel heading="Layers" height-scale="l" data-panel-id="layers" hidden>
+                <div id="layers-container"></div>
+            </calcite-panel>
+            <calcite-panel heading="Basemaps" height-scale="l" data-panel-id="basemaps" hidden>
+                <div id="basemaps-container"></div>
+            </calcite-panel>
+        </calcite-shell-panel>
+
+        <div id="viewDiv"></div>
+    </calcite-shell>
 </body>
 
 </html>

@@ -4,6 +4,7 @@
 //You can use filter using 2nd dropdown evern if first dropdown is null
 //Call the getQuery2Values, getUniqueValues, addToSelectQuery2 at the end of the
 //Of the second query so that "None" shows at the Barangay Dropdown
+//only object array --NOT WORKING
 
 require([
     "esri/Basemap",
@@ -53,7 +54,9 @@ require([
     TimeExtent, Expand, Editor, UniqueValueRenderer, DatePicker,
     FeatureTable, Compass, ElevationLayer, Ground,
     GraphicsLayer, Search, BasemapToggle) {
+        
 
+    
 
 
     //Create Map
@@ -272,7 +275,7 @@ require([
 
         const finalArray = muniSelect.map((muni) => {
             let temp = [];
-
+            
             //find barangay from each municipality
             const findBarangay = pair.filter((emp) => emp.municipality === muni);
 
@@ -283,11 +286,16 @@ require([
                 });
                 temp.push(obj);
             }
+
             return Object.assign({
                 municipality: muni,
                 barangay: temp.length === 0 ? [{ name: '' }] : temp,
             });
         }); console.log(finalArray);
+
+
+    
+
 
         $('#muniSelect').append('<option selected="true" disabled>Select option</option>');
         var i = 0;
@@ -298,19 +306,23 @@ require([
         });
 
         $(document).on('change', '#muniSelect', function () {
+            
             var value = $(this).val(); //get value
+            
 
             //filter json array
             var attribute = $(finalArray)
                 .filter(function (i, n) {
                     return n.municipality === value;
                 });
-            //empty second dropdown
+            
+                //empty second dropdown
             $('#brgySelect').html("");
             $('#brgySelect').append('<option selected="true" disabled>Select option</option>');
+            
             //loop through attribute
             $.each(attribute[0].barangay, function (index, value) {
-                //append datas
+                //append data
                 $('#brgySelect').append('<option value=' + value.name + '>' + value.name + '</option>');
 
 
