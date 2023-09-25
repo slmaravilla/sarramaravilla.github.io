@@ -464,15 +464,6 @@ require([
     //end
 
 
-    //Full Screen Logo
-    view.ui.add(
-        new Fullscreen({
-            view: view,
-            element: viewDiv
-        }),
-        "top-left"
-    );//end
-
     let polylineSymbol = {
         type: "simple-line",  // autocasts as SimpleLineSymbol()
         color: [226, 119, 40],

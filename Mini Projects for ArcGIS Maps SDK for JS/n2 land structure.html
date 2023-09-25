@@ -35,6 +35,7 @@
   calcite-list {
     overflow-y: auto;
     --calcite-ui-text-2: #000000;
+
   }
 
   calcite-loader {
@@ -58,8 +59,6 @@
   calcite-tab {
     width: 100%;
     height: 100%;
-    overflow: hidden;
-
   }
 
   #header-title {
@@ -214,15 +213,21 @@
   }
 
   /* Expropriation List */
-  /** clear background color of list box **/
-
-
-
   calcite-list-item {
     --calcite-ui-text-1: #f00;
     --calcite-ui-text-3: #eaeaea;
-  --calcite-ui-foreground-2: #202020;
-  
+    --calcite-ui-foreground-2: #202020;
+  }
+
+  calcite-chip {
+    --calcite-ui-text-1: #ffffff;
+    --calcite-ui-foreground-2: rgb(0, 0, 0, 0);
+    margin-left: 2.0rem !important;
+  }
+
+  calcite-avatar {
+    margin-right: 2.5rem !important;
+    position: absolute;
   }
 
   /* Dropdown list */
@@ -286,27 +291,6 @@
     background-color: #11a7fd;
     color: white !important;
   }
-
-  calcite-chip {
-    --calcite-ui-text-1: #ffffff;
-    --calcite-font-size--1: 0.7rem !important;
-    --calcite-ui-foreground-2: rgb(0, 0, 0, 0);
-    /*margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-top: 0 !important;
-    text-align: left;
-    display: inline-block;
-    margin-inline-start: -10rem;*/
-  }
-
-  /*calcite-avatar {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-top: 0 !important;
-    display: inline-block;
-    margin-inline-end: -10rem;
-  }*/
-
 </style>
 
 <body class="calcite-theme-dark">
@@ -409,12 +393,7 @@
             <div class="box4" id="nloPieChartDiv"></div>
           </calcite-tab>
           <calcite-tab>
-            <calcite-list id="expropriationListDiv">
-              
-
-
-
-            </calcite-list>
+            <calcite-list id="expropriationListDiv"></calcite-list>
           </calcite-tab>
         </div>
       </calcite-tabs>
@@ -2270,13 +2249,14 @@
                   chip.slot = "content-end";
                   chip.innerText = attributes.CP;
                   chip.scale = "s";
-                  
+
+
                   // calcite avatar
                   var avatar = document.createElement("calcite-avatar");
                   avatar.fullName = attributes.Municipality;
-                  //avatar.slot = "image";
                   avatar.slot = "content-end";
-                  
+                  avatar.scale = "s";
+
                   const status = attributes.StatusLA;
                   if (status == 5) {
                     statusla = "Expropriation";
@@ -2322,6 +2302,7 @@
                   expropriationList.appendChild(li);
                   li.appendChild(avatar);
                   li.appendChild(chip);
+                  console.log(li);
                   //li.appendChild(avatar);
                 }); // End of result.features.forEach
               }); // End of layerView.queryFeatures
