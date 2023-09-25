@@ -61,14 +61,13 @@
         "esri/widgets/BasemapGallery",
         "esri/widgets/Legend",
         "esri/widgets/Fullscreen",
-
     ], function (
         SceneView,
         Map,
         FeatureLayer,
         BasemapGallery,
         Legend,
-        Fullscreen
+        Fullscreen,
     ) {
 
         var map = new Map({
@@ -81,12 +80,13 @@
             //center: [121.00, 14.35],
             camera: {
                 position: [
-                120.99, // lon
-                13.93, // lat
-                  // elevation in meters
-                39000],
-                tilt : 50,
+                    121.01, // lon
+                    13.85, // lat
+                    // elevation in meters
+                    45000],
+                tilt: 50,
             },
+            qualityProfile: "high",
             zoom: 11.5,
 
             viewingMode: "local",
@@ -101,13 +101,119 @@
         });
         view.ui.components = [];
 
+
+        const basemaps = new BasemapGallery({
+            view,
+            container: "basemaps-container",
+        });
+
+        const renderer = {
+            type: "unique-value",
+            field: "SymbolID",
+            uniqueValueInfos: [
+                {
+                    value: 0,
+                    label: "MCX Extension via. Open Canal",
+                    symbol: {
+                        type: "line-3d",
+                        symbolLayers: [
+                            {
+                                type: "path",
+                                profile: "quad",
+                                material: {
+                                    color: "#0070FF"
+                                },
+                                width: 50,
+                                height: 90,
+                                join: "round",
+                                cap: "round",
+                                anchor: "bottom",
+                                profileRotation: "heading"
+                            }
+                        ]
+                    },
+                },
+                {
+                    value: 1,
+                    label: "DPWH-PPP",
+                    symbol: {
+                        type: "line-3d",
+                        symbolLayers: [
+                            {
+                                type: "path",
+                                profile: "quad",
+                                material: {
+                                    color: "#FF7F7F"
+                                },
+                                width: 50,
+                                height: 90,
+                                join: "round",
+                                cap: "round",
+                                anchor: "bottom",
+                                profileRotation: "heading"
+                            }
+                        ]
+                    },
+                },
+                {
+                    value: 2,
+                    label: "MCX Extension via. LLRN",
+                    symbol: {
+                        type: "line-3d",
+                        symbolLayers: [
+                            {
+                                type: "path",
+                                profile: "quad",
+                                material: {
+                                    color: "#C500FF"
+                                },
+                                width: 50,
+                                height: 90,
+                                join: "round",
+                                cap: "round",
+                                anchor: "bottom",
+                                profileRotation: "heading"
+                            }
+                        ]
+                    },
+                },
+                {
+                    value: 3,
+                    label: "MCX Extension via. Bacoor, Dasma, Silang",
+                    symbol: {
+                        type: "line-3d",
+                        symbolLayers: [
+                            {
+                                type: "path",
+                                profile: "quad",
+                                material: {
+                                    color: "#FFAA00"
+                                },
+                                width: 50,
+                                height: 90,
+                                join: "round",
+                                cap: "round",
+                                anchor: "bottom",
+                                profileRotation: "heading"
+                            }
+                        ]
+                    },
+                },
+
+            ]
+        };
+
+
         var mcxex_layer = new FeatureLayer({
             url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/MCXex_Alignment/FeatureServer",
             elevationInfo: {
                 model: "on-the-ground",
-            }
+            },
+            renderer: renderer,
         });
         map.add(mcxex_layer);
+
+
 
         var legend = new Legend({
             view,

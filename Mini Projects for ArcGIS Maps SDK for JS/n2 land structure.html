@@ -766,6 +766,54 @@
     endorsedLotLayer.popupTemplate = templateLot; //use the same popup as lot layer
 
 
+    //**** ---- Super Urgent Lots ---- ***///
+
+
+    var urgentLotLayer = new FeatureLayer({
+      portalItem: {
+        id: "dca1d785da0f458b8f87638a76918496",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 7,
+      definitionExpression: "Urgent = 0",
+      renderer: {
+        type: "simple", // autocasts as new SimpleRenderer()
+        symbol: {
+          type: "point-3d", // autocasts as new PointSymbol3D()
+          symbolLayers: [
+            {
+              type: "icon", // autocasts as new IconSymbol3DLayer()
+              resource: {
+                href: "https://sarramaravilla.github.io/3D Interactive Hiking Trail Map/images/mountain_symbol.png"
+              },
+              size: 20
+            }
+          ],
+          verticalOffset: {
+            screenLength: 60,
+            maxWorldLength: 400,
+            minWorldLength: 50
+          },
+          callout: {
+            type: "line",
+                color: "white",
+                size: 0.5,
+                border: {
+                    color: "grey"
+                }
+          }
+        },
+      },
+      elevationInfo: {
+        model: "on-the-ground",
+      },
+    });
+    urgentLotLayer.listMode = "hide";
+    map.add(urgentLotLayer, 2);
+
+
     //**** ---- Structure Layer ---- ***///
 
     // Polygon 3D extrution
@@ -2302,7 +2350,6 @@
                   expropriationList.appendChild(li);
                   li.appendChild(avatar);
                   li.appendChild(chip);
-                  console.log(li);
                   //li.appendChild(avatar);
                 }); // End of result.features.forEach
               }); // End of layerView.queryFeatures
