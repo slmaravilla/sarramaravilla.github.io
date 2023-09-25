@@ -14,7 +14,16 @@
 </head>
 <style>
     html,
-    body,
+    
+    body {
+        display: flex;
+    }
+
+    calcite-loader {
+      align-self: center;
+      justify-self: center;
+    }
+
     #viewDiv {
         padding: 0;
         margin: 0;
@@ -31,6 +40,27 @@
         font-size: 1.5rem;
     }
 
+    #header-controls {
+        display: flex;
+        margin-inline-start: auto;
+        align-self: center;
+    }
+
+    .label-wrapper {
+      display: flex;
+      margin-inline: 1rem;
+      padding: 0.5rem;
+      border: 1px solid var(--calcite-ui-border-1);
+      cursor: pointer;
+    }
+
+    calcite-checkbox {
+      margin: 0 0.5rem;
+    }
+
+
+
+
     .calcite-theme-dark .esri-legend__layer-caption {
         display: none;
     }
@@ -43,12 +73,23 @@
 </style>
 
 <body class="calcite-theme-dark">
+    <calcite-loader></calcite-loader>
     <calcite-shell content-behind>
-        <h2 id="header-title" slot="header">MCXex Alignment Map</h2>
+        <div slot="header" id="header">
+            <h2 id="header-title" slot="header">MCXex Alignment Map</h2>
+            <div id="header-controls">
+                <calcite-label layout="inline" class="label-wrapper">
+                    <calcite-checkbox>Mama</calcite-checkbox>
+                </calcite-label>
+            </div>
+        </div>
+
 
         <div id="container">
             <div id="viewDiv"></div>
+
         </div>
+
     </calcite-shell>
 
 </body>
