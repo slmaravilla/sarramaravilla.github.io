@@ -1,0 +1,1989 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+
+    <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
+  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
+
+  # The following implements Responsive Web Design
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  # refer to the following website for learming more about Responsive Web Design
+  https://www.freecodecamp.org/news/responsive-web-design-how-to-make-a-website-look-good-on-phones-and-tablets/
+  -->
+    <title>MMSP TBM Shaft & Cut and Cover (PO)</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.25/esri/themes/dark/main.css"
+    />
+    <script
+      type="module"
+      src="https://js.arcgis.com/calcite-components/1.4.2/calcite.esm.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://js.arcgis.com/calcite-components/1.4.2/calcite.css"
+    />
+
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Micro.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
+
+    <!-- Resources -->
+    <script src="https://js.arcgis.com/4.27/"></script>
+  </head>
+
+  <body class="calcite-theme-dark">
+    <calcite-loader></calcite-loader>
+    <calcite-shell content-behind>
+      <!--  Header slot  -->
+      <div slot="header" id="header">
+        <!-- Title -->
+        <h2 id="header-title" slot="header"></h2>
+        <div id="dateDiv"></div>
+        <!-- Radio button swidth -->
+        <div id="dataTypeInput" class="cpButtonClass">
+          <label for="dataTypeInput">Chart Switch</label>
+          <input type="radio" id="TBM Shaft" name="dataTypeInput" checked /> TBM
+          Shaft <input type="radio" id="Cut & Cover" name="dataTypeInput" /> Cut
+          & Cover
+        </div>
+      </div>
+      <!-- Icon -->
+      <!-- https://developers.arcgis.com/calcite-design-system/icons/?icon=list&library=Calcite%20UI -->
+      <calcite-shell-panel slot="panel-start" display-mode="float" detached>
+        <calcite-action-bar slot="action-bar">
+          <calcite-action
+            data-action-id="layers"
+            icon="layers"
+            text="Layers"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="basemaps"
+            icon="basemap"
+            text="Basemaps"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="legend"
+            icon="legend"
+            text="Legend"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="information"
+            icon="information"
+            text="Information"
+          ></calcite-action>
+        </calcite-action-bar>
+
+        <!-- Map-specific panels (each one provides a div for ArcGIS Maps SDK for JavaScript widgets) -->
+        <calcite-panel
+          heading="Layers"
+          height-scale="l"
+          data-panel-id="layers"
+          hidden
+        >
+          <div id="layers-container"></div>
+        </calcite-panel>
+        <calcite-panel
+          heading="Basemaps"
+          height-scale="l"
+          data-panel-id="basemaps"
+          hidden
+        >
+          <div id="basemaps-container"></div>
+        </calcite-panel>
+        <calcite-panel
+          heading="Legend"
+          height-scale="l"
+          data-panel-id="legend"
+          hidden
+        >
+          <div id="legend-container"></div>
+        </calcite-panel>
+
+        <!-- Info panel (populates with info from the web map) -->
+        <calcite-panel heading="Description" data-panel-id="information" hidden>
+          <div id="info-content">
+            <!-- <img id="item-thumbnail" alt="webmap thumbnail" /> -->
+            <div id="item-description">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </calcite-panel>
+      </calcite-shell-panel>
+      <div id="applicationDiv">
+        <div id="viewDiv">
+          <calcite-label layout="inline" id="see-through-label">
+            <calcite-checkbox id="myLink"></calcite-checkbox>See-through-Ground
+          </calcite-label>
+          <div id="chartPanel">
+            <div id="totalProgressDiv"></div>
+            <div id="chartShaftDiv"></div>
+            <div id="chartCutCoverDiv"></div>
+          </div>
+        </div>
+      </div>
+    </calcite-shell>
+  </body>
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      display: flex;
+    }
+
+    calcite-loader {
+      align-self: center;
+      justify-self: center;
+    }
+
+    calcite-label {
+      position: fixed;
+      z-index: 1;
+      --calcite-label-margin-bottom: 0px;
+      bottom: 1%;
+      right: 22vw;
+    }
+
+    #header-title {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+
+    #item-description b {
+      color: orange;
+      font-size: "1.1vw";
+    }
+
+    #info-content {
+      padding: 0.75rem;
+    }
+
+    calcite-rating {
+      margin-top: 0.25rem;
+    }
+
+    #header {
+      display: flex;
+      padding: 0 1rem;
+      background-color: var(--calcite-ui-foreground-1);
+    }
+
+    #header-controls {
+      display: flex;
+      margin-inline-start: auto;
+      align-self: center;
+    }
+
+    #dataTypeInput {
+      background-color: rgb(0, 0, 0, 0);
+      width: 50%;
+      opacity: 1;
+      color: white;
+      text-align: center;
+      margin: auto;
+    }
+
+    .label-wrapper {
+      display: flex;
+      margin-inline: 1rem;
+      padding: 0.5rem;
+      border: 1px solid var(--calcite-ui-border-1);
+      cursor: pointer;
+    }
+
+    calcite-switch {
+      margin: 0 0.5rem;
+    }
+
+    #chartPanel {
+      background-color: rgb(0, 0, 0, 0);
+      width: 23vw;
+      margin-right: 4vw;
+    }
+
+    #chartShaftDiv,
+    #chartCutCoverDiv {
+      margin-top: 2vw;
+      height: 30vw;
+      width: 23vw;
+    }
+
+    #totalProgressDiv {
+      margin-top: 1.5vw;
+      border: solid 0.5px gray;
+      width: 21vw;
+      height: 5vw;
+      text-align: center;
+    }
+
+    #totalProgressDiv span {
+      color: white;
+      text-align: center;
+      font-weight: normal;
+      font-size: 1.7vw;
+    }
+
+    #totalProgressDiv b {
+      font-size: 2.5vw;
+      color: rgb(0, 197, 255);
+    }
+
+    #dateDiv {
+      font-size: 0.85vw;
+      text-align: right;
+      display: flex;
+      align-items: flex-end;
+      font-weight: bold;
+    }
+
+    #timeSeriesChart {
+      position: absolute;
+      z-index: 1;
+      height: 30%;
+      width: 70%;
+      bottom: 20;
+      left: 150;
+    }
+
+    #time-series {
+      position: fixed;
+      top: 15;
+      right: 10;
+      width: 12.5vw;
+      height: 3.5vh;
+    }
+
+    /* Browser Setting */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    /*  */
+    .sassy-theme .esri-legend__layer-caption {
+      display: none;
+    }
+
+    .esri-layer-list__item-toggle-icon,
+    .esri-layer-list__item-title {
+      color: white;
+    }
+
+    .sassy-theme .esri-popup__header-title {
+      width: 17vw;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .sassy-theme .esri-menu,
+    .sassy-theme .esri-popup__main-container,
+    .sassy-theme .esri-popup .esri-popup__pointer-direction,
+    .sassy-theme .esri-popup .esri-popup__button,
+    .sassy-theme .esri-button,
+    .sassy-theme .esri-input,
+    .sassy-theme .esri-legend,
+    .sassy-theme .esri-layer-list,
+    .sassy-theme .esri-widget a {
+      background-color: rgb(0, 0, 0, 0.7);
+      color: #fff;
+    }
+  </style>
+
+  <script>
+    require([
+      "esri/Basemap",
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/views/SceneView",
+      "esri/layers/FeatureLayer",
+      "esri/layers/support/FeatureFilter",
+      "esri/layers/SceneLayer",
+      "esri/layers/Layer",
+      "esri/layers/TileLayer",
+      "esri/layers/VectorTileLayer",
+      "esri/layers/support/LabelClass",
+      "esri/symbols/LabelSymbol3D",
+      "esri/WebMap",
+      "esri/WebScene",
+      "esri/portal/PortalItem",
+      "esri/portal/Portal",
+      "esri/widgets/TimeSlider",
+      "esri/widgets/Legend",
+      "esri/widgets/LayerList",
+      "esri/widgets/Fullscreen",
+      "esri/rest/geometryService",
+      "esri/rest/support/Query",
+      "esri/rest/support/StatisticDefinition",
+      "esri/symbols/WebStyleSymbol",
+      "esri/TimeExtent",
+      "esri/widgets/Expand",
+      "esri/widgets/Editor",
+      "esri/renderers/UniqueValueRenderer",
+      "esri/widgets/support/DatePicker",
+      "esri/widgets/FeatureTable",
+      "esri/widgets/Compass",
+      "esri/layers/ElevationLayer",
+      "esri/Ground",
+      "esri/widgets/BasemapToggle",
+      "esri/popup/content/ImageMediaInfo",
+      "esri/popup/content/AttachmentsContent",
+      "esri/widgets/ElevationProfile",
+      "esri/widgets/BasemapGallery",
+    ], function (
+      Basemap,
+      Map,
+      MapView,
+      SceneView,
+      FeatureLayer,
+      FeatureFilter,
+      SceneLayer,
+      Layer,
+      TileLayer,
+      VectorTileLayer,
+      LabelClass,
+      LabelSymbol3D,
+      WebMap,
+      WebScene,
+      PortalItem,
+      Portal,
+      TimeSlider,
+      Legend,
+      LayerList,
+      Fullscreen,
+      geometryService,
+      Query,
+      StatisticDefinition,
+      WebStyleSymbol,
+      TimeExtent,
+      Expand,
+      Editor,
+      UniqueValueRenderer,
+      DatePicker,
+      FeatureTable,
+      Compass,
+      ElevationLayer,
+      Ground,
+      BasemapToggle,
+      ImageMediaInfo,
+      AttachmentsContent,
+      ElevationProfile,
+      BasemapGallery
+    ) {
+      let chartLayerView;
+      var basemap = new Basemap({
+        baseLayers: [
+          new VectorTileLayer({
+            portalItem: {
+              id: "79bd8b0729b34aabb4c93fa43c59c897", // Original: 3a62040541b84f528da3ac7b80cf4a63
+            },
+          }),
+        ],
+      });
+
+      // Add custom DEM to the default elevation layer of esri
+      const worldElevation = new ElevationLayer({
+        url: "//elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
+      });
+
+      const dem = new ElevationLayer({
+        portalItem: {
+          id: "dd2e85411a504182adb99215aa98ab68",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+      });
+
+      var map = new Map({
+        basemap: basemap, // "streets-night-vector", basemap, topo-vector
+        ground: new Ground({
+          layers: [worldElevation, dem],
+        }),
+      });
+      //map.ground.surfaceColor = "#FFFF";
+      //map.ground.opacity = 0.1;
+
+      var view = new SceneView({
+        map: map,
+        container: "viewDiv",
+        viewingMode: "local",
+        camera: {
+          position: {
+            x: 121.0173144,
+            y: 14.6871275,
+            z: 700,
+          },
+          tilt: 65,
+        },
+        environment: {
+          background: {
+            type: "color", // autocasts as new ColorBackground()
+            color: [0, 0, 0, 1],
+          },
+          // disable stars
+          starsEnabled: false,
+          //disable atmosphere
+          atmosphereEnabled: false,
+        },
+        popup: {
+          dockEnabled: true,
+          dockOptions: {
+            buttonEnabled: false,
+            breakpoint: false,
+          },
+        },
+      });
+
+      view.ui.components = [];
+
+      function catchAbortError(error) {
+        if (error.name != "AbortError") {
+          console.error(error);
+        }
+      }
+
+      // Setup UI
+      var headerDiv = document.getElementById("headerDiv");
+      var headerTitleDiv = document.getElementById("headerTitleDiv");
+      var applicationDiv = document.getElementById("applicationDiv");
+      const StructureTypesButton = document.getElementById("dataTypeInput");
+
+      //*******************************//
+      // Label Class Property Settings //
+      //*******************************//
+      // site photo labels
+      var sitePhotoLabelClass = new LabelClass({
+        symbol: {
+          type: "label-3d", // autocasts as new LabelSymbol3D()
+          symbolLayers: [
+            {
+              type: "text", // autocasts as new TextSymbol3DLayer()
+              material: {
+                color: "orange",
+              },
+              size: 15,
+              color: "black",
+              haloColor: "black",
+              haloSize: 1,
+              font: {
+                family: "Ubuntu Mono",
+                weight: "bold",
+              },
+            },
+          ],
+          verticalOffset: {
+            screenLength: 40,
+            maxWorldLength: 100,
+            minWorldLength: 20,
+          },
+          callout: {
+            type: "line",
+            size: 0.5,
+            color: [0, 0, 0],
+            border: {
+              color: [255, 255, 255, 0.7],
+            },
+          },
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          expression: 'DefaultValue($feature.Description, "no data")',
+        },
+      });
+
+      // Station labels
+      var stationLabelClass = new LabelClass({
+        symbol: {
+          type: "label-3d", // autocasts as new LabelSymbol3D()
+          symbolLayers: [
+            {
+              type: "text", // autocasts as new TextSymbol3DLayer()
+              material: {
+                color: "white",
+              },
+              size: 15,
+              color: "black",
+              haloColor: "black",
+              haloSize: 1,
+              font: {
+                family: "Ubuntu Mono",
+                weight: "bold",
+              },
+            },
+          ],
+          verticalOffset: {
+            screenLength: 40,
+            maxWorldLength: 100,
+            minWorldLength: 20,
+          },
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          expression: 'DefaultValue($feature.Station, "no data")',
+        },
+      });
+
+      // Excavation SPot Label
+      var excaspotlabelClass = new LabelClass({
+        symbol: {
+          type: "label-3d", // autocasts as new LabelSymbol3D()
+          symbolLayers: [
+            {
+              type: "text", // autocasts as new TextSymbol3DLayer()
+              material: {
+                color: "#98E600",
+              },
+              size: 10,
+              halo: {
+                size: 0.8,
+                color: "black",
+              },
+              font: {
+                family: "Ubuntu Mono",
+                weight: "bold",
+              },
+            },
+          ],
+          verticalOffset: {
+            screenLength: 100,
+            maxWorldLength: 200,
+            minWorldLength: 30,
+          },
+          callout: {
+            type: "line",
+            size: 0.5,
+            color: [0, 0, 0],
+            border: {
+              color: [255, 255, 255, 0.7],
+            },
+          },
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          value: "Excavating",
+        },
+      });
+
+      //*****************************//
+      //      Renderer Settings      //
+      //*****************************//
+      // Photo Symbol
+      function getUniqueValueSymbol(name, color, sizeS, util) {
+        // The point symbol is visualized with an icon symbol. To clearly see the location of the point
+        // we displace the icon vertically and add a callout line. The line connects the offseted symbol with the location
+        // of the point feature.
+        if (util == "Existing") {
+          return {
+            type: "point-3d", // autocasts as new PointSymbol3D()
+            symbolLayers: [
+              {
+                type: "icon", // autocasts as new IconSymbol3DLayer()
+                resource: {
+                  href: name,
+                },
+                size: sizeS,
+                outline: {
+                  color: "white",
+                  size: 2,
+                },
+              },
+            ],
+
+            verticalOffset: {
+              screenLength: 40,
+              maxWorldLength: 100,
+              minWorldLength: 20,
+            },
+
+            callout: {
+              type: "line", // autocasts as new LineCallout3D()
+              color: [128, 128, 128, 0.1],
+              size: 0.2,
+              border: {
+                color: "grey",
+              },
+            },
+          };
+        } else {
+          return {
+            type: "point-3d", // autocasts as new PointSymbol3D()
+            symbolLayers: [
+              {
+                type: "icon", // autocasts as new IconSymbol3DLayer()
+                resource: {
+                  href: name,
+                },
+                size: sizeS,
+                outline: {
+                  color: "white",
+                  size: 2,
+                },
+              },
+            ],
+            verticalOffset: {
+              screenLength: 40,
+              maxWorldLength: 100,
+              minWorldLength: 20,
+            },
+            callout: {
+              type: "line",
+              size: 0.5,
+              color: [0, 0, 0],
+              border: {
+                color: [255, 255, 255, 0.7],
+              },
+            },
+          };
+        }
+      }
+
+      var photoSymbolRenderer = {
+        type: "unique-value",
+        valueExpression:
+          "When($feature.Description == 'PHOTO','PHOTO',$feature.Description)",
+        uniqueValueInfos: [
+          {
+            value: "PHOTO",
+            label: "Photo Spot",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/Photo_symbol.png",
+              "#D13470",
+              20,
+              "Relocation"
+            ),
+          },
+        ],
+      };
+
+      // Boundary
+      let defaultLotSymbolBoundary = {
+        type: "simple-fill",
+        color: [0, 0, 0, 0],
+        style: "solid",
+        outline: {
+          style: "dash",
+          color: [215, 215, 158],
+          width: 1.5,
+        },
+      };
+
+      let BoundaryFillSymbol = {
+        type: "unique-value",
+        field: "StatusNVS3",
+        defaultSymbol: defaultLotSymbolBoundary,
+      };
+
+      // TBM Alignment line
+      let defaultTBMAlign = {
+        type: "simple-line",
+        color: [211, 211, 211, 0.5],
+        style: "solid",
+        width: 0.5,
+      };
+
+      let tbmAlignRenderer = {
+        type: "unique-value",
+        field: "LAYER",
+        defaultSymbol: defaultTBMAlign,
+      };
+
+      // Station Symbol
+      function stationsSymbol(name) {
+        return {
+          type: "web-style", // autocasts as new WebStyleSymbol()
+          name: name,
+          styleName: "EsriIconsStyle", //EsriRealisticTransportationStyle, EsriIconsStyle
+        };
+      }
+
+      // Station Renderer
+      var stationsRenderer = {
+        type: "unique-value", // autocasts as new UniqueValueRenderer()
+        field: "Name",
+        defaultSymbol: stationsSymbol("Train"), //Backhoe, Train
+      };
+
+      const colorP = [
+        "#FFE1E1E1",
+        "#80FF0000",
+        "#4D",
+        "#4D",
+        "#80",
+        "#80",
+        "#80",
+        "#80",
+      ];
+      // Legend Color for Structure Layer
+      const colors = {
+        1: [225, 225, 225, 0], // 0% (To be Constructed)
+        2: [208, 209, 230, 1], // 1 - >25%
+        3: [166, 189, 219, 1], // 25 - >50%
+        4: [116, 169, 207, 1], // 50 - >75%
+        5: [43, 140, 190, 1], // 75%<
+        6: [4, 90, 141, 1], // 100% (Completed)
+        //7: [255, 0, 0, 0.5], // Delayed
+      };
+
+      //*******************************//
+      // Import Layers                 //
+      //*******************************//
+      // Construction boundary
+      var constBoundary = new FeatureLayer({
+        portalItem: {
+          id: "b0cf28b499a54de7b085725bca08deee",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 4,
+        //renderer: BoundaryFillSymbol,
+        elevationInfo: {
+          mode: "on-the-ground",
+        },
+        popupEnabled: false,
+      });
+      constBoundary.listMode = "hide";
+      map.add(constBoundary);
+
+      // photo points
+      var photoLayer = new FeatureLayer({
+        portalItem: {
+          id: "bdbfa1159b6c4ef3a94e0c87462bc625",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        //labelingInfo: [sitePhotoLabelClass],
+        renderer: photoSymbolRenderer,
+        elevationInfo: {
+          mode: "relative-to-ground",
+          featureExpressionInfo: {
+            expression: "Geometry($feature).z * 0",
+          },
+          unit: "meters",
+        },
+        popupTemplate: {
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          content: [
+            {
+              type: "media",
+              mediaInfos: [
+                {
+                  title: "{Title}",
+                  type: "image",
+                  caption: "As of {DateTime}",
+                  value: {
+                    sourceURL: "{ImageURL}",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      });
+      map.add(photoLayer, 1);
+
+      view
+        .when()
+        .then(() => {
+          return photoLayer.when();
+        })
+        .then((layer) => {
+          return view.whenLayerView(layer);
+        })
+        .then((layerView) => {
+          view.on("click", eventHandler);
+
+          function eventHandler(event) {
+            const opts = {
+              include: photoLayer,
+            };
+            view.hitTest(event, opts).then(getGraphics);
+          }
+
+          function getGraphics(response) {
+            if (response.results.length) {
+              const graphic = response.results[0].graphic;
+              const attributes = graphic.attributes;
+              const objid = attributes.OBJECTID;
+            }
+          }
+        });
+
+      // Station point feature
+      var stationLayer = new SceneLayer({
+        portalItem: {
+          id: "6d8d606fee5841ea80fa133adbb028fc",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        popupEnabled: false,
+        definitionExpression: "Project = 'MMSP'",
+        labelingInfo: [stationLabelClass],
+        renderer: stationsRenderer,
+        elevationInfo: {
+          // this elevation mode will place points on top of
+          // buildings or other SceneLayer 3D objects
+          mode: "relative-to-ground",
+        },
+        //screenSizePerspectiveEnabled: false, // gives constant size regardless of zoom
+      });
+      stationLayer.listMode = "hide";
+      map.add(stationLayer, 3);
+
+      // Structure Layer
+      var structureLayer = new SceneLayer({
+        //structureLayer
+        portalItem: {
+          id: "0bba3bc8c087412b89a3d72a47a1c6aa",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        popupTemplate: {
+          title: "Percent Progress: {PercentProgress}%",
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "Status",
+                  label: "<h5>Construction Status</h5>",
+                },
+                {
+                  fieldName: "Type",
+                  label: "Type of Structure",
+                },
+                {
+                  fieldName: "StartDate",
+                  label: "Commencement Date",
+                },
+                {
+                  fieldName: "TargetDate",
+                  label: "Target Date",
+                },
+              ],
+            },
+          ],
+        },
+        elevationInfo: {
+          mode: "absolute-height",
+          offset: 0,
+        },
+        title: "TBM Shaft",
+        // when filter using date, example below. use this format
+        //definitionExpression: "EndDate = date'2020-6-3'"
+      });
+      map.add(structureLayer, 1);
+
+      function renderStructureLayer() {
+        const renderer = new UniqueValueRenderer({
+          field: "Status",
+        });
+
+        for (let property in colors) {
+          if (colors.hasOwnProperty(property)) {
+            renderer.addUniqueValueInfo({
+              value: property,
+              symbol: {
+                type: "mesh-3d",
+                symbolLayers: [
+                  {
+                    type: "fill",
+                    material: {
+                      color: colors[property],
+                      colorMixMode: "replace",
+                    },
+                    edges: {
+                      type: "solid", // autocasts as new SolidEdges3D()
+                      color: [225, 225, 225, 0.8], //225, 225, 225, 0.3
+                      size: 1,
+                    },
+                  },
+                ],
+              },
+            });
+          }
+        }
+        structureLayer.renderer = renderer;
+      }
+      renderStructureLayer();
+
+      //
+      const colorsCC = {
+        1: [225, 225, 225, 0], // To be Constructed (white)
+        2: [130, 130, 130, 0.3], // Under Construction
+        3: [255, 0, 0, 0.5], // Delayed
+        4: [0, 197, 255, 0.5], // Complete [0, 197, 255]
+      };
+
+      var ccLayer = new SceneLayer({
+        portalItem: {
+          id: "fbb56dc7963e4bef980c0b4c7c728491",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        title: "Cut & Cover",
+        outFields: ["*"],
+        popupTemplate: {
+          title: "Basic Information",
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "Status",
+                  label: "<h5>Construction Status</h5>",
+                },
+                {
+                  fieldName: "Type2",
+                  label: "Type of Structure",
+                },
+                {
+                  fieldName: "TargetDate",
+                  label: "Target Date",
+                },
+              ],
+            },
+          ],
+        },
+        // when filter using date, example below. use this format
+        //definitionExpression: "EndDate = date'2020-6-3'"
+      });
+      map.add(ccLayer);
+
+      function renderCCLayer() {
+        const rendererCC = new UniqueValueRenderer({
+          field: "Status",
+        });
+
+        for (let property in colorsCC) {
+          if (colorsCC.hasOwnProperty(property)) {
+            rendererCC.addUniqueValueInfo({
+              value: property,
+              symbol: {
+                type: "mesh-3d",
+                symbolLayers: [
+                  {
+                    type: "fill",
+                    material: {
+                      color: colorsCC[property],
+                      colorMixMode: "replace",
+                    },
+                    edges: {
+                      type: "solid", // autocasts as new SolidEdges3D()
+                      color: [225, 225, 225, 0.8], //225, 225, 225, 0.3
+                      size: 1,
+                    },
+                  },
+                ],
+              },
+            });
+          }
+        }
+
+        ccLayer.renderer = rendererCC;
+      }
+
+      renderCCLayer();
+
+      // TBM Alignment reference line:--------------
+      var tbmAlign = new FeatureLayer({
+        portalItem: {
+          id: "ea9eb839b97a42988bfb32d10a3c1141",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        renderer: tbmAlignRenderer,
+        elevationInfo: {
+          mode: "on-the-ground",
+          offset: 0,
+        },
+        title: "TBM Alignment",
+        popupEnabled: false,
+      });
+      map.add(tbmAlign, 0);
+
+      //*******************************//
+      //      Progress Chart           //
+      //*******************************//
+
+      // Total progress //
+      function toalProgressShaft() {
+        var averageProgress = {
+          onStatisticField: "PercentProgress",
+          outStatisticFieldName: "averageProgress",
+          statisticType: "avg",
+        };
+
+        var query = structureLayer.createQuery();
+        query.outStatistics = [averageProgress];
+        query.returnGeometry = true;
+        structureLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features[0].attributes;
+
+          const averageProgress = stats.averageProgress;
+          const value = averageProgress.toFixed(1);
+          document.getElementById("totalProgressDiv").innerHTML = `
+                                                                <span>Total Progress</span><br>
+                                                                <b>${value}%</b>
+                                                                `; //
+        });
+      }
+
+      /* Function for zooming to selected layers */
+      function zoomToLayer(layer) {
+        return layer.queryExtent().then(function (response) {
+          view
+            .goTo(response.extent, {
+              //response.extent
+              speedFactor: 2,
+            })
+            .catch(function (error) {
+              if (error.name != "AbortError") {
+                console.error(error);
+              }
+            });
+        });
+      }
+
+      // Total progress for Cut and Cover
+      function totalProgressCC() {
+        var total_cc_comp = {
+          onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cc_comp",
+          statisticType: "sum",
+        };
+
+        var total_cc_count = {
+          onStatisticField: "Layer",
+          outStatisticFieldName: "total_cc_count",
+          statisticType: "count",
+        };
+
+        var query = ccLayer.createQuery();
+        query.outStatistics = [total_cc_comp, total_cc_count];
+        query.returnGeometry = true;
+
+        ccLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features[0].attributes;
+
+          const total_N = stats.total_cc_count;
+          const comp = stats.total_cc_comp;
+          const perc = ((comp / total_N) * 100).toFixed(1);
+
+          document.getElementById("totalProgressDiv").innerHTML = `
+                                                                <span>Total Progress</span><br>
+                                                                <b>${perc}%</b>
+                                                                `; //
+        });
+      }
+
+      // Get last edited date
+      const month = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      function getEditedDateValue() {
+        var tempDates = [];
+
+        var query = structureLayer.createQuery();
+        //query.fields = ["enddate"];
+        query.where = "last_edited_date IS NOT NULL";
+        return structureLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features;
+          stats.forEach((result, index) => {
+            var attributes = result.attributes;
+            const dates = attributes.last_edited_date;
+            tempDates.push(dates);
+          });
+          const lastDate = Math.max(...tempDates);
+          const lastEdit = new Date(lastDate);
+          const yyyy = lastEdit.getFullYear();
+          const mm = month[lastEdit.getMonth()];
+          const dd = lastEdit.getDate();
+          const lastEditedDate = `${mm} ${dd}, ${yyyy}`;
+          document.getElementById("dateDiv").innerHTML =
+            "As of September 25, 2023"; //lastEditedDate;
+        });
+      }
+      getEditedDateValue();
+
+      // Create Bar chart to show progress of station structure
+      am5.ready(function () {
+        // For Monitoring Chart
+        // various properties setting
+        const marginTop = 0;
+        const marginLeft = 0;
+        const marginRight = 0;
+        const marginBottom = 0;
+        const paddingTop = 0;
+        const paddingLeft = 5;
+        const paddingRight = 5;
+        const paddingBottom = 15;
+
+        const xAxisNumberFormat = "#'%'";
+        const seriesBulletLabelFontSize = "1.5vw";
+
+        // series line fill pattern
+        const linePatternColorComplete = "#0070ff";
+        const linePatternColorOpacityComplete = 0;
+        const linePatternFillOpacityComplete = 0;
+
+        const linePatternColorOpacityIncomplet = 0;
+        const linePatternFillOpacityIncomplet = 1;
+        const linePatternStrokeOpacityIncomplet = 0;
+
+        // axis label
+        const yAxisLabelFontSize = "1.2vw";
+        const xAxisLabelFontSize = "0.8vw";
+        const legendFontSize = "1vw";
+
+        //
+        class MyTheme extends am5.Theme {
+          setupDefaultRules() {
+            var theme = this;
+
+            this.patterns = [
+              am5.LinePattern.new(this._root, {
+                color: am5.color(linePatternColorComplete),
+                colorOpacity: linePatternColorOpacityComplete,
+                fillOpacity: linePatternFillOpacityComplete,
+              }),
+
+              am5.LinePattern.new(this._root, {
+                colorOpacity: linePatternColorOpacityIncomplet,
+                fillOpacity: linePatternFillOpacityIncomplet,
+                strokeOpacity: linePatternStrokeOpacityIncomplet,
+              }),
+            ];
+
+            this.currentPattern = 0;
+            this.rule("RoundedRectangle").setAll({
+              fillOpacity: 1,
+            });
+
+            this.rule("RoundedRectangle").setup = function (target) {
+              target.set("fillPattern", theme.patterns[theme.currentPattern]);
+              theme.currentPattern++;
+              if (theme.currentPattern == theme.patterns.length) {
+                theme.currentPattern = 0;
+              }
+            };
+          }
+        }
+
+        var root = am5.Root.new("chartShaftDiv");
+        root._logo.dispose();
+        const type = [
+          {
+            type: "Bottom Slab",
+            value: 1,
+          },
+          {
+            type: "Retaining Wall",
+            value: 2,
+          },
+          {
+            type: "Inner Wall",
+            value: 3,
+          },
+          {
+            type: "Top Slab",
+            value: 4,
+          },
+          {
+            type: "Pump Pit",
+            value: 5,
+          },
+        ];
+
+        function updateChartShaft() {
+          root.container.children.clear();
+          var query = structureLayer.createQuery();
+          query.where = "Type > 0";
+          query.outFields = ["Type", "PercentProgress"];
+          query.orderByFields = ["Type"];
+          query.groupByFieldsForStatistics = ["Type"];
+
+          structureLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features;
+
+            const data = stats.map((result, index) => {
+              const attributes = result.attributes;
+              const complete = attributes.PercentProgress;
+              const incomplete = attributes.PercentProgress;
+              const TYPE = attributes.Type;
+
+              // find Type name using Type domain values
+              const find = type.find((emp) => emp.value === TYPE);
+              const typeSelect = find.type;
+
+              return Object.assign(
+                {},
+                {
+                  category: typeSelect,
+                  comp: complete,
+                  incomp: incomplete,
+                }
+              );
+            }); // end of stats.map
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root.setThemes([
+              am5themes_Animated.new(root),
+              am5themes_Responsive.new(root),
+              //MyTheme.new(root)
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root.container.children.push(
+              am5xy.XYChart.new(root, {
+                panX: false,
+                panY: false,
+                layout: root.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+                scale: 0.9,
+              })
+            );
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root, {
+              inversed: true,
+            });
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root, {
+                categoryField: "category",
+                renderer: yRenderer,
+                tooltip: am5.Tooltip.new(root, {}),
+              })
+            );
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            // Label properties Y axis
+            yAxis.get("renderer").labels.template.setAll({
+              //oversizedBehavior: "wrap",
+              textAlign: "center",
+              fill: am5.color("#ffffff"),
+              //maxWidth: 150,
+              fontSize: yAxisLabelFontSize,
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root, {
+                min: 0,
+                max: 100,
+                strictMax: true,
+                numberFormat: xAxisNumberFormat,
+                calculateTotals: true,
+                renderer: am5xy.AxisRendererX.new(root, {
+                  strokeOpacity: 0,
+                  strokeWidth: 1,
+                  stroke: am5.color("#ffffff"),
+                }),
+              })
+            );
+
+            // Label properties for yAxis (category axis)
+            xAxis.get("renderer").labels.template.setAll({
+              //oversizedBehavior: "wrap",
+              textAlign: "center",
+              fill: am5.color("#ffffff"),
+              //maxWidth: 150,
+              fontSize: xAxisLabelFontSize,
+            });
+
+            // Add legend
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+            var legend = chart.children.push(
+              am5.Legend.new(root, {
+                centerX: am5.p50,
+                x: am5.percent(70),
+                y: am5.percent(100),
+              })
+            );
+
+            legend.labels.template.setAll({
+              oversizedBehavior: "truncate",
+              fill: am5.color("#ffffff"),
+              fontSize: legendFontSize,
+              //scale: 0.8,
+              //textDecoration: "underline"
+              //width: am5.percent(200)
+              //fontWeight: "300"
+            });
+
+            // Chart title
+            /*
+          chart.children.unshift(am5.Label.new(root, {
+            text: "Construction Progress",
+            fontSize: "1.5vw",
+            fontWeight: "bold",
+            textAlign: "center",
+            fill: am5.color("#ffffff"),
+            x: am5.percent(50),
+            centerX: am5.percent(50),
+            paddingTop: 5,
+            paddingBottom: 8,
+        }));
+        */
+
+            chart.get("colors").set("colors", [
+              am5.color("#0070ff"), //
+              am5.color("#000000"),
+            ]);
+
+            // Add series
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  //valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                })
+              );
+
+              series.columns.template.setAll({
+                tooltipText: "{name}: {valueX}", // "{categoryY}: {valueX}",
+                tooltipY: am5.percent(90),
+                //fill: am5.color("#ffffff")
+                // 100% transparent for incomplete
+                fillOpacity: fieldName == "incomp" ? 0 : 1,
+              });
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root, {
+                  sprite: am5.Label.new(root, {
+                    text: "{valueX}" == 0 ? "" : "{valueX}%", //"{valueX}",
+                    fill: root.interfaceColors.get("alternativeText"),
+                    opacity: fieldName == "incomp" ? 0 : 1,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                // Layer
+                const SELECTED = ev.target.dataItem.dataContext.category;
+                const find = type.find((emp) => emp.type === SELECTED);
+                const typeSelects = find.value;
+
+                var highlight = null;
+                // Update layerView based on viaduct components being selected
+                view
+                  .whenLayerView(structureLayer)
+                  .then(function (structureLayerView) {
+                    structureLayerView.filter = {
+                      where: "Type = " + typeSelects,
+                      //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'"
+                    };
+
+                    structureLayerView.queryFeatures().then(function (results) {
+                      const ggg = results.features;
+                      const rowN = ggg.length;
+
+                      // Extract and obtain OBJECTID
+                      let objID = [];
+                      for (var i = 0; i < rowN; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                      }
+                      highlightSelect = structureLayerView.highlight([objID]);
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      // Reset selection by clicking anywhere on the map
+                      view.on("click", function () {
+                        structureLayerView.filter = null;
+                        highlightSelect.remove();
+                      });
+                    });
+                  }); // whenLayerView
+              }); // End of filterByChart
+              legend.data.push(series);
+            }
+            makeSeries("Complete", "comp");
+            makeSeries("Incomplete", "incomp");
+          }); // end of queryFeatures
+        } // end of updateChart
+        updateChartShaft();
+
+        // Cut and Cover
+        const typeCC = [
+          {
+            type: "Bottom Slab",
+            value: 1,
+          },
+          {
+            type: "Retaining Wall",
+            value: 2,
+          },
+          {
+            type: "Inner Wall",
+            value: 3,
+          },
+          {
+            type: "Top Slab",
+            value: 4,
+          },
+        ];
+        var root2 = am5.Root.new("chartCutCoverDiv");
+        root2._logo.dispose();
+
+        function updateChartCC() {
+          root2.container.children.clear();
+          var total_bottomslab_tobeC = {
+            onStatisticField:
+              "CASE WHEN (Type2 = 1 and Status = 1) THEN 1 ELSE 0 END", // D-Wall and to be Constructed
+            outStatisticFieldName: "total_bottomslab_tobeC",
+            statisticType: "sum",
+          };
+
+          var total_bottomslab_done = {
+            onStatisticField:
+              "CASE WHEN (Type2 = 1 and Status = 4) THEN 1 ELSE 0 END", // D-Wall and Complete
+            outStatisticFieldName: "total_bottomslab_done",
+            statisticType: "sum",
+          };
+
+          // Retaining Wall
+          var total_retainwall_tobeC = {
+            onStatisticField:
+              "CASE WHEN (Type2 = 2 and Status = 1) THEN 1 ELSE 0 END", // D-Wall and to be Constructed
+            outStatisticFieldName: "total_retainwall_tobeC",
+            statisticType: "sum",
+          };
+
+          var total_retainwall_done = {
+            onStatisticField:
+              "CASE WHEN (Type2 = 2 and Status = 4) THEN 1 ELSE 0 END", // D-Wall and Complete
+            outStatisticFieldName: "total_retainwall_done",
+            statisticType: "sum",
+          };
+
+          // Inner Wall
+          var total_innerwall_tobeC = {
+            onStatisticField:
+              "CASE WHEN (Type2 = 3 and Status = 1) THEN 1 ELSE 0 END", // D-Wall and to be Constructed
+            outStatisticFieldName: "total_innerwall_tobeC",
+            statisticType: "sum",
+          };
+
+          var total_innerwall_done = {
+            onStatisticField:
+              "CASE WHEN (Type2 = 3 and Status = 4) THEN 1 ELSE 0 END", // D-Wall and Complete
+            outStatisticFieldName: "total_innerwall_done",
+            statisticType: "sum",
+          };
+
+          // Top Slab
+          // Inner Wall
+          var total_topslab_tobeC = {
+            onStatisticField:
+              "CASE WHEN (Type2 = 4 and Status = 1) THEN 1 ELSE 0 END", // D-Wall and to be Constructed
+            outStatisticFieldName: "total_topslab_tobeC",
+            statisticType: "sum",
+          };
+
+          var total_topslab_done = {
+            onStatisticField:
+              "CASE WHEN (Type2 = 4 and Status = 4) THEN 1 ELSE 0 END", // D-Wall and Complete
+            outStatisticFieldName: "total_topslab_done",
+            statisticType: "sum",
+          };
+
+          var query = ccLayer.createQuery();
+          query.outStatistics = [
+            total_bottomslab_tobeC,
+            total_bottomslab_done,
+            total_retainwall_tobeC,
+            total_retainwall_done,
+            total_innerwall_tobeC,
+            total_innerwall_done,
+            total_topslab_tobeC,
+            total_topslab_done,
+          ];
+          query.returnGeometry = true;
+
+          ccLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            // Bottom Slab
+            const bottomslab_tobeC = stats.total_bottomslab_tobeC;
+            const bottomslab_done = stats.total_bottomslab_done;
+
+            // Retaining Wall
+            const retainwall_tobeC = stats.total_retainwall_tobeC;
+            const retainwall_done = stats.total_retainwall_done;
+
+            // Inner Wall
+            const innerwall_tobeC = stats.total_innerwall_tobeC;
+            const innerwall_done = stats.total_innerwall_done;
+
+            // Top Slab
+            const topslab_tobeC = stats.total_topslab_tobeC;
+            const topslab_done = stats.total_topslab_done;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root2.setThemes([
+              am5themes_Animated.new(root2),
+              am5themes_Responsive.new(root2),
+              //MyTheme.new(root2)
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root2.container.children.push(
+              am5xy.XYChart.new(root2, {
+                panX: false,
+                panY: false,
+                layout: root2.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+                scale: 0.9,
+              })
+            );
+
+            var data = [
+              {
+                category: "Top Slab",
+                comp: topslab_done,
+                incomp: topslab_tobeC,
+              },
+              {
+                category: "Inner Wall",
+                comp: innerwall_done,
+                incomp: innerwall_tobeC,
+              },
+              {
+                category: "Retaining Wall",
+                comp: retainwall_done,
+                incomp: retainwall_tobeC,
+              },
+              {
+                category: "Bottom Slab",
+                comp: bottomslab_done,
+                incomp: bottomslab_tobeC,
+              },
+            ];
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root2, {
+              inversed: true,
+            });
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root2, {
+                categoryField: "category",
+                renderer: yRenderer,
+                tooltip: am5.Tooltip.new(root2, {}),
+              })
+            );
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            // Label properties Y axis
+            yAxis.get("renderer").labels.template.setAll({
+              //oversizedBehavior: "wrap",
+              textAlign: "center",
+              fill: am5.color("#ffffff"),
+              //maxWidth: 150,
+              fontSize: yAxisLabelFontSize,
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root2, {
+                min: 0,
+                max: 100,
+                strictMax: true,
+                numberFormat: xAxisNumberFormat,
+                calculateTotals: true,
+                renderer: am5xy.AxisRendererX.new(root2, {
+                  strokeOpacity: 0,
+                  strokeWidth: 1,
+                  stroke: am5.color("#ffffff"),
+                }),
+              })
+            );
+
+            // Label properties for yAxis (category axis)
+            xAxis.get("renderer").labels.template.setAll({
+              //oversizedBehavior: "wrap",
+              textAlign: "center",
+              fill: am5.color("#ffffff"),
+              //maxWidth: 150,
+              fontSize: xAxisLabelFontSize,
+            });
+
+            // Add legend
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+            var legend = chart.children.push(
+              am5.Legend.new(root2, {
+                centerX: am5.p50,
+                x: am5.percent(70),
+                y: am5.percent(100),
+              })
+            );
+
+            legend.labels.template.setAll({
+              oversizedBehavior: "truncate",
+              fill: am5.color("#ffffff"),
+              fontSize: legendFontSize,
+              //scale: 0.8,
+              //textDecoration: "underline"
+              //width: am5.percent(200)
+              //fontWeight: "300"
+            });
+
+            // Chart title
+            /*
+        chart.children.unshift(am5.Label.new(root2, {
+          text: "Construction Progress",
+          fontSize: "1.5vw",
+          fontWeight: "bold",
+          textAlign: "center",
+          fill: am5.color("#ffffff"),
+          x: am5.percent(50),
+          centerX: am5.percent(50),
+          paddingTop: 5,
+          paddingBottom: 8,
+      }));
+      */
+
+            chart.get("colors").set("colors", [
+              am5.color("#0070ff"), //
+              am5.color("#000000"),
+            ]);
+
+            // Add series
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root2, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                })
+              );
+
+              series.columns.template.setAll({
+                tooltipText: "{name}: {valueX}", // "{categoryY}: {valueX}",
+                tooltipY: am5.percent(90),
+                //fill: am5.color("#ffffff")
+                // 100% transparent for incomplete
+                fillOpacity: fieldName == "incomp" ? 0 : 1,
+              });
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root2, {
+                  sprite: am5.Label.new(root2, {
+                    text:
+                      "{valueX}" == 0
+                        ? ""
+                        : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+                    fill: root2.interfaceColors.get("alternativeText"),
+                    opacity: fieldName == "incomp" ? 0 : 1,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                // Layer
+                const SELECTED = ev.target.dataItem.dataContext.category;
+                const find = typeCC.find((emp) => emp.type === SELECTED);
+                const typeSelect = find.value;
+
+                var highlight = null;
+                // Update layerView based on viaduct components being selected
+                view
+                  .whenLayerView(structureLayer)
+                  .then(function (structureLayerView) {
+                    structureLayerView.filter = {
+                      where: "Type2 = " + typeSelect,
+                      //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'"
+                    };
+
+                    structureLayerView.queryFeatures().then(function (results) {
+                      const ggg = results.features;
+                      const rowN = ggg.length;
+
+                      // Extract and obtain OBJECTID
+                      let objID = [];
+                      for (var i = 0; i < rowN; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                      }
+                      highlightSelect = structureLayerView.highlight([objID]);
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      // Reset selection by clicking anywhere on the map
+                      view.on("click", function () {
+                        structureLayerView.filter = null;
+                        highlightSelect.remove();
+                      });
+                    });
+                  }); // whenLayerView
+              }); // End of filterByChart
+
+              legend.data.push(series);
+            }
+
+            makeSeries("Complete", "comp");
+            makeSeries("Incomplete", "incomp");
+          }); // end of queryFeatures
+        } // end of updateChartCC
+
+        //
+
+        if ((document.getElementById("TBM Shaft").checked = true)) {
+          updateChartShaft();
+          zoomToLayer(structureLayer);
+
+          toalProgressShaft();
+        }
+
+        const chartShaftDiv = document.getElementById("chartShaftDiv");
+        const chartCutCoverDiv = document.getElementById("chartCutCoverDiv");
+
+        // click event handler for choices
+        StructureTypesButton.addEventListener("click", filterByTest);
+        function filterByTest(event) {
+          const selectedType = event.target.id; // TBM Shaft, Cut & Cover....
+          if (selectedType == "TBM Shaft") {
+            chartShaftDiv.style.display = "block";
+            chartCutCoverDiv.style.display = "none";
+
+            legend.visible = true;
+
+            zoomToLayer(structureLayer);
+            updateChartShaft;
+            toalProgressShaft();
+          } else if (selectedType == "Cut & Cover") {
+            chartShaftDiv.style.display = "none";
+            chartCutCoverDiv.style.display = "block";
+            legend.visible = false;
+
+            zoomToLayer(ccLayer);
+            updateChartCC();
+            totalProgressCC();
+          }
+        }
+
+        // view.when
+        view.when(() => {
+          document.querySelector("#header-title").textContent =
+            "MMSP TBM SHAFT/CUT & COVER";
+          document.querySelector("#item-description").innerHTML = `
+                                                              1. You can <b>filter data</b> by selecting 'TBM Shaft' or 'Cut & Cover' using a radio button in the header panel.<br>
+                                                              <br>2. You can view construction progress in bar charts.<br>
+                                                              <br>3. <b>Click column series in chart</b> to view selected structural components on the map.<br>
+                                                              <br>4. <b>Click 'Progress Chart'</b> in header panel to view time-series construction progress.<br>
+                                                              <br>5. Click/unclick widgets icon for viewing Layer list, legend, basemaps, and locate widgets under the main title.<br>
+                                                            `;
+
+          let activeWidget;
+          const handleActionBarClick = ({ target }) => {
+            if (target.tagName !== "CALCITE-ACTION") {
+              return;
+            }
+
+            if (activeWidget) {
+              document.querySelector(
+                `[data-action-id=${activeWidget}]`
+              ).active = false;
+              document.querySelector(
+                `[data-panel-id=${activeWidget}]`
+              ).hidden = true;
+            }
+
+            const nextWidget = target.dataset.actionId;
+            if (nextWidget !== activeWidget) {
+              document.querySelector(
+                `[data-action-id=${nextWidget}]`
+              ).active = true;
+              document.querySelector(
+                `[data-panel-id=${nextWidget}]`
+              ).hidden = false;
+              activeWidget = nextWidget;
+            } else {
+              activeWidget = null;
+            }
+          };
+
+          // Action bar
+          document
+            .querySelector("calcite-action-bar")
+            .addEventListener("click", handleActionBarClick);
+          let actionBarExpanded = false;
+          document.addEventListener("calciteActionBarToggle", (event) => {
+            actionBarExpanded = !actionBarExpanded;
+            view.padding = {
+              left: actionBarExpanded ? 135 : 45,
+            };
+          });
+        }); // end of view.when
+      }); // End of am5
+
+      ///////////////////////////////////////////////
+      const basemaps = new BasemapGallery({
+        view,
+        container: "basemaps-container",
+      });
+
+      // LayerList and Add legend to the LayerList
+      // On-off feature layer tab
+      var layerList = new LayerList({
+        view: view,
+        container: "layers-container",
+        listItemCreatedFunction: function (event) {
+          const item = event.item;
+          if (item.title === "Chainage" || item.title === "ROW") {
+            item.visible = false;
+          }
+        },
+      });
+
+      var legend = new Legend({
+        view,
+        container: "legend-container",
+        layerInfos: [
+          {
+            layer: structureLayer,
+            title: "Construction Progress (TBM Shaft ONLY)",
+          },
+        ],
+      });
+
+      view.ui.empty("top-left");
+
+      // Compass
+      var compass = new Compass({
+        view: view,
+      });
+      view.ui.add(compass, "top-right");
+
+      // See-through-Ground
+      view.when(function () {
+        // allow navigation above and below the ground
+        map.ground.navigationConstraint = {
+          type: "none",
+        };
+        // the webscene has no basemap, so set a surfaceColor on the ground
+        map.ground.surfaceColor = "#fff";
+        // to see through the ground, set the ground opacity to 0.4
+        map.ground.opacity = 0.5;
+      });
+
+      // See-through-Ground
+      view.when(function () {
+        // allow navigation above and below the ground
+        map.ground.navigationConstraint = {
+          type: "none",
+        };
+        // the webscene has no basemap, so set a surfaceColor on the ground
+        map.ground.surfaceColor = "#fff";
+
+        // to see through the ground, set the ground opacity to 0.4
+        map.ground.opacity = 0.9;
+      });
+
+      document
+        .getElementById("myLink")
+        .addEventListener("click", function (event) {
+          const checked = event.srcElement.checked;
+          map.ground.opacity = event.srcElement.checked ? 0.1 : 0.6;
+        });
+    });
+  </script>
+</html>
