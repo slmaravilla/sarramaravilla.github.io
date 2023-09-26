@@ -77,11 +77,8 @@
     <calcite-shell content-behind>
         <div slot="header" id="header">
             <h2 id="header-title" slot="header">MCXex Alignment Map</h2>
-            <div id="header-controls">
-                <calcite-label layout="inline" class="label-wrapper">
-                    <calcite-checkbox>Mama</calcite-checkbox>
-                </calcite-label>
-            </div>
+            
+            
         </div>
 
 
@@ -96,11 +93,17 @@
                 <div id="layers-container"></div>
             </calcite-panel>
             <calcite-panel heading ="Basemaps" height-scale="1" data-panel-id="basemaps" hidden>
-                <div id="basemaps-container"></div>
+                <div id="basemaps-container">
+                </div>
             </calcite-panel>
         </calcite-shell-panel>
+
         <div id="container">
-            <div id="viewDiv"></div>
+            <div id="viewDiv">
+                <calcite-label layout="inline" id="see-through-label">
+                    <calcite-checkbox id="myLink"></calcite-checkbox>See-through-Ground
+                  </calcite-label>
+            </div>
 
         </div>
 
