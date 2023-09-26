@@ -46,6 +46,20 @@
     <calcite-shell content-behind>
         <h2 id="header-title" slot="header">MCXex Alignment Map</h2>
 
+        <calcite-shell-panel slot="panel-start" display-mode="float" detached>
+            <calcite-action-bar slot="action-bar">
+                <calcite-action data-action-id="layers" icon="layers" text="Layers"></calcite-action>
+                <calcite-action data-action-id="basemaps" icon="basemap" text="Basemaps"></calcite-action>
+            </calcite-action-bar>
+
+
+            <calcite-panel heading ="Layers" height-scale="1" data-panel-id="layers" hidden>
+                <div id="layers-container"></div>
+            </calcite-panel>
+            <calcite-panel heading ="Basemaps" height-scale="1" data-panel-id="basemaps" hidden>
+                <div id="basemaps-container"></div>
+            </calcite-panel>
+        </calcite-shell-panel>
         <div id="container">
             <div id="viewDiv"></div>
         </div>
@@ -225,6 +239,63 @@
             ]
         });
         view.ui.add(legend, "bottom-left");
+
+
+        
+        let activeWidget;
+
+        const handleActionBarClick = ({ target }) => {
+          if (target.tagName !== "CALCITE-ACTION") {
+            return;
+          }
+
+          if (activeWidget) {
+            document.querySelector(
+              `[data-action-id=${activeWidget}]`
+            ).active = false;
+            document.querySelector(
+              `[data-panel-id=${activeWidget}]`
+            ).hidden = true;
+
+            // Close the progress time series chart when chart widget is closed
+            if (`${activeWidget}` === "charts") {
+              //document.getElementById("land-checkbox").checked = false;
+              timeSeriesChartDiv.style.display = "none";
+            }
+          }
+
+          const nextWidget = target.dataset.actionId;
+
+          if (nextWidget !== activeWidget) {
+            document.querySelector(
+              `[data-action-id=${nextWidget}]`
+            ).active = true;
+            document.querySelector(
+              `[data-panel-id=${nextWidget}]`
+            ).hidden = false;
+            activeWidget = nextWidget;
+
+            // Open the time series chart when chart widget is opened.
+            if (`${activeWidget}` === "charts") {
+              //document.getElementById("land-checkbox").checked = true;
+              timeSeriesChartDiv.style.display = "block";
+            }
+          } else {
+            activeWidget = null;
+          }
+        };
+
+        // Action bar
+        document
+          .querySelector("calcite-action-bar")
+          .addEventListener("click", handleActionBarClick);
+        let actionBarExpanded = false;
+        document.addEventListener("calciteActionBarToggle", (event) => {
+          actionBarExpanded = !actionBarExpanded;
+          view.padding = {
+            left: actionBarExpanded ? 135 : 45,
+          };
+        });
 
 
     });
