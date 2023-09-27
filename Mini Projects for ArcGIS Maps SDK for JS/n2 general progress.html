@@ -9,7 +9,7 @@
   <script type="module" src="https://js.arcgis.com/calcite-components/1.0.7/calcite.esm.js"></script>
   <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.0.7/calcite.css" />
 
-  <script src="https://js.arcgis.com/4.27/"></script>
+  <script src="https://js.arcgis.com/4.26/"></script>
 </head>
 <style>
   html,
@@ -171,10 +171,7 @@
     /*opacity: 0%;*/
   }
 
-  #compassDiv {
-    height: 40px;
-    width: 40px;
-  }
+  
 
   #stationContent1 {
     width: 10vw;
@@ -218,29 +215,51 @@
   #sliderDiv {
     width: 300px;
     margin: auto;
-
   }
 
-  #controlsWidget {
-    padding: 10px;
+  #launchButton {
+    position: absolute;
+    top: 2rem;
+    left: 10px;
+    --calcite-ui-icon-color: rgb(0, 0, 0);
+  }
+
+
+  #screenshotButton {
+    position: absolute;
+    top: 3rem;
+    left: 15px;
+    --calcite-ui-icon-color: rgb(0, 0, 0);
+  }
+
+  #compassDiv {
+    position: absolute;
+    height: 40px;
+    width: 40px;
+    top: 5.2rem;
+    left: 10px;
   }
 </style>
 
 <body class="sassy-theme">
   <calcite-loader></calcite-loader>
   <calcite-shell content-behind>
-    <div id="controlsWidget" class="esri-widget">
-      <a id="takeScreenshotButton" class="btn">Take Screenshot</a>
-    </div>
     <div id="overviewDiv">
       <div id="extentDiv"></div>
     </div>
     <div id="viewDiv">
       <div id="date"></div>
-      <calcite-button
-        href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/others/General_Progress/index6.html"
-        icon-end="launch" scale="s" label="Open Mariana Trench in map" target="_blank">
-      </calcite-button>
+      <div id="launchButton">
+        <calcite-button
+          href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/others/General_Progress/index6.html"
+          icon-end="launch" scale="s" label="Open Mariana Trench in map" target="_blank">
+        </calcite-button>
+      </div>
+      <div id="screenshotButton">
+        <calcite-button id="takeScreenshotButton" icon-end="screenshot-mode" scale="s">
+        </calcite-button>
+      </div>
+
       <calcite-card id="information">
         <!-- original was <calcite-card hidden>-->
         <calcite-label>
@@ -372,22 +391,20 @@
     Print,
     Circle,
     Compass,
-    Slider,
+    Slider
   ) {
     // **********************************************************
     // *       As of Date
-    document.getElementById("date").innerHTML = "As of August 15, 2023";
+    document.getElementById("date").innerHTML = "As of August 31, 2023";
     // **********************************************************
     const basemap = new Basemap({
       baseLayers: [
         new VectorTileLayer({
           portalItem: {
-            id: "6f77ddd2364c4199b5b32cd605bb550f", // Light-gray:"75cf54bd051041c0a6244958cee3ab5c"
-            // Dark-gray: "824fe99ab989479f83b9a6d7f2da0bcb"
+            id: "642ab8c40a864fd9a95e39ce0a97362b", // Light-gray:"75cf54bd051041c0a6244958cee3ab5c"
+            // Original Dark-gray: "824fe99ab989479f83b9a6d7f2da0bcb"
+            // Dark-gray v2: "642ab8c40a864fd9a95e39ce0a97362b"
             // community: "a56c8ba20f4c4a54a0b1440bbf631911"
-            // For community, default Land Hex: "#e6e5d6", Fixed Land Hex: "#f2eee9"
-            //                default Water Hex: "#76c4ea", Fixed Water Hex: "#b7dbec"
-            // Default: "824fe99ab989479f83b9a6d7f2da0bcb" (use this)
           },
         }),
       ],
@@ -397,7 +414,7 @@
       basemap: basemap, //basemap, // "streets-night-vector", basemap
       ground: "world-elevation",
     });
-    map.basemap.baseLayers.getItemAt(0).opacity = 1;
+    //map.basemap.baseLayers.getItemAt(0).opacity = 0.8;
     //map.opacity = 0.1;
     /*
     xmin: 13368016.94,
@@ -437,62 +454,49 @@
       scale: home_scale,
     });
 
-    //Adding screenshot button and takes screenshot automatically
-    view.ui.add("controlsWidget", "bottom-right");
 
+    /////////////////// Screenshot Button ////////////////
+
+    //Adding screenshot button and takes screenshot automatically
     let pixelRatio = 4;
 
     document
-  .getElementById("takeScreenshotButton")
-  .addEventListener("click", () => {
-    view.takeScreenshot({ width: view.width * pixelRatio, height: view.height * pixelRatio }).then((screenshot) => {
-      downloadImage("screenshot.png", screenshot.dataUrl);
-    });
-  });
-
-  function downloadImage(filename, dataUrl) {
-  // the download is handled differently in Microsoft browsers
-  // because the download attribute for <a> elements is not supported
-  if (!window.navigator.msSaveOrOpenBlob) {
-    // in browsers that support the download attribute
-    // a link is created and a programmatic click will trigger the download
-    const element = document.createElement("a");
-    element.setAttribute("href", dataUrl);
-    element.setAttribute("download", filename);
-    element.style.display = "none";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-  } else {
-    // for MS browsers convert dataUrl to Blob
-    const byteString = atob(dataUrl.split(",")[1]);
-    const mimeString = dataUrl.split(",")[0].split(":")[1].split(";")[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    const blob = new Blob([ab], { type: mimeString });
-
-    // download file
-    window.navigator.msSaveOrOpenBlob(blob, filename);
-  }
-}
-
-
-
-    //Adding print widget
-    /**view.when(() => {
-        const print = new Print({
-          view: view,
-          // specify your own print service
-          printServiceUrl:
-            "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+      .getElementById("takeScreenshotButton")
+      .addEventListener("click", () => {
+        view.takeScreenshot({ width: view.width * pixelRatio, height: view.height * pixelRatio }).then((screenshot) => {
+          downloadImage("screenshot.png", screenshot.dataUrl);
         });
+      });
 
-        // Add widget to the top right corner of the view
-        view.ui.add(print, "bottom-right");
-      });*/
+    function downloadImage(filename, dataUrl) {
+      // the download is handled differently in Microsoft browsers
+      // because the download attribute for <a> elements is not supported
+      if (!window.navigator.msSaveOrOpenBlob) {
+        // in browsers that support the download attribute
+        // a link is created and a programmatic click will trigger the download
+        const element = document.createElement("a");
+        element.setAttribute("href", dataUrl);
+        element.setAttribute("download", filename);
+        element.style.display = "none";
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      } else {
+        // for MS browsers convert dataUrl to Blob
+        const byteString = atob(dataUrl.split(",")[1]);
+        const mimeString = dataUrl.split(",")[0].split(":")[1].split(";")[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], { type: mimeString });
+
+        // download file
+        window.navigator.msSaveOrOpenBlob(blob, filename);
+      }
+    }
+
 
     // Inset maps (overview extent map)
     //https://www.esri.com/arcgis-blog/products/js-api-arcgis/mapping/inset-maps-for-the-web/
@@ -501,7 +505,7 @@
     // sample smart map: https://ekenes.github.io/national-park-visits/?viewType=all&variable=bivariate&year=2021
     // Overview Extent
     var overViewMap = new Map({
-      basemap: basemap // "streets-night-vector", basemap
+      basemap: "streets-night-vector", // "streets-night-vector", basemap
     });
 
     const overViewCenter = [120.9411264, 14.735462];
@@ -660,12 +664,6 @@
       );
     }
 
-    // Color palette for light and dark version
-    // 1. Light
-    const mmspHex = "#0000FF";
-    const nscrHex = "#FF5F22";
-    const otherColorHex = "#404040";
-
     //------------- Layer ----------------------------- /
     // Commercial Operatino Schdule image
 
@@ -676,7 +674,7 @@
     // Color based on project
     const centerlineProjectColor = {
       nscr_hex: "#ff5f22",
-      mmsp_hex: mmspHex, //"#0000ff"
+      mmsp_hex: "#00b7ff", //"#0000ff"
       nscrex_hex: "#ff5f22", //"#00b3ff","#00B0F0", "#15C2FF"
     };
 
@@ -758,13 +756,16 @@
       },
     };
 
-    // Construction Progress symbol
-    const tobeConstructed_color = [97, 116, 71]; // default: "#b0c4d8" "#cb552f", [205, 188, 142], [255, 196, 10], [205, 188, 142]
-    const underConstruction_color = [255, 196, 10]; //default: "#ffff00", [247, 230, 140]
-    const completedConstruction_color = "#b1260b"; //"#dc4b00",[203, 85, 47], "#b1260b"
+    // Civil Construction Progress symbol
 
-    //const construction_lineOutline_color = "#dc4b00";
-    const construction_lineOutline = "1px";
+    // Color
+
+    const colors = ["#dc4b00", "#ffff00", "#b0c4d8"];
+    //const colors = ["#3d5439", "#fcffd9", "#c0a878"];
+
+    const tobeConstructed_color = colors[2]; // original: "#b0c4d8";
+    const underConstruction_color = colors[1]; //original: #ffff00
+    const completedConstruction_color = colors[0]; // original: #dc4b00
 
     const construction_lineWidth = "6px";
 
@@ -810,6 +811,51 @@
       ],
     };
 
+    // Construction line width for Progress2
+    const construction_lineWidth_progress2 = "7px";
+    const lineSymbol_construction_progress2 = {
+      type: "unique-value", // autocasts as new SimpleLineSymbol(),
+      field: "construcStat",
+      /*
+    legendOptions: {
+      title: "Construction Status"
+    },
+    */
+      uniqueValueInfos: [
+        {
+          value: "To Be Constructed",
+          label: "To be Constructed",
+          symbol: {
+            type: "simple-line",
+            color: tobeConstructed_color,
+            width: construction_lineWidth_progress2,
+            style: "solid",
+          },
+        },
+        {
+          value: "On-going",
+          label: "Under Construction",
+          symbol: {
+            type: "simple-line",
+            color: underConstruction_color,
+            width: construction_lineWidth_progress2,
+            style: "solid",
+          },
+        },
+        {
+          value: "Completed",
+          label: "Completed",
+          symbol: {
+            type: "simple-line",
+            color: completedConstruction_color,
+            width: construction_lineWidth_progress2,
+            style: "solid",
+          },
+        },
+      ],
+    };
+
+
     // Centerline
     // NSCR
     var n1CenterlineLayer = new FeatureLayer({
@@ -847,7 +893,7 @@
       layerInfos: [
         {
           layer: n1CenterlineConstruction,
-          title: "Construction Progress",
+          title: "Civil Construction Progress",
         },
       ],
     });
@@ -920,7 +966,7 @@
       layerInfos: [
         {
           layer: mmspCenterlineConstruction,
-          title: "",
+          title: "Civil Construction Progress",
         },
       ],
     });
@@ -1039,9 +1085,9 @@
 
     // Station point color
     // Alignment
-    const pointSize = "10px";
+    const pointSize = "12px"; // original: 10px
     const pointColor = "white";
-    const pointOutlineWidth = 1.5;
+    const pointOutlineWidth = 2.5; // original: 1.5
 
     const defaultStationPoint_nscr = {
       symbol: {
@@ -1289,7 +1335,7 @@
       layerInfos: [
         {
           layer: n2CenterlineConstruction,
-          title: "Construction Progress",
+          title: "Civil Construction Progress",
         },
       ],
     });
@@ -1378,7 +1424,7 @@
       layerInfos: [
         {
           layer: scCenterlineConstruction,
-          title: "Construction Progress",
+          title: "Civil Construction Progress",
         },
       ],
     });
@@ -1528,7 +1574,7 @@
 
       let clarkAirport_textSymbol = {
         type: "text", // autocasts as new TextSymbol()
-        color: otherColorHex,
+        color: "white",
         //backgroundColor: projectBackgroundColor,
         text: "Clark Int. Airport",
         horizontalAlignment: "right",
@@ -1544,7 +1590,7 @@
 
       const simpleMarkerSymbol = {
         type: "simple-marker",
-        color: otherColorHex,
+        color: [226, 119, 40],
         size: 12,
         style: "circle",
         outline: {
@@ -1574,7 +1620,7 @@
       // Set line properties
       const clarkAirport_pin_LineSymbol = {
         type: "simple-line",
-        color: otherColorHex,
+        color: cpLineColor,
         width: cpLineWidth,
       };
 
@@ -1627,7 +1673,7 @@
 
       let airport_textSymbol = {
         type: "text", // autocasts as new TextSymbol()
-        color: otherColorHex,
+        color: "white",
         //backgroundColor: projectBackgroundColor,
         text: "Ninoy Aquino Int. Airport",
         horizontalAlignment: "right",
@@ -1643,7 +1689,7 @@
 
       const simpleMarkerSymbol = {
         type: "simple-marker",
-        color: otherColorHex,
+        color: [226, 119, 40],
         size: 12,
         style: "circle",
         outline: {
@@ -1673,7 +1719,7 @@
       // Set line properties
       const airport_pin_LineSymbol = {
         type: "simple-line",
-        color: otherColorHex,
+        color: cpLineColor,
         width: cpLineWidth,
       };
 
@@ -1725,7 +1771,7 @@
 
       let manila_textSymbol = {
         type: "text", // autocasts as new TextSymbol()
-        color: otherColorHex,
+        color: "white",
         //backgroundColor: projectBackgroundColor,
         text: "Manila",
         horizontalAlignment: "right",
@@ -1771,7 +1817,7 @@
       // Set line properties
       const manila_pin_LineSymbol = {
         type: "simple-line",
-        color: otherColorHex,
+        color: cpLineColor,
         width: cpLineWidth,
       };
 
@@ -1902,7 +1948,7 @@
         // Set line properties
         const simpleLineSymbol = {
           type: "simple-line",
-          color: otherColorHex,
+          color: cpLineColor,
           width: cpLineWidth,
         };
 
@@ -1934,7 +1980,7 @@
 
             let textSymbol = {
               type: "text", // autocasts as new TextSymbol()
-              color: otherColorHex,
+              color: cpLabelColor,
               //haloColor: "black",
               //haloSize: "1px",
               text: CPs[i],
@@ -2084,7 +2130,7 @@
         // Set line properties
         const simpleLineSymbol = {
           type: "simple-line",
-          color: otherColorHex,
+          color: cpLineColor,
           width: cpLineWidth,
         };
 
@@ -2111,7 +2157,7 @@
 
             let textSymbol = {
               type: "text", // autocasts as new TextSymbol()
-              color: otherColorHex,
+              color: cpLabelColor,
               //haloColor: "black",
               //haloSize: "1px",
               text: CPs[i],
@@ -2265,7 +2311,7 @@
         // Set line properties
         const simpleLineSymbol = {
           type: "simple-line",
-          color: otherColorHex,
+          color: cpLineColor,
           width: cpLineWidth,
         };
 
@@ -2292,7 +2338,7 @@
 
             let textSymbol = {
               type: "text", // autocasts as new TextSymbol()
-              color: otherColorHex,
+              color: cpLabelColor,
               //haloColor: "black",
               //haloSize: "1px",
               text: CPs[i],
@@ -2449,7 +2495,7 @@
         // Set line properties
         const simpleLineSymbol = {
           type: "simple-line",
-          color: otherColorHex,
+          color: cpLineColor,
           width: cpLineWidth,
         };
 
@@ -2492,7 +2538,7 @@
 
             let textSymbol = {
               type: "text", // autocasts as new TextSymbol()
-              color: otherColorHex,
+              color: cpLabelColor,
               //haloColor: "black",
               //haloSize: "1px",
               text: CPs[i],
@@ -2911,6 +2957,7 @@
 
     // Select Project for Progress
     function progressFilter() {
+      originalConstructionLineWidth();
       if (proj === "n1") {
         view.rotation = 360;
 
@@ -3113,8 +3160,30 @@
       }
     }
 
+    // // ONly when we print out Progress2, activate thincker line width
+    function originalConstructionLineWidth() {
+      mmspCenterlineConstruction.renderer = lineSymbol_construction;
+      n1CenterlineConstruction.renderer = lineSymbol_construction;
+      n2CenterlineConstruction.renderer = lineSymbol_construction;
+      scCenterlineConstruction.renderer = lineSymbol_construction;
+    }
+
+    function progress2ConstructionLineWidth() {
+      mmspCenterlineConstruction.renderer = lineSymbol_construction_progress2;
+      n1CenterlineConstruction.renderer = lineSymbol_construction_progress2;
+      n2CenterlineConstruction.renderer = lineSymbol_construction_progress2;
+      scCenterlineConstruction.renderer = lineSymbol_construction_progress2;
+    }
+
     function progress2Renderer() {
+      progress2ConstructionLineWidth();
       stationLabeFontSizeForProgress2();
+
+      // Turn off all station labels
+      n2StationLayer.labelsVisible = false;
+      scStationLayer.labelsVisible = false;
+      mmspStationLayer.labelsVisible = false;
+      n1StationLayer.labelsVisible = false;
 
       view.rotation = 320;
       view.center = [120.9, 14.7332299];
@@ -3163,7 +3232,7 @@
 
       n1GraphicsLayerMove(-0.05, 0.1);
       n2GraphicsLayerMove(-0.2, 0.15);
-      scGraphicsLayerMove(-0.15, 0.4);
+      scGraphicsLayerMove(-0.27, 0.35); // Original: -0.15, 0.4
 
       constructionProgressLegendOn();
 
@@ -3252,7 +3321,7 @@
     );
 
     // adds the compass to the top left corner of the MapView
-    view.ui.add(compass, "top-left");
+    view.ui.add(compass);
 
     // Station list
     const stationArray1 = [
