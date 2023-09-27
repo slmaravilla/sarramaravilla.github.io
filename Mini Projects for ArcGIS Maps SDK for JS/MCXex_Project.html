@@ -14,14 +14,14 @@
 </head>
 <style>
     html,
-    
+
     body {
         display: flex;
     }
 
     calcite-loader {
-      align-self: center;
-      justify-self: center;
+        align-self: center;
+        justify-self: center;
     }
 
     #viewDiv {
@@ -47,28 +47,46 @@
     }
 
     .label-wrapper {
-      display: flex;
-      margin-inline: 1rem;
-      padding: 0.5rem;
-      border: 1px solid var(--calcite-ui-border-1);
-      cursor: pointer;
+        display: flex;
+        margin-inline: 1rem;
+        padding: 0.5rem;
+        border: 1px solid var(--calcite-ui-border-1);
+        cursor: pointer;
     }
 
-    calcite-checkbox {
-      margin: 0 0.5rem;
+    #dataTypeInput {
+        background-color: rgb(44, 43, 43);
+        width: max-content;
+        height: max-content;
+        position: absolute;
+        top: 1%;
+        right: 1vw;
+        font-size: 1.2vw;
+        color: white;
+        padding-top: 1.3vw;
+        padding-left: 1.3vw;
+        padding-right: 1.3vw;
+        padding-bottom: 1.3vw;
     }
-
-
-
 
     .calcite-theme-dark .esri-legend__layer-caption {
         display: none;
     }
 
     .calcite-theme-dark .esri-legend .esri-legend__layer-cell--info {
-        /*background-color: black;*/
         color: "#f7f7f7";
         font-size: 0.9rem;
+    }
+
+    .esri-icon-non-visible::before {
+        content: '\e610' !important;
+        color: #969696 !important;
+    }
+
+    .esri-icon-visible::before {
+        content: '\e611' !important;
+        background-color: #11a7fd;
+        color: white !important;
     }
 </style>
 
@@ -77,22 +95,20 @@
     <calcite-shell content-behind>
         <div slot="header" id="header">
             <h2 id="header-title" slot="header">MCXex Alignment Map</h2>
-            
-            
         </div>
 
-
         <calcite-shell-panel slot="panel-start" display-mode="float" detached>
+            <!--Action Bar-->
             <calcite-action-bar slot="action-bar">
                 <calcite-action data-action-id="layers" icon="layers" text="Layers"></calcite-action>
                 <calcite-action data-action-id="basemaps" icon="basemap" text="Basemaps"></calcite-action>
             </calcite-action-bar>
 
-
-            <calcite-panel heading ="Layers" height-scale="1" data-panel-id="layers" hidden>
+            <!--Action Bar Panel-->
+            <calcite-panel heading="Layers" height-scale="1" data-panel-id="layers" hidden>
                 <div id="layers-container"></div>
             </calcite-panel>
-            <calcite-panel heading ="Basemaps" height-scale="1" data-panel-id="basemaps" hidden>
+            <calcite-panel heading="Basemaps" height-scale="1" data-panel-id="basemaps" hidden>
                 <div id="basemaps-container">
                 </div>
             </calcite-panel>
@@ -100,15 +116,29 @@
 
         <div id="container">
             <div id="viewDiv">
-                <calcite-label layout="inline" id="see-through-label">
-                    <calcite-checkbox id="myLink"></calcite-checkbox>See-through-Ground
-                  </calcite-label>
+                <!--Checkboxes-->
+                <div id="dataTypeInput">
+                    <!--<p>MCXex Alignment</p>-->
+                    <calcite-label layout="inline">
+                        <calcite-checkbox id="openCanal"></calcite-checkbox>
+                        MCX Extension via. Open Canal
+                    </calcite-label>
+                    <calcite-label layout="inline">
+                        <calcite-checkbox id="LLRN"></calcite-checkbox>
+                        MCX Extension via. LLRN
+                    </calcite-label>
+                    <calcite-label layout="inline">
+                        <calcite-checkbox id="BDS"></calcite-checkbox>
+                        MCX Extension via. Bacoor, Dasma, Silang
+                    </calcite-label>
+                    <calcite-label layout="inline">
+                        <calcite-checkbox id="PPP"></calcite-checkbox>
+                        DPWH-PPP
+                    </calcite-label>
+                </div>
             </div>
-
         </div>
-
     </calcite-shell>
-
 </body>
 
 <script>
@@ -118,14 +148,16 @@
         "esri/layers/FeatureLayer",
         "esri/widgets/BasemapGallery",
         "esri/widgets/Legend",
-        "esri/widgets/Fullscreen",
+        "esri/rest/support/Query",
+        "esri/widgets/LayerList",
     ], function (
         SceneView,
         Map,
         FeatureLayer,
         BasemapGallery,
         Legend,
-        Fullscreen,
+        Query,
+        LayerList
     ) {
 
         var map = new Map({
@@ -160,10 +192,7 @@
         view.ui.components = [];
 
 
-        const basemaps = new BasemapGallery({
-            view,
-            container: "basemaps-container",
-        });
+        //////////////////// Layer Import ///////////////////////
 
         const renderer = {
             type: "unique-value",
@@ -272,73 +301,154 @@
         map.add(mcxex_layer);
 
 
+        //////////////////// Widgets ///////////////////////
+
+        const basemaps = new BasemapGallery({
+            view,
+            container: "basemaps-container",
+        });
+
 
         var legend = new Legend({
             view,
-            container: "legend",
+            container: "legend-container",
             layerInfos: [
                 {
                     layer: mcxex_layer
                 }
             ]
         });
-        view.ui.add(legend, "bottom-left");
+
+        const layerList = new LayerList({
+            view: view,
+            selectionEnabled: true,
+            container: "layers-container",
+            listItemCreatedFunction: function (event) {
+                const item = event.item;
+                if (item.layer.type != "group") { // don't show legend twice
+                    item.panel = {
+                        content: "legend",
+                        open: true
+                    };
+                }
+            },
+        });
 
 
-        
+        //////////////////// Zoom To Layer ///////////////////////
+
+        function zoomToLayer(layer) {
+            var queryExtent = layer.createQuery();
+            return layer.queryExtent().then(function (response) {
+                view
+                    .goTo(response.extent, 
+                    {
+                        speedFactor: 1,
+                    }
+                    )
+                    .catch(function (error) {
+                        if (error.name != "AbortError") {
+                            console.error(error);
+                        }
+                    });
+            });
+        }
+
+
+        //////////////////// Checkbox ///////////////////////
+
+
+        const dataTypeButton = document.getElementById("dataTypeInput");
+        const openCanal = document.getElementById("openCanal");
+        const LLRN = document.getElementById("LLRN");
+        const BDS = document.getElementById("BDS");
+        const PPP = document.getElementById("PPP");
+
+        dataTypeButton.addEventListener("click", function (event) {
+            let openC_on = openCanal.checked;
+            let llrn_on = LLRN.checked;
+            let bds_on = BDS.checked;
+            let ppp_on = PPP.checked;
+
+            if (openC_on === true && llrn_on === false && bds_on === false && ppp_on === false) {
+                mcxex_layer.definitionExpression = "SymbolID = 0";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === false && llrn_on === true && bds_on === false && ppp_on === false) {
+                mcxex_layer.definitionExpression = "SymbolID = 2";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === false && llrn_on === false && bds_on === true && ppp_on === false) {
+                mcxex_layer.definitionExpression = "SymbolID = 3";
+
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === false && llrn_on === false && bds_on === false && ppp_on === true) {
+                mcxex_layer.definitionExpression = "SymbolID = 1";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === false && llrn_on === false && bds_on === false && ppp_on === false) {
+                mcxex_layer.definitionExpression = null;
+                zoomToLayer(mcxex_layer);
+
+            }
+
+        });
+
+        //////////////////// Calcite Action Bar ///////////////////////
         let activeWidget;
 
         const handleActionBarClick = ({ target }) => {
-          if (target.tagName !== "CALCITE-ACTION") {
-            return;
-          }
-
-          if (activeWidget) {
-            document.querySelector(
-              `[data-action-id=${activeWidget}]`
-            ).active = false;
-            document.querySelector(
-              `[data-panel-id=${activeWidget}]`
-            ).hidden = true;
-
-            // Close the progress time series chart when chart widget is closed
-            if (`${activeWidget}` === "charts") {
-              //document.getElementById("land-checkbox").checked = false;
-              timeSeriesChartDiv.style.display = "none";
+            if (target.tagName !== "CALCITE-ACTION") {
+                return;
             }
-          }
 
-          const nextWidget = target.dataset.actionId;
+            if (activeWidget) {
+                document.querySelector(
+                    `[data-action-id=${activeWidget}]`
+                ).active = false;
+                document.querySelector(
+                    `[data-panel-id=${activeWidget}]`
+                ).hidden = true;
 
-          if (nextWidget !== activeWidget) {
-            document.querySelector(
-              `[data-action-id=${nextWidget}]`
-            ).active = true;
-            document.querySelector(
-              `[data-panel-id=${nextWidget}]`
-            ).hidden = false;
-            activeWidget = nextWidget;
-
-            // Open the time series chart when chart widget is opened.
-            if (`${activeWidget}` === "charts") {
-              //document.getElementById("land-checkbox").checked = true;
-              timeSeriesChartDiv.style.display = "block";
+                // Close the progress time series chart when chart widget is closed
+                if (`${activeWidget}` === "charts") {
+                    //document.getElementById("land-checkbox").checked = false;
+                    timeSeriesChartDiv.style.display = "none";
+                }
             }
-          } else {
-            activeWidget = null;
-          }
+
+            const nextWidget = target.dataset.actionId;
+
+            if (nextWidget !== activeWidget) {
+                document.querySelector(
+                    `[data-action-id=${nextWidget}]`
+                ).active = true;
+                document.querySelector(
+                    `[data-panel-id=${nextWidget}]`
+                ).hidden = false;
+                activeWidget = nextWidget;
+
+                // Open the time series chart when chart widget is opened.
+                if (`${activeWidget}` === "charts") {
+                    //document.getElementById("land-checkbox").checked = true;
+                    timeSeriesChartDiv.style.display = "block";
+                }
+            } else {
+                activeWidget = null;
+            }
         };
 
         // Action bar
         document
-          .querySelector("calcite-action-bar")
-          .addEventListener("click", handleActionBarClick);
+            .querySelector("calcite-action-bar")
+            .addEventListener("click", handleActionBarClick);
         let actionBarExpanded = false;
         document.addEventListener("calciteActionBarToggle", (event) => {
-          actionBarExpanded = !actionBarExpanded;
-          view.padding = {
-            left: actionBarExpanded ? 135 : 45,
-          };
+            actionBarExpanded = !actionBarExpanded;
+            view.padding = {
+                left: actionBarExpanded ? 135 : 45,
+            };
         });
 
 
