@@ -120,7 +120,7 @@
                 <div id="dataTypeInput">
                     <!--<p>MCXex Alignment</p>-->
                     <calcite-label layout="inline">
-                        <calcite-checkbox id="openCanal"></calcite-checkbox>
+                        <calcite-checkbox id="openCanal" icon="view-visible"></calcite-checkbox>
                         MCX Extension via. Open Canal
                     </calcite-label>
                     <calcite-label layout="inline">
@@ -150,6 +150,7 @@
         "esri/widgets/Legend",
         "esri/rest/support/Query",
         "esri/widgets/LayerList",
+        "esri/core/reactiveUtils",
     ], function (
         SceneView,
         Map,
@@ -157,7 +158,8 @@
         BasemapGallery,
         Legend,
         Query,
-        LayerList
+        LayerList,
+        reactiveUtils
     ) {
 
         var map = new Map({
@@ -301,50 +303,16 @@
         map.add(mcxex_layer);
 
 
-        //////////////////// Widgets ///////////////////////
-
-        const basemaps = new BasemapGallery({
-            view,
-            container: "basemaps-container",
-        });
-
-
-        var legend = new Legend({
-            view,
-            container: "legend-container",
-            layerInfos: [
-                {
-                    layer: mcxex_layer
-                }
-            ]
-        });
-
-        const layerList = new LayerList({
-            view: view,
-            selectionEnabled: true,
-            container: "layers-container",
-            listItemCreatedFunction: function (event) {
-                const item = event.item;
-                if (item.layer.type != "group") { // don't show legend twice
-                    item.panel = {
-                        content: "legend",
-                        open: true
-                    };
-                }
-            },
-        });
-
-
         //////////////////// Zoom To Layer ///////////////////////
 
         function zoomToLayer(layer) {
             var queryExtent = layer.createQuery();
             return layer.queryExtent().then(function (response) {
                 view
-                    .goTo(response.extent, 
-                    {
-                        speedFactor: 1,
-                    }
+                    .goTo(response.extent,
+                        {
+                            speedFactor: 1,
+                        }
                     )
                     .catch(function (error) {
                         if (error.name != "AbortError") {
@@ -364,27 +332,73 @@
         const BDS = document.getElementById("BDS");
         const PPP = document.getElementById("PPP");
 
+        
         dataTypeButton.addEventListener("click", function (event) {
-            let openC_on = openCanal.checked;
+            var openC_on = openCanal.checked;
             let llrn_on = LLRN.checked;
             let bds_on = BDS.checked;
             let ppp_on = PPP.checked;
 
+
             if (openC_on === true && llrn_on === false && bds_on === false && ppp_on === false) {
                 mcxex_layer.definitionExpression = "SymbolID = 0";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === true && llrn_on === true && bds_on === false && ppp_on === false) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (0,2)";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === true && llrn_on === false && bds_on === true && ppp_on === false) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (0,3)";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === true && llrn_on === false && bds_on === false && ppp_on === true) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (0,1)";
                 zoomToLayer(mcxex_layer);
 
             } else if (openC_on === false && llrn_on === true && bds_on === false && ppp_on === false) {
                 mcxex_layer.definitionExpression = "SymbolID = 2";
                 zoomToLayer(mcxex_layer);
 
+            } else if (openC_on === false && llrn_on === true && bds_on === true && ppp_on === false) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (2,3)";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === false && llrn_on === true && bds_on === false && ppp_on === true) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (2,1)";
+                zoomToLayer(mcxex_layer);
+
             } else if (openC_on === false && llrn_on === false && bds_on === true && ppp_on === false) {
                 mcxex_layer.definitionExpression = "SymbolID = 3";
+                zoomToLayer(mcxex_layer);
 
+            } else if (openC_on === false && llrn_on === false && bds_on === true && ppp_on === true) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (3,1)";
                 zoomToLayer(mcxex_layer);
 
             } else if (openC_on === false && llrn_on === false && bds_on === false && ppp_on === true) {
                 mcxex_layer.definitionExpression = "SymbolID = 1";
+                zoomToLayer(mcxex_layer);
+
+                // three pair combination
+            } else if (openC_on === true && llrn_on === true && bds_on === true && ppp_on === false) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (0,2,3)";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === true && llrn_on === true && bds_on === false && ppp_on === true) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (0,2,1)";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === true && llrn_on === false && bds_on === true && ppp_on === true) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (0,3,1)";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === false && llrn_on === true && bds_on === true && ppp_on === true) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (2,3,1)";
+                zoomToLayer(mcxex_layer);
+
+            } else if (openC_on === true && llrn_on === true && bds_on === true && ppp_on === true) {
+                mcxex_layer.definitionExpression = "SymbolID  IN (0,2,3,1)";
                 zoomToLayer(mcxex_layer);
 
             } else if (openC_on === false && llrn_on === false && bds_on === false && ppp_on === false) {
@@ -392,8 +406,62 @@
                 zoomToLayer(mcxex_layer);
 
             }
-
         });
+
+
+        //////////////////// Widgets ///////////////////////
+
+
+        ////--------- Basemap Gallery --------////
+        const basemaps = new BasemapGallery({
+            view,
+            container: "basemaps-container",
+        });
+
+
+        var legend = new Legend({
+            view,
+            container: "legend-container",
+            layerInfos: [
+                {
+                    layer: mcxex_layer
+                }
+            ]
+        });
+
+        ////--------- LayerList --------////
+        const layerList = new LayerList({
+            view: view,
+            selectionEnabled: true,
+            container: "layers-container",
+            listItemCreatedFunction: function (event) {
+                const item = event.item;
+                if (item.layer.type != "group") { // don't show legend twice
+                    item.panel = {
+                        content: "legend",
+                        open: true
+                    };
+                }
+            },
+        });
+
+
+
+        //////////////////// ReactiveUtils to check for Layers visibility ///////////////////////
+        reactiveUtils.watch(
+            () => view.map.allLayers.forEach((layer) => {
+                if (layer.visible) {
+                    mcxex_layer.definitionExpression = null;
+                } else {
+                    openCanal.checked = openCanal.hidden;
+                    LLRN.checked = LLRN.hidden;
+                    BDS.checked = BDS.hidden;
+                    PPP.checked = PPP.hidden
+                }
+            }),
+        );
+
+
 
         //////////////////// Calcite Action Bar ///////////////////////
         let activeWidget;
@@ -429,11 +497,6 @@
                 ).hidden = false;
                 activeWidget = nextWidget;
 
-                // Open the time series chart when chart widget is opened.
-                if (`${activeWidget}` === "charts") {
-                    //document.getElementById("land-checkbox").checked = true;
-                    timeSeriesChartDiv.style.display = "block";
-                }
             } else {
                 activeWidget = null;
             }
