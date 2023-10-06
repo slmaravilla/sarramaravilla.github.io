@@ -454,6 +454,7 @@
     "esri/layers/TileLayer",
     "esri/core/reactiveUtils",
     "esri/popup/support/FieldInfoFormat",
+    "esri/layers/GroupLayer"
   ], function (
     WebMap,
     MapView,
@@ -487,7 +488,8 @@
     CustomContent,
     TileLayer,
     reactiveUtils,
-    FieldInfoFormat
+    FieldInfoFormat,
+    GroupLayer,
   ) {
 
     //****---------------- Creating Map -----------------------****//
@@ -800,7 +802,7 @@
           label: "Super Urgent Lots",
           symbol: {
             type: "simple-fill", // autocasts as new SimpleFillSymbol()
-            color: "red",
+            color: "#FF00C5",
 
           },
         },
@@ -1980,6 +1982,7 @@
       popupEnabled: false,
     });
     map.add(prowLayer, 0); // layer order in the map
+    prowLayer.listMode = "hide";
 
 
 
@@ -2226,6 +2229,42 @@
     });
     stationLayer.listMode = "hide"; // hides the layer in the layer list
     map.add(stationLayer, 0); // layer order in the map
+
+
+
+    //**** ---- Group Layers ---- ***///
+
+    const alignmentGroupLayer = new GroupLayer({
+            title: "Alignment",
+            visible: true,
+            visibilityMode: "indepenent",
+            layers: [stationBoxLayer, chainageLayer]
+        }); //map.add(alignmentGroupLayer, 0);
+
+
+        const nloLoOccupancyGroupLayer = new GroupLayer({
+            title: "NLO/LO Occupancy",
+            visible: true,
+            visibilityMode: "independent",
+            layers: [occupancyLayer, strucOwnershipLayer, nloLayer]
+        });
+
+        const lotGroupLayer = new GroupLayer({
+            title: "Land",
+            visible: true,
+            visibilityMode: "independent",
+            layers: [endorsedLotLayer, lotLayer, pnrLayer, fncLayer]
+        });
+
+
+
+        /// Order in the layer list
+        map.add(pierAccessLayer);
+        map.add(lotGroupLayer);
+        map.add(structureLayer);
+        map.add(nloLoOccupancyGroupLayer);
+        map.add(alignmentGroupLayer);
+        map.add(prowLayer);
 
 
 

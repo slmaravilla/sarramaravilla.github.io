@@ -225,7 +225,7 @@
     }
 
     calcite-avatar {
-        margin-right: 2.5rem !important;
+        margin-right: 2.8rem !important;
         position: absolute;
     }
 
@@ -562,7 +562,8 @@
                 3: [255, 170, 0],
                 4: [255, 0, 0],
                 5: [112, 173, 71],
-                6: [0, 0, 0, 0],
+                6: [178, 178, 178],
+                7: [0, 0, 0, 0],
             };
         }
 
@@ -570,9 +571,9 @@
             type: "unique-value",
             defaultSymbol: defaultSymbol, // autocasts as new SimpleFillSymbol()
             valueExpression:
-                "When($feature.StatusLA == 0, '0',$feature.StatusLA == 1, '1', $feature.StatusLA == 2, '2', \
-                               $feature.StatusLA == 3, '3', $feature.StatusLA == 4, '4', \
-                               $feature.StatusLA == 5, '5', $feature.StatusLA)",
+                "When($feature.StatusLA == 1, '1',$feature.StatusLA == 2, '2', $feature.StatusLA == 3, '3', \
+                               $feature.StatusLA == 4, '4', $feature.StatusLA == 5, '5', \
+                               $feature.StatusLA == 6, '6', $feature.StatusLA == 7, '7', $feature.StatusLA)",
             uniqueValueInfos: [
                 {
                     value: "1",
@@ -620,6 +621,14 @@
                     symbol: {
                         type: "simple-fill", // autocasts as new SimpleFillSymbol()
                         color: colorLotReqs()[5],
+                    },
+                },
+                {
+                    value: "7",
+                    label: "For Harmonization",
+                    symbol: {
+                        type: "simple-fill", // autocasts as new SimpleFillSymbol()
+                        color: colorLotReqs()[6],
                     },
                 },
             ],
@@ -670,7 +679,8 @@
             "For Legal Pass",
             "For Appraisal/Offer to Buy",
             "For Expro",
-            "With PTE"
+            "With PTE",
+            "For Harmonization"
         ];
 
         const landUseArray = [
@@ -2650,14 +2660,12 @@
                 const municipalityExpression = "Municipality = '" + municipal + "'";
                 if (municipal == "None") {
                     lotLayer.definitionExpression = null;
-                    endorsedLotLayer.definitionExpression = null;
                     structureLayer.definitionExpression = null;
                     nloLayer.definitionExpression = null;
                     pnrLayer.definitionExpression = null;
                     occupancyLayer.definitionExpression = null;
                 } else {
                     lotLayer.definitionExpression = municipalityExpression;
-                    endorsedLotLayer.definitionExpression = municipalityExpression;
                     structureLayer.definitionExpression = municipalityExpression;
                     nloLayer.definitionExpression = municipalityExpression;
                     pnrLayer.definitionExpression = municipalityExpression;
@@ -2682,29 +2690,24 @@
                 // all = 'None'
                 if (municipal == "None" && barangay == "None") {
                     lotLayer.definitionExpression = null;
-                    endorsedLotLayer.definitionExpression = null;
                     structureLayer.definitionExpression = null;
                     nloLayer.definitionExpression = null;
                     pnrLayer.definitionExpression = null;
                     occupancyLayer.definitionExpression = null;
                 } else if (municipal == "None" && barangay !== "None") {
                     lotLayer.definitionExpression = barangayExpression;
-                    endorsedLotLayer.definitionExpression = barangayExpression;
                     structureLayer.definitionExpression = barangayExpression;
                     nloLayer.definitionExpression = barangayExpression;
                     pnrLayer.definitionExpression = barangayExpression;
                     occupancyLayer.definitionExpression = barangayExpression;
                 } else if (municipal !== "None" && barangay == "None") {
                     lotLayer.definitionExpression = municipalityExpression;
-                    endorsedLotLayer.definitionExpression = municipalityExpression;
                     structureLayer.definitionExpression = municipalityExpression;
                     nloLayer.definitionExpression = municipalityExpression;
                     pnrLayer.definitionExpression = municipalityExpression;
                     occupancyLayer.definitionExpression = municipalityExpression;
                 } else if (municipal !== "None" && barangay !== "None") {
                     lotLayer.definitionExpression =
-                        municipalityExpression + " AND " + barangayExpression;
-                    endorsedLotLayer.definitionExpression =
                         municipalityExpression + " AND " + barangayExpression;
                     structureLayer.definitionExpression =
                         municipalityExpression + " AND " + barangayExpression;
@@ -2791,6 +2794,7 @@
                 "For Appraisal/Offer to Buy",
                 "For Expro",
                 "With PTE",
+                "For Harmonization",
             ];
 
             function updateChartLot(municipal, barangay) {
@@ -2831,6 +2835,12 @@
                     statisticType: "sum",
                 };
 
+                var total_harmo_lot = {
+                    onStatisticField: "CASE WHEN StatusLA = 7 THEN 1 ELSE 0 END",
+                    outStatisticFieldName: "total_harmo_lot",
+                    statisticType: "sum",
+                };
+
                 var query = lotLayer.createQuery();
                 query.outStatistics = [
                     total_paid_lot,
@@ -2839,6 +2849,7 @@
                     total_otb_lot,
                     total_expro_lot,
                     total_pte_lot,
+                    total_harmo_lot,
                 ];
                 query.returnGeometry = true;
 
@@ -2851,6 +2862,7 @@
                     const otb = stats.total_otb_lot;
                     const expro = stats.total_expro_lot;
                     const pte = stats.total_pte_lot;
+                    const harmo = stats.total_harmo_lot;
 
                     // Set themes
                     // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -2917,6 +2929,8 @@
                             selectedStatus = 5;
                         } else if (SELECTED == statusLot[5]) {
                             selectedStatus = 6;
+                        } else if (SELECTED == statusLot[6]) {
+                            selectedStatus = 7;
                         } else {
                             selectedStatus = null;
                         }
@@ -3024,6 +3038,13 @@
                             value: pte,
                             sliceSettings: {
                                 fill: am5.color("#70AD47"),
+                            },
+                        },
+                        {
+                            category: statusLot[6],
+                            value: harmo,
+                            sliceSettings: {
+                                fill: am5.color("#B2B2B2"),
                             },
                         }
                     ]);
