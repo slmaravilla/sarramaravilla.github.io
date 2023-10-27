@@ -824,14 +824,14 @@
       elevationInfo: {
         model: "on-the-ground",
       },
-      popupEnabled: false,
       minScale: 150000,
       maxScale: 0,
-
+      
     });
-    map.add(urgentLotLayer, 2);
+    map.add(urgentLotLayer, 0);
     urgentLotLayer.listMode = "hide";
     urgentLotLayer.visible = false;
+    urgentLotLayer.popupTemplate = templateLot;
 
 
 
@@ -1526,20 +1526,71 @@
       6: [255, 0, 0, 0.9], // Dates are missing
     };
 
-    var defaultPointSymbol = {
-      type: "simple",
-      label: "Accessible",
-      symbol: {
+    /*var defaultPointSymbol = {
         type: "simple-marker",
         size: 5,
         color: pierAccessDateColor[0],
         outline: {
           width: 0,
-          color: "black",
-        },
+          color: "black", 
       },
-    };
+    };*/
 
+    const pierAccessRenderer = {
+      type: "unique-value", // autocasts as new UniqueValueRenderer()
+      field: "AccessDate",
+      //defaultSymbol: defaultPointSymbol,
+
+      valueExpression:
+        "When(IsEmpty($feature.AccessDate), 'empty', \
+                            $feature.AccessDate <= 1696118400000, 'accessible', \
+                            $feature.AccessDate > 1696118400000, 'others',$feature.AccessDate)",
+      uniqueValueInfos: [
+        {
+          value: "empty",
+          label: "Dates are missing",
+          type: "simple",
+          symbol: {
+            type: "simple-marker",
+            size: 5,
+            color: pierAccessDateColor[6],
+            outline: {
+              width: 0.1,
+              color: "white",
+            },
+          },
+        },
+        {
+          value: "accessible",
+          label: "Accessible",
+          type: "simple",
+          symbol: {
+            type: "simple-marker",
+            size: 5,
+            color: pierAccessDateColor[0],
+            outline: {
+              width: 0.1,
+              color: "white",
+            },
+          },
+        },
+        {
+          value: "others",
+          label: "Others",
+          type: "simple",
+          symbol: {
+            type: "simple-marker",
+            size: 5,
+            color: pierAccessDateColor[5],
+            outline: {
+              width: 0.1,
+              color: "white",
+            },
+          },
+        },
+      ],
+    };
+    
     // labels
     // for multiple label class to a layer:
     // https://developers.arcgis.com/javascript/latest/sample-code/labels-multiple-classes/
@@ -1685,10 +1736,9 @@
     // 1. Get unique dates
     const numberDate = new Date(cutOffDateAccess);
     const cutDate = numberDate.toLocaleDateString("en-US");
-
+    
     // Adding PierAccess Layer
-    var pierAccessLayer = new FeatureLayer(
-      {
+    var pierAccessLayer = new FeatureLayer({
         portalItem: {
           id: "590680d19f2e48fdbd8bcddce3aaedb5",
           portal: {
@@ -1708,10 +1758,12 @@
         elevationInfo: {
           model: "on-the-ground",
         },
+        renderer: pierAccessRenderer,
       },
       { utcOffset: 300 }
     );
     map.add(pierAccessLayer, 1);
+
 
     // we first need to obtain unique values of date because valueExpression does not allow
     // date'2021-10-01' notation
@@ -1764,61 +1816,7 @@
     }
     DateValues().then(uniqueDateValues).then(uniqueValuesInfos);
 
-    const pierAccessRenderer = {
-      type: "unique-value", // autocasts as new UniqueValueRenderer()
-      field: "AccessDate",
-      defaultSymbol: defaultPointSymbol,
 
-      valueExpression:
-        "When(IsEmpty($feature.AccessDate), 'empty', \
-                            $feature.AccessDate <= 1636070400000, 'accessible', \
-                            $feature.AccessDate > 1636070400000, 'others',$feature.AccessDate)",
-      uniqueValueInfos: [
-        {
-          value: "empty",
-          label: "Dates are missing",
-          type: "simple",
-          symbol: {
-            type: "simple-marker",
-            size: 5,
-            color: pierAccessDateColor[6],
-            outline: {
-              width: 0.1,
-              color: "white",
-            },
-          },
-        },
-        {
-          value: "accessible",
-          label: "Accessible",
-          type: "simple",
-          symbol: {
-            type: "simple-marker",
-            size: 5,
-            color: pierAccessDateColor[0],
-            outline: {
-              width: 0.1,
-              color: "white",
-            },
-          },
-        },
-        {
-          value: "others",
-          label: "Others",
-          type: "simple",
-          symbol: {
-            type: "simple-marker",
-            size: 5,
-            color: pierAccessDateColor[5],
-            outline: {
-              width: 0.1,
-              color: "white",
-            },
-          },
-        },
-      ],
-    };
-    pierAccessLayer.renderer = pierAccessRenderer;
 
     // Popup Template
 
@@ -2126,7 +2124,7 @@
     };
 
     // Adding the layer
-    var pierHeadColumnLayerLayer = new FeatureLayer({
+    var pierHeadColumnLayer = new FeatureLayer({
       portalItem: {
         id: "590680d19f2e48fdbd8bcddce3aaedb5",
         portal: {
@@ -2146,8 +2144,8 @@
       },
       legendEnabled: false,
     });
-    pierHeadColumnLayerLayer.listMode = "hide"; //hide in the LayerList
-    map.add(pierHeadColumnLayerLayer, 1); //layer order in the map.add
+    pierHeadColumnLayer.listMode = "hide"; //hide in the LayerList
+    map.add(pierHeadColumnLayer, 1); //layer order in the map.add
 
 
 
@@ -2211,7 +2209,7 @@
     };
 
     // Station Layer
-    var stationLayer = new SceneLayer({
+    var stationLayer = new SceneLayer ({
       portalItem: {
         id: "207cb34b8a324b40985b5805862c4b29",
         portal: {
@@ -2237,7 +2235,7 @@
     const alignmentGroupLayer = new GroupLayer({
             title: "Alignment",
             visible: true,
-            visibilityMode: "indepenent",
+            visibilityMode: "independent",
             layers: [stationBoxLayer, chainageLayer]
         }); //map.add(alignmentGroupLayer, 0);
 
@@ -2253,7 +2251,7 @@
             title: "Land",
             visible: true,
             visibilityMode: "independent",
-            layers: [endorsedLotLayer, lotLayer, pnrLayer, fncLayer]
+            layers: [endorsedLotLayer, lotLayer, fncLayer, pnrLayer]
         });
 
 
@@ -5268,7 +5266,7 @@
         const mm = month[lastEdit.getMonth()];
         const dd = lastEdit.getDate();
         const lastEditedDate = `${mm} ${dd}, ${yyyy}`;
-        document.getElementById("dateDiv").innerHTML = "As of August 3, 2023"; //lastEditedDate;
+        document.getElementById("dateDiv").innerHTML = "As of October 4, 2023"; //lastEditedDate;
       });
     }
     getEditedDateValue();

@@ -580,6 +580,7 @@
       BasemapGallery
     ) {
       const timeSeries = document.querySelector("calcite-button");
+      console.log(timeSeries);
       timeSeries.addEventListener("click", function (event) {
         const timeSeriesChart = document.getElementById("timeSeriesChart");
         timeSeriesChart.hidden = !timeSeriesChart.hidden;
@@ -694,11 +695,11 @@
       // Adds a graphic when the user clicks the map. If 2 or more points exist, route is solved.
       //on(view, "click", addStop);
       /*
-      view.on("click", function() {
-        addStop();
+        view.on("click", function() {
+          addStop();
 
-    });
-    */
+      });
+      */
 
       function addStop(event) {
         // Add a point at the location of the map click
@@ -1134,10 +1135,10 @@
         addStop();
         await startAnimation(0);
         /*
-    window.setTimeout(function() {
-        startAnimation(0);
-    }, 1)
-    */
+      window.setTimeout(function() {
+          startAnimation(0);
+      }, 1)
+      */
       }
       //////////
 
@@ -1266,7 +1267,7 @@
       const colors = {
         1: [225, 225, 225, 0.1], // To be Constructed (white)
         2: [130, 130, 130, 0.5], // Under Construction
-        3: [255, 0, 0, 0.8], // Delayed
+        3: [255, 165, 0, 0.2], // Delayed, original: 255, 0, 0, 0.2
         4: [0, 112, 255, 0.8], // Bored Pile
         5: [0, 112, 255, 0.8], // Pile cap
         6: [0, 112, 255, 0.8], // Pier
@@ -1430,27 +1431,27 @@
         // when filter using date, example below. use this format
         //definitionExpression: "EndDate = date'2020-6-3'"
         /*
-    popupTemplate: {
-      title: "<h5>{Status1}</h5>",
-      lastEditInfoEnabled: false,
-      returnGeometry: true,
-      content: [
-        {
-          type: "fields",
-          fieldInfos: [
-            {
-              fieldName: "Type",
-              label: "Type of Structure"
-            },
-            {
-              fieldName: "PierNumber",
-              Label: "Pier No."
-            }
-          ]
-        }
-      ]
-    }
-    */
+      popupTemplate: {
+        title: "<h5>{Status1}</h5>",
+        lastEditInfoEnabled: false,
+        returnGeometry: true,
+        content: [
+          {
+            type: "fields",
+            fieldInfos: [
+              {
+                fieldName: "Type",
+                label: "Type of Structure"
+              },
+              {
+                fieldName: "PierNumber",
+                Label: "Pier No."
+              }
+            ]
+          }
+        ]
+      }
+      */
       });
       viaductLayer.listMode = "hide";
       map.add(viaductLayer);
@@ -1564,31 +1565,31 @@
         "December",
       ];
       /*
-    function getEditedDateValue() {
-      var tempDates = [];
+      function getEditedDateValue() {
+        var tempDates = [];
 
-      var query = viaductLayer.createQuery();
-      query.fields = ["last_edited_date"];
-      query.where = "last_edited_date IS NOT NULL";
-      return viaductLayer.queryFeatures(query).then(function(response) {
-        var stats = response.features;
-        stats.forEach((result, index) => {
-          var attributes = result.attributes;
-          const dates = attributes.last_edited_date;
-          tempDates.push(dates);
+        var query = viaductLayer.createQuery();
+        query.fields = ["last_edited_date"];
+        query.where = "last_edited_date IS NOT NULL";
+        return viaductLayer.queryFeatures(query).then(function(response) {
+          var stats = response.features;
+          stats.forEach((result, index) => {
+            var attributes = result.attributes;
+            const dates = attributes.last_edited_date;
+            tempDates.push(dates);
+          });
+          const lastDate = Math.max(...tempDates);
+          const lastEdit = new Date(lastDate);
+          const yyyy = lastEdit.getFullYear();
+          const mm = month[lastEdit.getMonth()];
+          const dd = lastEdit.getDate();
+          const lastEditedDate = `As of ${mm} ${dd}, ${yyyy}`;
+          document.getElementById("dateDiv").innerHTML = "As of July 26, 2023";//lastEditedDate;
         });
-        const lastDate = Math.max(...tempDates);
-        const lastEdit = new Date(lastDate);
-        const yyyy = lastEdit.getFullYear();
-        const mm = month[lastEdit.getMonth()];
-        const dd = lastEdit.getDate();
-        const lastEditedDate = `As of ${mm} ${dd}, ${yyyy}`;
-        document.getElementById("dateDiv").innerHTML = "As of July 26, 2023";//lastEditedDate;
-      });
-    }
-    getEditedDateValue();
-    */
-      document.getElementById("dateDiv").innerHTML = "As of August 30, 2023"; //lastEditedDate;
+      }
+      getEditedDateValue();
+      */
+      document.getElementById("dateDiv").innerHTML = "As of October 25, 2023"; //lastEditedDate;
 
       //*******************************************************************//
       // CHART FUNCTION:
@@ -1636,52 +1637,16 @@
         const xAxisNumberFormat = "#'%'";
         const seriesBulletLabelFontSize = "0.5em";
 
-        // series line fill pattern
-        const linePatternColorComplete = "#70AD47";
-        const linePatternColorOpacityComplete = 0;
-        const linePatternFillOpacityComplete = 0;
-
-        const linePatternColorOpacityIncomplet = 0;
-        const linePatternFillOpacityIncomplet = 1;
-        const linePatternStrokeOpacityIncomplet = 0;
-
         const chartIconWidth = 40;
         const chartIconHeight = 40;
         const chartIconPositionX = -27;
         const chartPaddingRightIconLabel = 45;
 
-        class MyTheme extends am5.Theme {
-          setupDefaultRules() {
-            var theme = this;
-
-            this.patterns = [
-              am5.LinePattern.new(this._root, {
-                color: am5.color(linePatternColorComplete),
-                colorOpacity: linePatternColorOpacityComplete,
-                fillOpacity: linePatternFillOpacityComplete,
-              }),
-
-              am5.LinePattern.new(this._root, {
-                colorOpacity: linePatternColorOpacityIncomplet,
-                fillOpacity: linePatternFillOpacityIncomplet,
-                strokeOpacity: linePatternStrokeOpacityIncomplet,
-              }),
-            ];
-
-            this.currentPattern = 0;
-            this.rule("RoundedRectangle").setAll({
-              fillOpacity: 1,
-            });
-
-            this.rule("RoundedRectangle").setup = function (target) {
-              target.set("fillPattern", theme.patterns[theme.currentPattern]);
-              theme.currentPattern++;
-              if (theme.currentPattern == theme.patterns.length) {
-                theme.currentPattern = 0;
-              }
-            };
-          }
-        }
+        const chartSeriesFillColorComp = "#0070ff";
+        const chartSeriesFillColorIncomp = "#000000";
+        const chartSeriesFillColorDelay = "#FF0000"; // original: #FF0000
+        const chartBorderLineColor = "#00c5ff";
+        const chartBorderLineWidth = 0.4;
 
         // 1. Bored pile
         var root = am5.Root.new("chartBoredPileDiv");
@@ -1734,7 +1699,6 @@
             root.setThemes([
               am5themes_Animated.new(root),
               am5themes_Responsive.new(root),
-              MyTheme.new(root),
             ]);
 
             // Create chart
@@ -1760,6 +1724,7 @@
                 category: "boredpile",
                 comp: boredPile_comp,
                 incomp: boredPile_incomp,
+                delay: boredPile_delay,
                 icon: "https://EijiGorilla.github.io/Symbols/Viaduct_Images/Viaduct_Pile_Logo.svg",
               },
             ];
@@ -1833,10 +1798,26 @@
                   valueXField: fieldName,
                   valueXShow: "valueXTotalPercent",
                   categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
                 })
               );
 
               series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
+                strokeWidth: chartBorderLineWidth,
                 tooltipText: "{name}, {categoryX}: {valueY}",
                 width: am5.percent(30),
                 tooltipY: 0,
@@ -1867,8 +1848,8 @@
                       boredPile_comp == 0
                         ? ""
                         : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
-                    fill: root4.interfaceColors.get("alternativeText"),
-                    opacity: fieldName == "incomp" ? 0 : 1,
+                    fill: root.interfaceColors.get("alternativeText"),
+                    opacity: fieldName === "comp" ? 1 : 0,
                     fontSize: seriesBulletLabelFontSize,
                     centerY: am5.p50,
                     centerX: am5.p50,
@@ -1878,7 +1859,15 @@
               });
 
               series.columns.template.events.on("click", function (ev) {
-                const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                let selectedStatus;
+                //const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                if (fieldName === "incomp") {
+                  selectedStatus = 1;
+                } else if (fieldName === "delay") {
+                  selectedStatus = 3;
+                } else if (fieldName === "comp") {
+                  selectedStatus = 4;
+                }
 
                 var highlight = null;
                 // Update layerView based on viaduct components being selected
@@ -1919,6 +1908,7 @@
 
             makeSeries("Complete", "comp");
             makeSeries("Incomplete", "incomp");
+            makeSeries("Delayed", "delay");
 
             chart.appear(1000, 100);
           });
@@ -1975,7 +1965,6 @@
             root2.setThemes([
               am5themes_Animated.new(root2),
               am5themes_Responsive.new(root2),
-              MyTheme.new(root2),
             ]);
 
             // Create chart
@@ -2001,6 +1990,7 @@
                 category: "pilecap",
                 comp: pileCap_comp,
                 incomp: pileCap_incomp,
+                delay: pileCap_delay,
                 icon: "https://EijiGorilla.github.io/Symbols/Viaduct_Images/Viaduct_Pilecap_Logo.svg",
               },
             ];
@@ -2074,13 +2064,30 @@
                   valueXField: fieldName,
                   valueXShow: "valueXTotalPercent",
                   categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
                 })
               );
 
               series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
+
                 tooltipText: "{name}, {categoryX}: {valueY}",
                 width: am5.percent(30),
                 tooltipY: 0,
+                strokeWidth: chartBorderLineWidth,
               });
 
               var tooltip = am5.Tooltip.new(root2, {
@@ -2109,7 +2116,7 @@
                         ? ""
                         : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
                     fill: root4.interfaceColors.get("alternativeText"),
-                    opacity: fieldName == "incomp" ? 0 : 1,
+                    opacity: fieldName === "comp" ? 1 : 0,
                     fontSize: seriesBulletLabelFontSize,
                     centerY: am5.p50,
                     centerX: am5.p50,
@@ -2119,7 +2126,15 @@
               });
 
               series.columns.template.events.on("click", function (ev) {
-                const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                let selectedStatus;
+                //const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                if (fieldName === "incomp") {
+                  selectedStatus = 1;
+                } else if (fieldName === "delay") {
+                  selectedStatus = 3;
+                } else if (fieldName === "comp") {
+                  selectedStatus = 4;
+                }
 
                 var highlight = null;
                 // Update layerView based on viaduct components being selected
@@ -2157,9 +2172,9 @@
                   }); // whenLayerView
               }); // End of filterByChart
             }
-
             makeSeries("Complete", "comp");
             makeSeries("Incomplete", "incomp");
+            makeSeries("Delayed", "delay");
 
             chart.appear(1000, 100);
           }); // end of queryFeatures
@@ -2216,7 +2231,6 @@
             root3.setThemes([
               am5themes_Animated.new(root3),
               am5themes_Responsive.new(root3),
-              MyTheme.new(root3),
             ]);
 
             // Create chart
@@ -2242,6 +2256,7 @@
                 category: "pilecap",
                 comp: pier_comp,
                 incomp: pier_incomp,
+                delay: pier_delay,
                 icon: "https://EijiGorilla.github.io/Symbols/Viaduct_Images/Viaduct_Pier_Logo.svg",
               },
             ];
@@ -2313,13 +2328,29 @@
                   valueXField: fieldName,
                   valueXShow: "valueXTotalPercent",
                   categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
                 })
               );
 
               series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
                 tooltipText: "{name}, {categoryX}: {valueY}",
                 width: am5.percent(30),
                 tooltipY: 0,
+                strokeWidth: chartBorderLineWidth,
               });
 
               var tooltip = am5.Tooltip.new(root3, {
@@ -2348,7 +2379,7 @@
                         ? ""
                         : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
                     fill: root4.interfaceColors.get("alternativeText"),
-                    opacity: fieldName == "incomp" ? 0 : 1,
+                    opacity: fieldName == "comp" ? 1 : 0,
                     fontSize: seriesBulletLabelFontSize,
                     centerY: am5.p50,
                     centerX: am5.p50,
@@ -2358,7 +2389,15 @@
               });
 
               series.columns.template.events.on("click", function (ev) {
-                const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                let selectedStatus;
+                //const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                if (fieldName === "incomp") {
+                  selectedStatus = 1;
+                } else if (fieldName === "delay") {
+                  selectedStatus = 3;
+                } else if (fieldName === "comp") {
+                  selectedStatus = 4;
+                }
 
                 var highlight = null;
                 // Update layerView based on viaduct components being selected
@@ -2400,6 +2439,7 @@
 
             makeSeries("Complete", "comp");
             makeSeries("Incomplete", "incomp");
+            makeSeries("Delayed", "delay");
             chart.appear(1000, 100);
           }); // end of queryFeatures
         } // end of chartPileCap
@@ -2455,7 +2495,6 @@
             root4.setThemes([
               am5themes_Animated.new(root4),
               am5themes_Responsive.new(root4),
-              MyTheme.new(root4),
             ]);
 
             // Create chart
@@ -2481,6 +2520,7 @@
                 category: "pilehead",
                 comp: pierHead_comp,
                 incomp: pierHead_incomp,
+                delay: pierHead_delay,
                 icon: "https://EijiGorilla.github.io/Symbols/Viaduct_Images/Viaduct_Pierhead_Logo.svg",
               },
             ];
@@ -2554,13 +2594,29 @@
                   valueXField: fieldName,
                   valueXShow: "valueXTotalPercent",
                   categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
                 })
               );
 
               series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
                 tooltipText: "{name}, {categoryX}: {valueY}",
                 width: am5.percent(30),
                 tooltipY: 0,
+                strokeWidth: chartBorderLineWidth,
               });
 
               var tooltip = am5.Tooltip.new(root4, {
@@ -2589,7 +2645,7 @@
                         ? ""
                         : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
                     fill: root4.interfaceColors.get("alternativeText"),
-                    opacity: fieldName == "incomp" ? 0 : 1,
+                    opacity: fieldName == "comp" ? 1 : 0,
                     fontSize: seriesBulletLabelFontSize,
                     centerY: am5.p50,
                     centerX: am5.p50,
@@ -2599,7 +2655,15 @@
               });
 
               series.columns.template.events.on("click", function (ev) {
-                const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                let selectedStatus;
+                //const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                if (fieldName === "incomp") {
+                  selectedStatus = 1;
+                } else if (fieldName === "delay") {
+                  selectedStatus = 3;
+                } else if (fieldName === "comp") {
+                  selectedStatus = 4;
+                }
 
                 var highlight = null;
                 // Update layerView based on viaduct components being selected
@@ -2640,6 +2704,7 @@
 
             makeSeries("Complete", "comp");
             makeSeries("Incomplete", "incomp");
+            makeSeries("Delayed", "delay");
             chart.appear(1000, 100);
           }); // end of queryFeatures
         } // end of chartPileCap
@@ -2695,7 +2760,6 @@
             root5.setThemes([
               am5themes_Animated.new(root5),
               am5themes_Responsive.new(root5),
-              MyTheme.new(root5),
             ]);
 
             // Create chart
@@ -2721,6 +2785,7 @@
                 category: "precast",
                 comp: preCast_comp,
                 incomp: preCast_incomp,
+                delay: preCast_delay,
                 icon: "https://EijiGorilla.github.io/Symbols/Viaduct_Images/Viaduct_Precast_Logo.svg",
               },
             ];
@@ -2794,13 +2859,29 @@
                   valueXField: fieldName,
                   valueXShow: "valueXTotalPercent",
                   categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
                 })
               );
 
               series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
                 tooltipText: "{name}, {categoryX}: {valueY}",
                 width: am5.percent(30),
                 tooltipY: 0,
+                strokeWidth: chartBorderLineWidth,
               });
 
               var tooltip = am5.Tooltip.new(root5, {
@@ -2829,7 +2910,7 @@
                         ? ""
                         : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
                     fill: root4.interfaceColors.get("alternativeText"),
-                    opacity: fieldName == "incomp" ? 0 : 1,
+                    opacity: fieldName == "comp" ? 1 : 0,
                     fontSize: seriesBulletLabelFontSize,
                     centerY: am5.p50,
                     centerX: am5.p50,
@@ -2839,7 +2920,15 @@
               });
 
               series.columns.template.events.on("click", function (ev) {
-                const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                let selectedStatus;
+                //const selectedStatus = fieldName == "incomp" ? 1 : 4;
+                if (fieldName === "incomp") {
+                  selectedStatus = 1;
+                } else if (fieldName === "delay") {
+                  selectedStatus = 3;
+                } else if (fieldName === "comp") {
+                  selectedStatus = 4;
+                }
 
                 var highlight = null;
                 // Update layerView based on viaduct components being selected
@@ -2879,6 +2968,7 @@
             }
             makeSeries("Complete", "comp");
             makeSeries("Incomplete", "incomp");
+            makeSeries("Delayed", "delay");
             chart.appear(1000, 100);
           }); // end of queryFeatures
         } // end of chartPileCap
@@ -3175,16 +3265,16 @@
       view.ui.add(contractPackage, "top-right");
       // Editor: enable when necessary
       /*
-  view.when(function () {
-    view.popup.autoOpenEnabled = true; //disable popups
-    // Create the Editor
-    const editor = new Editor({
-      view: view
+    view.when(function () {
+      view.popup.autoOpenEnabled = true; //disable popups
+      // Create the Editor
+      const editor = new Editor({
+        view: view
+      });
+      // Add widget to top-right of the view
+      view.ui.add(editor, "top-right");
     });
-    // Add widget to top-right of the view
-    view.ui.add(editor, "top-right");
-  });
-  */
+    */
 
       // LayerList and Add legend to the LayerList
       var layerList = new LayerList({
