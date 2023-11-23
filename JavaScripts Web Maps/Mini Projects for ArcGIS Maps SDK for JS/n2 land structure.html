@@ -5,7 +5,7 @@
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>N2 Land Acquisition</title>
 
-  <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/dark/main.css" />
+  <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/dark/main.css" />
   <script type="module" src="https://js.arcgis.com/calcite-components/1.4.2/calcite.esm.js"></script>
   <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.4.2/calcite.css" />
 
@@ -16,7 +16,7 @@
   <script src="https://cdn.amcharts.com/lib/5/themes/Micro.js"></script>
   <script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
 
-  <script src="https://js.arcgis.com/4.27/"></script>
+  <script src="https://js.arcgis.com/4.28/"></script>
 </head>
 <style>
   html,
@@ -301,7 +301,7 @@
   }
 </style>
 
-<body class="calcite-theme-dark">
+<body class="calcite-mode-dark">
   <calcite-loader></calcite-loader>
   <calcite-shell content-behind>
     <!--  Header slot  -->
@@ -693,11 +693,14 @@
         var date = new Date(handOverDate);
         var DATES = dateFormat(date, "MM-dd-yyyy");
 
+
+
         if (DATES === "01-01-1970") {
           var finalDate = "Undefined";
         } else {
           var finalDate = dateFormat(date, "MM-dd-yyyy");
         }
+
         // Convert domain code to domain name
         /// 1. Status
         if (statusLot >= 0) {
@@ -718,6 +721,7 @@
                     <li>CP:               <b>${cpNo}</b><br>
                     <li>Endorsed:         <b>${endorsed}</b></li></ul>`
       },
+
     });
 
     // Creating the popup template
@@ -826,7 +830,7 @@
       },
       minScale: 150000,
       maxScale: 0,
-      
+
     });
     map.add(urgentLotLayer, 0);
     urgentLotLayer.listMode = "hide";
@@ -1543,8 +1547,8 @@
 
       valueExpression:
         "When(IsEmpty($feature.AccessDate), 'empty', \
-                            $feature.AccessDate <= 1696118400000, 'accessible', \
-                            $feature.AccessDate > 1696118400000, 'others',$feature.AccessDate)",
+                            $feature.AccessDate <= 1636070400000, 'accessible', \
+                            $feature.AccessDate > 1636070400000, 'others',$feature.AccessDate)",
       uniqueValueInfos: [
         {
           value: "empty",
@@ -1590,12 +1594,16 @@
         },
       ],
     };
-    
+
     // labels
     // for multiple label class to a layer:
     // https://developers.arcgis.com/javascript/latest/sample-code/labels-multiple-classes/
 
+    //const cutOffDateAccess = 1636070400000;
+    //console.log(new Date (cutOffDateAccess).toISOString().split('T')[0]);
+
     const cutOffDateAccess = 1636070400000;
+
     // make sure to update numerical date values in 'pierAccessRenderer'
 
     const pierAccessReadyDateLabel = new LabelClass({
@@ -1638,8 +1646,11 @@
         //value: "{Type}"
       },
       labelPlacement: "above-center",
-      where: "AccessDate <= '" + cutOffDateAccess + "'",
+      //where: `AccessDate >= ${cutOffDateAccess}`,
+      where: "AccessDate <'"+cutOffDateAccess+"'",
     });
+
+
 
     const pierAccessNotYetLabel = new LabelClass({
       symbol: {
@@ -1681,13 +1692,10 @@
         //value: "{Type}"
       },
       labelPlacement: "above-center",
-      where:
-        "AccessDate > '" +
-        cutOffDateAccess +
-        "'" +
-        " OR " +
-        "AccessDate IS NULL",
+      //where: "AccessDate <'"+cutOffDateAccess+"'",
+
     });
+
 
     // Pier No Label Class
     const pierAccessDateMissingLabel = new LabelClass({
@@ -1730,43 +1738,49 @@
         //value: "{Type}"
       },
       labelPlacement: "above-center",
-      where: "AccessDate IS NULL",
+      //where: "AccessDate IS NULL",
     });
 
-    // 1. Get unique dates
-    const numberDate = new Date(cutOffDateAccess);
-    const cutDate = numberDate.toLocaleDateString("en-US");
+
+
+
     
     // Adding PierAccess Layer
     var pierAccessLayer = new FeatureLayer({
-        portalItem: {
-          id: "590680d19f2e48fdbd8bcddce3aaedb5",
-          portal: {
-            url: "https://gis.railway-sector.com/portal",
-          },
+      portalItem: {
+        id: "590680d19f2e48fdbd8bcddce3aaedb5",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
         },
-        layerId: 6,
-        labelingInfo: [
-          pierAccessDateMissingLabel,
-          pierAccessReadyDateLabel,
-          pierAccessNotYetLabel,
-        ],
-        title: "Pier with Access Date",
-        minScale: 150000,
-        maxScale: 0,
-        outFields: ["*"],
-        elevationInfo: {
-          model: "on-the-ground",
-        },
-        renderer: pierAccessRenderer,
       },
+      layerId: 6,
+      labelingInfo: [
+        pierAccessDateMissingLabel,
+        pierAccessReadyDateLabel,
+        pierAccessNotYetLabel,
+      ],
+      title: "Pier with Access Date",
+      minScale: 150000,
+      maxScale: 0,
+      outFields: ["*"],
+      elevationInfo: {
+        model: "on-the-ground",
+      },
+      renderer: pierAccessRenderer,
+    },
       { utcOffset: 300 }
     );
     map.add(pierAccessLayer, 1);
 
 
+    //QUERY PIER ACCESS DATE
     // we first need to obtain unique values of date because valueExpression does not allow
     // date'2021-10-01' notation
+
+    // 1. Get unique dates
+    //const numberDate = new Date(cutOffDateAccess);
+
+    //const cutDate = numberDate.toLocaleDateString("en-US");
     const queryDate = "AccessDate IS NOT NULL";
 
     function DateValues() {
@@ -1848,7 +1862,7 @@
     }
 
     // Custom Popup Content for pierAccessLayer
-    let customContent = new CustomContent({
+    var customContent = new CustomContent({
       outFields: ["*"],
       creator: function (event) {
         // Extract AsscessDate of clicked pierAccessLayer
@@ -1858,6 +1872,7 @@
         // Convert numeric to date format
         var date = new Date(stats);
         dateValue = dateFormat(date, "MM-dd-yyyy");
+
 
         const ddd = new Date(cutOffDateAccess);
         dddValue = dateFormat(ddd, "MM-dd-yyyy");
@@ -1874,9 +1889,12 @@
           DATES = dateValue;
         }
 
+
         //return `Access Date: <b>${DATES}</b>`;
         return `Access Date: <b>${DATES}</b>`;
+
       },
+
     });
 
     const template = new PopupTemplate({
@@ -2209,7 +2227,7 @@
     };
 
     // Station Layer
-    var stationLayer = new SceneLayer ({
+    var stationLayer = new SceneLayer({
       portalItem: {
         id: "207cb34b8a324b40985b5805862c4b29",
         portal: {
@@ -2233,36 +2251,36 @@
     //**** ---- Group Layers ---- ***///
 
     const alignmentGroupLayer = new GroupLayer({
-            title: "Alignment",
-            visible: true,
-            visibilityMode: "independent",
-            layers: [stationBoxLayer, chainageLayer]
-        }); //map.add(alignmentGroupLayer, 0);
+      title: "Alignment",
+      visible: true,
+      visibilityMode: "independent",
+      layers: [stationBoxLayer, chainageLayer]
+    }); //map.add(alignmentGroupLayer, 0);
 
 
-        const nloLoOccupancyGroupLayer = new GroupLayer({
-            title: "NLO/LO Occupancy",
-            visible: true,
-            visibilityMode: "independent",
-            layers: [occupancyLayer, strucOwnershipLayer, nloLayer]
-        });
+    const nloLoOccupancyGroupLayer = new GroupLayer({
+      title: "NLO/LO Occupancy",
+      visible: true,
+      visibilityMode: "independent",
+      layers: [occupancyLayer, strucOwnershipLayer, nloLayer]
+    });
 
-        const lotGroupLayer = new GroupLayer({
-            title: "Land",
-            visible: true,
-            visibilityMode: "independent",
-            layers: [endorsedLotLayer, lotLayer, fncLayer, pnrLayer]
-        });
+    const lotGroupLayer = new GroupLayer({
+      title: "Land",
+      visible: true,
+      visibilityMode: "independent",
+      layers: [endorsedLotLayer, lotLayer, fncLayer, pnrLayer]
+    });
 
 
 
-        /// Order in the layer list
-        map.add(pierAccessLayer);
-        map.add(lotGroupLayer);
-        map.add(structureLayer);
-        map.add(nloLoOccupancyGroupLayer);
-        map.add(alignmentGroupLayer);
-        map.add(prowLayer);
+    /// Order in the layer list
+    map.add(pierAccessLayer);
+    map.add(lotGroupLayer);
+    map.add(structureLayer);
+    map.add(nloLoOccupancyGroupLayer);
+    map.add(alignmentGroupLayer);
+    map.add(prowLayer);
 
 
 
@@ -4983,7 +5001,7 @@
               highlightSelect.remove();
             });
           });
-          urgentlayerView.filter = { where: "Urgent = 0"};
+          urgentlayerView.filter = { where: "Urgent = 0" };
         });
       }
 

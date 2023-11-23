@@ -1,0 +1,5164 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>N2 Land Acquisition</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.28/esri/themes/dark/main.css"
+    />
+    <script
+      type="module"
+      src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"
+    />
+
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Micro.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
+
+    <script src="https://js.arcgis.com/4.28/"></script>
+  </head>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      display: flex;
+    }
+
+    calcite-list {
+      overflow-y: auto;
+      --calcite-ui-text-2: #000000;
+    }
+
+    calcite-loader {
+      align-self: center;
+      justify-self: center;
+    }
+
+    calcite-label {
+      --calcite-label-margin-bottom: 0px;
+    }
+
+    #container {
+      display: grid;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      grid-template-columns: 1fr 0.25fr;
+      width: 100%;
+      height: 100%;
+    }
+
+    calcite-tab {
+      width: 100%;
+      height: 100%;
+    }
+
+    #header-title {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+
+    #info-content {
+      padding: 0.75rem;
+    }
+
+    calcite-rating {
+      margin-top: 0.25rem;
+    }
+
+    #header {
+      display: flex;
+      padding: 0 1rem;
+      background-color: var(--calcite-ui-foreground-1);
+    }
+
+    #header-controls {
+      display: flex;
+      margin-inline-start: auto;
+      align-self: center;
+    }
+
+    .label-wrapper {
+      display: flex;
+      margin-inline: 1rem;
+      padding: 0.5rem;
+      border: 1px solid var(--calcite-ui-border-1);
+      cursor: pointer;
+    }
+
+    calcite-switch {
+      margin: 0 0.5rem;
+      margin-top: 3%;
+    }
+
+    #chartPanel {
+      background-color: rgb(0, 0, 0, 0);
+      padding: 8;
+      width: 100%;
+      height: 100%;
+    }
+
+    #landPieChartDiv,
+    #landPieChartDiv2,
+    #structurePieChartDiv,
+    #nloPieChartDiv {
+      height: 45%;
+      margin-bottom: 5;
+    }
+
+    .lotNumber-container,
+    .structureNumber-container,
+    .nloNumber-container,
+    .pteLot-container,
+    .pteStructure-container {
+      display: flex;
+    }
+
+    #lotNumberDiv,
+    #structureNumberDiv,
+    #nloNumberDiv,
+    #pteLotNumberDiv,
+    #pteStructureNumberDiv {
+      width: 50%;
+      height: 10%;
+      padding-top: 2%;
+      padding-left: 15px;
+      font-size: 1vw;
+      color: #f7f5f7;
+    }
+
+    #lotNumberDiv b,
+    #nloNumberDiv b,
+    #structureNumberDiv b {
+      font-size: 2.5vw;
+      font-family: "Calibri";
+      font-weight: bold;
+      color: #6ede00;
+      /*#d4ff33;*/
+      margin: auto;
+    }
+
+    #pteLotNumberDiv b,
+    #pteStructureNumberDiv b {
+      font-size: 2vw;
+      font-family: "Calibri";
+      font-weight: bold;
+      color: #6ede00;
+      /*#d4ff33;*/
+      margin: auto;
+    }
+
+    #landImage,
+    #landNumberImage,
+    #nloNumberImage,
+    #structureImage,
+    #structureNumberImage {
+      width: 20%;
+      height: auto;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 0;
+      margin-bottom: -10;
+    }
+
+    #chartMoaLotDiv,
+    #chartMoaStructureDiv {
+      width: 100%;
+      height: 30%;
+      align-items: center;
+      padding: 1%;
+      margin-top: 7%;
+    }
+
+    #land-checkbox,
+    #land-endorsed-checkbox {
+      padding: 10;
+    }
+
+    #timeSeriesChart {
+      position: absolute;
+      z-index: 1;
+      height: 40vh;
+      width: 60vw;
+      bottom: 20%;
+      left: 8vw;
+      background-color: rgb(37, 37, 37);
+    }
+
+    br {
+      content: "";
+      margin: 2em;
+      display: block;
+      font-size: 24%;
+    }
+
+    b {
+      color: orange;
+    }
+
+    #dateDiv {
+      font-size: 0.85vw;
+      text-align: right;
+      display: flex;
+      align-items: flex-end;
+      font-weight: bold;
+    }
+
+    /* Expropriation List */
+    calcite-list-item {
+      --calcite-ui-text-1: #f00;
+      --calcite-ui-text-3: #eaeaea;
+      --calcite-ui-foreground-2: #202020;
+    }
+
+    calcite-chip {
+      --calcite-ui-text-1: #ffffff;
+      --calcite-ui-foreground-2: rgb(0, 0, 0, 0);
+      margin-left: 2rem !important;
+    }
+
+    calcite-avatar {
+      margin-right: 2.5rem !important;
+      position: absolute;
+    }
+
+    /* Dropdown list */
+    #dropdownDiv {
+      background-color: rgb(0, 0, 0, 0);
+      width: 50%;
+      opacity: 1;
+      color: white;
+      text-align: right;
+      margin: auto;
+    }
+
+    /* SCROLL BAR */
+    /* ESRI POPUP */
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: #00032235;
+      /*#032235*/
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: #ffba1f;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: #b98816;
+    }
+
+    .esri-legend__layer-caption {
+      display: none;
+    }
+
+    /*
+    .esri-legend__layer-cell--info {
+      background-color: black;
+      color: white;
+      font-size: 0.85vw;
+    }
+    */
+
+    .esri-legend {
+      overflow: hidden;
+      overflow-y: auto;
+      margin-left: -10;
+    }
+
+    .esri-icon-non-visible::before {
+      content: "\e610" !important;
+      color: #969696 !important;
+    }
+
+    .esri-icon-visible::before {
+      content: "\e611" !important;
+      background-color: #11a7fd;
+      color: white !important;
+    }
+
+    calcite-segmented-control {
+      margin-left: 10px;
+    }
+
+    #urgentLots-segmented-control {
+      margin-bottom: 20px;
+    }
+
+    .esri-view .esri-view-surface--touch-none:focus::after {
+        outline: none !important;
+    }
+  </style>
+
+  <body class="calcite-mode-dark">
+    <calcite-loader></calcite-loader>
+    <calcite-shell content-behind>
+      <!--  Header slot  -->
+      <div slot="header" id="header">
+        <!-- Title -->
+        <h2 id="header-title" slot="header"></h2>
+        <div id="dateDiv"></div>
+
+        <!-- Dropdown Lists -->
+        <div id="dropdownDiv" class="esri-widget">
+          <label id="dropdownMunicipalLabel">
+            City/Municipality:
+            <select id="municipalSelect" class="esri-widget"></select>
+          </label>
+          <label id="dropdownBarangayLabel">
+            Barangay:
+            <select
+              style="width: 10vw"
+              id="barangaySelect"
+              class="esri-widget"
+            ></select>
+          </label>
+        </div>
+      </div>
+
+      <!-- Icon -->
+      <!-- https://developers.arcgis.com/calcite-design-system/icons/?icon=list&library=Calcite%20UI -->
+      <calcite-shell-panel slot="panel-start" display-mode="float" detached>
+        <calcite-action-bar slot="action-bar">
+          <calcite-action
+            data-action-id="layers"
+            icon="layers"
+            text="Layers"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="basemaps"
+            icon="basemap"
+            text="Basemaps"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="charts"
+            icon="graph-time-series"
+            text="Progress Chart"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="information"
+            icon="information"
+            text="Information"
+          ></calcite-action>
+        </calcite-action-bar>
+
+        <!-- Map-specific panels (each one provides a div for ArcGIS Maps SDK for JavaScript widgets) -->
+        <calcite-panel
+          heading="Layers"
+          height-scale="l"
+          data-panel-id="layers"
+          hidden
+        >
+          <div id="layers-container"></div>
+        </calcite-panel>
+        <calcite-panel
+          heading="Basemaps"
+          height-scale="l"
+          data-panel-id="basemaps"
+          hidden
+        >
+          <div id="basemaps-container"></div>
+        </calcite-panel>
+        <calcite-panel
+          class="timeSeries-panel"
+          height-scale="l"
+          data-panel-id="charts"
+          hidden
+        >
+        </calcite-panel>
+        <!--Panel for super urgent lots button-->
+        <!-- Info panel (populates with info from the web map) -->
+        <calcite-panel heading="Description" data-panel-id="information" hidden>
+          <div id="info-content">
+            <!-- <img id="item-thumbnail" alt="webmap thumbnail" /> -->
+            <div id="item-description">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </calcite-panel>
+      </calcite-shell-panel>
+
+      <div id="container">
+        <div id="timeSeriesChart" hidden></div>
+        <div id="viewDiv"></div>
+        <!-- Chart Panel -->
+        <!-- Tabs "https://esri.github.io/calcite-web/documentation/patterns/#tabs" -->
+        <!-- Tabs "https://developers.arcgis.com/calcite-design-system/components/tabs/" -->
+        <calcite-tabs>
+          <div id="chartPanel">
+            <calcite-tab-nav slot="tab-nav" id="thetabs">
+              <calcite-tab-title class="Land" selected>Land</calcite-tab-title>
+              <calcite-tab-title class="Structure">Structure</calcite-tab-title>
+              <calcite-tab-title class="ISF">NLO</calcite-tab-title>
+              <calcite-tab-title class="ExproList">ExproList</calcite-tab-title>
+            </calcite-tab-nav>
+            <calcite-tab>
+              <div class="lotNumber-container">
+                <div id="lotNumberDiv"></div>
+                <img
+                  id="landNumberImage"
+                  src="https://EijiGorilla.github.io/Symbols/Land_logo.png"
+                />
+              </div>
+              <calcite-switch class="chartChange"></calcite-switch>
+              <div class="box" id="landPieChartDiv"></div>
+              <div class="box2" id="landPieChartDiv2" hidden></div>
+              <div class="pteLot-container">
+                <div id="pteLotNumberDiv"></div>
+                <img
+                  id="landImage"
+                  src="https://EijiGorilla.github.io/Symbols/Permit-To-Enter.png"
+                />
+              </div>
+              <div id="chartMoaLotDiv"></div>
+            </calcite-tab>
+            <calcite-tab>
+              <div class="structureNumber-container">
+                <div id="structureNumberDiv"></div>
+                <img
+                  id="structureNumberImage"
+                  src="https://EijiGorilla.github.io/Symbols/House_Logo.svg"
+                />
+              </div>
+              <div class="box3" id="structurePieChartDiv"></div>
+              <div class="pteStructure-container">
+                <div id="pteStructureNumberDiv"></div>
+                <img
+                  id="structureImage"
+                  src="https://EijiGorilla.github.io/Symbols/Permit-To-Enter.png"
+                />
+              </div>
+              <div id="chartMoaStructureDiv"></div>
+            </calcite-tab>
+            <calcite-tab>
+              <div class="nloNumber-container">
+                <div id="nloNumberDiv"></div>
+                <img
+                  id="nloNumberImage"
+                  src="https://EijiGorilla.github.io/Symbols/NLO_Logo.svg"
+                />
+              </div>
+              <div class="box4" id="nloPieChartDiv"></div>
+            </calcite-tab>
+            <calcite-tab>
+              <calcite-list id="expropriationListDiv"></calcite-list>
+            </calcite-tab>
+          </div>
+        </calcite-tabs>
+      </div>
+    </calcite-shell>
+  </body>
+  <script>
+    require([
+      "esri/WebMap",
+      "esri/views/MapView",
+      "esri/views/SceneView",
+      "esri/Map",
+      "esri/layers/FeatureLayer",
+      "esri/layers/SceneLayer",
+      "esri/widgets/Bookmarks",
+      "esri/widgets/BasemapGallery",
+      "esri/widgets/LayerList",
+      "esri/widgets/Legend",
+      "esri/rest/support/Query",
+      "esri/widgets/Fullscreen",
+      "esri/layers/support/FeatureFilter",
+      "esri/widgets/TableList",
+      "esri/portal/PortalItem",
+      "esri/portal/Portal",
+      "esri/rest/geometryService",
+      "esri/rest/support/StatisticDefinition",
+      "esri/symbols/WebStyleSymbol",
+      "esri/widgets/Expand",
+      "esri/renderers/UniqueValueRenderer",
+      "esri/Ground",
+      "esri/rest/support/RelationshipQuery",
+      "esri/layers/GraphicsLayer",
+      "esri/widgets/Search",
+      "esri/widgets/Locate",
+      "esri/widgets/BasemapToggle",
+      "esri/PopupTemplate",
+      "esri/layers/support/LabelClass",
+      "esri/popup/content/CustomContent",
+      "esri/layers/TileLayer",
+      "esri/core/reactiveUtils",
+      "esri/popup/support/FieldInfoFormat",
+      "esri/layers/GroupLayer",
+    ], function (
+      WebMap,
+      MapView,
+      SceneView,
+      Map,
+      FeatureLayer,
+      SceneLayer,
+      Bookmarks,
+      BasemapGallery,
+      LayerList,
+      Legend,
+      Query,
+      Fullscreen,
+      FeatureFilter,
+      TableList,
+      PortalItem,
+      Portal,
+      geometryService,
+      StatisticDefinition,
+      WebStyleSymbol,
+      Expand,
+      UniqueValueRenderer,
+      Ground,
+      RelationshipQuery,
+      GraphicsLayer,
+      Search,
+      Locate,
+      BasemapToggle,
+      PopupTemplate,
+      LabelClass,
+      CustomContent,
+      TileLayer,
+      reactiveUtils,
+      FieldInfoFormat,
+      GroupLayer
+    ) {
+      //****---------------- Creating Map -----------------------****//
+      var map = new Map({
+        basemap: "dark-gray-vector", // "streets-night-vector", basemap
+        ground: "world-elevation",
+      });
+
+      //****---------------- Creating Scene -----------------------****//
+      var view = new SceneView({
+        map: map,
+        center: [120.5793, 15.18],
+        zoom: 12,
+        viewingMode: "local",
+        container: "viewDiv",
+        environment: {
+          background: {
+            type: "color", // autocasts as new ColorBackground()
+            color: [0, 0, 0, 1],
+          },
+        },
+      });
+
+      view.ui.components = [];
+
+      /////////////////// LAYER IMPORT ////////////////////////////
+
+      //**** ---- Lot Layer ---- ***///
+
+      // Default symbol for Lot
+      let defaultSymbol = {
+        type: "simple-fill", // autocasts as new SimpleFillSymbol()
+        color: [0, 0, 0, 0],
+        style: "solid",
+        outline: {
+          // autocasts as new SimpleLineSymbol()
+          color: [110, 110, 110],
+          width: 0.7,
+        },
+      };
+
+      // Unique Value Renderer for Lot
+      function colorLotReqs() {
+        return {
+          0: [0, 197, 255],
+          1: [112, 173, 71],
+          2: [0, 112, 255],
+          3: [255, 255, 0],
+          4: [255, 170, 0],
+          5: [255, 0, 0],
+          6: [0, 0, 0, 0],
+        };
+      }
+
+      let lotLayerRenderer = {
+        type: "unique-value",
+        defaultSymbol: defaultSymbol, // autocasts as new SimpleFillSymbol()
+        valueExpression:
+          "When($feature.StatusLA == 0, '0',$feature.StatusLA == 1, '1', $feature.StatusLA == 2, '2', \
+                               $feature.StatusLA == 3, '3', $feature.StatusLA == 4, '4', \
+                               $feature.StatusLA == 5, '5', $feature.StatusLA)",
+        uniqueValueInfos: [
+          {
+            value: "0",
+            label: "Handed-Over",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              color: colorLotReqs()[0],
+            },
+          },
+          {
+            value: "1",
+            label: "Paid",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              color: colorLotReqs()[1],
+            },
+          },
+          {
+            value: "2",
+            label: "For Payment Processing",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              color: colorLotReqs()[2],
+            },
+          },
+          {
+            value: "3",
+            label: "For Legal Pass",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              color: colorLotReqs()[3],
+            },
+          },
+          {
+            value: "4",
+            label: "For Appraisal/Offer to Buy",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              color: colorLotReqs()[4],
+            },
+          },
+          {
+            value: "5",
+            label: "For Expro",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              color: colorLotReqs()[5],
+            },
+          },
+        ],
+      };
+
+      // Label class for Lot
+      var lotIdLabel = new LabelClass({
+        labelExpressionInfo: { expression: "$feature.LotID" },
+        symbol: {
+          type: "text",
+          color: "black",
+          haloColor: "white",
+          haloSize: 0.5,
+          font: {
+            size: 11,
+            weight: "bold",
+          },
+        },
+      });
+
+      // Adding lot layer
+      var lotLayer = new FeatureLayer({
+        portalItem: {
+          id: "dca1d785da0f458b8f87638a76918496",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 7,
+        renderer: lotLayerRenderer,
+        labelingInfo: [lotIdLabel],
+        outFields: ["*"],
+        title: "Land Acquisition",
+        minScale: 150000,
+        maxScale: 0,
+        //labelsVisible: false,
+        elevationInfo: {
+          model: "on-the-ground",
+        },
+      });
+      //map.add(lotLayer, 0); //layer order in map.add
+      lotLayer.visible = true;
+
+      // Popup for lot layer
+      const lotStatusArray = [
+        "Handed-Over",
+        "Paid",
+        "For Payment Processing",
+        "For Legal Pass",
+        "For Appraisal/Offer to Buy",
+        "For Expro",
+      ];
+
+      const landUseArray = [
+        "Agricultural",
+        "Agricultural & Commercial",
+        "Agricultural / Residential",
+        "Commercial",
+        "Industrial",
+        "Irrigation",
+        "Residential",
+        "Road",
+        "Road Lot",
+        "Special Exempt",
+      ];
+
+      const endorsedStatus = ["Not Endorsed", "Endorsed", "NA"];
+
+      // Organizing the popup content
+
+      let customContentLot = new CustomContent({
+        outFields: ["*"],
+        creator: function (event) {
+          // Extract AsscessDate of clicked pierAccessLayer
+          const lotNo = event.graphic.attributes.LotID;
+          const handOverDate = event.graphic.attributes.HandOverDate;
+          const handOverArea = event.graphic.attributes.percentHandedOver;
+          const statusLot = event.graphic.attributes.StatusLA;
+          const landUse = event.graphic.attributes.LandUse;
+          const municipal = event.graphic.attributes.Municipality;
+          const barangay = event.graphic.attributes.Barangay;
+          const landOwner = event.graphic.attributes.LandOwner;
+          const cpNo = event.graphic.attributes.CP;
+          const endorse = event.graphic.attributes.Endorsed;
+          const endorsed = endorsedStatus[endorse];
+
+          // Convert numeric to date format
+
+          var date = new Date(handOverDate);
+          var DATES = dateFormat(date, "MM-dd-yyyy");
+
+          if (DATES === "01-01-1970") {
+            var finalDate = "Undefined";
+          } else {
+            var finalDate = dateFormat(date, "MM-dd-yyyy");
+          }
+          // Convert domain code to domain name
+          /// 1. Status
+          if (statusLot >= 0) {
+            //headerTitleDiv.innerHTML = lotStatusArray[statusLot];
+            var statusLotTemp = lotStatusArray[statusLot];
+          }
+
+          if (landUse >= 1) {
+            var landUseTemp = landUseArray[landUse - 1];
+          }
+
+          return `<ul><li>Handed-Over Area: <b>${handOverArea} %</b></li><br>
+                    <li>Status:           <b>${statusLotTemp}</b></li><br>
+                    <li>Land Use:         <b>${landUseTemp}</b></li><br>
+                    <li>Municipality:     <b>${municipal}</b></li><br>
+                    <li>Barangay:         <b>${barangay}</b></li><br>
+                    <li>Land Owner:       <b>${landOwner}</b>
+                    <li>CP:               <b>${cpNo}</b><br>
+                    <li>Endorsed:         <b>${endorsed}</b></li></ul>`;
+        },
+      });
+
+      // Creating the popup template
+      const templateLot = new PopupTemplate({
+        outFields: ["*"],
+        title: "Lot No.: <b>{LotID}</b>",
+        lastEditInfoEnabled: false,
+        content: [customContentLot],
+      });
+      lotLayer.popupTemplate = templateLot;
+
+      //**** ---- Endorsed Layer from lot layer ---- ***///
+
+      // Renderer for endorsed lot layer
+      let endorsedLayerRenderer = {
+        type: "unique-value",
+        field: "Endorsed",
+        defaultSymbol: defaultSymbol,
+        uniqueValueInfos: [
+          {
+            value: 0,
+            label: "Not Endorsed",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              color: colorLotReqs()[5],
+            },
+          },
+          {
+            value: 1,
+            label: "Endorsed",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              color: colorLotReqs()[2],
+            },
+          },
+          {
+            value: 2,
+            label: "NA",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              color: [211, 211, 211, 0.7],
+            },
+          },
+        ],
+      };
+
+      // Adding endorsed lot layer
+      var endorsedLotLayer = new FeatureLayer({
+        portalItem: {
+          id: "dca1d785da0f458b8f87638a76918496",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 7,
+        renderer: endorsedLayerRenderer,
+        labelingInfo: [lotIdLabel], //use the same labelClass as lot layer
+        outFields: ["*"],
+        title: "Land Acquisition (Endorsed Status)",
+        minScale: 150000,
+        maxScale: 0,
+        //labelsVisible: false,
+        elevationInfo: {
+          model: "on-the-ground",
+        },
+      });
+      //map.add(endorsedLotLayer, 0); //layer order in map.add
+      endorsedLotLayer.popupTemplate = templateLot; //use the same popup as lot layer
+
+      //**** ---- Super Urgent Lots ---- ***///
+      const superUrgentLotRenderer = {
+        type: "unique-value",
+        field: "Urgent",
+        uniqueValueInfos: [
+          {
+            value: 0,
+            label: "Super Urgent",
+            symbol: {
+              type: "simple-fill",
+              color: [255, 0, 0, 0],
+              outline: {
+                color: [255, 0, 0, 1],
+                width: 0.3,
+              },
+            },
+          },
+        ],
+      };
+
+      const superUrgentLotLayer = new FeatureLayer({
+        portalItem: {
+          id: "dca1d785da0f458b8f87638a76918496",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 7,
+        definitionExpression: "Urgent = 0",
+        renderer: superUrgentLotRenderer,
+        popupEnabled: false,
+        labelsVisible: false,
+        title: "Super Urgent Lot",
+        elevationInfo: {
+          mode: "on-the-ground",
+        },
+      });
+
+      //**** ---- Structure Layer ---- ***///
+
+      // Polygon 3D extrution
+      const height = 5;
+      const edgeSize = 0.3;
+      const dismantled = {
+        type: "polygon-3d",
+        symbolLayers: [
+          {
+            type: "extrude",
+            size: height,
+            material: {
+              color: [0, 197, 255, 0.3],
+            },
+            edges: {
+              type: "solid",
+              color: "#4E4E4E",
+              size: edgeSize,
+            },
+          },
+        ],
+      };
+
+      const paid = {
+        type: "polygon-3d",
+        symbolLayers: [
+          {
+            type: "extrude",
+            size: height,
+            material: {
+              color: [112, 173, 71, 0.3],
+            },
+            edges: {
+              type: "solid",
+              color: "#4E4E4E",
+              size: edgeSize,
+            },
+          },
+        ],
+      };
+
+      const payp = {
+        type: "polygon-3d",
+        symbolLayers: [
+          {
+            type: "extrude",
+            size: height,
+            material: {
+              color: [0, 112, 255, 0.3],
+            },
+            edges: {
+              type: "solid",
+              color: "#4E4E4E",
+              size: edgeSize,
+            },
+          },
+        ],
+      };
+
+      const legalpass = {
+        type: "polygon-3d",
+        symbolLayers: [
+          {
+            type: "extrude",
+            size: height,
+            material: {
+              color: [255, 255, 0, 0.3],
+            },
+            edges: {
+              type: "solid",
+              color: "#4E4E4E",
+              size: edgeSize,
+            },
+          },
+        ],
+      };
+
+      const otc = {
+        type: "polygon-3d",
+        symbolLayers: [
+          {
+            type: "extrude",
+            size: height,
+            material: {
+              color: [255, 170, 0, 0.3],
+            },
+            edges: {
+              type: "solid",
+              color: "#4E4E4E",
+              size: edgeSize,
+            },
+          },
+        ],
+      };
+
+      const lbp = {
+        type: "polygon-3d",
+        symbolLayers: [
+          {
+            type: "extrude",
+            size: height,
+            material: {
+              color: [255, 0, 0, 0.3],
+            },
+            edges: {
+              type: "solid",
+              color: "#4E4E4E",
+              size: edgeSize,
+            },
+          },
+        ],
+      };
+
+      // renderer for structure layer
+      const structureRenderer = {
+        type: "unique-value",
+        defaultSymbol: {
+          type: "polygon-3d",
+          symbolLayers: [
+            {
+              type: "extrude",
+              size: 5, // in meters
+              material: {
+                color: [0, 0, 0, 0.4],
+              },
+              edges: {
+                type: "solid",
+                color: "#4E4E4E",
+                size: edgeSize,
+              },
+            },
+          ],
+        },
+        defaultLabel: "Other",
+        field: "StatusStruc",
+        legendOptions: {
+          title: "Status of Structure",
+        },
+        uniqueValueInfos: [
+          {
+            value: 1,
+            symbol: dismantled,
+            label: "Dismantling/Clearing",
+          },
+          {
+            value: 2,
+            symbol: paid,
+            label: "Paid",
+          },
+          {
+            value: 3,
+            symbol: payp,
+            label: "For Payment Processing",
+          },
+          {
+            value: 4,
+            symbol: legalpass,
+            label: "For Legal Pass",
+          },
+          {
+            value: 5,
+            symbol: otc,
+            label: "For Appraisal/Offer to Compensation",
+          },
+          {
+            value: 6,
+            symbol: lbp,
+            label: "LBP Account Opening",
+          },
+        ],
+      };
+
+      // Adding structure layer
+      var structureLayer = new FeatureLayer({
+        portalItem: {
+          id: "dca1d785da0f458b8f87638a76918496",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 6,
+        title: "Structure",
+        renderer: structureRenderer, // adding the renderer for structure
+        outFields: ["*"],
+        elevationInfo: {
+          model: "on-the-ground",
+        },
+        popupTemplate: {
+          //creating popup for structure
+          title: "<p>{StrucID}</p>",
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "FamilyNumber",
+                  label: "<b>Number of Families</b>",
+                },
+                {
+                  fieldName: "StrucOwner",
+                  label: "Structure Owner",
+                },
+                {
+                  fieldName: "StatusStruc",
+                  label: "<p>Status of Structure</p>",
+                },
+                {
+                  fieldName: "LotID",
+                  label: "Lot ID",
+                },
+                {
+                  fieldName: "Municipality",
+                },
+                {
+                  fieldName: "Barangay",
+                },
+              ],
+            },
+          ],
+        },
+      });
+      //map.add(structureLayer, 0); //layer order in map.add
+
+      //**** ---- Non-Land Owner (ISF) ---- ***///
+
+      // Adding symbology
+      const isfSymbolColor = {
+        1: [0, 197, 255], // Relocated  (original: 255, 0, 197)
+        2: [112, 173, 71], // Paid
+        3: [0, 112, 255], // For Payment Processing
+        4: [255, 255, 0], // For Legal Pass
+        5: [255, 170, 0], // For Appraisal/OtC/Requirements for Other Entitlements
+        6: [255, 0, 0], //LBP Account Opening
+      };
+      const outlineColor = "gray";
+
+      var verticalOffsetExisting = {
+        screenLength: 80,
+        maxWorldLength: 500,
+        minWorldLength: 30,
+      };
+
+      function getUniqueValueSymbol(name, size) {
+        return {
+          type: "point-3d", // autocasts as new PointSymbol3D()
+          symbolLayers: [
+            {
+              type: "icon", // autocasts as new IconSymbol3DLayer()
+              resource: {
+                href: name,
+              },
+              size: size,
+              outline: {
+                color: "white",
+                size: 2,
+              },
+            },
+          ],
+
+          /*
+      verticalOffset: verticalOffsetExisting,
+
+      callout: {
+        type: "line", // autocasts as new LineCallout3D()
+        color: [128,128,128,0.1],
+        size: 0.2,
+        border: {
+          color: "grey"
+        }
+      }
+      */
+        };
+      }
+
+      const symbolSize = 30;
+      let isfRenderer = {
+        type: "unique-value",
+        valueExpression:
+          "When($feature.StatusRC == 1, 'relocated', \
+                        $feature.StatusRC == 2, 'paid', $feature.StatusRC == 3, 'payp', \
+                        $feature.StatusRC == 4, 'legalpass', $feature.StatusRC == 5, 'otc', \
+                        $feature.StatusRC == 6, 'lbp', $feature.StatusRC)",
+        uniqueValueInfos: [
+          {
+            value: "relocated",
+            label: "Relocated",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/3D_Web_Style/ISF/ISF_Relocated.svg",
+              symbolSize
+            ),
+          },
+          {
+            value: "paid",
+            label: "Paid",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/3D_Web_Style/ISF/ISF_Paid.svg",
+              symbolSize
+            ),
+          },
+          {
+            value: "payp",
+            label: "For Payment Processing",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/3D_Web_Style/ISF/ISF_PaymentProcess.svg",
+              symbolSize
+            ),
+          },
+          {
+            value: "legalpass",
+            label: "For Legal Pass",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/3D_Web_Style/ISF/ISF_LegalPass.svg",
+              symbolSize
+            ),
+          },
+          {
+            value: "otc",
+            label: "For Appraisal/OtC/Reqs for Other Entitlements",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/3D_Web_Style/ISF/ISF_OtC.svg",
+              symbolSize
+            ),
+          },
+          {
+            value: "lbp",
+            label: "LBP Account Opening",
+            symbol: getUniqueValueSymbol(
+              "https://EijiGorilla.github.io/Symbols/3D_Web_Style/ISF/ISF_LBP.svg",
+              symbolSize
+            ),
+          },
+        ],
+      };
+
+      // Adding the ISF layer
+      var nloLayer = new FeatureLayer({
+        portalItem: {
+          id: "dca1d785da0f458b8f87638a76918496",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 4,
+        renderer: isfRenderer,
+        outFields: ["*"],
+        title: "NLO (Non-Land Owner)",
+        elevationInfo: {
+          mode: "relative-to-scene",
+        },
+        minScale: 10000,
+        maxScale: 0,
+        popupTemplate: {
+          title: "<p>{StrucID}</p>",
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "StrucOwner",
+                  label: "Structure Owner",
+                },
+                {
+                  fieldName: "Municipality",
+                },
+                {
+                  fieldName: "Barangay",
+                },
+                {
+                  fieldName: "StatusRC",
+                  label: "<p>Status for Relocation</p>",
+                },
+                {
+                  fieldName: "Name",
+                },
+                {
+                  fieldName: "Status",
+                  label: "NLO/LO Ownership (structure) ",
+                },
+              ],
+            },
+          ],
+        },
+      });
+      //nloLayer.listMode = "hide";
+      //map.add(nloLayer, 0);
+
+      //**** ---- Occupancy (Structure) ---- ***///
+
+      // Property of the lineCallout
+      const outlineColorOccupancy = "gray";
+
+      var verticalOffsetExistingOccupancy = {
+        screenLength: 10,
+        maxWorldLength: 10,
+        minWorldLength: 10,
+      };
+
+      // Unique symbol for occupancy
+      function getUniqueValueSymbolOccupancy(name, size) {
+        return {
+          type: "point-3d", // autocasts as new PointSymbol3D()
+          symbolLayers: [
+            {
+              type: "icon", // autocasts as new IconSymbol3DLayer()
+              resource: {
+                href: name,
+              },
+              size: size,
+              outline: {
+                color: "white",
+                size: 2,
+              },
+            },
+          ],
+
+          verticalOffset: verticalOffsetExistingOccupancy,
+
+          callout: {
+            type: "line", // autocasts as new LineCallout3D()
+            color: [128, 128, 128, 0.6],
+            size: 0.4,
+            border: {
+              color: "grey",
+            },
+          },
+        };
+      }
+
+      // Renderer for occupancy
+      const occupancyPointSize = 20;
+      let occupancyRenderer = {
+        type: "unique-value",
+        valueExpression:
+          "When($feature.Occupancy == 0, 'Occupied', \
+                      $feature.Occupancy == 1, 'Relocated', $feature.Occupancy)",
+        uniqueValueInfos: [
+          {
+            value: "Occupied",
+            label: "Occupied",
+            symbol: getUniqueValueSymbolOccupancy(
+              "https://EijiGorilla.github.io/Symbols/Demolished.png",
+              occupancyPointSize
+            ),
+          },
+          {
+            value: "Relocated",
+            label: "Relocated",
+            symbol: getUniqueValueSymbolOccupancy(
+              "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png",
+              occupancyPointSize
+            ),
+          },
+        ],
+      };
+
+      // Adding the occupancy layer
+      var occupancyLayer = new FeatureLayer({
+        portalItem: {
+          id: "dca1d785da0f458b8f87638a76918496",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 5,
+        outFields: ["*"],
+        title: "Occupancy (Structure)",
+        renderer: occupancyRenderer, // Adding the renderer for occupancy
+        elevationInfo: {
+          mode: "relative-to-scene",
+        },
+        popupTemplate: {
+          //creating the popup
+          title: "<p>{StrucID}</p>",
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "StrucOwner",
+                  label: "Structure Owner",
+                },
+                {
+                  fieldName: "Municipality",
+                },
+                {
+                  fieldName: "Barangay",
+                },
+                {
+                  fieldName: "Occupancy",
+                  label: "<p>Status for Relocation(structure)</p>",
+                },
+                {
+                  fieldName: "Name",
+                },
+                {
+                  fieldName: "Status",
+                  label: "NLO/LO Ownership",
+                },
+              ],
+            },
+          ],
+        },
+      });
+      //map.add(occupancyLayer, 0); // layer order in the map.add
+
+      //**** ---- NLO/LO Ownership (Structure) ---- ***///
+
+      // NLO and LO renderer
+      let NLOLORenderer = {
+        type: "unique-value",
+        field: "Status",
+        defaultSymbol: { type: "simple-fill" },
+        uniqueValueInfos: [
+          {
+            value: 1,
+            label: "LO (Land Owner)",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              style: "forward-diagonal",
+              color: [128, 128, 128, 1],
+              outline: {
+                color: "#6E6E6E",
+                width: 0.3,
+              },
+            },
+          },
+          {
+            value: 2,
+            label: "NLO (Non-Land Owner)",
+            symbol: {
+              type: "simple-fill", // autocasts as new SimpleFillSymbol()
+              style: "vertical",
+              color: [128, 128, 128, 1],
+              outline: {
+                color: "#6E6E6E",
+                width: 0.3,
+              },
+            },
+          },
+        ],
+      };
+
+      // Adding NLO/LO layer
+      var strucOwnershipLayer = new FeatureLayer({
+        portalItem: {
+          id: "dca1d785da0f458b8f87638a76918496",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        renderer: NLOLORenderer,
+        layerId: 3,
+        title: "NLO/LO Ownership (Structure)",
+        outFields: ["*"],
+        popupEnabled: false,
+        elevationInfo: {
+          model: "on-the-ground",
+        },
+      });
+      //map.add(strucOwnershipLayer, 0); //layer order in the map.add
+
+      //**** ---- Free and Clear Lot ---- ***///
+
+      // Adding the fnc layer
+      /*
+      var fncLayer = new FeatureLayer({
+        portalItem: {
+          id: "dca1d785da0f458b8f87638a76918496",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 2,
+        title: "Free-and-Clear Area",
+        //popupEnabled: false
+      });
+      map.add(fncLayer, 0); //layer order in the map.add
+*/
+      //**** ---- PNR Land ---- ***///
+      // Adding renderer
+      let pnrRenderer = {
+        type: "unique-value",
+        valueExpression:
+          "When($feature.LandOwner == 'BASES CONVERSION DEVELOPMENT AUTHORITY', 'BCDA', \
+                        $feature.LandOwner == 'MANILA RAILROAD COMPANY' || $feature.LandOwner == 'Manila Railroad Company','PNR',$feature.LandOwner)",
+        uniqueValueInfos: [
+          {
+            value: "BCDA",
+            symbol: {
+              type: "simple-fill",
+              color: [137, 205, 102],
+              style: "diagonal-cross",
+              outline: {
+                width: 0.5,
+                color: "black",
+              },
+            },
+          },
+          {
+            value: "PNR",
+            symbol: {
+              type: "simple-fill",
+              color: [137, 205, 102],
+              style: "diagonal-cross",
+              outline: {
+                width: 0.5,
+                color: "black",
+              },
+            },
+          },
+        ],
+      };
+
+      // Adding pnr lot
+      var pnrLayer = new FeatureLayer({
+        portalItem: {
+          id: "dca1d785da0f458b8f87638a76918496",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 10,
+        title: "Land (PNR)",
+        definitionExpression:
+          "LandOwner IN ('BASES CONVERSION DEVELOPMENT AUTHORITY','MANILA RAILROAD COMPANY')",
+        outFields: ["*"],
+        title: "PNR",
+        elevationInfo: {
+          model: "on-the-ground",
+        },
+        labelsVisible: false,
+        renderer: pnrRenderer,
+        popupTemplate: {
+          title: "<p>{LandOwner} ({LotID})</p>",
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "HandOverDate",
+                  label: "Hand-Over Date",
+                },
+                {
+                  fieldName: "Municipality",
+                },
+                {
+                  fieldName: "Barangay",
+                },
+                {
+                  fieldName: "LandOwner",
+                  label: "Land Owner",
+                },
+              ],
+            },
+          ],
+        },
+      });
+      //map.add(pnrLayer, 0); //layer order in the map.add
+
+      //**** ---- Pier No (Point) with Access Date ---- ***///
+
+      // Renderer
+      // 0. Define colors for unique values
+      const pierAccessDateColor = {
+        0: [0, 255, 0, 0.9], // Accessible (green)
+        1: [255, 127, 80], // Orange
+        2: [255, 255, 0], // Yellow
+        3: [0, 112, 255], // Blue
+        4: [143, 0, 255], // violet
+        5: [255, 255, 255, 0.9],
+        6: [255, 0, 0, 0.9], // Dates are missing
+      };
+
+      /*var defaultPointSymbol = {
+        type: "simple",
+        label: "Accessible",
+        symbol: {
+          type: "simple-marker",
+          size: 5,
+          color: pierAccessDateColor[0],
+          outline: {
+            width: 0,
+            color: "black",
+          },
+        },
+      };*/
+
+      // labels
+      // for multiple label class to a layer:
+      // https://developers.arcgis.com/javascript/latest/sample-code/labels-multiple-classes/
+
+      const today = new Date();
+      const todayn = today.getTime();
+      const cutOffDateAccess = todayn;
+      // make sure to update numerical date values in 'pierAccessRenderer'
+
+      const pierAccessReadyDateLabel = new LabelClass({
+        symbol: {
+          type: "label-3d", // autocast as new LabelSymbol3D()
+          symbolLayers: [
+            {
+              type: "text",
+              material: {
+                color: pierAccessDateColor[0],
+              },
+              size: 15,
+              color: pierAccessDateColor[0],
+              haloColor: pierAccessDateColor[0],
+              haloSize: 1,
+              font: {
+                family: "Ubuntu Mono",
+                weight: "bold",
+              },
+            },
+          ],
+          verticalOffset: {
+            screenLength: 80,
+            maxWorldLength: 500,
+            minWorldLength: 30,
+          },
+          callout: {
+            type: "line",
+            size: 0.5,
+            color: [0, 0, 0],
+            border: {
+              color: [255, 255, 255, 0.7],
+            },
+          },
+        },
+        labelExpressionInfo: {
+          expression: `var accessdate = $feature.AccessDate;
+                        var cutoffDate = 1700011031473;
+                        var labelPier = when($feature.AccessDate <= cutoffDate, $feature.PIER, '');
+                        return \`\${labelPier}\`
+                        `                      
+        },
+        labelPlacement: "above-center",
+      });
+
+      const pierAccessNotYetLabel = new LabelClass({
+        symbol: {
+          type: "label-3d", // autocast as new LabelSymbol3D()
+          symbolLayers: [
+            {
+              type: "text",
+              material: {
+                color: "#cccccc",
+              },
+              size: 10,
+              color: "#cccccc",
+              haloColor: "#cccccc",
+              haloSize: 1,
+              font: {
+                family: "Ubuntu Mono",
+                weight: "normal",
+              },
+            },
+          ],
+          verticalOffset: {
+            screenLength: 80,
+            maxWorldLength: 500,
+            minWorldLength: 30,
+          },
+          callout: {
+            type: "line",
+            size: 0.5,
+            color: [0, 0, 0],
+            border: {
+              color: [255, 255, 255, 0.7],
+            },
+          },
+        },
+        labelExpressionInfo: {
+          expression: `var accessdate = $feature.AccessDate;
+                        var cutoffDate = 1700011031473;
+                        var labelPier = when($feature.AccessDate > cutoffDate, $feature.PIER, '');
+                        return \`\${labelPier}\`
+                        ` 
+        },
+        labelPlacement: "above-center",
+      });
+
+      // Pier No Label Class
+      const pierAccessDateMissingLabel = new LabelClass({
+        symbol: {
+          type: "label-3d", // autocast as new LabelSymbol3D()
+          symbolLayers: [
+            {
+              type: "text",
+              material: {
+                color: "#ff0000",
+              },
+              size: 10,
+              color: "#cccccc",
+              haloColor: "#cccccc",
+              haloSize: 1,
+              font: {
+                family: "Ubuntu Mono",
+                weight: "normal",
+              },
+            },
+          ],
+          verticalOffset: {
+            screenLength: 80,
+            maxWorldLength: 500,
+            minWorldLength: 30,
+          },
+          callout: {
+            type: "line",
+            size: 0.5,
+            color: [0, 0, 0],
+            border: {
+              color: [255, 255, 255, 0.7],
+            },
+          },
+        },
+        labelExpressionInfo: {
+          expression: "$feature.PIER",
+          //'DefaultValue($feature.GeoTechName, "no data")'
+          //"IIF($feature.Score >= 13, '', '')"
+          //value: "{Type}"
+        },
+        labelPlacement: "above-center",
+        where: "AccessDate IS NULL",
+      });
+
+      // 1. Get unique dates
+      const numberDate = new Date(cutOffDateAccess);
+      const cutDate = numberDate.toLocaleDateString("en-US");
+
+      // Adding PierAccess Layer
+      var pierAccessLayer = new FeatureLayer(
+        {
+          portalItem: {
+            id: "590680d19f2e48fdbd8bcddce3aaedb5",
+            portal: {
+              url: "https://gis.railway-sector.com/portal",
+            },
+          },
+          layerId: 6,
+          labelingInfo: [
+            pierAccessDateMissingLabel,
+            pierAccessReadyDateLabel,
+            pierAccessNotYetLabel,
+          ],
+          title: "Pier with Access Date",
+          minScale: 150000,
+          maxScale: 0,
+          outFields: ["*"],
+          elevationInfo: {
+            model: "on-the-ground",
+          },
+        },
+        { utcOffset: 300 }
+      );
+      //map.add(pierAccessLayer, 1);
+
+      // we first need to obtain unique values of date because valueExpression does not allow
+      // date'2021-10-01' notation
+      const queryDate = "AccessDate IS NOT NULL";
+
+      function DateValues() {
+        const dates = [];
+        var query = pierAccessLayer.createQuery();
+
+        query.where = queryDate;
+        return pierAccessLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features;
+
+          stats.forEach((result, index) => {
+            const attributes = result.attributes;
+            const date = attributes.AccessDate;
+            dates.push(date);
+          });
+          return dates;
+        });
+      }
+
+      function uniqueDateValues(values) {
+        var uniqueValues = [];
+        values.forEach((item, index) => {
+          if (
+            (uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) &&
+            item !== ""
+          ) {
+            uniqueValues.push(item);
+          }
+        });
+        const sortedDates = uniqueValues.sort();
+        return sortedDates;
+      }
+
+      function uniqueValuesInfos(sortedDates) {
+        const dates = sortedDates.map((date, index) => {
+          const temp = new Date(date);
+          const labelDate = temp.toLocaleDateString("en-US");
+          return Object.assign(
+            {},
+            {
+              value: date, // make sure to use 'number'. you cannot add 'date'
+              label: labelDate,
+            }
+          );
+        });
+        console.log(dates);
+      }
+      DateValues().then(uniqueDateValues).then(uniqueValuesInfos);
+
+      const pierAccessRenderer = {
+        type: "unique-value", // autocasts as new UniqueValueRenderer()
+        field: "AccessDate",
+        //defaultSymbol: defaultPointSymbol,
+
+        valueExpression:
+          "When(IsEmpty($feature.AccessDate), 'empty', \
+                            $feature.AccessDate <= 1636070400000, 'accessible', \
+                            $feature.AccessDate > 1636070400000, 'others',$feature.AccessDate)",
+        uniqueValueInfos: [
+          {
+            value: "empty",
+            label: "Dates are missing",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: pierAccessDateColor[6],
+              outline: {
+                width: 0.1,
+                color: "white",
+              },
+            },
+          },
+          {
+            value: "accessible",
+            label: "Accessible",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: pierAccessDateColor[0],
+              outline: {
+                width: 0.1,
+                color: "white",
+              },
+            },
+          },
+          {
+            value: "others",
+            label: "Others",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: pierAccessDateColor[5],
+              outline: {
+                width: 0.1,
+                color: "white",
+              },
+            },
+          },
+        ],
+      };
+      pierAccessLayer.renderer = pierAccessRenderer;
+
+      // Popup Template
+
+      /// Define popup template on dates for pier no
+      // Date Format function
+      function dateFormat(inputDate, format) {
+        //parse the input date
+        const date = new Date(inputDate);
+
+        //extract the parts of the date
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+
+        //replace the month
+        format = format.replace("MM", month.toString().padStart(2, "0"));
+
+        //replace the year
+        if (format.indexOf("yyyy") > -1) {
+          format = format.replace("yyyy", year.toString());
+        } else if (format.indexOf("yy") > -1) {
+          format = format.replace("yy", year.toString().substr(2, 2));
+        }
+
+        //replace the day
+        format = format.replace("dd", day.toString().padStart(2, "0"));
+
+        return format;
+      }
+
+      // Custom Popup Content for pierAccessLayer
+      let customContent = new CustomContent({
+        outFields: ["*"],
+        creator: function (event) {
+          // Extract AsscessDate of clicked pierAccessLayer
+          const stats = event.graphic.attributes.AccessDate;
+          const pierNo = event.graphic.attributes.PIER;
+
+          // Convert numeric to date format
+          var date = new Date(stats);
+          dateValue = dateFormat(date, "MM-dd-yyyy");
+
+          const ddd = new Date(cutOffDateAccess);
+          dddValue = dateFormat(ddd, "MM-dd-yyyy");
+
+          //console.log(dateValue + "; " + dddValue);
+
+          // If the date is before current date, popupContent should be "AVAILABLE"
+          if (dateValue === "01-01-1970") {
+            // Empty date is entered as this
+            DATES = "NO DATES AVAILABLE";
+          } else if (date <= cutOffDateAccess) {
+            DATES = "ACCESSIBLE";
+          } else if (date > cutOffDateAccess) {
+            DATES = "NOT ACCESSIBLE";
+          }
+
+          //return `Access Date: <b>${DATES}</b>`;
+          return `Access Date: <b>${dateValue}</b><br>
+                  Status: <b>${DATES}</b>
+          `
+          ;
+        },
+      });
+
+      const template = new PopupTemplate({
+        outFields: ["*"],
+        title: "Pier No: <b>{PIER}</b>",
+        lastEditInfoEnabled: false,
+        content: [customContent],
+      });
+      pierAccessLayer.popupTemplate = template;
+
+      //**** ---- Station Box ---- ***///
+
+      // Station Box Renderer
+      let stationBoxRenderer = {
+        type: "unique-value",
+        field: "Layer",
+        defaultSymbol: { type: "simple-fill" },
+        uniqueValueInfos: [
+          {
+            value: "00_Platform",
+            label: "Platform",
+            symbol: {
+              type: "simple-fill",
+              color: [160, 160, 160],
+              style: "backward-diagonal",
+              outline: {
+                width: 1,
+                color: "black",
+              },
+            },
+          },
+          {
+            value: "00_Platform 10car",
+            label: "Platform 10car",
+            symbol: {
+              type: "simple-fill",
+              color: [104, 104, 104],
+              style: "cross",
+              outline: {
+                width: 1,
+                color: "black",
+                style: "short-dash",
+              },
+            },
+          },
+          {
+            value: "00_Station",
+            label: "Station Box",
+            symbol: {
+              type: "simple-fill",
+              color: [0, 0, 0, 0],
+              outline: {
+                width: 2,
+                color: [115, 0, 0],
+              },
+            },
+          },
+        ],
+      };
+
+      // Adding station box layer
+      var stationBoxLayer = new FeatureLayer({
+        portalItem: {
+          id: "590680d19f2e48fdbd8bcddce3aaedb5",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 3,
+        renderer: stationBoxRenderer,
+        minScale: 150000,
+        maxScale: 0,
+        title: "Station Box",
+        outFields: ["*"],
+        popupEnabled: false,
+        elevationInfo: {
+          model: "on-the-ground",
+        },
+      });
+      //stationBoxLayer.listMode = "hide";
+      //map.add(stationBoxLayer, 0);
+
+      //**** ---- ROW ---- ***///
+
+      //Adding the PROW layer
+      var prowLayer = new FeatureLayer({
+        portalItem: {
+          id: "590680d19f2e48fdbd8bcddce3aaedb5",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 1,
+        title: "PROW",
+        popupEnabled: false,
+      });
+      prowLayer.listMode = "hide";
+      //map.add(prowLayer, 0); // layer order in the map
+
+      //**** ---- Chainage ---- ***///
+
+      // Chainage label class
+      var labelChainage = new LabelClass({
+        labelExpressionInfo: { expression: "$feature.KmSpot" },
+        symbol: {
+          type: "text",
+          color: [85, 255, 0],
+          haloColor: "black",
+          haloSize: 0.5,
+          font: {
+            size: 15,
+            weight: "bold",
+          },
+        },
+      });
+
+      // Chainage renderer
+      var chainageRenderer = {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          size: 5,
+          color: [255, 255, 255, 0.9],
+          outline: {
+            width: 0.2,
+            color: "black",
+          },
+        },
+      };
+
+      // Adding chainage layer
+      var chainageLayer = new FeatureLayer({
+        portalItem: {
+          id: "590680d19f2e48fdbd8bcddce3aaedb5",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 5,
+        title: "Chainage",
+        elevationInfo: {
+          mode: "relative-to-ground",
+        },
+        labelingInfo: [labelChainage],
+        minScale: 150000,
+        maxScale: 0,
+        renderer: chainageRenderer,
+        outFields: ["*"],
+        popupEnabled: false,
+      });
+      //map.add(chainageLayer, 0); //layer order in the map.add
+
+      //**** ---- Pier Head and Column ---- ***///
+
+      // Polygon 3D extrution
+      const pHeight = 0;
+
+      // Symbol for column
+      const pierColumn = {
+        type: "polygon-3d",
+        symbolLayers: [
+          {
+            type: "extrude",
+            size: pHeight + 10,
+            material: {
+              color: [78, 78, 78, 0.5],
+            },
+            edges: {
+              type: "solid",
+              color: "#4E4E4E",
+              size: 0.3,
+            },
+          },
+        ],
+      };
+
+      // Symbol for pilecap
+      const pileCap = {
+        type: "polygon-3d",
+        symbolLayers: [
+          {
+            type: "extrude",
+            size: pHeight + 3,
+            material: {
+              color: [200, 200, 200, 0.7],
+            },
+            edges: {
+              type: "solid",
+              color: "#4E4E4E",
+              size: 1.0,
+            },
+          },
+        ],
+      };
+
+      // Renderer
+      const pierHeadRenderer = {
+        type: "unique-value",
+        defaultSymbol: {
+          type: "polygon-3d",
+          symbolLayers: [
+            {
+              type: "extrude",
+              size: 5, // in meters
+              material: {
+                color: "#E1E1E1",
+              },
+              edges: {
+                type: "solid",
+                color: "#4E4E4E",
+                size: 1.0,
+              },
+            },
+          ],
+        },
+        defaultLabel: "Other",
+        field: "Layer",
+        legendOptions: {
+          title: "Pier Head/Pier Column/Pile Cap",
+        },
+        uniqueValueInfos: [
+          {
+            value: "Pier_Column",
+            symbol: pierColumn,
+            label: "Column",
+          },
+          {
+            value: "Pile_Cap",
+            symbol: pileCap,
+            label: "Pile Cap",
+          },
+        ],
+      };
+
+      // Adding the layer
+      var pierHeadColumnLayer = new FeatureLayer({
+        portalItem: {
+          id: "590680d19f2e48fdbd8bcddce3aaedb5",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 4,
+        title: "Pier Head/Column",
+        definitionExpression: "Layer <> 'Pier_Head'",
+        outFields: ["*"],
+        minScale: 150000,
+        maxScale: 0,
+        renderer: pierHeadRenderer,
+        popupEnabled: false,
+        elevationInfo: {
+          model: "on-the-ground",
+        },
+        legendEnabled: false,
+      });
+      pierHeadColumnLayer.listMode = "hide"; //hide in the LayerList
+      map.add(pierHeadColumnLayer, 1); //layer order in the map.add
+
+      //**** ---- Station Point ---- ***///
+
+      // Station point label class
+      var labelClass = new LabelClass({
+        symbol: {
+          type: "label-3d", // autocasts as new LabelSymbol3D()
+          symbolLayers: [
+            {
+              type: "text", // autocasts as new TextSymbol3DLayer()
+              material: {
+                color: "#d4ff33",
+              },
+              size: 15,
+              color: "black",
+              haloColor: "black",
+              haloSize: 0.5,
+              font: {
+                family: "Ubuntu Mono",
+                //weight: "bold"
+              },
+            },
+          ],
+          verticalOffset: {
+            screenLength: 100,
+            maxWorldLength: 300,
+            minWorldLength: 80,
+          },
+
+          callout: {
+            type: "line", // autocasts as new LineCallout3D()
+            color: [128, 128, 128, 0.5],
+            size: 0.2,
+            border: {
+              color: "grey",
+            },
+          },
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          expression: "$feature.Station",
+          //value: "{TEXTSTRING}"
+        },
+      });
+
+      function stationsSymbol(name) {
+        return {
+          type: "web-style", // autocasts as new WebStyleSymbol()
+          name: name,
+          styleName: "EsriIconsStyle", //EsriRealisticTransportationStyle, EsriIconsStyle
+        };
+      }
+
+      var stationsRenderer = {
+        type: "unique-value", // autocasts as new UniqueValueRenderer()
+        field: "Station",
+        defaultSymbol: stationsSymbol("Train"), //Backhoe, Train
+      };
+
+      // Station Layer
+      var stationLayer = new SceneLayer({
+        portalItem: {
+          id: "207cb34b8a324b40985b5805862c4b29",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        title: "N2 Stations",
+        labelingInfo: [labelClass],
+        //renderer: stationsRenderer,
+        elevationInfo: {
+          mode: "relative-to-ground",
+        },
+        definitionExpression: "Extension = 'N2'",
+        //screenSizePerspectiveEnabled: false, // gives constant size regardless of zoom
+      });
+      stationLayer.listMode = "hide"; // hides the layer in the layer list
+      map.add(stationLayer); // layer order in the map
+
+      //**** ---- Group Layers ---- ***///
+
+      const alignmentGroupLayer = new GroupLayer({
+        title: "Alignment",
+        visible: true,
+        visibilityMode: "independent",
+        layers: [stationBoxLayer, chainageLayer],
+      }); //map.add(alignmentGroupLayer, 0);
+
+      const nloLoOccupancyGroupLayer = new GroupLayer({
+        title: "NLO/LO Occupancy",
+        visible: true,
+        visibilityMode: "independent",
+        layers: [occupancyLayer, strucOwnershipLayer, nloLayer],
+      });
+
+      const lotGroupLayer = new GroupLayer({
+        title: "Land",
+        visible: true,
+        visibilityMode: "independent",
+        layers: [endorsedLotLayer, lotLayer, superUrgentLotLayer, pnrLayer],
+      });
+
+      /// Order in the layer list
+      map.add(pierAccessLayer);
+      map.add(lotGroupLayer);
+      map.add(structureLayer);
+      map.add(nloLoOccupancyGroupLayer);
+      map.add(alignmentGroupLayer);
+      map.add(prowLayer);
+
+      /////////////////// END Of LAYER IMPORT ////////////////////////////
+
+      //****---------------- Zoom To Layer -----------------------****//
+      function zoomToLayer(layer) {
+        return layer.queryExtent().then(function (response) {
+          view
+            .goTo(response.extent, {
+              //response.extent
+              speedFactor: 2,
+            })
+            .catch(function (error) {
+              if (error.name != "AbortError") {
+                console.error(error);
+              }
+            });
+        });
+      }
+
+      zoomToLayer(stationLayer);
+
+      //////////////////////// CHART ////////////////////////////
+      let chartLayerView;
+      var highlightSelect;
+
+      const lotNumberDiv = document.getElementById("lotNumberDiv");
+      const pteLotNumberDiv = document.getElementById("pteLotNumberDiv");
+      const structureNumberDiv = document.getElementById("structureNumberDiv");
+      const pteStructureNumberDiv = document.getElementById(
+        "pteStructureNumberDiv"
+      );
+      const nloNumberDiv = document.getElementById("nloNumberDiv");
+
+      var municipalSelect = document.getElementById("municipalSelect");
+      var barangaySelect = document.getElementById("barangaySelect");
+
+      // Get last edited date
+      const month = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      am5.ready(function () {
+        // Default
+        nloLayer.visible = false;
+        pierAccessLayer.visible = true;
+
+        //****---------------- Expropriation List -----------------------****//
+
+        view.when(function () {
+          var expropriationList = document.getElementById(
+            "expropriationListDiv"
+          );
+
+          // Obtain a list of Owner's names and status
+          view.whenLayerView(lotLayer).then(function (exprolayerView) {
+            exprolayerView.watch("updating", function (val) {
+              if (!val) {
+                // Query for only Expropriation lots
+                var query = new Query();
+                query.outFields = ["*"];
+                query.where = "StatusLA = 5";
+                exprolayerView
+                  .queryFeatures(query)
+                  .then(function (result, index) {
+                    expropriationList.innerHTML = "";
+                    result.features.forEach(function (feature) {
+                      var attributes = feature.attributes;
+
+                      // exproprition result
+                      var li = document.createElement("calcite-list-item");
+                      li.label = attributes.LotID;
+                      li.description = attributes.LandOwner;
+                      li.value = index;
+
+                      // calcite chip
+                      var chip = document.createElement("calcite-chip");
+                      chip.value = attributes.CP;
+                      chip.slot = "content-end";
+                      chip.innerText = attributes.CP;
+                      chip.scale = "s";
+
+                      // calcite avatar
+                      var avatar = document.createElement("calcite-avatar");
+                      avatar.fullName = attributes.Municipality;
+                      avatar.slot = "content-end";
+                      avatar.scale = "s";
+
+                      const status = attributes.StatusLA;
+                      if (status == 5) {
+                        statusla = "Expropriation";
+                      }
+
+                      li.addEventListener("click", function (event) {
+                        var target = event.target;
+                        var objectId = feature.attributes.OBJECTID;
+                        var queryExtent = new Query({
+                          objectIds: [objectId],
+                        });
+
+                        // Query extent for selected expropriation lot in the list
+                        exprolayerView
+                          .queryExtent(queryExtent)
+                          .then(function (result) {
+                            if (result.extent) {
+                              view
+                                .goTo({
+                                  target: result.extent,
+                                  speedFactor: 2,
+                                  zoom: 17,
+                                })
+                                .catch(function (error) {
+                                  if (error.name != "AbortError") {
+                                    console.error(error);
+                                  }
+                                }); // End of catch
+                            } // End of if (result.extent)
+                          }); // End of layerView.queryExtent
+
+                        // Highlight selected lots
+                        if (highlightSelect) {
+                          highlightSelect.remove();
+                        }
+                        highlightSelect = exprolayerView.highlight([objectId]);
+                        view.on("click", function () {
+                          exprolayerView.filter = null;
+                          highlightSelect.remove();
+                        });
+                      }); // End of li.addEventListener
+
+                      expropriationList.appendChild(li);
+                      li.appendChild(avatar);
+                      li.appendChild(chip);
+                      //li.appendChild(avatar);
+                    }); // End of result.features.forEach
+                  }); // End of layerView.queryFeatures
+              } // End of if (!val)
+            }); // End of layerView.watch
+          }); // End of view.whenLayerView
+        }); // End of view.when()
+
+        // Thousand separators function
+        function thousands_separators(num) {
+          var num_parts = num.toString().split(".");
+          num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          return num_parts.join(".");
+        }
+
+        // 0. Total Number of Lots including PNR (i.e., lands which do not belong to any StatusLA)
+        function totalNumberOfAllLots() {
+          var totalLot = {
+            onStatisticField: "CASE WHEN LotID IS NOT NULL THEN 1 ELSE 0 END",
+            outStatisticFieldName: "totalLot",
+            statisticType: "sum",
+          };
+          var query = lotLayer.createQuery();
+          query.outStatistics = [totalLot];
+          query.returnGeometry = true;
+
+          return lotLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const totalLotAll = stats.totalLot;
+
+            return totalLotAll;
+          });
+        }
+
+        // 1. Total Number of Lots
+        function totalNumberOfLots(totalLotAll) {
+          var totalLot = {
+            onStatisticField: "CASE WHEN StatusLA >= 0 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "totalLot",
+            statisticType: "sum",
+          };
+          var query = lotLayer.createQuery();
+          query.outStatistics = [totalLot];
+          query.returnGeometry = true;
+
+          lotLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const LOT_TOTAL = thousands_separators(stats.totalLot);
+            const totalLotAlls = thousands_separators(totalLotAll);
+
+            lotNumberDiv.innerHTML = `TOTAL LOTS<br><br><b>${LOT_TOTAL}</b> (${totalLotAlls})`;
+          });
+        }
+
+        totalNumberOfAllLots().then(totalNumberOfLots);
+
+        // Total number of handed-over lots
+        function pteNumberLot() {
+          var total_pte_lot = {
+            onStatisticField: "CASE WHEN PTE = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_pte_lot",
+            statisticType: "sum",
+          };
+
+          var total_lot_N = {
+            onStatisticField: "CASE WHEN StatusLA >= 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_lot_N",
+            statisticType: "sum",
+          };
+          var query = lotLayer.createQuery();
+          query.outStatistics = [total_pte_lot, total_lot_N];
+          query.returnGeometry = true;
+
+          lotLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const pte = stats.total_pte_lot;
+            const totalN = stats.total_lot_N;
+            const percPTE = ((pte / totalN) * 100).toFixed(0);
+
+            const value =
+              percPTE == "Infinity" ? "N/A" : percPTE + "% (" + pte + ")";
+            pteLotNumberDiv.innerHTML = `PERMIT-TO-ENTER<br><br><b>${value}</b>`;
+          });
+        }
+        pteNumberLot();
+
+        // Total number of structures
+        function totalNumberOfStructures() {
+          var totalStructure = {
+            onStatisticField: "CASE WHEN StatusStruc >=1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "totalStructure",
+            statisticType: "count",
+          };
+          var query = structureLayer.createQuery();
+          query.outStatistics = [totalStructure];
+          query.returnGeometry = true;
+
+          structureLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const STRUCTURE_TOTAL = thousands_separators(stats.totalStructure);
+            structureNumberDiv.innerHTML = `TOTAL STRUCTURES<br><br><b>${STRUCTURE_TOTAL}</b>`;
+          });
+        }
+        totalNumberOfStructures();
+
+        // Total number of PTE for structure
+        function pteNumberStructure() {
+          var total_pte_structure = {
+            onStatisticField: "CASE WHEN PTE = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_pte_structure",
+            statisticType: "sum",
+          };
+
+          var total_struc_N = {
+            onStatisticField: "CASE WHEN StatusStruc >=1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_struc_N",
+            statisticType: "sum",
+          };
+
+          var query = structureLayer.createQuery();
+          query.outStatistics = [total_pte_structure, total_struc_N];
+          query.returnGeometry = true;
+
+          structureLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const pte = stats.total_pte_structure;
+            const totalN = stats.total_struc_N;
+            const percPTE = ((pte / totalN) * 100).toFixed(0);
+
+            const value = percPTE + "% (" + pte + ")";
+            pteStructureNumberDiv.innerHTML = `PERMIT-TO-ENTER<br><br><b>${value}</b>`;
+          });
+        }
+        pteNumberStructure();
+
+        //****---------------- Dropdown List -----------------------****//
+        view
+          .when(function () {
+            return lotLayer.when(function () {
+              var query = lotLayer.createQuery();
+              return lotLayer.queryFeatures(query);
+            });
+          })
+          .then(getValues)
+          .then(getUniqueValues)
+          .then(addToSelect);
+
+        function queryForLotGeometries() {
+          var lotQuery = lotLayer.createQuery();
+
+          return lotLayer.queryFeatures(lotQuery).then(function (response) {
+            lotGeometries = response.features.map(function (feature) {
+              return feature.geometry;
+            });
+            return lotGeometries;
+          });
+        }
+
+        // 1. Get values and return to drop down list
+        // 1.1. Municipality
+        function getValues(response) {
+          var features = response.features;
+          var values = features.map(function (feature) {
+            return feature.attributes.Municipality;
+          });
+          return values;
+        }
+
+        // Return an array of unique values in the 'Municipality' field of the lot Layer
+        function getUniqueValues(values) {
+          var uniqueValues = [];
+
+          values.forEach(function (item, i) {
+            if (
+              (uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) &&
+              item !== ""
+            ) {
+              uniqueValues.push(item);
+            }
+          });
+          return uniqueValues;
+        }
+
+        // Add the unique values to the municipalility select element. this will allow the user
+        // to filter lot layer by municipality.
+        function addToSelect(values) {
+          values.sort();
+          values.unshift("None"); // Add 'None' to the array and place it to the beginning of the array
+          values.forEach(function (value) {
+            var option = document.createElement("option");
+            option.text = value;
+            municipalSelect.add(option);
+          });
+        }
+
+        // 1.2. Barangay
+        function barangayFilterList(municipalValue) {
+          function barangayQuery() {
+            var query = lotLayer.createQuery();
+            if (municipalValue === undefined || municipalValue === "None") {
+              query.where = "1=1";
+            } else if (municipalValue !== "None") {
+              query.where = "Municipality = '" + municipalValue + "'";
+            }
+
+            return lotLayer.queryFeatures(query).then(function (response) {
+              stats = response.features;
+              var values = stats.map(function (feature) {
+                return feature.attributes.Barangay;
+              });
+              return values;
+            });
+          }
+
+          function getUniqueValues2(values2) {
+            var uniqueValues2 = [];
+            values2.forEach(function (item, i) {
+              if (
+                (uniqueValues2.length < 1 ||
+                  uniqueValues2.indexOf(item) === -1) &&
+                item !== ""
+              ) {
+                uniqueValues2.push(item);
+              }
+            });
+            return uniqueValues2;
+          }
+
+          function addToSelectQuery2(query2Values) {
+            barangaySelect.options.length = 0;
+            query2Values.sort();
+            query2Values.unshift("None");
+            query2Values.forEach(function (value) {
+              var option = document.createElement("option");
+              option.text = value;
+              barangaySelect.add(option);
+            });
+          }
+
+          barangayQuery().then(getUniqueValues2).then(addToSelectQuery2);
+        }
+        barangayFilterList();
+
+        // Set the definition expression on the lot layer
+        // to reflect the selecction of the user
+        // Only for Municipality
+        function setMunicipalExpression(municipal) {
+          const municipalityExpression = "Municipality = '" + municipal + "'";
+          if (municipal == "None") {
+            lotLayer.definitionExpression = null;
+            endorsedLotLayer.definitionExpression = null;
+            structureLayer.definitionExpression = null;
+            nloLayer.definitionExpression = null;
+            pnrLayer.definitionExpression = null;
+            occupancyLayer.definitionExpression = null;
+          } else {
+            lotLayer.definitionExpression = municipalityExpression;
+            endorsedLotLayer.definitionExpression = municipalityExpression;
+            structureLayer.definitionExpression = municipalityExpression;
+            nloLayer.definitionExpression = municipalityExpression;
+            pnrLayer.definitionExpression = municipalityExpression;
+            occupancyLayer.definitionExpression = municipalityExpression;
+          }
+          zoomToLayer(lotLayer);
+
+          //var barang = barangaySelect.options[barangaySelect.selectedIndex].value;
+          if (!lotLayer.visible) {
+            lotLayer.visible = true;
+          }
+          return queryForLotGeometries();
+        }
+
+        // for Municipcality + Barangay + Priority
+        function setMunicipalBarangayPriorityExpression(municipal, barangay) {
+          //var municipal = municipalSelect.options[municipalSelect.selectedIndex].value;
+          //var barang = barangaySelect.options[barangaySelect.selectedIndex].value;
+          const barangayExpression = "Barangay = '" + barangay + "'";
+          const municipalityExpression = "Municipality = '" + municipal + "'";
+
+          // all = 'None'
+          if (municipal == "None" && barangay == "None") {
+            lotLayer.definitionExpression = null;
+            endorsedLotLayer.definitionExpression = null;
+            structureLayer.definitionExpression = null;
+            nloLayer.definitionExpression = null;
+            pnrLayer.definitionExpression = null;
+            occupancyLayer.definitionExpression = null;
+          } else if (municipal == "None" && barangay !== "None") {
+            lotLayer.definitionExpression = barangayExpression;
+            endorsedLotLayer.definitionExpression = barangayExpression;
+            structureLayer.definitionExpression = barangayExpression;
+            nloLayer.definitionExpression = barangayExpression;
+            pnrLayer.definitionExpression = barangayExpression;
+            occupancyLayer.definitionExpression = barangayExpression;
+          } else if (municipal !== "None" && barangay == "None") {
+            lotLayer.definitionExpression = municipalityExpression;
+            endorsedLotLayer.definitionExpression = municipalityExpression;
+            structureLayer.definitionExpression = municipalityExpression;
+            nloLayer.definitionExpression = municipalityExpression;
+            pnrLayer.definitionExpression = municipalityExpression;
+            occupancyLayer.definitionExpression = municipalityExpression;
+          } else if (municipal !== "None" && barangay !== "None") {
+            lotLayer.definitionExpression =
+              municipalityExpression + " AND " + barangayExpression;
+            endorsedLotLayer.definitionExpression =
+              municipalityExpression + " AND " + barangayExpression;
+            structureLayer.definitionExpression =
+              municipalityExpression + " AND " + barangayExpression;
+            nloLayer.definitionExpression =
+              municipalityExpression + " AND " + barangayExpression;
+            pnrLayer.definitionExpression =
+              municipalityExpression + " AND " + barangayExpression;
+            occupancyLayer.definitionExpression =
+              municipalityExpression + " AND " + barangayExpression;
+          }
+
+          //var barang = barangaySelect.options[barangaySelect.selectedIndex].value;
+          if (!lotLayer.visible) {
+            lotLayer.visible = true;
+          }
+          return queryForLotGeometries();
+        }
+
+        // When CP is changed, Type is reset to 'None'
+        const changeSelected = (e) => {
+          const $select = document.querySelector("#barangaySelect");
+          $select.value = "None";
+        };
+
+        // Select Municipality from dropdown list
+        municipalSelect.addEventListener("change", function () {
+          var municipal = event.target.value;
+          var barangay = barangaySelect.value;
+
+          setMunicipalExpression(municipal);
+          changeSelected();
+
+          barangayFilterList(municipal);
+
+          totalNumberOfAllLots().then(totalNumberOfLots);
+          pteNumberLot();
+          totalNumberOfStructures();
+          pteNumberStructure();
+          updateChartLot(municipal, barangay);
+          updateMoaChartLot(municipal, barangay);
+          updateChartStructure(municipal, barangay);
+          updateMoaChartStructure(municipal, barangay);
+          updateChartISF(municipal, barangay);
+          timeSeriesChart(municipal, barangay);
+
+          zoomToLayer(lotLayer);
+        });
+
+        barangaySelect.addEventListener("change", function () {
+          var municipal = municipalSelect.value;
+          var barangay = event.target.value;
+
+          setMunicipalBarangayPriorityExpression(municipal, barangay);
+
+          //barangayFilterList(municipal);
+
+          totalNumberOfAllLots().then(totalNumberOfLots);
+          pteNumberLot();
+          totalNumberOfStructures();
+          pteNumberStructure();
+          updateChartLot(municipal, barangay);
+          updateMoaChartLot(municipal, barangay);
+          updateChartStructure(municipal, barangay);
+          updateMoaChartStructure(municipal, barangay);
+          updateChartISF(municipal, barangay);
+          timeSeriesChart(municipal, barangay);
+
+          zoomToLayer(lotLayer);
+          //relocationObjectID(reloStatusLayer);
+        });
+        // End of Dropdown List
+
+        //****---------------- Charts for Lot and Structure -----------------------****//
+
+        // ----------------- Pie Chart for Lot ----------------- //
+        const LEGEND_FONT_SIZE = "0.9em";
+        var root = am5.Root.new("landPieChartDiv");
+        root._logo.dispose();
+
+        const statusLot = [
+          "Handed-Over",
+          "Paid",
+          "For Payment Processing",
+          "For Legal Pass",
+          "For Appraisal/Offer to Buy",
+          "For Expro",
+        ];
+
+        function updateChartLot(municipal, barangay) {
+          root.container.children.clear();
+          // First, define statuses
+          var total_handedover_lot = {
+            onStatisticField: "CASE WHEN StatusLA = 0 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_handedover_lot",
+            statisticType: "sum",
+          };
+
+          var total_paid_lot = {
+            onStatisticField: "CASE WHEN StatusLA = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_paid_lot",
+            statisticType: "sum",
+          };
+
+          var total_payp_lot = {
+            onStatisticField: "CASE WHEN StatusLA = 2 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_payp_lot",
+            statisticType: "sum",
+          };
+
+          var total_legalpass_lot = {
+            onStatisticField: "CASE WHEN StatusLA = 3 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_legalpass_lot",
+            statisticType: "sum",
+          };
+
+          var total_otb_lot = {
+            onStatisticField: "CASE WHEN StatusLA = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_otb_lot",
+            statisticType: "sum",
+          };
+
+          var total_expro_lot = {
+            onStatisticField: "CASE WHEN StatusLA = 5 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_expro_lot",
+            statisticType: "sum",
+          };
+
+          var query = lotLayer.createQuery();
+          query.outStatistics = [
+            total_handedover_lot,
+            total_paid_lot,
+            total_payp_lot,
+            total_legalpass_lot,
+            total_otb_lot,
+            total_expro_lot,
+          ];
+          query.returnGeometry = true;
+
+          return lotLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const handedover = stats.total_handedover_lot;
+            const paid = stats.total_paid_lot;
+            const payp = stats.total_payp_lot;
+            const legalpass = stats.total_legalpass_lot;
+            const otb = stats.total_otb_lot;
+            const expro = stats.total_expro_lot;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root.setThemes([
+              am5themes_Animated.new(root),
+              am5themes_Responsive.new(root),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
+            var chart = root.container.children.push(
+              am5percent.PieChart.new(root, {
+                //centerY: am5.percent(-2), //-10
+                //y: am5.percent(-30), // -30
+                layout: root.verticalLayout,
+              })
+            );
+
+            // Create series
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
+            var pieSeries = chart.series.push(
+              am5percent.PieSeries.new(root, {
+                name: "Series",
+                categoryField: "category",
+                valueField: "value",
+                //legendLabelText: "[{fill}]{category}[/]",
+                legendValueText:
+                  "{valuePercentTotal.formatNumber('#.')}% ({value})",
+                radius: am5.percent(85), // outer radius
+                innerRadius: am5.percent(40),
+              })
+            );
+
+            // Set data
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
+            //https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/pie-series/
+
+            // Set slice opacity and stroke color
+            pieSeries.slices.template.setAll({
+              fillOpacity: 0.9,
+              stroke: am5.color("#ffffff"),
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              templateField: "sliceSettings",
+            });
+
+            // Disabling labels and ticks
+            pieSeries.labels.template.set("visible", false);
+            pieSeries.ticks.template.set("visible", false);
+
+            //pieSeries.appear(1000, 100)
+            pieSeries.slices.template.events.on("click", function (ev) {
+              const SELECTED = ev.target.dataItem.dataContext.category;
+
+              if (SELECTED == statusLot[0]) {
+                selectedStatus = 0;
+              } else if (SELECTED == statusLot[1]) {
+                selectedStatus = 1;
+              } else if (SELECTED == statusLot[2]) {
+                selectedStatus = 2;
+              } else if (SELECTED == statusLot[3]) {
+                selectedStatus = 3;
+              } else if (SELECTED == statusLot[4]) {
+                selectedStatus = 4;
+              } else if (SELECTED == statusLot[5]) {
+                selectedStatus = 5;
+              } else {
+                selectedStatus = null;
+              }
+
+              var query = lotLayer.createQuery();
+              const municipalExpression = "Municipality = '" + municipal + "'";
+              const barangayExpression = "Barangay ='" + barangay + "'";
+              const statusExpression = "StatusLA = " + selectedStatus;
+
+              if (municipal === undefined && barangay === undefined) {
+                query.where = statusExpression;
+              } else if (municipal !== "None" && barangay === "None") {
+                query.where = municipalExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay !== "None") {
+                query.where = barangayExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay === "None") {
+                query.where = "1=1";
+              } else if (municipal !== "None" && barangay !== "None") {
+                query.where =
+                  municipalExpression +
+                  " AND " +
+                  barangayExpression +
+                  " AND " +
+                  statusExpression;
+              }
+              view.when(function () {
+                view.whenLayerView(lotLayer).then(function (layerView) {
+                  //chartLayerView = layerView;
+
+                  lotLayer.queryFeatures(query).then(function (results) {
+                    const RESULT_LENGTH = results.features;
+                    const ROW_N = RESULT_LENGTH.length;
+
+                    let objID = [];
+                    for (var i = 0; i < ROW_N; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                    }
+
+                    var queryExt = new Query({
+                      objectIds: objID,
+                    });
+
+                    lotLayer.queryExtent(queryExt).then(function (result) {
+                      if (result.extent) {
+                        view.goTo(result.extent);
+                      }
+                    });
+
+                    if (highlightSelect) {
+                      highlightSelect.remove();
+                    }
+                    highlightSelect = layerView.highlight(objID);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                      highlightSelect.remove();
+                    });
+                  }); // End of queryFeatures
+                  layerView.filter = {
+                    where: "StatusLA = " + selectedStatus,
+                  };
+                }); // End of view.whenLayerView
+              }); // End of view.when
+            });
+
+            pieSeries.data.setAll([
+              {
+                category: statusLot[0],
+                value: handedover,
+                sliceSettings: {
+                  fill: am5.color("#00c5ff"),
+                },
+              },
+              {
+                category: statusLot[1],
+                value: paid,
+                sliceSettings: {
+                  fill: am5.color("#70ad47"),
+                },
+              },
+              {
+                category: statusLot[2],
+                value: payp,
+                sliceSettings: {
+                  fill: am5.color("#0070ff"),
+                },
+              },
+              {
+                category: statusLot[3],
+                value: legalpass,
+                sliceSettings: {
+                  fill: am5.color("#ffff00"),
+                },
+              },
+              {
+                category: statusLot[4],
+                value: otb,
+                sliceSettings: {
+                  fill: am5.color("#ffaa00"),
+                },
+              },
+              {
+                category: statusLot[5],
+                value: expro,
+                sliceSettings: {
+                  fill: am5.color("#ff0000"),
+                },
+              },
+            ]);
+
+            // Legend
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
+            var legend = chart.children.push(
+              am5.Legend.new(root, {
+                centerX: am5.percent(50),
+                x: am5.percent(50),
+                layout: root.verticalLayout,
+                marginBottom: 10,
+              })
+            );
+            legend.data.setAll(pieSeries.dataItems);
+
+            // Change the size of legend markers
+            legend.markers.template.setAll({
+              width: 18,
+              height: 18,
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              stroke: am5.color("#ffffff"),
+            });
+
+            // Change the marker shape
+            legend.markerRectangles.template.setAll({
+              cornerRadiusTL: 10,
+              cornerRadiusTR: 10,
+              cornerRadiusBL: 10,
+              cornerRadiusBR: 10,
+            });
+
+            // To align legend items: valueLabels right, labels to left
+            // 1. fix width of valueLabels
+            // 2. dynamically change width of labels by screen size
+
+            const valueLabelsWidth = 50;
+
+            // Responsive legend
+            // https://www.amcharts.com/docs/v5/tutorials/pie-chart-with-a-legend-with-dynamically-sized-labels/
+            chart.onPrivate("width", function (width) {
+              let box = document.querySelector(".box");
+              const boxWidth = box.offsetWidth;
+              var availableSpace = Math.max(width - chart.width() - 150, 180);
+              //var availableSpace = (boxWidth - valueLabelsWidth) * 0.7
+              legend.labels.template.setAll({
+                width: availableSpace,
+                maxWidth: availableSpace,
+              });
+            });
+
+            // Change legend labelling properties
+            // To have responsive font size, do not set font size
+            legend.labels.template.setAll({
+              oversizedBehavior: "truncate",
+              fill: am5.color("#ffffff"),
+              //textDecoration: "underline"
+              //width: am5.percent(200)
+              //fontWeight: "300"
+            });
+
+            legend.valueLabels.template.setAll({
+              textAlign: "right",
+              width: valueLabelsWidth,
+              fill: am5.color("#ffffff"),
+              //fontSize: LEGEND_FONT_SIZE,
+            });
+
+            legend.itemContainers.template.setAll({
+              // set space between legend items
+              paddingTop: 1.1,
+              paddingBottom: 2,
+            });
+
+            pieSeries.appear(1000, 100);
+          }); // End of queryFeatures
+        } // End of updateChartLot()
+        updateChartLot();
+
+        /*
+     am5.array.each(am5.registry.rootElements, function(root) {
+       if (root) {
+         if (root.dom.id == "landPieChartDiv") {
+           root.dispose();
+         }
+       }
+     });*/
+
+        // ----------------- Bar Chart for MOA Lot ----------------- //
+        var root2 = am5.Root.new("chartMoaLotDiv");
+        root2._logo.dispose();
+        var myTheme = am5.Theme.new(root2);
+
+        myTheme.rule("Grid", ["base"]).setAll({
+          strokeOpacity: 0,
+        });
+        const statusMOA = [
+          "For Negotiation",
+          "Expropriation",
+          "Donation",
+          "CA 141",
+          "No Need to Acquire",
+        ];
+
+        function updateMoaChartLot(municipal, barangay) {
+          root2.container.children.clear();
+
+          var total_nego_lot = {
+            onStatisticField: "CASE WHEN MoA = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_nego_lot",
+            statisticType: "sum",
+          };
+
+          var total_expro_lot = {
+            onStatisticField: "CASE WHEN MoA = 2 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_expro_lot",
+            statisticType: "sum",
+          };
+
+          var total_donate_lot = {
+            onStatisticField: "CASE WHEN MoA = 3 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_donate_lot",
+            statisticType: "sum",
+          };
+
+          var total_ca141_lot = {
+            onStatisticField: "CASE WHEN MoA = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_ca141_lot",
+            statisticType: "sum",
+          };
+
+          var total_noneed_lot = {
+            onStatisticField: "CASE WHEN MoA = 5 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_noneed_lot",
+            statisticType: "sum",
+          };
+
+          var query = lotLayer.createQuery();
+          query.outStatistics = [
+            total_nego_lot,
+            total_expro_lot,
+            total_donate_lot,
+            total_ca141_lot,
+            total_noneed_lot,
+          ];
+          query.returnGeometry = true;
+
+          lotLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const nego = stats.total_nego_lot;
+            const expro = stats.total_expro_lot;
+            const donate = stats.total_donate_lot;
+            const ca141 = stats.total_ca141_lot;
+            const noneed = stats.total_noneed_lot;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root2.setThemes([am5themes_Animated.new(root2), myTheme]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root2.container.children.push(
+              am5xy.XYChart.new(root2, {
+                panX: false,
+                panY: false,
+                wheelX: "none",
+                wheelY: "none",
+                paddingLeft: 0,
+              })
+            );
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root2, {
+              minGridDistance: 5,
+              strokeOpacity: 1,
+              strokeWidth: 1,
+              inversed: true,
+              stroke: am5.color("#ffffff"),
+            });
+            yRenderer.grid.template.set("location", 1);
+
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root2, {
+                maxDeviation: 0,
+                categoryField: "category",
+                renderer: yRenderer,
+              })
+            );
+
+            // Remove grid lines
+            yAxis.get("renderer").grid.template.set("forceHidden", true);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root2, {
+                maxDeviation: 0,
+                min: 0,
+                renderer: am5xy.AxisRendererX.new(root2, {
+                  visible: true,
+                  strokeOpacity: 1,
+                  strictMinMax: true,
+                  calculateTotals: true,
+                  strokeWidth: 1,
+                  stroke: am5.color("#ffffff"),
+                }),
+              })
+            );
+            // Remove grid lines
+            xAxis.get("renderer").grid.template.set("forceHidden", true);
+
+            // Label properties for yAxis (category axis)
+            yAxis.get("renderer").labels.template.setAll({
+              //oversizedBehavior: "wrap",
+              textAlign: "center",
+              fill: am5.color("#ffffff"),
+              //maxWidth: 150,
+              fontSize: 12,
+            });
+
+            xAxis.get("renderer").labels.template.setAll({
+              fill: am5.color("#ffffff"),
+              fontSize: 10,
+            });
+
+            // Create series
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            var series = chart.series.push(
+              am5xy.ColumnSeries.new(root2, {
+                name: "Series 1",
+                xAxis: xAxis,
+                yAxis: yAxis,
+                valueXField: "value",
+                sequencedInterpolation: true,
+                categoryYField: "category",
+              })
+            );
+
+            var columnTemplate = series.columns.template;
+
+            columnTemplate.setAll({
+              draggable: true,
+              cursorOverStyle: "pointer",
+              tooltipText: "{value}",
+              cornerRadiusBR: 10,
+              cornerRadiusTR: 10,
+              strokeOpacity: 0,
+            });
+
+            // Add Label bullet
+            series.bullets.push(function () {
+              return am5.Bullet.new(root2, {
+                locationY: 1,
+                sprite: am5.Label.new(root2, {
+                  text: "{value}",
+                  fill: root2.interfaceColors.get("alternativeText"),
+                  centerY: 3,
+                  centerX: am5.p50,
+                  fontSize: 14,
+                  populateText: true,
+                }),
+              });
+            });
+
+            // Use different color by column
+            columnTemplate.adapters.add("fill", (fill, target) => {
+              return chart
+                .get("colors")
+                .getIndex(series.columns.indexOf(target));
+            });
+
+            columnTemplate.adapters.add("stroke", (stroke, target) => {
+              return chart
+                .get("colors")
+                .getIndex(series.columns.indexOf(target));
+            });
+
+            series.columns.template.events.on("click", function (ev) {
+              const SELECTED = ev.target.dataItem.dataContext.category;
+              if (SELECTED == statusMOA[0]) {
+                selectedStatus = 1;
+              } else if (SELECTED == statusMOA[1]) {
+                selectedStatus = 2;
+              } else if (SELECTED == statusMOA[2]) {
+                selectedStatus = 3;
+              } else if (SELECTED == statusMOA[3]) {
+                selectedStatus = 4;
+              } else if (SELECTED == statusMOA[4]) {
+                selectedStatus = 5;
+              }
+
+              var query = lotLayer.createQuery();
+              const municipalExpression = "Municipality = '" + municipal + "'";
+              const barangayExpression = "Barangay ='" + barangay + "'";
+              const statusExpression = "MoA = " + selectedStatus;
+
+              if (municipal === undefined && barangay === undefined) {
+                query.where = statusExpression;
+              } else if (municipal !== "None" && barangay === "None") {
+                query.where = municipalExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay !== "None") {
+                query.where = barangayExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay === "None") {
+                query.where = statusExpression;
+              } else if (municipal !== "None" && barangay !== "None") {
+                query.where =
+                  municipalExpression +
+                  " AND " +
+                  barangayExpression +
+                  " AND " +
+                  statusExpression;
+              }
+
+              view.whenLayerView(lotLayer).then(function (layerView) {
+                //CHART_ELEMENT.style.visibility = "visible";
+
+                lotLayer.queryFeatures(query).then(function (results) {
+                  const RESULT_LENGTH = results.features;
+                  const ROW_N = RESULT_LENGTH.length;
+
+                  let objID = [];
+                  for (var i = 0; i < ROW_N; i++) {
+                    var obj = results.features[i].attributes.OBJECTID;
+                    objID.push(obj);
+                  }
+
+                  var queryExt = new Query({
+                    objectIds: objID,
+                  });
+
+                  lotLayer.queryExtent(queryExt).then(function (result) {
+                    if (result.extent) {
+                      view.goTo(result.extent);
+                    }
+                  });
+
+                  if (highlightSelect) {
+                    highlightSelect.remove();
+                  }
+                  highlightSelect = layerView.highlight(objID);
+
+                  view.on("click", function () {
+                    layerView.filter = null;
+                    highlightSelect.remove();
+                  });
+                });
+                layerView.filter = {
+                  where: "MoA = " + selectedStatus,
+                  //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'"
+                };
+              }); // End of whenLayerView
+            });
+
+            // Chart title
+            chart.children.unshift(
+              am5.Label.new(root2, {
+                text: "MODE OF ACQUISITION",
+                fontSize: 14,
+                fontWeight: "normal",
+                textAlign: "left",
+                fill: am5.color("#f7f5f7"),
+                paddingTop: -15,
+                paddingBottom: 0,
+              })
+            );
+            // Set data
+            var data = [
+              {
+                category: statusMOA[0],
+                value: nego,
+              },
+              {
+                category: statusMOA[1],
+                value: expro,
+              },
+              {
+                category: statusMOA[2],
+                value: donate,
+              },
+              {
+                category: statusMOA[3],
+                value: ca141,
+              },
+              {
+                category: statusMOA[4],
+                value: noneed,
+              },
+            ]; // End of chart
+
+            yAxis.data.setAll(data);
+            series.data.setAll(data);
+
+            // Make stuff animate on load
+            // https://www.amcharts.com/docs/v5/concepts/animations/
+            series.appear(1000);
+            chart.appear(1000, 100);
+          }); // End of queryFeatures
+        } // End of updateMOAChartLot
+        updateMoaChartLot();
+
+        // ----------------- Pier Chart for Structure ----------------- //
+        var root3 = am5.Root.new("structurePieChartDiv");
+        root3._logo.dispose();
+
+        const statusStructure = [
+          "Dismantling/Clearing",
+          "Paid",
+          "For Payment Processing",
+          "For Legal Pass",
+          "For Appraisal/Offer to Compensate",
+          "LBP Account Opening",
+        ];
+
+        async function updateChartStructure(municipal, barangay) {
+          root3.container.children.clear();
+
+          var total_clear_lot = {
+            onStatisticField: "CASE WHEN StatusStruc = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_clear_lot",
+            statisticType: "sum",
+          };
+
+          var total_paid_lot = {
+            onStatisticField: "CASE WHEN StatusStruc = 2 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_paid_lot",
+            statisticType: "sum",
+          };
+
+          var total_payp_lot = {
+            onStatisticField: "CASE WHEN StatusStruc = 3 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_payp_lot",
+            statisticType: "sum",
+          };
+
+          var total_legalpass_lot = {
+            onStatisticField: "CASE WHEN StatusStruc = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_legalpass_lot",
+            statisticType: "sum",
+          };
+
+          var total_otc_lot = {
+            onStatisticField: "CASE WHEN StatusStruc = 5 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_otc_lot",
+            statisticType: "sum",
+          };
+
+          var total_lbp_lot = {
+            onStatisticField: "CASE WHEN StatusStruc = 6 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_lbp_lot",
+            statisticType: "sum",
+          };
+
+          var query = structureLayer.createQuery();
+          query.outStatistics = [
+            total_clear_lot,
+            total_paid_lot,
+            total_payp_lot,
+            total_legalpass_lot,
+            total_otc_lot,
+            total_lbp_lot,
+          ];
+          query.returnGeometry = true;
+
+          return structureLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const clear = stats.total_clear_lot;
+            const paid = stats.total_paid_lot;
+            const payp = stats.total_payp_lot;
+            const legalpass = stats.total_legalpass_lot;
+            const otc = stats.total_otc_lot;
+            const lbp = stats.total_lbp_lot;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root3.setThemes([
+              am5themes_Animated.new(root3),
+              am5themes_Responsive.new(root3),
+              //MyTheme.new(root3),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
+            var chart = root3.container.children.push(
+              am5percent.PieChart.new(root3, {
+                //centerY: am5.percent(-2), //-10
+                //y: am5.percent(-30), // -30
+                layout: root3.verticalLayout,
+              })
+            );
+
+            // Create series
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
+            var pieSeries = chart.series.push(
+              am5percent.PieSeries.new(root3, {
+                name: "Series",
+                categoryField: "category",
+                valueField: "value",
+                //legendLabelText: "[{fill}]{category}[/]",
+                legendValueText:
+                  "{valuePercentTotal.formatNumber('#.')}% ({value})",
+                radius: am5.percent(85), // outer radius
+                innerRadius: am5.percent(40),
+              })
+            );
+
+            // Set slice opacity and stroke color
+            pieSeries.slices.template.setAll({
+              fillOpacity: 0.9,
+              stroke: am5.color("#ffffff"),
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              //tooltipText: "{category}: {value}",
+              //tooltipY: am5.percent(10),
+              templateField: "sliceSettings",
+              //fill: am5.color("#1e8553")//root3.interfaceColors.get("alternativeText"),
+            });
+
+            // Disabling labels and ticks
+            pieSeries.labels.template.set("visible", false);
+            pieSeries.ticks.template.set("visible", false);
+
+            pieSeries.slices.template.events.on("click", function (ev) {
+              const SELECTED = ev.target.dataItem.dataContext.category;
+
+              if (SELECTED == statusStructure[0]) {
+                selectedStatus = 1;
+              } else if (SELECTED == statusStructure[1]) {
+                selectedStatus = 2;
+              } else if (SELECTED == statusStructure[2]) {
+                selectedStatus = 3;
+              } else if (SELECTED == statusStructure[3]) {
+                selectedStatus = 4;
+              } else if (SELECTED == statusStructure[4]) {
+                selectedStatus = 5;
+              } else if (SELECTED == statusStructure[5]) {
+                selectedStatus = 6;
+              } else {
+                selectedStatus = null;
+              }
+
+              var query = structureLayer.createQuery();
+              const municipalExpression = "Municipality = '" + municipal + "'";
+              const barangayExpression = "Barangay ='" + barangay + "'";
+              const statusExpression = "StatusStruc = " + selectedStatus;
+
+              if (municipal === undefined && barangay === undefined) {
+                query.where = statusExpression;
+              } else if (municipal !== "None" && barangay === "None") {
+                query.where = municipalExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay !== "None") {
+                query.where = barangayExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay === "None") {
+                query.where = statusExpression;
+              } else if (municipal !== "None" && barangay !== "None") {
+                query.where =
+                  municipalExpression +
+                  " AND " +
+                  barangayExpression +
+                  " AND " +
+                  statusExpression;
+              }
+
+              // Zoom, filter, and highlight selected chart categories
+              view.when(function () {
+                view.whenLayerView(structureLayer).then(function (layerView) {
+                  structureLayer.queryFeatures(query).then(function (results) {
+                    const RESULT_LENGTH = results.features;
+                    const ROW_N = RESULT_LENGTH.length;
+
+                    let objID = [];
+                    for (var i = 0; i < ROW_N; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                    }
+
+                    var queryExt = new Query({
+                      objectIds: objID,
+                    });
+
+                    structureLayer
+                      .queryExtent(queryExt)
+                      .then(function (result) {
+                        if (result.extent) {
+                          view.goTo(result.extent);
+                        }
+                      });
+
+                    if (highlightSelect) {
+                      highlightSelect.remove();
+                    }
+                    highlightSelect = layerView.highlight(objID);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                      highlightSelect.remove();
+                    });
+                  }); // End of queryFeatures
+
+                  layerView.filter = {
+                    where: "StatusStruc = " + selectedStatus,
+                  };
+                }); // End of view.whenLayerView
+              }); // End of view.when
+            });
+
+            pieSeries.data.setAll([
+              {
+                category: statusStructure[0],
+                value: clear,
+                sliceSettings: {
+                  fill: am5.color("#00C5FF"),
+                },
+              },
+              {
+                category: statusStructure[1],
+                value: paid,
+                sliceSettings: {
+                  fill: am5.color("#70ad47"),
+                },
+              },
+              {
+                category: statusStructure[2],
+                value: payp,
+                sliceSettings: {
+                  fill: am5.color("#0070ff"),
+                },
+              },
+              {
+                category: statusStructure[3],
+                value: legalpass,
+                sliceSettings: {
+                  fill: am5.color("#ffff00"),
+                },
+              },
+              {
+                category: statusStructure[4],
+                value: otc,
+                sliceSettings: {
+                  fill: am5.color("#ffaa00"),
+                },
+              },
+              {
+                category: statusStructure[5],
+                value: lbp,
+                sliceSettings: {
+                  fill: am5.color("#ff0000"),
+                },
+              },
+            ]);
+
+            // Legend
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
+            var legend = chart.children.push(
+              am5.Legend.new(root3, {
+                centerX: am5.percent(50),
+                x: am5.percent(50),
+                layout: root3.verticalLayout,
+                marginBottom: 10,
+              })
+            );
+            legend.data.setAll(pieSeries.dataItems);
+
+            // Change the size of legend markers
+            legend.markers.template.setAll({
+              width: 18,
+              height: 18,
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              stroke: am5.color("#ffffff"),
+            });
+
+            // Change the marker shape
+            legend.markerRectangles.template.setAll({
+              cornerRadiusTL: 10,
+              cornerRadiusTR: 10,
+              cornerRadiusBL: 10,
+              cornerRadiusBR: 10,
+            });
+
+            const valueLabelsWidth = 50;
+
+            // Responsive legend
+            // https://www.amcharts.com/docs/v5/tutorials/pie-chart-with-a-legend-with-dynamically-sized-labels/
+            chart.onPrivate("width", function (width) {
+              let box = document.querySelector(".box3");
+              const boxWidth = box.offsetWidth;
+              var availableSpace = Math.max(width - chart.width() - 150, 180);
+              //var availableSpace = (boxWidth - valueLabelsWidth) * 0.7
+              legend.labels.template.setAll({
+                width: availableSpace,
+                maxWidth: availableSpace,
+              });
+            });
+
+            // Change legend labelling properties
+            // To have responsive font size, do not set font size
+            legend.labels.template.setAll({
+              oversizedBehavior: "truncate",
+              fill: am5.color("#ffffff"),
+              //textDecoration: "underline"
+              //width: am5.percent(200)
+              //fontWeight: "300"
+            });
+
+            legend.valueLabels.template.setAll({
+              textAlign: "right",
+              width: valueLabelsWidth,
+              fill: am5.color("#ffffff"),
+              //fontSize: LEGEND_FONT_SIZE,
+            });
+
+            legend.itemContainers.template.setAll({
+              // set space between legend items
+              paddingTop: 1.1,
+              paddingBottom: 1.1,
+            });
+
+            pieSeries.appear(1000, 100);
+          }); // End of queryFeature
+        } // End of updateChartStructure()
+        updateChartStructure();
+
+        // ----------------- Bar Chart for MOA Structure ----------------- //
+
+        var root4 = am5.Root.new("chartMoaStructureDiv");
+        root4._logo.dispose();
+        var myTheme = am5.Theme.new(root4);
+        myTheme.rule("Grid", ["base"]).setAll({
+          strokeOpacity: 0,
+        });
+
+        const statusMoaStructure = [
+          "For Negotiation",
+          "Expropriation",
+          "Donation",
+          "No Need to Acquire",
+        ];
+
+        async function updateMoaChartStructure(municipal, barangay) {
+          root4.container.children.clear();
+
+          var total_nego_lot = {
+            onStatisticField: "CASE WHEN MoA = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_nego_lot",
+            statisticType: "sum",
+          };
+
+          var total_expro_lot = {
+            onStatisticField: "CASE WHEN MoA = 2 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_expro_lot",
+            statisticType: "sum",
+          };
+
+          var total_donate_lot = {
+            onStatisticField: "CASE WHEN MoA = 3 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_donate_lot",
+            statisticType: "sum",
+          };
+
+          var total_noneed_lot = {
+            onStatisticField: "CASE WHEN MoA = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_noneed_lot",
+            statisticType: "sum",
+          };
+
+          var query = structureLayer.createQuery();
+          query.outStatistics = [
+            total_nego_lot,
+            total_expro_lot,
+            total_donate_lot,
+            total_noneed_lot,
+          ];
+          query.returnGeometry = true;
+
+          structureLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const nego = stats.total_nego_lot;
+            const expro = stats.total_expro_lot;
+            const donate = stats.total_donate_lot;
+            const noneed = stats.total_noneed_lot;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root4.setThemes([am5themes_Animated.new(root4), myTheme]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root4.container.children.push(
+              am5xy.XYChart.new(root4, {
+                panX: false,
+                panY: false,
+                wheelX: "none",
+                wheelY: "none",
+                paddingLeft: 0,
+              })
+            );
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root4, {
+              minGridDistance: 5,
+              strokeOpacity: 1,
+              strokeWidth: 1,
+              inversed: true,
+              stroke: am5.color("#ffffff"),
+            });
+            yRenderer.grid.template.set("location", 1);
+
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root4, {
+                maxDeviation: 0,
+                categoryField: "category",
+                renderer: yRenderer,
+              })
+            );
+
+            // Remove grid lines
+            yAxis.get("renderer").grid.template.set("forceHidden", true);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root4, {
+                maxDeviation: 0,
+                min: 0,
+                renderer: am5xy.AxisRendererX.new(root4, {
+                  visible: true,
+                  strokeOpacity: 1,
+                  strictMinMax: true,
+                  calculateTotals: true,
+                  strokeWidth: 1,
+                  stroke: am5.color("#ffffff"),
+                }),
+              })
+            );
+            // Remove grid lines
+            xAxis.get("renderer").grid.template.set("forceHidden", true);
+
+            // Label properties for yAxis (category axis)
+            yAxis.get("renderer").labels.template.setAll({
+              //oversizedBehavior: "wrap",
+              textAlign: "center",
+              fill: am5.color("#ffffff"),
+              //maxWidth: 150,
+              fontSize: 12,
+            });
+
+            xAxis.get("renderer").labels.template.setAll({
+              fill: am5.color("#ffffff"),
+            });
+
+            // Create series
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            var series = chart.series.push(
+              am5xy.ColumnSeries.new(root4, {
+                name: "Series 1",
+                xAxis: xAxis,
+                yAxis: yAxis,
+                valueXField: "value",
+                sequencedInterpolation: true,
+                categoryYField: "category",
+              })
+            );
+
+            var columnTemplate = series.columns.template;
+
+            columnTemplate.setAll({
+              draggable: true,
+              cursorOverStyle: "pointer",
+              tooltipText: "{value}",
+              cornerRadiusBR: 10,
+              cornerRadiusTR: 10,
+              strokeOpacity: 0,
+            });
+
+            // Add Label bullet
+            series.bullets.push(function () {
+              return am5.Bullet.new(root4, {
+                locationY: 1,
+                sprite: am5.Label.new(root4, {
+                  text: "{value}",
+                  fill: root4.interfaceColors.get("alternativeText"),
+                  centerY: 1.3,
+                  centerX: am5.p50,
+                  fontSize: 14,
+                  populateText: true,
+                }),
+              });
+            });
+
+            // Use different color by column
+            columnTemplate.adapters.add("fill", (fill, target) => {
+              return chart
+                .get("colors")
+                .getIndex(series.columns.indexOf(target));
+            });
+
+            columnTemplate.adapters.add("stroke", (stroke, target) => {
+              return chart
+                .get("colors")
+                .getIndex(series.columns.indexOf(target));
+            });
+
+            series.columns.template.events.on("click", function (ev) {
+              const SELECTED = ev.target.dataItem.dataContext.category;
+
+              if (SELECTED == statusMoaStructure[0]) {
+                selectedStatus = 1;
+              } else if (SELECTED == statusMoaStructure[1]) {
+                selectedStatus = 2;
+              } else if (SELECTED == statusMoaStructure[2]) {
+                selectedStatus = 3;
+              } else if (SELECTED == statusMoaStructure[3]) {
+                selectedStatus = 4;
+              } else {
+                selectedStatus = null;
+              }
+
+              var query = structureLayer.createQuery();
+              const municipalExpression = "Municipality = '" + municipal + "'";
+              const barangayExpression = "Barangay ='" + barangay + "'";
+              const statusExpression = "MoA = " + selectedStatus;
+
+              if (municipal === undefined && barangay === undefined) {
+                query.where = statusExpression;
+              } else if (municipal !== "None" && barangay === "None") {
+                query.where = municipalExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay !== "None") {
+                query.where = barangayExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay === "None") {
+                query.where = statusExpression;
+              } else if (municipal !== "None" && barangay !== "None") {
+                query.where =
+                  municipalExpression +
+                  " AND " +
+                  barangayExpression +
+                  " AND " +
+                  statusExpression;
+              } else if (municipal !== "None" && barangay !== "None") {
+                query.where =
+                  municipalExpression +
+                  " AND " +
+                  barangayExpression +
+                  " AND " +
+                  statusExpression;
+              }
+
+              view.whenLayerView(structureLayer).then(function (layerView) {
+                //CHART_ELEMENT.style.visibility = "visible";
+
+                structureLayer.queryFeatures(query).then(function (results) {
+                  const RESULT_LENGTH = results.features;
+                  const ROW_N = RESULT_LENGTH.length;
+
+                  let objID = [];
+                  for (var i = 0; i < ROW_N; i++) {
+                    var obj = results.features[i].attributes.OBJECTID;
+                    objID.push(obj);
+                  }
+
+                  var queryExt = new Query({
+                    objectIds: objID,
+                  });
+
+                  structureLayer.queryExtent(queryExt).then(function (result) {
+                    if (result.extent) {
+                      view.goTo(result.extent);
+                    }
+                  });
+
+                  if (highlightSelect) {
+                    highlightSelect.remove();
+                  }
+                  highlightSelect = layerView.highlight(objID);
+
+                  view.on("click", function () {
+                    layerView.filter = null;
+                    highlightSelect.remove();
+                  });
+                });
+                layerView.filter = {
+                  where: "MoA = " + selectedStatus,
+                  //where: "Status1 = '" + selectedC + "'" + " AND " + "Layer = '" + selectedStatus + "'"
+                };
+              }); // End of whenLayerVie
+            });
+
+            // Chart title
+            chart.children.unshift(
+              am5.Label.new(root4, {
+                text: "MODE OF ACQUISITION",
+                fontSize: 14,
+                fontWeight: "normal",
+                textAlign: "left",
+                fill: am5.color("#f7f5f7"),
+                paddingTop: -15,
+                paddingBottom: 0,
+              })
+            );
+            // Set data
+            var data = [
+              {
+                category: statusMoaStructure[0],
+                value: nego,
+              },
+              {
+                category: statusMoaStructure[1],
+                value: expro,
+              },
+              {
+                category: statusMoaStructure[2],
+                value: donate,
+              },
+              {
+                category: statusMoaStructure[3],
+                value: noneed,
+              },
+            ];
+
+            yAxis.data.setAll(data);
+            series.data.setAll(data);
+
+            // Make stuff animate on load
+            // https://www.amcharts.com/docs/v5/concepts/animations/
+            series.appear(1000);
+            chart.appear(1000, 100);
+          }); // End of queryFeatures
+        } // End of updateS_MOAChartStructure
+        updateMoaChartStructure();
+
+        // ----------------- ISF Chart ----------------- //
+
+        var root5 = am5.Root.new("nloPieChartDiv");
+        root5._logo.dispose();
+        const statusISF = [
+          "Relocated",
+          "Paid",
+          "For Payment Processing",
+          "For Legal Pass",
+          "For Appraisal/OtC/Requirements for Other Entitlements",
+          "LBP Account Opening",
+        ];
+
+        async function updateChartISF(municipal, barangay) {
+          root5.container.children.clear();
+
+          var total_relocated_lot = {
+            onStatisticField: "CASE WHEN StatusRC = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_relocated_lot",
+            statisticType: "sum",
+          };
+
+          var total_paid_lot = {
+            onStatisticField: "CASE WHEN StatusRC = 2 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_paid_lot",
+            statisticType: "sum",
+          };
+
+          var total_payp_lot = {
+            onStatisticField: "CASE WHEN StatusRC = 3 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_payp_lot",
+            statisticType: "sum",
+          };
+
+          var total_legalpass_lot = {
+            onStatisticField: "CASE WHEN StatusRC = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_legalpass_lot",
+            statisticType: "sum",
+          };
+
+          var total_otc_lot = {
+            onStatisticField: "CASE WHEN StatusRC = 5 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_otc_lot",
+            statisticType: "sum",
+          };
+
+          var total_lbp_lot = {
+            onStatisticField: "CASE WHEN StatusRC = 6 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_lbp_lot",
+            statisticType: "sum",
+          };
+
+          var query = nloLayer.createQuery();
+          query.outStatistics = [
+            total_relocated_lot,
+            total_paid_lot,
+            total_payp_lot,
+            total_legalpass_lot,
+            total_otc_lot,
+            total_lbp_lot,
+          ];
+          query.returnGeometry = true;
+
+          return nloLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const clear = stats.total_relocated_lot;
+            const paid = stats.total_paid_lot;
+            const payp = stats.total_payp_lot;
+            const legalpass = stats.total_legalpass_lot;
+            const otc = stats.total_otc_lot;
+            const lbp = stats.total_lbp_lot;
+
+            const total_nlo = thousands_separators(
+              clear + paid + payp + legalpass + otc + lbp
+            );
+            nloNumberDiv.innerHTML = `TOTAL NLOs<br><br><b>${total_nlo}</b>`;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root5.setThemes([
+              am5themes_Animated.new(root5),
+              am5themes_Responsive.new(root5),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
+            var chart = root5.container.children.push(
+              am5percent.PieChart.new(root5, {
+                //centerY: am5.percent(-2), //-10
+                //y: am5.percent(-30), // -30
+                layout: root5.verticalLayout,
+              })
+            );
+
+            // Create series
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
+            var pieSeries = chart.series.push(
+              am5percent.PieSeries.new(root5, {
+                name: "Series",
+                categoryField: "category",
+                valueField: "value",
+                //legendLabelText: "[{fill}]{category}[/]",
+                legendValueText:
+                  "{valuePercentTotal.formatNumber('#.')}% ({value})",
+                radius: am5.percent(85), // outer radius
+                innerRadius: am5.percent(40),
+              })
+            );
+
+            // Set data
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
+            //https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/pie-series/
+
+            // To set slice color, you need to add this before data.setAll
+            /*
+      pieSeries.get("colors").set("colors", [
+        am5.color("#70ad47"),
+        am5.color("#0070FF"),
+        am5.color("#FFFF00"),
+        am5.color("#FFAA00"),
+        am5.color("#FF0000"),
+        am5.color("#00734C"),
+      ]);
+      */
+
+            // Set slice opacity and stroke color
+            pieSeries.slices.template.setAll({
+              fillOpacity: 0.9,
+              stroke: am5.color("#ffffff"),
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              templateField: "sliceSettings",
+            });
+
+            // Disabling labels and ticks
+            pieSeries.labels.template.set("visible", false);
+            pieSeries.ticks.template.set("visible", false);
+
+            //pieSeries.appear(1000, 100)
+            pieSeries.slices.template.events.on("click", function (ev) {
+              const SELECTED = ev.target.dataItem.dataContext.category;
+              if (SELECTED == statusISF[0]) {
+                selectedStatus = 1;
+              } else if (SELECTED == statusISF[1]) {
+                selectedStatus = 2;
+              } else if (SELECTED == statusISF[2]) {
+                selectedStatus = 3;
+              } else if (SELECTED == statusISF[3]) {
+                selectedStatus = 4;
+              } else if (SELECTED == statusISF[4]) {
+                selectedStatus = 5;
+              } else if (SELECTED == statusISF[5]) {
+                selectedStatus = 6;
+              } else {
+                selectedStatus = null;
+              }
+
+              var query = nloLayer.createQuery();
+              const municipalExpression = "Municipality = '" + municipal + "'";
+              const barangayExpression = "Barangay ='" + barangay + "'";
+              const statusExpression = "StatusRC = " + selectedStatus;
+
+              if (municipal === undefined && barangay === undefined) {
+                query.where = statusExpression;
+              } else if (municipal !== "None" && barangay === "None") {
+                query.where = municipalExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay !== "None") {
+                query.where = barangayExpression + " AND " + statusExpression;
+              } else if (municipal === "None" && barangay === "None") {
+                query.where = statusExpression;
+              } else if (municipal !== "None" && barangay !== "None") {
+                query.where =
+                  municipalExpression +
+                  " AND " +
+                  barangayExpression +
+                  " AND " +
+                  statusExpression;
+              } else if (municipal !== "None" && barangay !== "None") {
+                query.where =
+                  municipalExpression +
+                  " AND " +
+                  barangayExpression +
+                  " AND " +
+                  statusExpression;
+              }
+
+              view.when(function () {
+                view.whenLayerView(nloLayer).then(function (layerView) {
+                  //chartLayerView = layerView;
+
+                  nloLayer.queryFeatures(query).then(function (results) {
+                    const RESULT_LENGTH = results.features;
+                    const ROW_N = RESULT_LENGTH.length;
+
+                    let objID = [];
+                    for (var i = 0; i < ROW_N; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                    }
+
+                    var queryExt = new Query({
+                      objectIds: objID,
+                    });
+
+                    nloLayer.queryExtent(queryExt).then(function (result) {
+                      if (result.extent) {
+                        view.goTo(result.extent);
+                      }
+                    });
+
+                    if (highlightSelect) {
+                      highlightSelect.remove();
+                    }
+                    highlightSelect = layerView.highlight(objID);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                      highlightSelect.remove();
+                    });
+                  }); // End of queryFeatures
+                  layerView.filter = {
+                    where: "StatusRC = " + selectedStatus,
+                  };
+                }); // End of view.whenLayerView
+              }); // End of view.when
+            });
+
+            pieSeries.data.setAll([
+              {
+                category: statusISF[0],
+                value: clear,
+                sliceSettings: {
+                  fill: am5.color("#00C5FF"),
+                },
+              },
+              {
+                category: statusISF[1],
+                value: paid,
+                sliceSettings: {
+                  fill: am5.color("#70AD47"),
+                },
+              },
+              {
+                category: statusISF[2],
+                value: payp,
+                sliceSettings: {
+                  fill: am5.color("#0070FF"),
+                },
+              },
+              {
+                category: statusISF[3],
+                value: legalpass,
+                sliceSettings: {
+                  fill: am5.color("#FFFF00"),
+                },
+              },
+              {
+                category: statusISF[4],
+                value: otc,
+                sliceSettings: {
+                  fill: am5.color("#FFAA00"),
+                },
+              },
+              {
+                category: statusISF[5],
+                value: lbp,
+                sliceSettings: {
+                  fill: am5.color("#FF0000"),
+                },
+              },
+            ]);
+
+            // Legend
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
+            var legend = chart.children.push(
+              am5.Legend.new(root5, {
+                centerX: am5.percent(50),
+                x: am5.percent(50),
+                layout: root5.verticalLayout,
+                marginBottom: 10,
+              })
+            );
+            legend.data.setAll(pieSeries.dataItems);
+
+            // Change the size of legend markers
+            legend.markers.template.setAll({
+              width: 18,
+              height: 18,
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              stroke: am5.color("#ffffff"),
+            });
+
+            // Change the marker shape
+            legend.markerRectangles.template.setAll({
+              cornerRadiusTL: 10,
+              cornerRadiusTR: 10,
+              cornerRadiusBL: 10,
+              cornerRadiusBR: 10,
+            });
+
+            // To align legend items: valueLabels right, labels to left
+            // 1. fix width of valueLabels
+            // 2. dynamically change width of labels by screen size
+
+            const valueLabelsWidth = 50;
+
+            // Responsive legend
+            // https://www.amcharts.com/docs/v5/tutorials/pie-chart-with-a-legend-with-dynamically-sized-labels/
+            chart.onPrivate("width", function (width) {
+              let box = document.querySelector(".box4");
+              const boxWidth = box.offsetWidth;
+              var availableSpace = Math.max(width - chart.width() - 150, 180);
+              //var availableSpace = (boxWidth - valueLabelsWidth) * 0.7
+              legend.labels.template.setAll({
+                width: availableSpace,
+                maxWidth: availableSpace,
+              });
+            });
+
+            // Change legend labelling properties
+            // To have responsive font size, do not set font size
+            legend.labels.template.setAll({
+              oversizedBehavior: "truncate",
+              fill: am5.color("#ffffff"),
+              //textDecoration: "underline"
+              //width: am5.percent(200)
+              //fontWeight: "300"
+            });
+
+            legend.valueLabels.template.setAll({
+              textAlign: "right",
+              width: valueLabelsWidth,
+              fill: am5.color("#ffffff"),
+              //fontSize: LEGEND_FONT_SIZE,
+            });
+
+            legend.itemContainers.template.setAll({
+              // set space between legend items
+              paddingTop: 1.1,
+              paddingBottom: 2,
+            });
+
+            pieSeries.appear(1000, 100);
+          }); // End of queryFeature
+        } // End of updateChartISF()
+        updateChartISF();
+
+        // Handed-Over Area Bar chart
+        function n2HandedOverArea() {
+          var total_affected = {
+            onStatisticField: "AffectedArea",
+            outStatisticFieldName: "total_affected",
+            statisticType: "sum",
+          };
+
+          var total_handedover = {
+            onStatisticField: "HandedOverArea",
+            outStatisticFieldName: "total_handedover",
+            statisticType: "sum",
+          };
+
+          var query = lotLayer.createQuery();
+          query.where = "CP IS NOT NULL";
+          query.outStatistics = [total_affected, total_handedover];
+          query.orderByFields = ["CP"];
+          query.returnGeometry = true;
+          query.groupByFieldsForStatistics = ["CP"];
+
+          //const affected = [];
+          //const handedOver = [];
+
+          lotLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features;
+
+            const data = stats.map((result, index) => {
+              const attributes = result.attributes;
+              const affected = attributes.total_affected;
+              const handedOver = attributes.total_handedover;
+              const cp = attributes.CP;
+
+              const percent = ((handedOver / affected) * 100).toFixed(0);
+
+              return Object.assign(
+                {},
+                {
+                  category: cp,
+                  value: percent,
+                }
+              );
+            });
+
+            // Now use the above compiled values
+            var root6 = am5.Root.new("landPieChartDiv2");
+            root6._logo.dispose();
+            var myTheme = am5.Theme.new(root6);
+
+            myTheme.rule("Grid", ["base"]).setAll({
+              strokeOpacity: 0,
+            });
+
+            myTheme.rule("Grid", ["base"]).setAll({
+              strokeOpacity: 0.1,
+            });
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root6.setThemes([am5themes_Animated.new(root6), myTheme]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root6.container.children.push(
+              am5xy.XYChart.new(root6, {
+                panX: false,
+                panY: false,
+                wheelX: "panY",
+                wheelY: "zoomY",
+                layout: root6.verticalLayout,
+              })
+            );
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root6, {
+              strokeOpacity: 1,
+              strokeWidth: 1,
+              stroke: am5.color("#ffffff"),
+            });
+
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root6, {
+                categoryField: "category",
+                renderer: yRenderer,
+                tooltip: am5.Tooltip.new(root6, {}),
+              })
+            );
+
+            // Label properties Y axis
+            yAxis.get("renderer").labels.template.setAll({
+              //oversizedBehavior: "wrap",
+              textAlign: "center",
+              fill: am5.color("#ffffff"),
+              //maxWidth: 150,
+              fontSize: 12,
+            });
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+            yAxis.data.setAll(data);
+
+            // Set xaxis
+            var xRenderer = am5xy.AxisRendererX.new(root6, {
+              strokeOpacity: 1,
+              strokeWidth: 1,
+              stroke: am5.color("#ffffff"),
+            });
+
+            // Remove xaxis labels
+            xRenderer.labels.template.set("visible", false);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root6, {
+                min: 0,
+                max: 100,
+                strictMinMax: true,
+                calculateTotals: true,
+                renderer: xRenderer,
+              })
+            );
+
+            // Chart title
+            chart.children.unshift(
+              am5.Label.new(root6, {
+                text: "Handed-Over Area",
+                fontSize: 15,
+                fontWeight: "bold",
+                textAlign: "center",
+                fill: am5.color("#ffffff"),
+                x: am5.percent(50),
+                centerX: am5.percent(50),
+                paddingTop: -5,
+                paddingBottom: 0,
+              })
+            );
+
+            // Add series
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root6, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXShow: "valueXTotalPercent",
+                  valueXField: fieldName,
+                  categoryYField: "category",
+                  fill: am5.color("#0070ff"),
+                })
+              );
+
+              series.columns.template.setAll({
+                //tooltipText: "{name}, {categoryY}: {valueX}%",
+                //tooltipY: am5.percent(90)
+              });
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root6, {
+                  sprite: am5.Label.new(root6, {
+                    text: "{valueX}%",
+                    fill: am5.color("#ffffff"), //root6.interfaceColors.get("alternativeText"),
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                    fontSize: 12,
+                  }),
+                });
+              });
+            }
+            makeSeries("Value", "value");
+            chart.appear(1000, 100);
+          });
+        }
+
+        n2HandedOverArea();
+
+        // ----------------- Time Series Chart ----------------- //
+
+        var root7 = am5.Root.new("timeSeriesChart");
+        root7._logo.dispose();
+        function timeSeriesChart(municipal, barangay) {
+          root7.container.children.clear();
+
+          var query = lotLayer.createQuery();
+          const municipalExpression = "Municipality = '" + municipal + "'";
+          const barangayExpression = "Barangay = '" + barangay + "'";
+          const statusExpression = "HandedOverDate IS NOT NULL";
+
+          if (
+            municipal === "None" &&
+            (barangay === "None" || barangay === undefined)
+          ) {
+            query.where = statusExpression;
+          } else if (municipal === undefined && barangay === undefined) {
+            query.where = statusExpression;
+          } else if (municipal === "None" && barangay !== "None") {
+            query.where = barangayExpression + " AND " + statusExpression;
+          } else if (
+            municipal !== "None" &&
+            (barangay === "None" || barangay === undefined)
+          ) {
+            query.where = municipalExpression + " AND " + statusExpression;
+          } else if (municipal !== "None" && barangay !== "None") {
+            query.where =
+              municipalExpression +
+              " AND " +
+              barangayExpression +
+              " AND " +
+              statusExpression;
+          } else {
+            query.where = statusExpression;
+          }
+
+          var total_count_handedOver_private = {
+            onStatisticField:
+              "CASE WHEN (LandOwner <> 'BASES CONVERSION DEVELOPMENT AUTHORITY' and LandOwner <> 'MANILA RAILROAD COMPANY') THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_count_handedOver_private",
+            statisticType: "sum",
+          };
+
+          var total_count_handedOver_public = {
+            onStatisticField:
+              "CASE WHEN (LandOwner = 'BASES CONVERSION DEVELOPMENT AUTHORITY' or LandOwner = 'MANILA RAILROAD COMPANY') THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_count_handedOver_public",
+            statisticType: "sum",
+          };
+
+          query.outStatistics = [
+            total_count_handedOver_private,
+            total_count_handedOver_public,
+          ];
+          query.outFields = ["HandedOverDate"];
+          query.orderByFields = ["HandedOverDate"];
+          query.groupByFieldsForStatistics = ["HandedOverDate"];
+
+          const private = [];
+          const public = [];
+
+          lotLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features;
+            ////
+            // collect all dates
+            const data = stats.map((result, index) => {
+              const attributes = result.attributes;
+              const date = attributes.HandedOverDate;
+
+              const privateCount = attributes.total_count_handedOver_private;
+              const publicCount = attributes.total_count_handedOver_public;
+
+              // compile in object array
+              return Object.assign(
+                {},
+                {
+                  date,
+                  private: privateCount,
+                  public: publicCount,
+                }
+              );
+            });
+
+            // set themes
+            root7.setThemes([am5themes_Animated.new(root7)]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root7.container.children.push(
+              am5xy.XYChart.new(root7, {
+                panX: false,
+                panY: false,
+                wheelX: "panX",
+                wheelY: "zoomX",
+                paddingBottom: 35,
+              })
+            );
+
+            chart
+              .get("colors")
+              .set("colors", [am5.color("#6ede00"), am5.color("#4a99ff")]);
+
+            // Chart title
+            chart.children.unshift(
+              am5.Label.new(root7, {
+                text: "Monthly Progress of Handed-Over Lots",
+                fontSize: 14,
+                fontWeight: "bold",
+                textAlign: "center",
+                fill: am5.color("#ffffff"),
+                x: am5.percent(50),
+                centerX: am5.percent(50),
+                paddingTop: 0,
+                paddingBottom: 0,
+              })
+            );
+
+            // Add cursor
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+            var cursor = chart.set(
+              "cursor",
+              am5xy.XYCursor.new(root7, {
+                behavior: "zoomX",
+              })
+            );
+            cursor.lineY.set("visible", false);
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var xAxis = chart.xAxes.push(
+              am5xy.DateAxis.new(root7, {
+                maxDeviation: 0,
+                groupData: true,
+                baseInterval: {
+                  timeUnit: "day",
+                  count: 1,
+                },
+                groupIntervals: [{ timeUnit: "month", count: 1 }],
+                renderer: am5xy.AxisRendererX.new(root7, {
+                  minGridDistance: 60,
+                  strokeOpacity: 1,
+                  strokeWidth: 1,
+                  stroke: am5.color("#ffffff"),
+                }),
+                //tooltip: am5.Tooltip.new(root7, {})
+              })
+            );
+
+            // Label properties for yAxis (category axis)
+            xAxis.get("renderer").labels.template.setAll({
+              //oversizedBehavior: "wrap",
+              textAlign: "center",
+              fill: am5.color("#ffffff"),
+              //maxWidth: 150,
+              fontSize: 12,
+            });
+
+            var yAxis = chart.yAxes.push(
+              am5xy.ValueAxis.new(root7, {
+                calculateTotals: true,
+                min: 0,
+                renderer: am5xy.AxisRendererY.new(root7, {
+                  minGridDistance: 60,
+                  strokeOpacity: 1,
+                  strokeWidth: 1,
+                  stroke: am5.color("#ffffff"),
+                }),
+              })
+            );
+
+            yAxis.get("renderer").labels.template.setAll({
+              //oversizedBehavior: "wrap",
+              textAlign: "center",
+              fill: am5.color("#ffffff"),
+              //maxWidth: 150,
+              fontSize: 12,
+            });
+
+            // Add yaxix title
+            yAxis.children.unshift(
+              am5.Label.new(root7, {
+                rotation: -90,
+                text: "No. of handed-over lots",
+                y: am5.p50,
+                centerX: am5.p50,
+                fill: am5.color("#ffffff"),
+                fontSize: 11,
+              })
+            );
+
+            // Add legend
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+            var legend = chart.children.push(
+              am5.Legend.new(root7, {
+                centerX: am5.p50,
+                centerY: am5.percent(50),
+                x: am5.p50,
+                y: am5.percent(108),
+              })
+            );
+
+            legend.labels.template.setAll({
+              oversizedBehavior: "truncate",
+              fill: am5.color("#ffffff"),
+              fontSize: 17,
+              scale: 0.8,
+              //textDecoration: "underline"
+              //width: am5.percent(200)
+              //fontWeight: "300"
+            });
+
+            function makeSeries(name, fieldName) {
+              // Add series
+              // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root7, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  valueYField: fieldName,
+                  valueXField: "date",
+                  valueYGrouped: "sum",
+                })
+              );
+
+              series.columns.template.setAll({
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                tooltipY: am5.percent(10),
+                strokeOpacity: 0,
+              });
+              series.data.setAll(data);
+              series.appear(1000);
+
+              // Add Label bullet
+              series.bullets.push(function () {
+                return am5.Bullet.new(root7, {
+                  locationY: 1,
+                  locationX: 0.5,
+                  sprite: am5.Label.new(root7, {
+                    text: "{valueY}",
+                    fill: root7.interfaceColors.get("alternativeText"),
+                    centerY: 0,
+                    centerX: am5.p50,
+                    populateText: true,
+                    fontSize: 10,
+                  }),
+                });
+              });
+              legend.data.push(series);
+            }
+            makeSeries("Private Land", "private");
+            makeSeries("Public Land", "public");
+
+            chart.appear(1000, 100);
+          });
+        }
+        timeSeriesChart();
+
+        // ----------------- Super Urgent Lots Button ----------------- //
+
+        function highlightUrgent() {
+          view.whenLayerView(urgentLotLayer).then((urgentlayerView) => {
+            var query = urgentLotLayer.createQuery();
+            urgentLotLayer.queryFeatures(query).then(function (results) {
+              const RESULT_LENGTH = results.features;
+              const ROW_N = RESULT_LENGTH.length;
+
+              let objID = [];
+              for (var i = 0; i < ROW_N; i++) {
+                var obj = results.features[i].attributes.OBJECTID;
+                objID.push(obj);
+              }
+
+              var queryExt = new Query({
+                objectIds: objID,
+              });
+
+              var queryExt = new Query({
+                objectIds: objID,
+              });
+
+              lotLayer.queryExtent(queryExt).then(function (result) {
+                if (result.extent) {
+                  view.goTo(result.extent);
+                }
+              });
+
+              if (highlightSelect) {
+                highlightSelect.remove();
+              }
+              highlightSelect = urgentlayerView.highlight(objID);
+
+              view.on("click", function () {
+                urgentlayerView.filter = null;
+                highlightSelect.remove();
+              });
+            });
+            urgentlayerView.filter = { where: "Urgent = 0" };
+          });
+        }
+
+        // ----------------- Calcite Action Bar (Inside: the chart) ----------------- //
+
+        // view.when
+        view.when(() => {
+          document.querySelector("#header-title").textContent =
+            "N2 LAND ACQUISITION";
+          document.querySelector("#item-description").innerHTML = `
+                                                                 1. You can <b>filter the data</b> by City and Barangy using dropdown lists.<br>
+                                                                 2. <b>Click a tab</b> below the dropdown lists to view progress on land, structure, or NLO in charts.<br>
+                                                                 3. <b>Click series in pie charts</b> to view progress on the corresponding lots/structures/NLO on the map.<br>
+                                                                 4. <b>Lots under expropriation</b> are available in the 'Expro List' tab.<br>
+                                                                 5. Click/unclick widgets icon for viewing Layer list, legend, basemaps, and locate widgets under the main title.<br>
+                                                                 6. <b>Toggle a checkbox</b> above the Land pie chart to view <b>handed-over areas</b> (m2) of Contract Packages.`;
+
+          const timeSeriesChartDiv = document.getElementById("timeSeriesChart");
+          let activeWidget;
+
+          const handleActionBarClick = ({ target }) => {
+            if (target.tagName !== "CALCITE-ACTION") {
+              return;
+            }
+
+            if (activeWidget) {
+              document.querySelector(
+                `[data-action-id=${activeWidget}]`
+              ).active = false;
+              document.querySelector(
+                `[data-panel-id=${activeWidget}]`
+              ).hidden = true;
+
+              // Close the progress time series chart when chart widget is closed
+              if (`${activeWidget}` === "charts") {
+                //document.getElementById("land-checkbox").checked = false;
+                timeSeriesChartDiv.style.display = "none";
+              }
+            }
+
+            const nextWidget = target.dataset.actionId;
+
+            if (nextWidget !== activeWidget) {
+              document.querySelector(
+                `[data-action-id=${nextWidget}]`
+              ).active = true;
+              document.querySelector(
+                `[data-panel-id=${nextWidget}]`
+              ).hidden = false;
+              activeWidget = nextWidget;
+
+              // Open the time series chart when chart widget is opened.
+              if (`${activeWidget}` === "charts") {
+                //document.getElementById("land-checkbox").checked = true;
+                timeSeriesChartDiv.style.display = "block";
+              }
+            } else {
+              activeWidget = null;
+            }
+          };
+
+          // Action bar
+          document
+            .querySelector("calcite-action-bar")
+            .addEventListener("click", handleActionBarClick);
+          let actionBarExpanded = false;
+          document.addEventListener("calciteActionBarToggle", (event) => {
+            actionBarExpanded = !actionBarExpanded;
+            view.padding = {
+              left: actionBarExpanded ? 135 : 45,
+            };
+          });
+
+          // Switch theme
+          document.querySelector("calcite-shell").hidden = false;
+          document.querySelector("calcite-loader").hidden = true;
+
+          // chart switch between land acquisition pie chart and handed-over area bar graph
+          const landPieChartDiv = document.getElementById("landPieChartDiv");
+          const landPieChartDiv2 = document.getElementById("landPieChartDiv2");
+          const toggleChart = () => {
+            landPieChartDiv.hidden = !landPieChartDiv.hidden;
+            landPieChartDiv2.hidden = !landPieChartDiv2.hidden;
+          };
+          document
+            .querySelector(".chartChange")
+            .addEventListener("calciteSwitchChange", toggleChart);
+
+          // Switch between Occupancy (structure) and ISF point features
+          document
+            .querySelector("#thetabs")
+            .addEventListener("click", tabChange);
+          function tabChange(event) {
+            const value = event.target.className;
+
+            if (value === "ISF") {
+              nloLayer.visible = true;
+              //occupancyLayer.visible = false;
+
+              updateChartISF();
+            } else if (
+              value === "Land" ||
+              value === "Structure" ||
+              value === "ExproList"
+            ) {
+              nloLayer.visible = false;
+              //occupancyLayer.visible = true;
+            }
+          }
+        }); // end of view.when
+      }); // End of am5
+
+      /////////////////// Widgets ////////////////////////////
+
+      //****---------------- Legend-----------------------****//
+
+      const legend = new Legend({
+        view: view,
+        container: "legend-container",
+        layerInfos: ["*"],
+      });
+
+      //****---------------- Basemap Gallery -----------------------****//
+
+      const basemaps = new BasemapGallery({
+        view,
+        container: "basemaps-container",
+      });
+
+      //****---------------- Layer List -----------------------****//
+      function highlightUrgent(layer) {
+        let highlight;
+        view.whenLayerView(layer).then((urgentLayerView) => {
+          var query = layer.createQuery();
+          layer.queryFeatures(query).then((results) => {
+            const length = results.features.length;
+            let objID = [];
+            for (var i = 0; i < length; i++) {
+              var obj = results.features[i].attributes.OBJECTID;
+              objID.push(obj);
+            }
+
+            if (highlight) {
+              highlight.remove();
+            }
+            highlight = urgentLayerView.highlight(objID);
+          });
+        });
+      }
+
+      const layerList = new LayerList({
+        view: view,
+        selectionEnabled: true,
+        container: "layers-container",
+        listItemCreatedFunction: function (event) {
+          const item = event.item;
+
+          if (item.title === "Super Urgent Lot") {
+            highlightUrgent(superUrgentLotLayer);
+          }
+
+          if (
+            item.title === "Chainage" ||
+            item.title === "Occupancy (Structure)" ||
+            item.title === "NLO/LO Ownership (Structure)" ||
+            item.title === "Land Acquisition (Endorsed Status)" ||
+            item.title === "Super Urgent Lot"
+          ) {
+            item.visible = false;
+          }
+          if (item.layer.type != "group") {
+            // don't show legend twice
+            item.panel = {
+              content: "legend",
+              open: true,
+            };
+          }
+        },
+      });
+
+      //****---------------- Search Widget -----------------------****//
+
+      var searchWidget = new Search({
+        view: view,
+        container: "search-container",
+        locationEnabled: false,
+        allPlaceholder: "LotID, StructureID, Chainage",
+        includeDefaultSources: false,
+        sources: [
+          {
+            layer: lotLayer,
+            searchFields: ["LotID"],
+            displayField: "LotID",
+            exactMatch: false,
+            outFields: ["LotID"],
+            name: "Lot ID",
+            placeholder: "example: 10083",
+          },
+          {
+            layer: structureLayer,
+            searchFields: ["StrucID"],
+            displayField: "StrucID",
+            exactMatch: false,
+            outFields: ["StrucID"],
+            name: "Structure ID",
+            placeholder: "example: MCRP-01-02-ML022",
+          },
+          {
+            layer: chainageLayer,
+            searchFields: ["KmSpot"],
+            displayField: "KmSpot",
+            exactMatch: false,
+            outFields: ["*"],
+            name: "Main KM",
+            placeholder: "example: 80+400",
+          },
+          {
+            layer: pierAccessLayer,
+            searchFields: ["PIER"],
+            displayField: "PIER",
+            exactMatch: false,
+            outFields: ["PIER"],
+            name: "Pier No",
+            zoomScale: 1000,
+            placeholder: "example: P-288",
+          },
+        ],
+      });
+      view.ui.empty("top-left");
+
+      const searchExpand = new Expand({
+        view: view,
+        content: searchWidget,
+        expandIconClass: "esri-icon-search",
+        group: "top-right",
+      });
+      view.ui.add(searchExpand, {
+        position: "top-right",
+      });
+
+      searchExpand.watch("expanded", function () {
+        if (!searchExpand.expanded) {
+          searchWidget.searchTerm = null;
+        }
+      });
+
+      //****---------------- Date -----------------------****//
+      document.getElementById("dateDiv").innerHTML = "As of October 23, 2023"; //lastEditedDate;
+    });
+  </script>
+</html>
