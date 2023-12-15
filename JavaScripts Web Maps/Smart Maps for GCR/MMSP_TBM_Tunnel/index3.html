@@ -1,0 +1,85 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
+  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
+  -->
+<title>MMSP Tunnel</title>
+
+
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/dark/main.css"/>
+    <link rel="stylesheet" href="css/main3.css">
+    
+        <!-- Resources -->
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+    <script src="https://unpkg.com/three@0.144.0/build/three.js"></script>
+    <script src="https://unpkg.com/three@0.144.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/7/Stats.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+    <script src="https://js.arcgis.com/4.25/"></script>
+    <script src="js/main3.js"></script>
+    <script src="js/animepoint.js"></script>
+
+  </head>
+  <div id="viewDiv">
+    <div id="segmentedDateDiv"></div>
+    <div id="timeContainer" class="timeSlider"></div>
+  <body class="sassy-theme">
+    <div id="headerTitleDiv">MMSP TUNNEL</div>
+    <div class="dateDiv">As of xx, 2022</div>
+    <div class="esri-widget" id="dropdownDiv">
+      <label for="sel-options">Section:</label>
+      <select id="sectionSelect" class="esri-widget"></select>
+      <label for="sel-options">Tunnel</label>
+      <select id="tunnelSelect" class="esri-widget"></select>
+    </div>
+    <div id="boxTBM">
+      <div id="labelTbm">TBM</div>
+      <div class="lowerPanelBox">
+        <div id="logoDiv">
+          <img src="https://EijiGorilla.github.io/Symbols/TBM.png">
+        </div>
+        <div id="chartPanel">
+          <div id="chartTbmDiv"></div>
+        </div>
+      </div>
+    </div>
+    <div id="boxNATM">
+      <div id="labelNatm">NATM</div>
+      <div class="lowerPanelBox">
+        <div id="logoDiv">
+          <img src="https://EijiGorilla.github.io/Symbols/NATM_Logo.png">
+        </div>
+        <div id="chartPanel">
+          <div id="chartNatmDiv"></div>
+        </div>
+      </div>
+    </div>
+    <div id="boxSurvey">
+      <div id="labelSurvey">DILAPIDATED</div>
+      <div class="lowerPanelBox">
+        <div id="logoDiv">
+          <img src="https://EijiGorilla.github.io/Symbols/Broken_House_Logo.png">
+        </div>
+        <div id="chartPanel">
+          <div id="chartSurveyDiv"></div>
+        </div>
+      </div>
+    </div>
+    <div id="menu" class="esri-widget">
+      <input type="checkbox" id="opacityInput" unchecked />
+      <label for="opacityInput">See through ground</label>
+    </div>
+</div>
+  </body>
+</html>

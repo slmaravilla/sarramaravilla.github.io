@@ -1,0 +1,2812 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about working on Building Scene Layer
+  https://pro.arcgis.com/en/pro-app/2.7/help/mapping/layer-properties/maintain-and-work-with-a-building-scene-layer.html
+  https://www.youtube.com/watch?v=maEXHMI9ddQ
+
+  # BuildingFiler
+  https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-support-BuildingFilter.html
+
+  -->
+    <title>Station Structure (N2)</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.27/esri/themes/dark/main.css"
+    />
+    <script
+      type="module"
+      src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"
+    />
+
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Micro.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
+
+    <!-- Resources -->
+    <script src="https://js.arcgis.com/4.28/"></script>
+  </head>
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    #headerTitleDiv {
+      font-size: 2vw;
+      vertical-align: middle;
+      padding-top: 3px;
+      z-index: 99;
+      position: absolute;
+      left: 13;
+      top: 18;
+      color: white;
+    }
+
+    #see-through-label {
+      padding-top: 5;
+      padding-bottom: 0;
+      padding-right: 5;
+      padding-left: 5;
+      display: flex;
+      align-self: center;
+      position: absolute;
+      z-index: 1;
+      bottom: 5;
+      right: 10;
+    }
+
+    #chartPanel {
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #chartdiv {
+      width: 20vw;
+      height: 37vh;
+      align-items: center;
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+        sans-serif;
+      padding: 0;
+      margin: 0;
+    }
+
+    .labelStFraming,
+    .labelStFoundation,
+    .labelStColumn,
+    .labelFloors,
+    .labelWalls,
+    .labelColumns {
+      color: white;
+      font-size: 1.3vw;
+      margin: 0;
+      padding-top: 5;
+      float: right;
+      background-color: rgb(0, 0, 0, 0);
+      height: 4vh;
+      text-align: center;
+    }
+
+    #labelTotalDiv {
+      color: white;
+      font-size: 1.5vw;
+      width: 100%;
+      height: 3.5vh;
+      padding-top: 6;
+      text-align: center;
+    }
+
+    #boxStFoundation {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 1%;
+      left: 0.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxStColumn {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 1%;
+      left: 11.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxStFraming {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 1%;
+      left: 22.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxFloors {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 1%;
+      left: 33.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxWalls {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 1%;
+      left: 44.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxColumns {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 1%;
+      left: 55.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #boxTotal {
+      display: grid;
+      position: fixed;
+      z-index: 99;
+      background-image: linear-gradient(rgb(0, 0, 0, 0), rgb(0, 185, 242, 0.4));
+      border-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      background-color: rgb(0, 0, 0, 0.5);
+      bottom: 1%;
+      left: 66.5%;
+      color: white;
+      font-size: 2vw;
+      width: 10.8vw;
+      height: 14vh;
+      text-align: center;
+    }
+
+    #chartStFramingDiv,
+    #chartStFoundationDiv,
+    #chartStColumnDiv,
+    #chartFloorsDiv,
+    #chartWallsDiv,
+    #chartColumnsDiv {
+      padding: 0;
+      margin: 0;
+      align-items: center;
+      background-color: rgb(0, 0, 0, 0);
+      width: 100%;
+      height: 11vh;
+    }
+
+    #totalProgressDiv {
+      color: rgb(0, 197, 255);
+      font-size: 2.5vw;
+      width: 100%;
+      height: 100%;
+      background-color: rgb(0, 0, 0, 0);
+      text-align: center;
+    }
+
+    .panel {
+      padding: 0px;
+      margin: 0;
+      box-sizing: border-box;
+      width: 13vw;
+      height: 40vh;
+      position: fixed;
+      bottom: 10vw;
+      left: 1;
+      font-size: 1.3vw;
+      color: white;
+      background-color: rgb(0, 0, 0, 0);
+      z-index: 1;
+      transition: 3;
+      line-height: 2;
+    }
+
+    .active,
+    .test:hover {
+      background-color: rgba(77, 75, 75, 0);
+      color: orange;
+      font-size: 1.7vw;
+    }
+
+    .dateDiv {
+      color: rgb(0, 197, 255);
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+        sans-serif;
+      text-align: left;
+      font-weight: normal;
+      font-size: 1.1vw;
+      padding-top: 20px;
+      margin: 0;
+      z-index: 99;
+      top: 55;
+      left: 20;
+      position: absolute;
+    }
+
+    #menu {
+      position: absolute;
+      padding: 0.8em;
+      max-width: 250px;
+      background-color: rgb(0, 0, 0, 0);
+      z-index: 99;
+      bottom: 13rem;
+      right: 5;
+    }
+
+    #menu1 {
+      padding: 0.8em;
+      width: 250px;
+      z-index: 99;
+      position: absolute;
+      right: 0;
+    }
+
+    #measurementToolMenu {
+      padding: 0.8em;
+      max-width: 180px;
+      width: 250px;
+    }
+
+    #measurementToolLabel {
+      color: white;
+    }
+
+    #sliceContainer {
+      width: inherit;
+    }
+
+    #sliceOptions {
+      margin: 0 15px;
+    }
+
+    #sliceOptions > button {
+      margin-bottom: 15px;
+    }
+
+    #sliceContainer {
+      max-width: 228px;
+    }
+
+    .esri-widget--button.active,
+    .esri-widget--button.active:hover,
+    .esri-widget--button.active:focus {
+      cursor: default;
+      background-color: #999696;
+    }
+
+    .esri-widget--button.active path,
+    .esri-widget--button.active:hover path,
+    .esri-widget--button.active:focus path {
+      fill: #e4e4e4;
+    }
+
+    br {
+      content: " ";
+    }
+    br:after {
+      content: " ";
+    }
+
+    .esri-layer-list__item-toggle-icon,
+    .esri-layer-list__item-title {
+      color: white;
+    }
+
+    .sassy-theme .esri-menu,
+    .sassy-theme .esri-building-explorer,
+    .sassy-theme .esri-popup__main-container,
+    .sassy-theme .esri-popup .esri-popup__pointer-direction,
+    .sassy-theme .esri-popup .esri-popup__button,
+    .sassy-theme .esri-button,
+    .sassy-theme .esri-input,
+    .sassy-theme .esri-legend,
+    .sassy-theme .esri-layer-list,
+    .sassy-theme .esri-widget a {
+      background-color: rgb(0, 0, 0, 0.5);
+      color: #fff;
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .sassy-theme .esri-legend__layer-caption {
+      display: none;
+    }
+
+    .button {
+      cursor: pointer;
+      font-size: 12pt !important;
+      font-weight: bold !important;
+      color: rgb(230, 230, 230);
+    }
+
+    .button:hover,
+    #label {
+      color: white;
+    }
+
+    .button,
+    #label {
+      margin: 15px;
+    }
+
+    .esri-view-surface--inset-outline:focus::after {
+      outline: none !important;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: #00032235; /*#032235*/
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: #ffba1f;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: #b98816;
+    }
+
+    .esri-legend__layer-caption {
+      display: none;
+    }
+
+    #basemaps-pos {
+      position: absolute;
+      z-index: 1;
+      top: 100;
+      left: 10;
+      overflow-y: auto;
+    }
+  </style>
+
+  <body class="calcite-theme-dark">
+    <calcite-loader></calcite-loader>
+    <calcite-shell content-behind>
+      <div id="viewDiv">
+        <div class="dateDiv">As of November 15, 2023</div>
+        <div class="panel">
+          <ul id="stationList">
+            <li style="display: block" class="test active" id="Calumpit">
+              Calumpit
+            </li>
+            <li style="display: block" class="test" id="Apalit">Apalit</li>
+            <li style="display: block" class="test" id="San Fernando">
+              San Fernando
+            </li>
+            <li style="display: block" class="test" id="Angeles">Angeles</li>
+            <li style="display: block" class="test" id="Clark">Clark</li>
+            <li style="display: block" class="test" id="CIA">CIA</li>
+          </ul>
+        </div>
+        <div id="headerTitleDiv">N2 STATION STRUCTURE</div>
+        <div id="boxStFoundation">
+          <label class="labelStFoundation">St.Foundation</label>
+          <div id="chartPanel">
+            <div id="chartStFoundationDiv"></div>
+          </div>
+        </div>
+        <div id="boxStColumn">
+          <label class="labelStColumn">St.Column</label>
+          <div id="chartPanel">
+            <div id="chartStColumnDiv"></div>
+          </div>
+        </div>
+        <div id="boxStFraming">
+          <label class="labelStFraming">St.Framing</label>
+          <div id="chartPanel">
+            <div id="chartStFramingDiv"></div>
+          </div>
+        </div>
+        <div id="boxFloors">
+          <label class="labelFloors">Floors</label>
+          <div id="chartPanel">
+            <div id="chartFloorsDiv"></div>
+          </div>
+        </div>
+        <div id="boxWalls">
+          <label class="labelWalls">Walls</label>
+          <div id="chartPanel">
+            <div id="chartWallsDiv"></div>
+          </div>
+        </div>
+        <div id="boxColumns">
+          <label class="labelColumns">Columns</label>
+          <div id="chartPanel">
+            <div id="chartColumnsDiv"></div>
+          </div>
+        </div>
+        <div id="boxTotal">
+          <div id="labelTotalDiv">TOTAL</div>
+          <div id="totalProgressDiv"></div>
+        </div>
+        <calcite-label
+          layout="inline"
+          id="see-through-label"
+          class="esri-widget"
+        >
+          <calcite-checkbox id="myLink"></calcite-checkbox
+          ><b style="color: white; font-weight: normal">See-through-ground</b>
+        </calcite-label>
+        <calcite-button icon-end="play" id="play"> </calcite-button>
+        <calcite-button icon-end="pause" id="pause"> </calcite-button>
+        <div id="measurementToolMenu" class="esri-widget">
+          <calcite-label>
+            <div id="measurementToolLabel">
+              Click one of the buttons below to open the corresponding analysis
+              widget and interact with the analysis.
+            </div>
+          </calcite-label>
+          <calcite-button
+            id="directLineMeasurementAnalysisButton"
+            icon-start="measure-line"
+            title="Interact with direct line measurement"
+          >
+          </calcite-button>
+          <calcite-button
+            id="areaMeasurementAnalysisButton"
+            icon-start="measure-area"
+            title="Interact with area measurement"
+          >
+          </calcite-button>
+          <calcite-button
+            id="sliceAnalysisButton"
+            icon-start="slice"
+            title="Interact with slice plane"
+          >
+          </calcite-button>
+          <calcite-button
+            id="lineOfSightAnalysisButton"
+            icon-start="line-of-sight"
+            title="Interact with line of sight analysis"
+          >
+          </calcite-button>
+          <calcite-label></calcite-label>
+          <calcite-button
+            id="removeWidgetButton"
+            title="Remove Widget"
+            style="display: none; width: 140px"
+            >Remove Widget
+          </calcite-button>
+        </div>
+      </div>
+    </calcite-shell>
+  </body>
+
+  <script>
+    require([
+      "esri/Basemap",
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/views/SceneView",
+      "esri/widgets/BasemapGallery",
+      "esri/layers/FeatureLayer",
+      "esri/layers/support/FeatureFilter",
+      "esri/layers/SceneLayer",
+      "esri/layers/Layer",
+      "esri/layers/TileLayer",
+      "esri/layers/VectorTileLayer",
+      "esri/layers/support/LabelClass",
+      "esri/symbols/LabelSymbol3D",
+      "esri/WebMap",
+      "esri/WebScene",
+      "esri/portal/PortalItem",
+      "esri/portal/Portal",
+      "esri/widgets/TimeSlider",
+      "esri/widgets/Legend",
+      "esri/widgets/LayerList",
+      "esri/widgets/Fullscreen",
+      "esri/rest/geometryService",
+      "esri/rest/support/Query",
+      "esri/rest/support/StatisticDefinition",
+      "esri/symbols/WebStyleSymbol",
+      "esri/TimeExtent",
+      "esri/widgets/Expand",
+      "esri/widgets/Editor",
+      "esri/renderers/UniqueValueRenderer",
+      "esri/widgets/support/DatePicker",
+      "esri/widgets/FeatureTable",
+      "esri/widgets/Compass",
+      "esri/layers/ElevationLayer",
+      "esri/Ground",
+      "esri/layers/BuildingSceneLayer",
+      "esri/widgets/BuildingExplorer",
+      "esri/widgets/Slice",
+      "esri/analysis/SlicePlane",
+      "esri/renderers/SimpleRenderer",
+      "esri/symbols/MeshSymbol3D",
+      "esri/symbols/edges/SolidEdges3D",
+      "esri/layers/GroupLayer",
+      "esri/geometry/Point",
+      "esri/Camera",
+      "esri/core/reactiveUtils",
+      "esri/analysis/DirectLineMeasurementAnalysis",
+      "esri/widgets/DirectLineMeasurement3D",
+      "esri/analysis/AreaMeasurementAnalysis",
+      "esri/widgets/AreaMeasurement3D",
+      "esri/analysis/SliceAnalysis",
+      "esri/widgets/Slice",
+      "esri/analysis/LineOfSightAnalysis",
+      "esri/widgets/LineOfSight",
+      "esri/geometry/SpatialReference",
+      "esri/geometry/Polygon",
+    ], function (
+      Basemap,
+      Map,
+      MapView,
+      SceneView,
+      BasemapGallery,
+      FeatureLayer,
+      FeatureFilter,
+      SceneLayer,
+      Layer,
+      TileLayer,
+      VectorTileLayer,
+      LabelClass,
+      LabelSymbol3D,
+      WebMap,
+      WebScene,
+      PortalItem,
+      Portal,
+      TimeSlider,
+      Legend,
+      LayerList,
+      Fullscreen,
+      geometryService,
+      Query,
+      StatisticDefinition,
+      WebStyleSymbol,
+      TimeExtent,
+      Expand,
+      Editor,
+      UniqueValueRenderer,
+      DatePicker,
+      FeatureTable,
+      Compass,
+      ElevationLayer,
+      Ground,
+      BuildingSceneLayer,
+      BuildingExplorer,
+      Slice,
+      SlicePlane,
+      SimpleRenderer,
+      MeshSymbol3D,
+      SolidEdges3D,
+      GroupLayer,
+      Point,
+      Camera,
+      reactiveUtils,
+      DirectLineMeasurementAnalysis,
+      DirectLineMeasurement3D,
+      AreaMeasurementAnalysis,
+      AreaMeasurement3D,
+      SliceAnalysis,
+      Slice,
+      LineOfSightAnalysis,
+      LineOfSight,
+      SpatialReference,
+      Polygon
+    ) {
+      ////////////////////////////////////////////////////
+      var basemap = new Basemap({
+        baseLayers: [
+          new VectorTileLayer({
+            portalItem: {
+              id: "8a9ef2a144e8423786f6139408ac3424",
+            },
+          }),
+        ],
+      });
+
+      var map = new Map({
+        basemap: "satellite", //basemap, // "streets-night-vector",
+        ground: "world-elevation",
+      });
+
+      var view = new SceneView({
+        map: map,
+        container: "viewDiv",
+        viewingMode: "local",
+        camera: {
+          position: {
+            x: 120.770421,
+            y: 14.902323,
+            z: 500,
+          },
+          tilt: 65,
+        },
+        environment: {
+          background: {
+            type: "color", // autocasts as new ColorBackground()
+            color: [0, 0, 0, 1],
+          },
+          // disable stars
+          starsEnabled: false,
+          //disable atmosphere
+          atmosphereEnabled: false,
+        },
+      });
+
+      view.ui.components = [];
+
+      // OpenStreetMap 3D Buildings
+      let osmSymbol = {
+        type: "mesh-3d",
+        symbolLayers: [
+          {
+            type: "fill",
+            material: {
+              color: [74, 80, 87, 0.5],
+              colorMixMode: "replace",
+            },
+            edges: {
+              type: "solid", // autocasts as new SolidEdges3D()
+              color: [225, 225, 225, 0.3],
+            },
+          },
+        ],
+      };
+
+      var osm3D = new SceneLayer({
+        portalItem: {
+          id: "ca0470dbbddb4db28bad74ed39949e25",
+        },
+        title: "OpenStreetMap 3D Buildings",
+      });
+      map.add(osm3D);
+
+      osm3D.renderer = {
+        type: "simple",
+        symbol: osmSymbol,
+      };
+
+      // Label Class
+      // Station labels
+      var labelClass = new LabelClass({
+        symbol: {
+          type: "label-3d", // autocasts as new LabelSymbol3D()
+          symbolLayers: [
+            {
+              type: "text", // autocasts as new TextSymbol3DLayer()
+              material: {
+                color: [255, 170, 0],
+              },
+              size: 20,
+              color: "black",
+              haloColor: "black",
+              haloSize: 1,
+              font: {
+                family: "Ubuntu Mono",
+                //weight: "bold"
+              },
+            },
+          ],
+          verticalOffset: {
+            screenLength: 40,
+            maxWorldLength: 100,
+            minWorldLength: 20,
+          },
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          expression: "$feature.Station",
+          //value: "{TEXTSTRING}"
+        },
+      });
+
+      // Station Symbol
+      function stationsSymbol(name) {
+        return {
+          type: "web-style", // autocasts as new WebStyleSymbol()
+          name: name,
+          styleName: "EsriIconsStyle", //EsriRealisticTransportationStyle, EsriIconsStyle
+        };
+      }
+
+      // Station Renderer
+      var stationsRenderer = {
+        type: "unique-value", // autocasts as new UniqueValueRenderer()
+        field: "Station",
+        defaultSymbol: stationsSymbol("Train"), //Backhoe, Train
+      };
+
+      // Station Layer
+      var stationLayer = new SceneLayer({
+        portalItem: {
+          id: "207cb34b8a324b40985b5805862c4b29",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        labelingInfo: [labelClass],
+        renderer: stationsRenderer,
+        elevationInfo: {
+          // this elevation mode will place points on top of
+          // buildings or other SceneLayer 3D objects
+          mode: "relative-to-ground",
+        },
+        definitionExpression: "Extension = 'N2'",
+        //screenSizePerspectiveEnabled: false, // gives constant size regardless of zoom
+      });
+      stationLayer.listMode = "hide";
+      map.add(stationLayer, 0);
+
+      // PROW //
+      var rowLayer = new FeatureLayer({
+        portalItem: {
+          id: "e47e9f4d475e4e24acad458a1428f3f9",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 1,
+        title: "ROW",
+        popupEnabled: false,
+      });
+      map.add(rowLayer, 2); // PROW //
+
+      // Station structures
+      const buildingLayer = new BuildingSceneLayer({
+        portalItem: {
+          id: "87292b4f3d0a4e31b170627b68aa2e35",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        outFields: ["*"],
+        title: "N2 Station Structures",
+      });
+      map.add(buildingLayer);
+
+      view.ui.empty("top-left");
+
+      const buildingExplorer = new BuildingExplorer({
+        view: view,
+        layers: [buildingLayer],
+      });
+
+      const buildingExplorerExpand = new Expand({
+        view,
+        content: buildingExplorer,
+        expandIconClass: "esri-icon-layers",
+        expandTooltip: "Building Explorer",
+      });
+      view.ui.add(buildingExplorerExpand, "top-right");
+      //view.ui.add(buildingExplorer, "bottom-right");
+
+      // only display the building levels filter
+      buildingExplorer.visibleElements = {
+        phases: false,
+        disciplines: false,
+      };
+
+      /// chart
+      const headerTitleDiv = document.getElementById("headerTitleDiv");
+      /*
+    const excludedLayers = [];
+  const sliceButton = document.getElementById("slice");
+  const resetPlaneBtn = document.getElementById("resetPlaneBtn");
+  const clearPlaneBtn = document.getElementById("clearPlaneBtn");
+  const sliceOptions = document.getElementById("sliceOptions");
+  const plane = new SlicePlane({
+    position: {
+      latitude: 34.0600460070941,
+      longitude: -117.18669237418565,
+      z: 417.75
+    },
+    tilt: 32.62,
+    width: 29,
+    height: 29,
+    heading: 0.46
+  });
+  var sliceWidget = null;
+          var sliceTiltEnabled = true;
+  */
+      // Discipline: Architectural
+      var columnsLayer = null;
+      var floorsLayer = null;
+      var wallsLayer = null;
+
+      // Discipline: Structural
+      var stFramingLayer = null;
+      var stColumnLayer = null;
+      var stFoundationLayer = null;
+
+      buildingLayer.when(() => {
+        // Iterate through the flat array of sublayers and extract the ones
+        // that should be excluded from the slice widget
+        buildingLayer.allSublayers.forEach((layer) => {
+          // modelName is standard accross all BuildingSceneLayer,
+          // use it to identify a certain layer
+          switch (layer.modelName) {
+            // Because of performance reasons, the Full Model view is
+            // by default set to false. In this scene the Full Model should be visible.
+            case "FullModel":
+              layer.visible = true;
+              break;
+
+            case "Columns":
+              columnsLayer = layer;
+              //excludedLayers.push(layer);
+              break;
+
+            case "Floors":
+              floorsLayer = layer;
+              //excludedLayers
+              break;
+
+            case "Walls":
+              wallsLayer = layer;
+              break;
+
+            case "StructuralFraming":
+              stFramingLayer = layer;
+              break;
+
+            case "StructuralColumns":
+              stColumnLayer = layer;
+              break;
+
+            case "StructuralFoundation":
+              stFoundationLayer = layer;
+              break;
+
+            default:
+              layer.visible = true;
+          }
+        });
+        // setSliceWidget();
+      });
+
+      /* Function for zooming to selected layers */
+      function zoomToLayer(layer) {
+        return layer.queryExtent().then(function (response) {
+          view
+            .goTo(response.extent, {
+              //response.extent
+              speedFactor: 2,
+            })
+            .catch(function (error) {
+              if (error.name != "AbortError") {
+                console.error(error);
+              }
+            });
+        });
+      }
+
+      const play = document.getElementById("play");
+      const pause = document.getElementById("pause");
+      pause.style.display = "none";
+
+      let abort = false;
+      let center = null;
+      function rotate() {
+        if (!view.interacting && !abort) {
+          play.style.display = "none";
+          pause.style.display = "block";
+
+          center = center || view.center;
+
+          view.goTo(
+            {
+              heading: view.camera.heading + 0.2,
+              center,
+            },
+            { animate: false }
+          );
+
+          requestAnimationFrame(rotate);
+        } else {
+          abort = false;
+          center = null;
+          play.style.display = "block";
+          pause.style.display = "none";
+        }
+      } // end
+
+      play.addEventListener("click", () => {
+        play.onclick = rotate;
+        pause.onclick = function () {
+          abort = true;
+        };
+      });
+
+      // Animation play button
+      view.ui.add(play, {
+        position: "top-right",
+      });
+
+      view.ui.add(pause, {
+        position: "top-right",
+      });
+
+      function totalProgressStFoundation() {
+        // structural Foundation
+        var total_complete = {
+          onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_complete",
+          statisticType: "sum",
+        };
+
+        var total_obs = {
+          onStatisticField: "Status",
+          outStatisticFieldName: "total_obs",
+          statisticType: "count",
+        };
+
+        var query = stFoundationLayer.createQuery();
+        query.outStatistics = [total_complete, total_obs];
+        query.returnGeometry = true;
+        return stFoundationLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features[0].attributes;
+
+          const total_comp = stats.total_complete;
+          const total_obs = stats.total_obs;
+          const compile_stFoundation = [total_comp, total_obs];
+          return compile_stFoundation;
+        });
+      }
+
+      // structural columns
+      function totalProgressStColumn(compile_stFoundation) {
+        // structural Foundation
+        var total_complete = {
+          onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_complete",
+          statisticType: "sum",
+        };
+
+        var total_obs = {
+          onStatisticField: "Status",
+          outStatisticFieldName: "total_obs",
+          statisticType: "count",
+        };
+
+        var query = stColumnLayer.createQuery();
+        query.outStatistics = [total_complete, total_obs];
+        query.returnGeometry = true;
+        return stColumnLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features[0].attributes;
+
+          const total_comp = stats.total_complete;
+          const total_obs = stats.total_obs;
+          const comp_comp = total_comp + compile_stFoundation[0];
+          const comp_obs = total_obs + compile_stFoundation[1];
+          const compile_stColumn = [comp_comp, comp_obs];
+
+          return compile_stColumn;
+        });
+      }
+
+      // structura framing
+      function totalProgressStFraming(compile_stColumn) {
+        // structural Foundation
+        var total_complete = {
+          onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_complete",
+          statisticType: "sum",
+        };
+
+        var total_obs = {
+          onStatisticField: "Status",
+          outStatisticFieldName: "total_obs",
+          statisticType: "count",
+        };
+
+        var query = stFramingLayer.createQuery();
+        query.outStatistics = [total_complete, total_obs];
+        query.returnGeometry = true;
+        return stFramingLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features[0].attributes;
+
+          const total_comp = stats.total_complete;
+          const total_obs = stats.total_obs;
+          const comp_comp = total_comp + compile_stColumn[0];
+          const comp_obs = total_obs + compile_stColumn[1];
+          const compile_stFraming = [comp_comp, comp_obs];
+
+          return compile_stFraming;
+        });
+      }
+
+      // Columns
+      function totalProgressColumns(compile_stFraming) {
+        // structural Foundation
+        var total_complete = {
+          onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_complete",
+          statisticType: "sum",
+        };
+
+        var total_obs = {
+          onStatisticField: "Status",
+          outStatisticFieldName: "total_obs",
+          statisticType: "count",
+        };
+
+        var query = columnsLayer.createQuery();
+        query.outStatistics = [total_complete, total_obs];
+        query.returnGeometry = true;
+        return columnsLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features[0].attributes;
+
+          const total_comp = stats.total_complete;
+          const total_obs = stats.total_obs;
+          const comp_comp = total_comp + compile_stFraming[0];
+          const comp_obs = total_obs + compile_stFraming[1];
+          const compile_columns = [comp_comp, comp_obs];
+
+          return compile_columns;
+        });
+      }
+
+      // Floors
+      function totalProgressFloors(compile_columns) {
+        // structural Foundation
+        var total_complete = {
+          onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_complete",
+          statisticType: "sum",
+        };
+
+        var total_obs = {
+          onStatisticField: "Status",
+          outStatisticFieldName: "total_obs",
+          statisticType: "count",
+        };
+
+        var query = floorsLayer.createQuery();
+        query.outStatistics = [total_complete, total_obs];
+        query.returnGeometry = true;
+        return floorsLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features[0].attributes;
+
+          const total_comp = stats.total_complete;
+          const total_obs = stats.total_obs;
+          const comp_comp = total_comp + compile_columns[0];
+          const comp_obs = total_obs + compile_columns[1];
+          const compile_floors = [comp_comp, comp_obs];
+
+          return compile_floors;
+        });
+      }
+
+      // Walls
+      function totalProgressWalls(compile_floors) {
+        // structural Foundation
+        var total_complete = {
+          onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_complete",
+          statisticType: "sum",
+        };
+
+        var total_obs = {
+          onStatisticField: "Status",
+          outStatisticFieldName: "total_obs",
+          statisticType: "count",
+        };
+
+        var query = wallsLayer.createQuery();
+        query.outStatistics = [total_complete, total_obs];
+        query.returnGeometry = true;
+        return wallsLayer.queryFeatures(query).then(function (response) {
+          var stats = response.features[0].attributes;
+
+          const total_comp = stats.total_complete;
+          const total_obs = stats.total_obs;
+          const comp_comp = total_comp + compile_floors[0];
+          const comp_obs = total_obs + compile_floors[1];
+          const compile_walls = [comp_comp, comp_obs];
+
+          return compile_walls;
+        });
+      }
+
+      function progressAll(compile_walls) {
+        document.getElementById("totalProgressDiv").innerHTML =
+          ((compile_walls[0] / compile_walls[1]) * 100).toFixed(1) + " %";
+      }
+
+      function totalProgressStation() {
+        totalProgressStFoundation()
+          .then(totalProgressStColumn)
+          .then(totalProgressStFraming)
+          .then(totalProgressColumns)
+          .then(totalProgressFloors)
+          .then(totalProgressWalls)
+          .then(progressAll);
+      }
+
+      ////////////////////////////////
+      var stationList = document.getElementById("stationList");
+      var ttt = stationList.getElementsByClassName("test");
+
+      am5.ready(function () {
+        // Total progress //
+        view.when(() => {
+          buildingLayer.when(() => {
+            const defaultStation = "Station = 8";
+            columnsLayer.definitionExpression = defaultStation;
+            floorsLayer.definitionExpression = defaultStation;
+            wallsLayer.definitionExpression = defaultStation;
+
+            stFramingLayer.definitionExpression = defaultStation;
+            stColumnLayer.definitionExpression = defaultStation;
+            stFoundationLayer.definitionExpression = defaultStation;
+
+            columnsLayer.visible = true;
+            floorsLayer.visible = true;
+            wallsLayer.visible = true;
+            //windowsLayer.visible = true;
+
+            stFramingLayer.visible = true;
+            stColumnLayer.visible = true;
+            stFoundationLayer.visible = true;
+
+            totalProgressStation();
+            combineCharts();
+            zoomToLayer(stFramingLayer);
+          });
+        });
+
+        // Default selection = 'None'
+
+        // Station list
+        for (var i = 0; i < ttt.length; i++) {
+          ttt[i].addEventListener("click", filterByP);
+        }
+
+        const stationObj = {
+          CIA: 3,
+          Clark: 4,
+          Angeles: 5,
+          "San Fernando": 6,
+          Apalit: 7,
+          Calumpit: 8,
+        };
+
+        function filterByP(event) {
+          var current = document.getElementsByClassName("active");
+          current[0].className = current[0].className.replace(" active", "");
+          this.className += " active";
+
+          // convert basemaps to dark gray vector
+          map.basemap = "dark-gray-vector";
+          map.ground.opacity = 0.6;
+
+          const selectedID = event.target.id;
+          const stationExpression = "Station = " + stationObj[selectedID];
+          columnsLayer.definitionExpression = stationExpression;
+          floorsLayer.definitionExpression = stationExpression;
+          wallsLayer.definitionExpression = stationExpression;
+
+          stFramingLayer.definitionExpression = stationExpression;
+          stColumnLayer.definitionExpression = stationExpression;
+          stFoundationLayer.definitionExpression = stationExpression;
+
+          columnsLayer.visible = true;
+          floorsLayer.visible = true;
+          wallsLayer.visible = true;
+          //windowsLayer.visible = true;
+
+          stFramingLayer.visible = true;
+          stColumnLayer.visible = true;
+          stFoundationLayer.visible = true;
+
+          combineCharts();
+          totalProgressStation();
+          zoomToLayer(stFramingLayer);
+        }
+
+        // CHART
+        // various properties setting
+        const marginTop = 0;
+        const marginLeft = 0;
+        const marginRight = 0;
+        const marginBottom = 0;
+        const paddingTop = 0;
+        const paddingLeft = 5;
+        const paddingRight = 5;
+        const paddingBottom = 15;
+
+        const xAxisNumberFormat = "#'%'";
+        const seriesBulletLabelFontSize = "0.5em";
+
+        const chartSeriesFillColorComp = "#0070ff";
+        const chartSeriesFillColorIncomp = "#000000";
+        const chartSeriesFillColorDelay = "#FF0000";
+        const chartBorderLineColor = "#00c5ff";
+        const chartBorderLineWidth = 0.4;
+
+        // Progress Chart
+        // 1. Structural Foundation
+        var root = am5.Root.new("chartStFoundationDiv");
+        root._logo.dispose();
+
+        var myTheme = am5.Theme.new(root);
+        myTheme.rule("Grid", ["base"]).setAll({
+          strokeOpacity: 0,
+        });
+
+        function chartStFoundation() {
+          root.container.children.clear();
+
+          var total_stFoundation_tobec = {
+            onStatisticField:
+              "CASE WHEN (Types = 1 and Status = 1) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_stFoundation_tobec",
+            statisticType: "sum",
+          };
+
+          var total_stFoundation_delay = {
+            onStatisticField:
+              "CASE WHEN (Types = 1 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_stFoundation_delay",
+            statisticType: "sum",
+          };
+
+          var total_stFoundation_comp = {
+            onStatisticField:
+              "CASE WHEN (Types = 1 and Status = 4) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_stFoundation_comp",
+            statisticType: "sum",
+          };
+
+          var query = stFoundationLayer.createQuery();
+          query.outStatistics = [
+            total_stFoundation_tobec,
+            total_stFoundation_delay,
+            total_stFoundation_comp,
+          ];
+          query.returnGeometry = true;
+
+          stFoundationLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const foundation_tobec = stats.total_stFoundation_tobec;
+            const foundation_delay = stats.total_stFoundation_delay;
+            const foundation_comp = stats.total_stFoundation_comp;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root.setThemes([
+              am5themes_Animated.new(root),
+              am5themes_Responsive.new(root),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root.container.children.push(
+              am5xy.XYChart.new(root, {
+                panX: false,
+                panY: false,
+                layout: root.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            var data = [
+              {
+                category: "structural foundation",
+                comp: foundation_comp,
+                incomp: foundation_tobec,
+                delay: foundation_delay,
+              },
+            ];
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root, {
+                categoryField: "category",
+                visible: false, // disable axis label
+                renderer: yRenderer,
+                tooltip: am5.Tooltip.new(root, {}),
+              })
+            );
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root, {
+                min: 0,
+                max: 100,
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
+                })
+              );
+
+              series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
+                strokeWidth: chartBorderLineWidth,
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: am5.percent(30),
+                tooltipY: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root, {
+                getFillFromSprite: true,
+                labelText: "[bold][fontSize:16px]{name}: {valueX}",
+              });
+
+              tooltip.get("background").setAll({
+                fillOpacity: 0.8,
+                strokeOpacity: 0,
+                //width: am5.percent(10)
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root, {
+                  sprite: am5.Label.new(root, {
+                    text:
+                      foundation_comp == 0
+                        ? ""
+                        : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+                    fill: root.interfaceColors.get("alternativeText"),
+                    opacity: fieldName === "comp" ? 1 : 0,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                stFoundationLayer.visible = true;
+                stColumnLayer.visible = false;
+                stFramingLayer.visible = false;
+                wallsLayer.visible = false;
+                floorsLayer.visible = false;
+                columnsLayer.visible = false;
+
+                view.on("click", function () {
+                  stFoundationLayer.visible = true;
+                  stColumnLayer.visible = true;
+                  stFramingLayer.visible = true;
+                  wallsLayer.visible = true;
+                  floorsLayer.visible = true;
+                  columnsLayer.visible = true;
+                });
+              }); // End of filterByChart
+            }
+
+            makeSeries("Complete", "comp");
+            makeSeries("Incomplete", "incomp");
+            makeSeries("Delay", "delay");
+
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        } // End of Chart
+
+        // 2. Structural Column
+        var root2 = am5.Root.new("chartStColumnDiv");
+        root2._logo.dispose();
+
+        function chartStColumn() {
+          root2.container.children.clear();
+          var total_stColumn_tobec = {
+            onStatisticField:
+              "CASE WHEN (Types = 2 and Status = 1) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_stColumn_tobec",
+            statisticType: "sum",
+          };
+
+          var total_stColumn_delay = {
+            onStatisticField:
+              "CASE WHEN (Types = 2 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_stColumn_delay",
+            statisticType: "sum",
+          };
+
+          var total_stColumn_comp = {
+            onStatisticField:
+              "CASE WHEN (Types = 2 and Status = 4) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_stColumn_comp",
+            statisticType: "sum",
+          };
+
+          var query = stColumnLayer.createQuery();
+          query.outStatistics = [
+            total_stColumn_tobec,
+            total_stColumn_delay,
+            total_stColumn_comp,
+          ];
+          query.returnGeometry = true;
+
+          stColumnLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const column_tobec = stats.total_stColumn_tobec;
+            const column_delay = stats.total_stColumn_delay;
+            const column_comp = stats.total_stColumn_comp;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root2.setThemes([
+              am5themes_Animated.new(root2),
+              am5themes_Responsive.new(root2),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root2.container.children.push(
+              am5xy.XYChart.new(root2, {
+                panX: false,
+                panY: false,
+                layout: root2.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            var data = [
+              {
+                category: "structural column",
+                comp: column_comp,
+                incomp: column_tobec,
+                delay: column_delay,
+              },
+            ];
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root2, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root2, {
+                categoryField: "category",
+                visible: false, // disable axis label
+                renderer: yRenderer,
+                tooltip: am5.Tooltip.new(root2, {}),
+              })
+            );
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root2, {
+                min: 0,
+                max: 100,
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root2, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root2, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
+                })
+              );
+
+              series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
+                strokeWidth: chartBorderLineWidth,
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: am5.percent(30),
+                tooltipY: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root2, {
+                getFillFromSprite: true,
+                labelText: "[bold][fontSize:16px]{name}: {valueX}",
+              });
+
+              tooltip.get("background").setAll({
+                fillOpacity: 0.8,
+                strokeOpacity: 0,
+                //width: am5.percent(10)
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root2, {
+                  sprite: am5.Label.new(root2, {
+                    text:
+                      column_comp == 0
+                        ? ""
+                        : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+                    fill: root2.interfaceColors.get("alternativeText"),
+                    opacity: fieldName === "comp" ? 1 : 0,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                stFoundationLayer.visible = false;
+                stColumnLayer.visible = true;
+                stFramingLayer.visible = false;
+                wallsLayer.visible = false;
+                floorsLayer.visible = false;
+                columnsLayer.visible = false;
+
+                // Listen to the click event on the map view and resets to default
+                view.on("click", function () {
+                  stFoundationLayer.visible = true;
+                  stColumnLayer.visible = true;
+                  stFramingLayer.visible = true;
+                  wallsLayer.visible = true;
+                  floorsLayer.visible = true;
+                  columnsLayer.visible = true;
+                });
+              }); // End of filterByChart
+            }
+            makeSeries("Complete", "comp");
+            makeSeries("Incomplete", "incomp");
+            makeSeries("Delay", "delay");
+
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        } // End of Chart
+
+        // 3. Structural Framing
+        var root3 = am5.Root.new("chartStFramingDiv");
+        root3._logo.dispose();
+
+        function chartStFraming() {
+          root3.container.children.clear();
+          var total_stFraming_tobec = {
+            onStatisticField:
+              "CASE WHEN (Types = 3 and Status = 1) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_stFraming_tobec",
+            statisticType: "sum",
+          };
+
+          var total_stFraming_delay = {
+            onStatisticField:
+              "CASE WHEN (Types = 3 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_stFraming_delay",
+            statisticType: "sum",
+          };
+
+          var total_stFraming_comp = {
+            onStatisticField:
+              "CASE WHEN (Types = 3 and Status = 4) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_stFraming_comp",
+            statisticType: "sum",
+          };
+
+          var query = stFramingLayer.createQuery();
+          query.outStatistics = [
+            total_stFraming_tobec,
+            total_stFraming_delay,
+            total_stFraming_comp,
+          ];
+          query.returnGeometry = true;
+
+          stFramingLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const framing_tobec = stats.total_stFraming_tobec;
+            const framing_delay = stats.total_stFraming_delay;
+            const framing_comp = stats.total_stFraming_comp;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root3.setThemes([
+              am5themes_Animated.new(root3),
+              am5themes_Responsive.new(root3),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root3.container.children.push(
+              am5xy.XYChart.new(root3, {
+                panX: false,
+                panY: false,
+                layout: root3.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            var data = [
+              {
+                category: "structural framing",
+                comp: framing_comp,
+                incomp: framing_tobec,
+                delay: framing_delay,
+              },
+            ];
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root3, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root3, {
+                categoryField: "category",
+                visible: false, // disable axis label
+                renderer: yRenderer,
+                tooltip: am5.Tooltip.new(root3, {}),
+              })
+            );
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root3, {
+                min: 0,
+                max: 100,
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root3, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root3, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
+                })
+              );
+
+              series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
+                strokeWidth: chartBorderLineWidth,
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: am5.percent(30),
+                tooltipY: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root3, {
+                getFillFromSprite: true,
+                labelText: "[bold][fontSize:16px]{name}: {valueX}",
+              });
+
+              tooltip.get("background").setAll({
+                fillOpacity: 0.8,
+                strokeOpacity: 0,
+                //width: am5.percent(10)
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root3, {
+                  sprite: am5.Label.new(root3, {
+                    text:
+                      framing_comp == 0
+                        ? ""
+                        : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+                    fill: root3.interfaceColors.get("alternativeText"),
+                    opacity: fieldName === "comp" ? 1 : 0,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                stFoundationLayer.visible = false;
+                stColumnLayer.visible = false;
+                stFramingLayer.visible = true;
+                wallsLayer.visible = false;
+                floorsLayer.visible = false;
+                columnsLayer.visible = false;
+
+                // Listen to the click event on the map view and resets to default
+                view.on("click", function () {
+                  stFoundationLayer.visible = true;
+                  stColumnLayer.visible = true;
+                  stFramingLayer.visible = true;
+                  wallsLayer.visible = true;
+                  floorsLayer.visible = true;
+                  columnsLayer.visible = true;
+                });
+              }); // End of filterByChart
+            }
+            makeSeries("Complete", "comp");
+            makeSeries("Incomplete", "incomp");
+            makeSeries("Delay", "delay");
+
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        } // End of Chart
+
+        // 4. Floors
+        var root4 = am5.Root.new("chartFloorsDiv");
+        root4._logo.dispose();
+
+        function chartFloors() {
+          root4.container.children.clear();
+          var total_floors_tobec = {
+            onStatisticField:
+              "CASE WHEN (Types = 5 and Status = 1) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_floors_tobec",
+            statisticType: "sum",
+          };
+
+          var total_floors_delay = {
+            onStatisticField:
+              "CASE WHEN (Types = 5 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_floors_delay",
+            statisticType: "sum",
+          };
+
+          var total_floors_comp = {
+            onStatisticField:
+              "CASE WHEN (Types = 5 and Status = 4) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_floors_comp",
+            statisticType: "sum",
+          };
+
+          var query = floorsLayer.createQuery();
+          query.outStatistics = [
+            total_floors_tobec,
+            total_floors_delay,
+            total_floors_comp,
+          ];
+          query.returnGeometry = true;
+
+          floorsLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const floors_tobec = stats.total_floors_tobec;
+            const floors_delay = stats.total_floors_delay;
+            const floors_comp = stats.total_floors_comp;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root4.setThemes([
+              am5themes_Animated.new(root4),
+              am5themes_Responsive.new(root4),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root4.container.children.push(
+              am5xy.XYChart.new(root4, {
+                panX: false,
+                panY: false,
+                layout: root4.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            var data = [
+              {
+                category: "floors",
+                comp: floors_comp,
+                incomp: floors_tobec,
+                delay: floors_delay,
+              },
+            ];
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root4, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root4, {
+                categoryField: "category",
+                visible: false, // disable axis label
+                renderer: yRenderer,
+                tooltip: am5.Tooltip.new(root4, {}),
+              })
+            );
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root4, {
+                min: 0,
+                max: 100,
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root4, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root4, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
+                })
+              );
+
+              series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
+                strokeWidth: chartBorderLineWidth,
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: am5.percent(30),
+                tooltipY: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root4, {
+                getFillFromSprite: true,
+                labelText: "[bold][fontSize:16px]{name}: {valueX}",
+              });
+
+              tooltip.get("background").setAll({
+                fillOpacity: 0.8,
+                strokeOpacity: 0,
+                //width: am5.percent(10)
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root4, {
+                  sprite: am5.Label.new(root4, {
+                    text:
+                      floors_comp == 0
+                        ? ""
+                        : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+                    fill: root4.interfaceColors.get("alternativeText"),
+                    opacity: fieldName === "comp" ? 1 : 0,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                stFoundationLayer.visible = false;
+                stColumnLayer.visible = false;
+                stFramingLayer.visible = false;
+                wallsLayer.visible = false;
+                floorsLayer.visible = true;
+                columnsLayer.visible = false;
+
+                // Listen to the click event on the map view and resets to default
+                view.on("click", function () {
+                  stFoundationLayer.visible = true;
+                  stColumnLayer.visible = true;
+                  stFramingLayer.visible = true;
+                  wallsLayer.visible = true;
+                  floorsLayer.visible = true;
+                  columnsLayer.visible = true;
+                });
+              }); // End of filterByChart
+            }
+            makeSeries("Complete", "comp");
+            makeSeries("Incomplete", "incomp");
+            makeSeries("Delay", "delay");
+
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        } // End of Chart
+
+        // 5. Walls
+        var root5 = am5.Root.new("chartWallsDiv");
+        root5._logo.dispose();
+
+        function chartWalls() {
+          root5.container.children.clear();
+          var total_walls_tobec = {
+            onStatisticField:
+              "CASE WHEN (Types = 6 and Status = 1) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_walls_tobec",
+            statisticType: "sum",
+          };
+
+          var total_walls_delay = {
+            onStatisticField:
+              "CASE WHEN (Types = 6 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_walls_delay",
+            statisticType: "sum",
+          };
+
+          var total_walls_comp = {
+            onStatisticField:
+              "CASE WHEN (Types = 6 and Status = 4) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_walls_comp",
+            statisticType: "sum",
+          };
+
+          var query = wallsLayer.createQuery();
+          query.outStatistics = [
+            total_walls_tobec,
+            total_walls_delay,
+            total_walls_comp,
+          ];
+          query.returnGeometry = true;
+
+          wallsLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const walls_tobec = stats.total_walls_tobec;
+            const walls_delay = stats.total_walls_delay;
+            const walls_comp = stats.total_walls_comp;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root5.setThemes([
+              am5themes_Animated.new(root5),
+              am5themes_Responsive.new(root5),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root5.container.children.push(
+              am5xy.XYChart.new(root5, {
+                panX: false,
+                panY: false,
+                layout: root5.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            var data = [
+              {
+                category: "walls",
+                comp: walls_comp,
+                incomp: walls_tobec,
+                delay: walls_delay,
+              },
+            ];
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root5, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root5, {
+                categoryField: "category",
+                visible: false, // disable axis label
+                renderer: yRenderer,
+                tooltip: am5.Tooltip.new(root5, {}),
+              })
+            );
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root5, {
+                min: 0,
+                max: 100,
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root5, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root5, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
+                })
+              );
+
+              series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
+                strokeWidth: chartBorderLineWidth,
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: am5.percent(30),
+                tooltipY: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root5, {
+                getFillFromSprite: true,
+                labelText: "[bold][fontSize:16px]{name}: {valueX}",
+              });
+
+              tooltip.get("background").setAll({
+                fillOpacity: 0.8,
+                strokeOpacity: 0,
+                //width: am5.percent(10)
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root5, {
+                  sprite: am5.Label.new(root5, {
+                    text:
+                      walls_comp == 0
+                        ? ""
+                        : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+                    fill: root5.interfaceColors.get("alternativeText"),
+                    opacity: fieldName === "comp" ? 1 : 0,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                stFoundationLayer.visible = false;
+                stColumnLayer.visible = false;
+                stFramingLayer.visible = false;
+                wallsLayer.visible = true;
+                floorsLayer.visible = false;
+                columnsLayer.visible = false;
+
+                // Listen to the click event on the map view and resets to default
+                view.on("click", function () {
+                  stFoundationLayer.visible = true;
+                  stColumnLayer.visible = true;
+                  stFramingLayer.visible = true;
+                  wallsLayer.visible = true;
+                  floorsLayer.visible = true;
+                  columnsLayer.visible = true;
+                });
+              }); // End of filterByChart
+            }
+            makeSeries("Complete", "comp");
+            makeSeries("Incomplete", "incomp");
+            makeSeries("Delay", "delay");
+
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        } // End of Chart
+
+        // 6. Columns
+        var root6 = am5.Root.new("chartColumnsDiv");
+        root6._logo.dispose();
+
+        function chartColumns() {
+          root6.container.children.clear();
+          var total_columns_tobec = {
+            onStatisticField:
+              "CASE WHEN (Types = 7 and Status = 1) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_columns_tobec",
+            statisticType: "sum",
+          };
+
+          var total_columns_delay = {
+            onStatisticField:
+              "CASE WHEN (Types = 7 and Status = 3) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_columns_delay",
+            statisticType: "sum",
+          };
+
+          var total_columns_comp = {
+            onStatisticField:
+              "CASE WHEN (Types = 7 and Status = 4) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_columns_comp",
+            statisticType: "sum",
+          };
+
+          var query = columnsLayer.createQuery();
+          query.outStatistics = [
+            total_columns_tobec,
+            total_columns_delay,
+            total_columns_comp,
+          ];
+          query.returnGeometry = true;
+
+          columnsLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const columns_tobec = stats.total_columns_tobec;
+            const columns_delay = stats.total_columns_delay;
+            const columns_comp = stats.total_columns_comp;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root6.setThemes([
+              am5themes_Animated.new(root6),
+              am5themes_Responsive.new(root6),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root6.container.children.push(
+              am5xy.XYChart.new(root6, {
+                panX: false,
+                panY: false,
+                layout: root6.verticalLayout,
+                marginTop: marginTop,
+                marginLeft: marginLeft,
+                marginRight: marginRight,
+                marginBottom: marginBottom,
+                paddingTop: paddingTop,
+                paddingLeft: paddingLeft,
+                paddingRight: paddingRight,
+                paddingBottom: paddingBottom,
+              })
+            );
+
+            var data = [
+              {
+                category: "structural foundation",
+                comp: columns_comp,
+                incomp: columns_tobec,
+                delay: columns_delay,
+              },
+            ];
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var yRenderer = am5xy.AxisRendererY.new(root6, {});
+            var yAxis = chart.yAxes.push(
+              am5xy.CategoryAxis.new(root6, {
+                categoryField: "category",
+                visible: false, // disable axis label
+                renderer: yRenderer,
+                tooltip: am5.Tooltip.new(root6, {}),
+              })
+            );
+
+            yRenderer.grid.template.setAll({
+              location: 1,
+            });
+
+            yAxis.data.setAll(data);
+
+            var xAxis = chart.xAxes.push(
+              am5xy.ValueAxis.new(root6, {
+                min: 0,
+                max: 100,
+                strictMinMax: true,
+                numberFormat: xAxisNumberFormat,
+                calculateTotals: true,
+                visible: false, // disable axis label
+                renderer: am5xy.AxisRendererX.new(root6, {
+                  strokeOpacity: 0.1,
+                }),
+              })
+            );
+
+            // Add series
+
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            function makeSeries(name, fieldName) {
+              var series = chart.series.push(
+                am5xy.ColumnSeries.new(root6, {
+                  name: name,
+                  stacked: true,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  baseAxis: yAxis,
+                  valueXField: fieldName,
+                  valueXShow: "valueXTotalPercent",
+                  categoryYField: "category",
+                  fill:
+                    fieldName === "delay"
+                      ? fieldName === "incomp"
+                        ? am5.color(chartSeriesFillColorIncomp)
+                        : am5.color(chartSeriesFillColorDelay)
+                      : am5.color(chartSeriesFillColorComp),
+                  stroke: am5.color(chartBorderLineColor),
+                })
+              );
+
+              series.columns.template.setAll({
+                fillOpacity:
+                  fieldName === "comp" // first condition
+                    ? fieldName === "incomp" // second condition
+                      ? 0 // if first condition is false and second condition is true,
+                      : 1 // if first condition is true
+                    : fieldName === "delay" // third condition
+                    ? 0.5 // if first and second conditions are false but third condition is true
+                    : 0, // else
+                strokeWidth: chartBorderLineWidth,
+                tooltipText: "{name}, {categoryX}: {valueY}",
+                width: am5.percent(30),
+                tooltipY: 0,
+              });
+
+              var tooltip = am5.Tooltip.new(root6, {
+                getFillFromSprite: true,
+                labelText: "[bold][fontSize:16px]{name}: {valueX}",
+              });
+
+              tooltip.get("background").setAll({
+                fillOpacity: 0.8,
+                strokeOpacity: 0,
+                //width: am5.percent(10)
+              });
+
+              series.set("tooltip", tooltip);
+              series.data.setAll(data);
+
+              // Make stuff animate on load
+              // https://www.amcharts.com/docs/v5/concepts/animations/
+              series.appear();
+
+              series.bullets.push(function () {
+                return am5.Bullet.new(root6, {
+                  sprite: am5.Label.new(root6, {
+                    text:
+                      columns_comp == 0
+                        ? ""
+                        : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
+                    fill: root6.interfaceColors.get("alternativeText"),
+                    opacity: fieldName === "comp" ? 1 : 0,
+                    fontSize: seriesBulletLabelFontSize,
+                    centerY: am5.p50,
+                    centerX: am5.p50,
+                    populateText: true,
+                  }),
+                });
+              });
+
+              series.columns.template.events.on("click", function (ev) {
+                stFoundationLayer.visible = false;
+                stColumnLayer.visible = false;
+                stFramingLayer.visible = false;
+                wallsLayer.visible = false;
+                floorsLayer.visible = false;
+                columnsLayer.visible = true;
+
+                // Listen to the click event on the map view and resets to default
+                view.on("click", function () {
+                  stFoundationLayer.visible = true;
+                  stColumnLayer.visible = true;
+                  stFramingLayer.visible = true;
+                  wallsLayer.visible = true;
+                  floorsLayer.visible = true;
+                  columnsLayer.visible = true;
+                });
+              }); // End of filterByChart
+            }
+
+            makeSeries("Complete", "comp");
+            makeSeries("Incomplete", "incomp");
+            makeSeries("Delay", "delay");
+
+            chart.appear(1000, 100);
+          }); // end of queryFeatures
+        } // End of Chart
+
+        function combineCharts() {
+          chartStFoundation();
+          chartStColumn();
+          chartStFraming();
+          chartFloors();
+          chartWalls();
+          chartColumns();
+        }
+      }); // End of am5
+
+      // See-through-Ground
+      view.when(function () {
+        // allow navigation above and below the ground
+        map.ground.navigationConstraint = {
+          type: "none",
+        };
+        // the webscene has no basemap, so set a surfaceColor on the ground
+        map.ground.surfaceColor = "#fff";
+
+        // to see through the ground, set the ground opacity to 0.4
+        map.ground.opacity = 0.9;
+      });
+
+      document
+        .getElementById("myLink")
+        .addEventListener("click", function (event) {
+          const checked = event.srcElement.checked;
+          map.ground.opacity = event.srcElement.checked ? 0.1 : 0.6;
+        });
+
+      var layerList = new LayerList({
+        view: view,
+        listItemCreatedFunction: function (event) {
+          const item = event.item;
+          if (item.title === "OpenStreetMap 3D Buildings") {
+            item.visible = false;
+          }
+        },
+      });
+
+      var layerListExpand = new Expand({
+        view: view,
+        content: layerList,
+        expandIconClass: "esri-icon-visible",
+        group: "top-right",
+      });
+
+      view.ui.add(layerListExpand, {
+        position: "top-right",
+      });
+
+      let basemapGallery = new BasemapGallery({
+        view: view,
+      });
+
+      const basemapGalleryExpand = new Expand({
+        view,
+        content: basemapGallery,
+        expandIconClass: "esri-icon-basemap",
+        group: "top-right",
+      });
+      // Add widget to the top right corner of the view
+      view.ui.add(basemapGalleryExpand, {
+        position: "top-right",
+      });
+
+      // Full screen logo
+      view.ui.add(
+        new Fullscreen({
+          view: view,
+          element: viewDiv,
+        }),
+        "top-right"
+      );
+
+      // Measurement Widgets
+      // To modify analysis objects we will temporarily store the corresponding widget in this variable.
+      let analysisWidget = null;
+
+      view.when(async () => {
+        // Create the analysis objects
+        const directLineMeasurementAnalysis =
+          createDirectLineMeasurementAnalysis();
+        const areaMeasurementAnalysis = createAreaMeasurementAnalysis();
+        const sliceAnalysis = createSliceAnalysis();
+        const lineOfSightAnalysis = createLineOfSightAnalysis();
+
+        // Wait for the view to load before adding analysis objects
+        await reactiveUtils.whenOnce(() => !view.updating);
+
+        // Add analysis object to the view to show them
+        view.analyses.addMany([
+          directLineMeasurementAnalysis,
+          areaMeasurementAnalysis,
+          sliceAnalysis,
+          lineOfSightAnalysis,
+        ]);
+
+        // Configure buttons to interact with the analysis objects
+        const areaMeasurementAnalysisButton = setupAnalysisButton(
+          "areaMeasurementAnalysisButton",
+          () =>
+            new AreaMeasurement3D({ view, analysis: areaMeasurementAnalysis })
+        );
+
+        const directLineMeasurementAnalysisButton = setupAnalysisButton(
+          "directLineMeasurementAnalysisButton",
+          () =>
+            new DirectLineMeasurement3D({
+              view,
+              analysis: directLineMeasurementAnalysis,
+            })
+        );
+
+        const lineOfSightAnalysisButton = setupAnalysisButton(
+          "lineOfSightAnalysisButton",
+          () => new LineOfSight({ view, analysis: lineOfSightAnalysis })
+        );
+
+        const sliceAnalysisButton = setupAnalysisButton(
+          "sliceAnalysisButton",
+          () => new Slice({ view, analysis: sliceAnalysis })
+        );
+
+        // Remove button is a bit special
+        document
+          .getElementById("removeWidgetButton")
+          .addEventListener("click", () => {
+            removeActiveWidget();
+          });
+
+        function setupAnalysisButton(elementId, widgetFactotry) {
+          const button = document.getElementById(elementId);
+
+          button.addEventListener("click", () => {
+            // remove current widget (if any)
+            removeActiveWidget();
+
+            // install a suitable widget in the `analysisWidget` variable
+            analysisWidget = widgetFactotry();
+
+            // highlight this button as the currently active one and add the remove widget button
+            button.appearance = "outline";
+            document.getElementById("removeWidgetButton").style.display =
+              "block";
+
+            // show the analysisWidget in the lower right corner
+            view.ui.add(analysisWidget, "bottom-right");
+          });
+          return button;
+        }
+
+        function removeActiveWidget() {
+          // remove the analysisWidget if one exists
+          if (analysisWidget) {
+            analysisWidget.destroy();
+            analysisWidget = null;
+          }
+
+          // hide remove button
+          document.getElementById("removeWidgetButton").style.display = "none";
+
+          // reset appearance of the analysis buttons
+          areaMeasurementAnalysisButton.appearance = "solid";
+          directLineMeasurementAnalysisButton.appearance = "solid";
+          lineOfSightAnalysisButton.appearance = "solid";
+          sliceAnalysisButton.appearance = "solid";
+        }
+      });
+
+      function createDirectLineMeasurementAnalysis() {
+        return new DirectLineMeasurementAnalysis({
+          startPoint: newPoint(-8238827, 4971466, 3),
+          endPoint: newPoint(-8238819, 4971537, 3),
+        });
+      }
+
+      function createAreaMeasurementAnalysis() {
+        const roofPolygon = new Polygon({
+          rings: [
+            [
+              [-8238931, 4971381, 50],
+              [-8238926, 4971426, 50],
+              [-8238835, 4971415, 50],
+              [-8238841, 4971369, 50],
+              [-8238931, 4971381, 50],
+            ],
+          ],
+          spatialReference: SpatialReference.WebMercator,
+        });
+
+        return new AreaMeasurementAnalysis({
+          geometry: roofPolygon,
+        });
+      }
+
+      function createSliceAnalysis() {
+        return new SliceAnalysis({
+          shape: {
+            position: newPoint(-8238840, 4971700, 21),
+            tilt: 0,
+            width: 70,
+            height: 100,
+            heading: 278,
+          },
+        });
+      }
+
+      function createLineOfSightAnalysis() {
+        return new LineOfSightAnalysis({
+          observer: { position: newPoint(-8238825, 4971538, 48) },
+          targets: [
+            { position: newPoint(-8238903, 4971649, 2) },
+            { position: newPoint(-8238866, 4971629, 19) },
+            { position: newPoint(-8238825, 4971880, 2) },
+            { position: newPoint(-8238791, 4971784, 2) },
+          ],
+        });
+      }
+
+      function newPoint(x, y, z) {
+        // convenience function to have all points in the same spatial reference
+        return new Point({
+          x,
+          y,
+          z,
+          spatialReference: SpatialReference.WebMercator,
+        });
+      }
+
+      //view.ui.add("measurementToolMenu", "bottom-left");
+
+      const measurementToolMenuExpand = new Expand({
+        view,
+        content: document.getElementById("measurementToolMenu"),
+        expandIconClass: "esri-icon-measure-line",
+      });
+      view.ui.add(measurementToolMenuExpand, "top-right");
+    });
+  </script>
+</html>

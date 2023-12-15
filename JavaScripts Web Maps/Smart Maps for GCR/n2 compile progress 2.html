@@ -7,9 +7,9 @@
 
     <!-- https://www.esri.com/arcgis-blog/products/arcgis-living-atlas/public-safety/wildfire-aware-app-design-and-implementation/-->
 
-    <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/dark/main.css" />
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.4.2/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.4.2/calcite.css" />
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/dark/main.css" />
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css" />
 
     <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
@@ -23,7 +23,7 @@
     <script src="https://unpkg.com/three@0.144.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/7/Stats.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
-    <script src="https://js.arcgis.com/4.27/"></script>
+    <script src="https://js.arcgis.com/4.28/"></script>
     <script src="js/animepoint.js"></script>
 
 </head>
@@ -42,7 +42,6 @@
         display: flex;
     }
 
-
     #container {
         display: grid;
         flex-wrap: wrap;
@@ -52,13 +51,7 @@
         height: 100%;
     }
 
-    #dateDiv {
-        font-size: 0.85vw;
-        text-align: right;
-        display: flex;
-        align-items: flex-end;
-        font-weight: bold;
-    }
+
 
     calcite-list {
         overflow-y: auto;
@@ -76,17 +69,35 @@
         justify-self: center;
     }
 
-
+    /* Header */
+    #header {
+        display: flex;
+        padding: 0 1rem;
+        width: 100%;
+    }
 
     #header-title {
+        color: white;
         margin-left: 1rem;
-        margin-right: 1rem;
+        font-size: 2.6vh;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+    #dateDiv {
+        color: gray;
+        font-size: 0.8rem;
+        width: 150px;
+        height: 20px;
+        margin-top: auto;
+        margin-left: 2rem;
     }
 
     #contractPackageDiv {
-        margin-top: auto;
+        margin-top: 10px;
         margin-bottom: auto;
         margin-left: auto;
+        margin-right: 2rem;
 
     }
 
@@ -111,11 +122,7 @@
         margin-top: 0.25rem;
     }
 
-    #header {
-        display: flex;
-        padding: 0 1rem;
-        background-color: var(--calcite-ui-foreground-1);
-    }
+    
 
     #header-controls {
         display: flex;
@@ -410,20 +417,22 @@
         margin-bottom: 20px;   
     }
 
-    .esri-view .esri-view-surface--touch-none:focus::after {
-        outline: none !important;
+    #logo {
+        margin-bottom: "auto";
+        margin-top: "auto";
     }
 </style>
 
-<body class="calcite-theme-dark">
+<body class="calcite-mode-dark">
     <calcite-loader></calcite-loader>
     <calcite-shell content-behind>
         <!--  Header slot  -->
-        <div slot="header" id="header">
+        <header slot="header" id="header">
+            <img id="logo" src="https://EijiGorilla.github.io/Symbols/Projec_Logo/DOTr_Logo_v2.png" alt="DOTr Logo" style="height:2.9%;width:2.9%"/>
 
             <!-- Title -->
-            <h2 id="header-title" slot="header"></h2>
-            <div id="dateDiv">As of October 4, 2023</div>
+            <b id="header-title">N2 WORK PROGRESS</b>
+            <div id="dateDiv">As of December 4, 2023</div>
 
             <!-- Dropdown Lists -->
             <div id="contractPackageDiv">
@@ -436,7 +445,8 @@
                     <calcite-segmented-control-item id="N-05" value="n-05">N-05</calcite-segmented-control-item>
                 </calcite-segmented-control>
             </div>
-        </div>
+            <img id="logo" src="https://EijiGorilla.github.io/Symbols/Projec_Logo/GCR LOGO.png" alt="GCR Logo" style="height:4.4%;width:4.4%"/>
+        </header>
 
         <!-- Icon -->
         <!-- https://developers.arcgis.com/calcite-design-system/icons/?icon=list&library=Calcite%20UI -->
@@ -1202,7 +1212,7 @@
         // ROW //
         var prowLayer = new FeatureLayer({
             portalItem: {
-                id: "590680d19f2e48fdbd8bcddce3aaedb5",
+                id: "e47e9f4d475e4e24acad458a1428f3f9",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -1301,7 +1311,7 @@
 
         var lotLayer = new FeatureLayer({
             portalItem: {
-                id: "dca1d785da0f458b8f87638a76918496",
+                id: "13026f2da4804673be557e959ed154c4",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -1435,7 +1445,7 @@
         // Adding endorsed lot layer
         var endorsedLotLayer = new FeatureLayer({
             portalItem: {
-                id: "dca1d785da0f458b8f87638a76918496",
+                id: "13026f2da4804673be557e959ed154c4",
                 portal: {
                     url: "https://gis.railway-sector.com/portal",
                 },
@@ -1476,7 +1486,7 @@
 
         var urgentLotLayer = new FeatureLayer({
             portalItem: {
-                id: "dca1d785da0f458b8f87638a76918496",
+                id: "13026f2da4804673be557e959ed154c4",
                 portal: {
                     url: "https://gis.railway-sector.com/portal",
                 },
@@ -1672,7 +1682,7 @@
 
         var structureLayer = new FeatureLayer({
             portalItem: {
-                id: "dca1d785da0f458b8f87638a76918496",
+                id: "13026f2da4804673be557e959ed154c4",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -1756,7 +1766,7 @@
 
         var strucOwnershipLayer = new FeatureLayer({
             portalItem: {
-                id: "dca1d785da0f458b8f87638a76918496",
+                id: "13026f2da4804673be557e959ed154c4",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -1830,7 +1840,7 @@
 
         var occupancyLayer = new FeatureLayer({
             portalItem: {
-                id: "dca1d785da0f458b8f87638a76918496",
+                id: "13026f2da4804673be557e959ed154c4",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -1962,7 +1972,7 @@
 
         var nloLayer = new FeatureLayer({
             portalItem: {
-                id: "dca1d785da0f458b8f87638a76918496",
+                id: "13026f2da4804673be557e959ed154c4",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -2024,7 +2034,7 @@
         // Adding the fnc layer
         var fncLayer = new FeatureLayer({
             portalItem: {
-                id: "dca1d785da0f458b8f87638a76918496",
+                id: "13026f2da4804673be557e959ed154c4",
                 portal: {
                     url: "https://gis.railway-sector.com/portal",
                 },
@@ -2113,7 +2123,7 @@
 
         var treeCuttingLayer = new FeatureLayer({
             portalItem: {
-                id: "4da5697d684f4babad15aedfe74c5b36",
+                id: "ba9104f5829e489faf42b142e5934784",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -2228,7 +2238,7 @@
 
         var treeCompensationLayer = new FeatureLayer({
             portalItem: {
-                id: "4da5697d684f4babad15aedfe74c5b36",
+                id: "ba9104f5829e489faf42b142e5934784",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -2647,7 +2657,7 @@
 
         var utilityPointLayer = new FeatureLayer({
             portalItem: {
-                id: "109d4ef09fd946d1bda17396f35deb94",
+                id: "8258f9a91c0e4b9997745fb0741e1c32",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -2716,7 +2726,7 @@
 
         var utilityPointLayer1 = new FeatureLayer({
             portalItem: {
-                id: "109d4ef09fd946d1bda17396f35deb94",
+                id: "8258f9a91c0e4b9997745fb0741e1c32",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -2842,7 +2852,7 @@
 
         var utilityLineLayer = new FeatureLayer({
             portalItem: {
-                id: "109d4ef09fd946d1bda17396f35deb94",
+                id: "8258f9a91c0e4b9997745fb0741e1c32",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -2995,7 +3005,7 @@
         /*Line for Symbols */
         var utilityLineLayer1 = new FeatureLayer({
             portalItem: {
-                id: "109d4ef09fd946d1bda17396f35deb94",
+                id: "8258f9a91c0e4b9997745fb0741e1c32",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -3095,7 +3105,7 @@
 
         var chainageLayer = new FeatureLayer({
             portalItem: {
-                id: "590680d19f2e48fdbd8bcddce3aaedb5",
+                id: "e47e9f4d475e4e24acad458a1428f3f9",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -3220,7 +3230,7 @@
         /*
         var pilecapPierLayer = new FeatureLayer ({
             portalItem: {
-                id: "590680d19f2e48fdbd8bcddce3aaedb5",
+                id: "e47e9f4d475e4e24acad458a1428f3f9",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -3409,7 +3419,7 @@
 
         var pierAccessLayer = new FeatureLayer({
             portalItem: {
-                id: "590680d19f2e48fdbd8bcddce3aaedb5",
+                id: "e47e9f4d475e4e24acad458a1428f3f9",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -3646,7 +3656,7 @@
 
         var stationBoxLayer = new FeatureLayer({
             portalItem: {
-                id: "590680d19f2e48fdbd8bcddce3aaedb5",
+                id: "e47e9f4d475e4e24acad458a1428f3f9",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -3682,7 +3692,7 @@
                     value: "BCDA",
                     symbol: {
                         type: "simple-fill",
-                        color: [225, 225, 225],
+                        color: [137, 205, 102],
                         style: "diagonal-cross",
                         outline: {
                             width: 0.5,
@@ -3694,7 +3704,7 @@
                     value: "PNR",
                     symbol: {
                         type: "simple-fill",
-                        color: [225, 225, 225],
+                        color: [137, 205, 102],
                         style: "diagonal-cross",
                         outline: {
                             width: 0.5,
@@ -3707,7 +3717,7 @@
 
         var pnrLayer = new FeatureLayer({
             portalItem: {
-                id: "dca1d785da0f458b8f87638a76918496",
+                id: "13026f2da4804673be557e959ed154c4",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
@@ -3814,21 +3824,20 @@
         };
 
         // Station Layer
-        var stationLayer = new SceneLayer({
+        var stationLayer = new FeatureLayer({
             portalItem: {
-                id: "207cb34b8a324b40985b5805862c4b29",
+                id: "e47e9f4d475e4e24acad458a1428f3f9",
                 portal: {
                     url: "https://gis.railway-sector.com/portal"
                 }
             },
+            layerId: 2,
             title: "N2 Stations",
             labelingInfo: [labelClass],
             //renderer: stationsRenderer,
             elevationInfo: {
                 mode: "relative-to-ground"
             },
-            definitionExpression: "Extension = 'N2'"
-            //screenSizePerspectiveEnabled: false, // gives constant size regardless of zoom
         });
         stationLayer.listMode = "hide";
         map.add(stationLayer, 0);
@@ -3912,10 +3921,7 @@
 
         var viaductLayer = new SceneLayer({
             portalItem: {
-                id: "a9c0878766964fa794cc67bbf38b7a09",
-                portal: {
-                    url: "https://gis.railway-sector.com/portal"
-                }
+                id: 'c7364b5cd79748e7866ea8eda9681d73',
             },
             // popupTemplate: viadTemplate,
             elevationInfo: {
@@ -3983,10 +3989,7 @@
 
         const buildingLayer = new BuildingSceneLayer({
             portalItem: {
-                id: "19fcf150d0474029a49643408a7c17dc",
-                portal: {
-                    url: "https://gis.railway-sector.com/portal"
-                }
+                id: "20e1136eec3149bda9ffa81effa08ebe",
             },
             outFields: ["*"],
             title: "N2 Station Structures"
@@ -4472,9 +4475,7 @@
         }
 
 
-        am.ready(function () {
 
-        
         // CHART PANEL FOR LOT
         const LEGEND_FONT_SIZE = "0.9em";
         var root = am5.Root.new("landPieChartDiv");
@@ -5155,7 +5156,7 @@
 
                 this.currentPattern = 0;
                 this.rule("Slice").setAll({
-                    fillOpacity: 1
+                    fillOpacity: 0
                 });
 
                 this.rule("Slice").setup = function (target) {
@@ -8134,7 +8135,6 @@
             });
         }
         timeSeriesChartLand();
-    });
         /////////////////// END Of LAYER IMPORT ////////////////////////////
 
 
@@ -8274,9 +8274,27 @@
         var searchWidget = new Search({
             view: view,
             locationEnabled: false,
-            allPlaceholder: "Chainage or Pier No.",
+            allPlaceholder: "LotID, Structure, Chainage or Pier No.",
             includeDefaultSources: false,
             sources: [
+              {
+                layer: lotLayer,
+                searchFields: ["LotID"],
+                displayField: "LotID",
+                exactMatch: false,
+                outFields: ["LotID"],
+                name: "Lot ID",
+                placeholder: "example: 10083",
+              },
+              {
+                layer: structureLayer,
+                searchFields: ["StrucID"],
+                displayField: "StrucID",
+                exactMatch: false,
+                outFields: ["StrucID"],
+                name: "Structure ID",
+                placeholder: "example: MCRP-01-02-ML022",
+              },
                 {
                     layer: chainageLayer,
                     searchFields: ["KmSpot"],
@@ -8317,7 +8335,7 @@
 
         // view.when
         view.when(() => {
-            document.querySelector("#header-title").textContent = "N2 WORK PROGRESS";
+            //document.querySelector("#header-title").textContent = "N2 WORK PROGRESS";
             document.querySelector("#item-description").innerHTML = `
                                                                  1. This web app shows key progress on:<br>
                                                                  <ul><li>Land acquisition including structures and NLOs (non-land owners),</li><br>

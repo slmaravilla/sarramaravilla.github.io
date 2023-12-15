@@ -1,0 +1,161 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>BuildingSceneLayer with Slice widget | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      #menu {
+        padding: 0.8em;
+        max-width: 250px;
+      }
+
+      #sliceContainer {
+        width: inherit;
+      }
+
+      #sliceOptions {
+        margin: 0 15px;
+      }
+
+      #sliceOptions > button {
+        margin-bottom: 15px;
+      }
+
+      #sliceContainer {
+        max-width: 228px;
+      }
+    </style>
+
+    <link href="https://js.arcgis.com/4.28/esri/themes/light/main.css" rel="stylesheet" type="text/css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+
+    <script>
+      require([
+      "esri/Basemap",
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/views/SceneView",
+    "esri/layers/FeatureLayer",
+    "esri/layers/support/FeatureFilter",
+    "esri/layers/SceneLayer",
+    "esri/layers/Layer",
+    "esri/layers/TileLayer",
+    "esri/layers/VectorTileLayer",
+    "esri/layers/support/LabelClass",
+    "esri/symbols/LabelSymbol3D",
+    "esri/WebMap",
+    "esri/WebScene",
+    "esri/portal/PortalItem",
+    "esri/portal/Portal",
+    "esri/widgets/TimeSlider",
+    "esri/widgets/Legend",
+    "esri/widgets/LayerList",
+    "esri/widgets/Fullscreen",
+    "esri/rest/geometryService",
+    "esri/rest/support/Query",
+    "esri/rest/support/StatisticDefinition",
+    "esri/symbols/WebStyleSymbol",
+    "esri/TimeExtent",
+    "esri/widgets/Expand",
+    "esri/widgets/Editor",
+    "esri/renderers/UniqueValueRenderer",
+    "esri/widgets/support/DatePicker",
+    "esri/widgets/FeatureTable",
+    "esri/widgets/Compass",
+    "esri/layers/ElevationLayer",
+    "esri/Ground",
+    "esri/layers/BuildingSceneLayer",
+    "esri/widgets/BuildingExplorer",
+    "esri/widgets/Slice",
+    "esri/analysis/SlicePlane",
+    "esri/renderers/SimpleRenderer",
+    "esri/symbols/MeshSymbol3D",
+    "esri/symbols/edges/SolidEdges3D",
+    "esri/layers/GroupLayer",
+    "esri/widgets/BasemapToggle",
+    "esri/widgets/Daylight",
+    "esri/core/promiseUtils",
+    "esri/Graphic",
+    "esri/form/elements/FieldElement"
+      ], (Basemap, Map, MapView, SceneView,
+        FeatureLayer, FeatureFilter,
+        SceneLayer, Layer, TileLayer, VectorTileLayer,
+        LabelClass, LabelSymbol3D, WebMap,
+        WebScene, PortalItem, Portal,
+        TimeSlider, Legend, LayerList, Fullscreen,
+        geometryService, Query,
+        StatisticDefinition, WebStyleSymbol,
+        TimeExtent, Expand, Editor, UniqueValueRenderer, DatePicker,
+        FeatureTable, Compass, ElevationLayer, Ground,
+        BuildingSceneLayer, BuildingExplorer, Slice, SlicePlane,
+        SimpleRenderer, MeshSymbol3D, SolidEdges3D, GroupLayer, BasemapToggle, Daylight,
+        promiseUtil, Graphic, FieldElement) => {
+        // Load webscene and display it in a SceneView
+
+
+      var map = new Map({
+        basemap: "satellite", //basemap, // "streets-night-vector",
+        ground: "world-elevation",
+      });
+
+      var view = new SceneView({
+        map: map,
+        container: "viewDiv",
+        viewingMode: "local",
+        camera: {
+          position: {
+            x: 120.770421,
+            y: 14.902323,
+            z: 500,
+          },
+          tilt: 65,
+        },
+        environment: {
+          background: {
+            type: "color", // autocasts as new ColorBackground()
+            color: [0, 0, 0, 1],
+          },
+          // disable stars
+          starsEnabled: false,
+          //disable atmosphere
+          atmosphereEnabled: false,
+        },
+      });
+
+        // Create the BuildingSceneLayer and add it to the webscene
+        const buildingLayer = new BuildingSceneLayer({
+          url: "https://services8.arcgis.com/h9TUF6x5VzqLQaYx/arcgis/rest/services/N2_Station_Structures/SceneServer",
+        });
+        map.add(buildingLayer);
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv">
+      
+    </div>
+  </body>
+</html>

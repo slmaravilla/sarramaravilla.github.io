@@ -1,0 +1,3113 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
+  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
+  -->
+<title>MMSP Tunnel</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/dark/main.css"/>
+    
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.4.2/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.4.2/calcite.css" />
+
+    <!-- Resources -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Micro.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
+    <script src="https://unpkg.com/three@0.144.0/build/three.js"></script>
+    <script src="https://unpkg.com/three@0.144.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/7/Stats.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+    <script src="https://js.arcgis.com/4.27/"></script>
+    <script src="js/animepoint.js"></script>
+
+  </head>
+  <style>
+  html,
+  body,
+  #viewDiv {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+  body {
+      display: flex;
+    }
+
+  calcite-loader {
+    align-self: center;
+    justify-self: center;
+  }
+  
+  calcite-label {
+    --calcite-label-margin-bottom: 0px;
+  }
+
+  #see-through-label {
+    position: fixed;
+    z-index: 1;
+    bottom: 10;
+    right: 21%;
+    height: 30px;
+    width: 170px;
+    padding: 5;
+  }
+
+  calcite-tabs {
+    height: 100%;
+    width: 100%;
+  }
+
+  calcite-button {
+    margin: 20;
+  }
+
+  #container {
+    display: grid;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    grid-template-columns: 1fr 0.25fr;
+    width: 100%;
+    height: 100%;
+  }
+
+  #header-title {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-top: 1rem;
+    font-size: 1.5vw;
+  }
+
+  #info-content {
+    padding: 0.75rem;
+  }
+
+  calcite-rating {
+    margin-top: 0.25rem;
+  }
+  
+  #header {
+    display: flex;
+    padding: 0 1rem;
+    background-color: var(--calcite-ui-foreground-1);
+  }
+
+  #header-controls {
+    display: flex;
+    margin-inline-start: auto;
+    align-self: center;
+  }
+
+  #item-description b {
+    color: orange;
+    font-size: 0.9vw;
+    font-weight: bold;
+  }
+
+  .label-wrapper {
+    display: flex;
+    margin-inline: 1rem;
+    padding: 0.5rem;
+    border: 1px solid var(--calcite-ui-border-1);
+    cursor: pointer;
+  }
+
+  calcite-switch {
+    margin: 0 0.5rem;
+  }
+
+  #informationDiv {
+    background-color: rgb(0, 0, 0, 0);
+    padding: 8;
+    width: 100%;
+    height: 100%;
+  }
+
+  .responsive {
+    float: left;
+    z-index: 99;
+    position: absolute;
+    right: 10%;
+    bottom: 20%;
+    width: 100%;
+    max-width: 50px;
+    height: auto;
+  }
+
+  #filterValuesDiv {
+    position: fixed;
+    z-index: 1;
+    padding: 5;
+    top: 10%;
+    right: 50%;
+  }
+
+  #filterValuesDiv b {
+    color: #d4ff33;
+    margin: auto;
+    font-size: 2.5vw;
+  }
+
+  #chartTbmDiv,
+  #chartNatmDiv {
+    width: 100%;
+    height: 35%;
+    align-items: center;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    background-color: rgb(0, 0, 0 ,0);
+  }
+
+  #chartSurveyDiv {
+    width: 100%;
+    height: 50%;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    background-color: rgb(0, 0, 0 ,0);
+  }
+
+  #dropdownDiv {
+    background-color: rgb(0, 0, 0, 0);
+    width: 50%;
+    opacity: 1;
+    color: white;
+    text-align: right;
+    margin: auto;
+  }
+
+  #cutterHeadPositionDiv,
+  #totalSegmentNoDiv {
+    border: 1px solid var(--calcite-ui-border-1);
+    width: 99%;
+    height: 5vw;
+    text-align: center;
+    font-weight: normal;
+    padding-top: 1vw;
+    color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    margin-top: 2vw;
+    margin-bottom: 1vw;
+  }
+
+  #cutterHeadPositionDiv b,
+  #totalSegmentNoDiv b {
+    font-size: 1.5vw;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+  }
+
+  #cutterHeadPositionDiv h3 {
+    text-align: center;
+    font-size: 1.5vw;
+    font-weight: normal;
+    color: white;
+  }
+
+  #cutterHeadPositionDiv span {
+    text-align: center;
+    font-size: 2.5vw;
+    font-weight: bold;
+    color: rgb(232, 54, 24);
+  }
+
+  #cutterHeadPositionDiv h6 {
+    text-align: center;
+    font-size: 1.5vw;
+    font-weight: normal;
+    color: white;
+    padding: 1.5vw;
+    margin: 0;
+  }
+
+  #cutterHeadPositionDiv h4 {
+    text-align: center;
+    font-size: 1vw;
+    font-weight: bold;
+    color: #d4ff33;
+  }
+
+  #totalSegmentNoDiv h5 {
+    text-align: center;
+    font-size: 2.6vw;
+    font-weight: bold;
+    color: #d4ff33;
+    margin-top: 1.6vw;
+  }
+
+  #timeSeriesChart {
+    position: absolute;
+    z-index: 99;
+    height: 40vh;
+    width: 70vw;
+    bottom: 40%;
+    left: 5vw;
+    background-color: rgb(37, 37, 37);
+  }
+
+  b {
+    color: #d4ff33;
+    font-size: 1.5w;
+    font-weight: bold;
+  }
+
+  /*
+  #dateDiv {
+    font-size: 0.85vw;
+    text-align: right;
+    display: flex;
+    align-items: flex-end;
+    font-weight: bold;
+  }
+  */
+  #dateDiv {
+    position: fixed;
+    z-index: 1;
+    font-size: 0.85vw;
+    text-align: right;
+    bottom: 5;
+    right: 5;
+    font-weight: bold;
+  }
+
+  #menu {
+    background-color: rgb(0, 0, 0 ,0);
+  }
+
+  .overlay {
+    background-color: rgba(80, 80, 80, 0);
+    padding-top: 30;
+  }
+  
+  .button {
+    cursor: pointer;
+    font-size: 10pt !important;
+    font-weight: bold !important;
+    color: rgb(230, 230, 230);
+  }
+  
+  .button:hover, #label {
+    color: white;
+  }
+
+  #play {
+    vertical-align: middle;
+  }
+  
+  br{content:' ';}
+  br:after{content:' ';}
+
+  .esri-search__container button,
+  .esri-layerlist__container button  {
+    background-color: rgb(17, 54, 81);
+  }
+
+  .esri-layer-list__item-toggle-icon,
+  .esri-layer-list__item-title {
+    color: orange;
+    font-size: 0.8vw;
+    font-weight: normal;
+    text-align: left;
+  }
+
+  .sassy-theme .esri-menu,
+  .sassy-theme .esri-popup__main-container,
+  .sassy-theme .esri-popup .esri-popup__pointer-direction,
+  .sassy-theme .esri-popup .esri-popup__button,
+  .sassy-theme .esri-button,
+  .sassy-theme .esri-input,
+  .sassy-theme .esri-legend,
+  .sassy-theme .esri-layer-list,
+  .sassy-theme .esri-widget a {
+    background-color: rgb(0, 0, 0, 0.5);
+    color: #fff;
+  }
+
+  .esri-legend__layer-caption {
+    display: none;
+  }
+
+  /* Browser Setting */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  </style>
+  <body class="calcite-theme-dark">
+    <calcite-loader></calcite-loader>
+    <calcite-shell content-behind>
+      <!--  Header slot  -->
+      <div slot="header" id="header">
+
+        <!-- Title -->
+        <h2 id="header-title" slot="header"></h2>
+
+        <!-- Dropdown list -->
+        <div class="esri-widget" id="dropdownDiv">
+          <label for="sel-options" style="font-weight: bold;">CP
+            <select id="cpSelect" class="esri-widget"></select>
+          </label>
+          <label for="sel-options" style="font-weight: bold;">SEGMENT No.
+            <select id="tbmSelect" class="esri-widget"></select>
+          </label>
+        </div>
+
+        <!-- Train Animation -->
+      </div>
+      <div id="filterValuesDiv"></div>
+      <!-- Icon Panel for Action -->
+      <!-- https://developers.arcgis.com/calcite-design-system/icons/?icon=list&library=Calcite%20UI -->
+      <calcite-shell-panel slot="panel-start" display-mode="float" detached>
+        <calcite-action-bar slot="action-bar">
+          <calcite-action data-action-id="layers" icon="layers" text="Layers"></calcite-action>
+          <calcite-action data-action-id="basemaps" icon="basemap" text="Basemaps"></calcite-action>
+          <calcite-action data-action-id="legend" icon="legend" text="Legend"></calcite-action>
+          <calcite-action data-action-id="charts" icon="graph-time-series" text="Progree Chart"></calcite-action>
+          <calcite-action data-action-id="animation" icon="play" text="Animation"></calcite-action>
+          <calcite-action data-action-id="information" icon="information" text="Information"></calcite-action>
+        </calcite-action-bar>
+        
+        <!-- Map-specific panels (each one provides a div for ArcGIS Maps SDK for JavaScript widgets) -->
+        <calcite-panel heading="Layers" height-scale="l" data-panel-id="layers" hidden>
+          <div id="layers-container"></div>
+        </calcite-panel>
+        <calcite-panel heading="Basemaps" height-scale="l" data-panel-id="basemaps" hidden>
+          <div id="basemaps-container"></div>
+        </calcite-panel>
+        <calcite-panel heading="Legend" height-scale="l" data-panel-id="legend" hidden>
+          <div id="legend-container"></div>
+        </calcite-panel>
+
+        <calcite-panel class="timeSeries-panel" height-scale="l" data-panel-id="charts" hidden></calcite-panel>
+
+        <calcite-panel class="animation-panel"  height-scale="l" data-panel-id="animation" hidden></calcite-panel>
+
+        <!-- Info panel (populates with info from the web map) -->
+        <calcite-panel heading="Description" data-panel-id="information" hidden>
+          <div id="info-content">
+            <!-- <img id="item-thumbnail" alt="webmap thumbnail" /> -->
+            <div id="item-description">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </calcite-panel>
+      </calcite-shell-panel>
+      <div id="container">
+        <div id="viewDiv"></div>
+        <calcite-tabs>
+          <div id="informationDiv">
+            <calcite-tab-nav slot="tab-nav">
+              <calcite-tab-title selected>Tunnel</calcite-tab-title>
+              <calcite-tab-title>Survey</calcite-tab-title>
+            </calcite-tab-nav>
+            <calcite-tab>
+              <div id="totalSegmentNoDiv"></div>
+              <div id="chartTbmDiv"></div>
+              <div id="cutterHeadPositionDiv"></div>
+            </calcite-tab>
+            <calcite-tab>
+              <div id="chartSurveyDiv"></div>
+            </calcite-tab>
+          </div>
+        </calcite-tabs>
+      </div>
+    <div id="timeSeriesChart" hidden></div>
+    <div id="dateDiv"></div>
+      <calcite-label layout="inline" id="see-through-label" class="esri-widget">
+        <calcite-checkbox id="myLink"></calcite-checkbox>See-through-ground
+      </calcite-label>
+    </calcite-shell>
+  </body>
+  <script>
+require([
+    "esri/Basemap",
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/views/SceneView",
+    "esri/layers/FeatureLayer",
+    "esri/layers/support/FeatureFilter",
+    "esri/layers/SceneLayer",
+    "esri/layers/Layer",
+    "esri/layers/TileLayer",
+    "esri/layers/VectorTileLayer",
+    "esri/layers/support/LabelClass",
+    "esri/symbols/LabelSymbol3D",
+    "esri/WebMap",
+    "esri/WebScene",
+    "esri/portal/PortalItem",
+    "esri/portal/Portal",
+    "esri/widgets/TimeSlider",
+    "esri/widgets/Legend",
+    "esri/widgets/LayerList",
+    "esri/widgets/Fullscreen",
+    "esri/rest/geometryService",
+    "esri/rest/support/Query",
+    "esri/rest/support/StatisticDefinition",
+    "esri/symbols/WebStyleSymbol",
+    "esri/TimeExtent",
+    "esri/widgets/Expand",
+    "esri/widgets/Editor",
+    "esri/renderers/UniqueValueRenderer",
+    "esri/widgets/support/DatePicker",
+    "esri/widgets/FeatureTable",
+    "esri/widgets/Compass",
+    "esri/TimeExtent",
+    "esri/layers/ElevationLayer",
+    "esri/Ground",
+    "esri/widgets/Search",
+    "esri/widgets/BasemapToggle",
+    "esri/geometry/geometryEngine",
+    "esri/geometry/Polygon",
+    "esri/geometry/support/webMercatorUtils",
+    "esri/layers/GraphicsLayer",
+    "esri/Graphic",
+    "esri/geometry/SpatialReference",
+    "esri/core/reactiveUtils",
+    "esri/widgets/ElevationProfile",
+    "esri/widgets/ElevationProfile/ElevationProfileLineQuery",
+    "esri/layers/GraphicsLayer",
+    "esri/Graphic",
+    "esri/rest/support/RouteParameters",
+    "esri/symbols/SimpleMarkerSymbol",
+    "esri/symbols/SimpleLineSymbol",
+    "esri/geometry/Point",
+    "esri/geometry/Polyline",
+    "esri/views/3d/externalRenderers",
+    "esri/rest/support/FeatureSet",
+    "esri/core/Accessor",
+    "esri/widgets/BasemapGallery",
+  ], function(Basemap, Map, MapView, SceneView, 
+              FeatureLayer, FeatureFilter,
+              SceneLayer, Layer, TileLayer, VectorTileLayer,
+              LabelClass, LabelSymbol3D, WebMap,
+              WebScene, PortalItem, Portal,
+              TimeSlider, Legend, LayerList, Fullscreen,
+              geometryService, Query,
+              StatisticDefinition, WebStyleSymbol,
+              TimeExtent, Expand, Editor, UniqueValueRenderer, DatePicker,
+              FeatureTable, Compass, TimeExtent, ElevationLayer, Ground, Search,
+              BasemapToggle, geometryEngine, Polygon,
+              webMercatorUtils, GraphicsLayer, Graphic, SpatialReference, reactiveUtils,
+              ElevationProfile, ElevationProfileLineQuery,
+              GraphicsLayer, Graphic, RouteParameters,
+              SimpleMarkerSymbol, SimpleLineSymbol, Point, Polyline,
+              externalRenderers, FeatureSet, Accessor, BasemapGallery) {
+  
+  let chartLayerView;
+  //const features = [];
+  const spatialReference = SpatialReference.WebMercator;
+  
+  // Route Layer for animatioin
+  // The stops and route result will be stored in this layer
+  var routeLyr = new GraphicsLayer();
+
+  // Setup the route parameters
+  var routeParams = new RouteParameters({
+      stops: new FeatureSet(),
+      outSpatialReference: { // autocasts as new SpatialReference()
+          wkid: 3857
+      }
+  });
+
+  // Define the symbology used to display the stops
+  var stopSymbol = new SimpleMarkerSymbol({
+      style: "cross",
+      size: 0, // 15
+      outline: { // autocasts as new SimpleLineSymbol()
+          width: 0 // 4
+      }
+  });
+
+  // Define the symbology used to display the route
+  var routeSymbol = new SimpleLineSymbol({
+      color: [0, 0, 255, 0], // [0, 0, 255, 0.5]
+      width: 5
+  });
+
+
+  
+  // Add custom DEM to the default elevation layer of esri
+  const worldElevation = new ElevationLayer({
+    url: "//elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"
+    });
+    
+  const dem = new ElevationLayer({
+    portalItem: {
+      id: "dd2e85411a504182adb99215aa98ab68",
+      portal: {
+          url: "https://gis.railway-sector.com/portal"
+      },
+    }
+    });
+  
+    var map = new Map({
+          basemap: "satellite",//basemap, // "streets-night-vector", basemap, topo-vector
+          ground: new Ground({
+            layers: [worldElevation, dem]
+          })
+    });
+    //map.ground.surfaceColor = "#FFFF";
+    //map.ground.opacity = 0.1;
+     
+    var view = new SceneView ({
+        map: map,
+        container: "viewDiv",
+        viewingMode: "local",
+        camera: {
+            position: {
+                x: 121.0322874,
+                y: 14.6750462,
+                z: 1000
+                },
+                tilt: 65
+                },
+        environment: {
+            background: {
+                type: "color", // autocasts as new ColorBackground()
+                color: [0, 0, 0, 1]
+                },
+                // disable stars
+                starsEnabled: false,
+                //disable atmosphere
+                atmosphereEnabled: false
+                }
+    });
+  
+    view.ui.components = [];
+  // OpenStreetMap 3D Buildings
+  let osmSymbol = {
+  type: "mesh-3d",
+  symbolLayers: [
+  {
+  type: "fill",
+  material: {
+    color: [74, 80, 87, 0.5],
+    colorMixMode: "replace"
+  },
+  edges: {
+    type: "solid", // autocasts as new SolidEdges3D()
+    color: [225, 225, 225, 0.3]
+  }
+  }
+  ]
+  };
+  
+  
+  var osm3D = new SceneLayer({
+  portalItem: {
+  id: "ca0470dbbddb4db28bad74ed39949e25"
+  },
+  title: "OpenStreetMap 3D Buildings"
+  });
+  map.add(osm3D);
+  osm3D.renderer = {
+  type: "simple",
+  symbol: osmSymbol
+  }
+////// Train Animation using externalRenderers
+  
+      // Adds a graphic when the user clicks the map. If 2 or more points exist, route is solved.
+      //on(view, "click", addStop);
+      /*
+      view.on("click", function() {
+        addStop();
+
+    });
+    */
+
+    function addStop(event) {
+
+        // Add a point at the location of the map click
+        //var stop = new Graphic({
+        //    geometry: event.mapPoint,
+        //    symbol: stopSymbol
+        //});
+
+        var stop1 = new Graphic({
+            geometry: new Point(
+                {x: polylinePoints[0][0], 
+                 y: polylinePoints[0][1],
+                 z: polylinePoints[0][2],
+                 spatialReference: SpatialReference.WebMercator}),
+            symbol: stopSymbol
+        });
+        routeLyr.add(stop1);
+
+        const lengthAnimeLine = polylinePoints.length;
+        var stop2 = new Graphic({
+            geometry: new Point(
+                {x: polylinePoints[lengthAnimeLine - 1][0],
+                 y: polylinePoints[lengthAnimeLine - 1][1],
+                 z: polylinePoints[lengthAnimeLine - 1][2],
+                 spatialReference: SpatialReference.WebMercator }),
+            symbol: stopSymbol
+        });
+        routeLyr.add(stop2);
+
+        routeParams.stops.features.push(stop1);
+        routeParams.stops.features.push(stop2);
+
+        // Execute the route task if 2 or more stops are input
+        //routeParams.stops.features.push(stop);
+        if (routeParams.stops.features.length >= 2) {
+            //routeTask.solve(routeParams).then(showRoute);
+            showRoute();
+        }
+    }
+
+    // Adds the solved route to the map as a graphic
+    function showRoute(data) {
+        
+        //var routeResult = data.routeResults[0].route;
+
+        var polyline = new Polyline(polylinePoints);
+        polyline.spatialReference = SpatialReference.WebMercator;
+
+        var routeResult = new Graphic({
+            geometry: polyline,
+            symbol: routeSymbol
+        });
+        routeResult.symbol = routeSymbol;
+
+        routeLyr.add(routeResult);
+      
+      // the speed of the object becomes low with maximum segment of length
+      var pl = geometryEngine.densify(routeResult.geometry, 0.1, "meters");
+        // register the external renderer
+        const myExternalRenderer = new skeletonRenderer(view, pl);
+        externalRenderers.add(view, myExternalRenderer);
+
+    }
+    // Disable lighting based on the current camera position.
+    // We want to display the lighting according to the current time of day.
+    //view.environment.lighting.cameraTrackingEnabled = false;
+
+    // Create our custom external renderer
+   //////////////////////////////////////////////////////////////////////////////////////
+    //https://github.nicogis.it/externalRendererSkeleton/
+    var skeletonRenderer = Accessor.createSubclass({ // if '|| {}' is not added beside null,
+    // you will receive the following error 'Cannot destructure property of xx of 'null' as it is null'
+        view: null,
+        //pl: null,
+        renderer: null,     // three.js renderer
+        camera: null,       // three.js camera
+        scene: null,        // three.js scene
+        vertexIdx: 0,
+        ambient: null,      // three.js ambient light source
+        sun: null,          // three.js sun light source
+        mixer: null,
+        mixer2: null,
+        clock: null,
+        clips: null,
+        animate: null,
+        light: null,
+        iss: null, 
+        iss2: null,                                                   // ISS model
+        issScale: 0.7,                                     // scale for the iss model
+        issScale2: 10,
+        path: null,
+      count: null,
+      up: null,
+      timeDelta: null,
+      markerMaterial: null,    // material for the markers left by the ISS
+      markerGeometry: null,    // geometry for the markers left by the ISS
+      issMaterial: new THREE.MeshLambertMaterial({ color: 0x2194ce, transparent: true, opacity: 0.5 }), 
+
+        cameraPositionInitialized: false, // we focus the view on the ISS once we receive our first data point
+        positionHistory: [],
+      
+        constructor: function (view, pl) {
+          this.view = view;
+            this.path = pl.paths[0]; //pl.paths[0];
+        },
+        /**
+         * Setup function, called once by the ArcGIS JS API.
+         */
+        setup: function (context) {
+
+            // initialize the three.js renderer
+            /////////////////////////////////////////////////////////////////////////////////////
+            this.renderer = new THREE.WebGLRenderer({
+                context: context.gl,
+                premultipliedAlpha: false
+            });
+            this.renderer.setPixelRatio(window.devicePixelRatio);
+            this.renderer.setSize(context.camera.fullWidth, context.camera.fullHeight);
+            this.renderer.setViewport(0, 0, view.width, view.height);
+
+            // prevent three.js from clearing the buffers provided by the ArcGIS JS API.
+            this.renderer.autoClearDepth = false;
+            this.renderer.autoClearStencil = false;
+            this.renderer.autoClearColor = false;
+
+            // The ArcGIS JS API renders to custom offscreen buffers, and not to the default framebuffers.
+            // We have to inject this bit of code into the three.js runtime in order for it to bind those
+            // buffers instead of the default ones.
+            var originalSetRenderTarget = this.renderer.setRenderTarget.bind(this.renderer);
+            this.renderer.setRenderTarget = function (target) {
+                originalSetRenderTarget(target);
+                if (target == null) {
+                    context.bindRenderTarget();
+                }
+            }
+
+            // setup the three.js scene
+            //////////////////////////////////////////////////////////////////////////////////////         
+            this.scene = new THREE.Scene();
+
+            // setup the camera
+            this.camera = new THREE.PerspectiveCamera();
+
+            // setup scene lighting
+            this.ambient = new THREE.AmbientLight(0xffffff, 0.5);
+            this.scene.add(this.ambient);
+            this.sun = new THREE.DirectionalLight(0xffffff, 0.5);
+            this.scene.add(this.sun);
+
+          // setup markers
+            this.markerGeometry = new THREE.SphereBufferGeometry(12*1000, 16, 16);
+            this.markerMaterial = new THREE.MeshBasicMaterial({ color: 0xe03110, transparent: true, opacity: 0.5});
+
+            this.clock = new THREE.Clock();
+
+            var issMeshUrl = "https://EijiGorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/Sample/Three_js/3d-model-gltf/assets/TBM2.glb"; 
+            var loaderGLTF = new THREE.GLTFLoader(); // check this: https://qgenhate.hatenablog.com/ [object not an instance of THREE.Object3D]
+            let example = new THREE.Object3D();
+
+            loaderGLTF.load(issMeshUrl,
+            function(gltf) {
+                console.log("ISS mesh loaded.");
+               
+                example = gltf.scene;
+                this.iss = example;
+
+                // apply ISS material to all nodes in the geometry
+                /*
+                this.iss.traverse( function ( child ) {
+                    if ( child instanceof THREE.Mesh ) {
+                        child.material = this.issMaterial;
+                    }
+                }.bind(this));
+                */
+
+                // set the specified scale for the model
+                this.iss.scale.set(this.issScale, this.issScale, this.issScale);
+                
+                // add the model
+                this.scene.add(this.iss); // original: this.iss
+                console.log("ISS mesh added.");
+
+                // Mixer for animation
+                this.mixer = new THREE.AnimationMixer(this.iss);
+                this.mixer.clipAction(gltf.animations[0]).play();
+                
+            
+            }.bind(this), undefined, function(error) {
+                console.error("Error loading ISS mesh. ", error);
+            });
+
+            this.light = new THREE.DirectionalLight(0xffffff, 1);
+            this.light.position.set(0, 1, 0);
+            this.scene.add(this.light);
+          
+          // rotation 
+              this.up = new THREE.Vector3(0, 0, 1); // used with lookAt: look at the next point at x-axis
+              this.axis = new THREE.Vector3();
+              this.n  = new THREE.Vector3( ); // normal,
+              this.b  = new THREE.Vector3( ); // binormal
+              this.M3 = new THREE.Matrix3( );
+              this.M4 = new THREE.Matrix4( );
+              this.pp = new THREE.Vector3( );
+              this.quaternion = new THREE.Quaternion();
+
+            // cleanup after ourselfs
+            context.resetWebGLState();
+        },
+        render: function (context) {
+
+            // update camera parameters
+            ///////////////////////////////////////////////////////////////////////////////////
+            var cam = context.camera;
+
+            this.camera.position.set(cam.eye[0], cam.eye[1], cam.eye[2]);
+            this.camera.up.set(cam.up[0], cam.up[1], cam.up[2]);
+            this.camera.lookAt(new THREE.Vector3(cam.center[0], cam.center[1], cam.center[2]));
+
+            // Projection matrix can be copied directly
+            this.camera.projectionMatrix.fromArray(cam.projectionMatrix);
+          
+            if (this.iss) {
+                     
+                // Add this.mixer.update first; otherwise, the object will not be animated.s
+                if (this.mixer) {
+                    var scale = 0.0001; //this.gui.getTimeScale();
+                    var delta = this.clock.getDelta();
+
+                  this.mixer.update(delta);
+                }
+
+                    if (this.path.length == (this.vertexIdx + 1))
+                {
+                    this.vertexIdx = 0;
+                }
+              
+                var p = this.path[this.vertexIdx]; // vertexIdx = 0
+              var p1 = this.path[this.vertexIdx + 1];
+              
+            
+              // Define Z:
+              // It is important that the same Z values are set for both current (pt) and next points (pt1)
+              // Otherwise, the object will be tilted.
+              const changeZ = 0;
+              const offset = 0;
+              const offsetZ = 0.5;
+
+                var pt = new Point({
+                    x: p[0] + offset, // longitude
+                    y: p[1], // latitude
+                    z: p[2] + offsetZ
+                });
+
+                pt.spatialReference = SpatialReference.WebMercator;
+
+                //z = offsetZ; // view.basemapTerrain.getElevation(p);
+
+                pos = [pt.x, pt.y, pt.z];
+
+                this.vertexIdx++;
+
+                if (this.path.length == (this.vertexIdx)) {
+                    this.vertexIdx--;
+                }
+              
+                var transform = new THREE.Matrix4();
+                transform.fromArray(externalRenderers.renderCoordinateTransformAt(view, pos, SpatialReference.WebMercator, new Array(16)));
+
+               this.iss.position.set(transform.elements[12], transform.elements[13], transform.elements[14]);
+              
+                this.count ++;
+                if (this.count === 1) {
+                  console.log(transform.elements[12], transform.elements[13], transform.elements[14]);
+                }
+
+                var p0;
+                var p1;
+
+                if ((this.path.length - 1) == (this.vertexIdx))
+                {
+                    p0 = this.path[--this.vertexIdx];
+                    p1 = this.path[this.vertexIdx];
+                }
+                else
+                {
+                    p0 = this.path[this.vertexIdx];
+                    p1 = this.path[++this.vertexIdx];
+                }
+                            
+              var rotation = new THREE.Matrix4();
+              
+                var pt1 = new Point({
+                    x: p1[0] + offset, // longitude
+                    y: p1[1], // latitude
+                    z: p1[2] + offsetZ
+                });
+              posR = [pt1.x, pt1.y, pt1.z];
+              rotation.fromArray(externalRenderers.renderCoordinateTransformAt(view, posR, SpatialReference.WebMercator, new Array(16)));
+              // https://answers.unity.com/questions/36255/lookat-to-only-rotate-on-y-axis-how.html
+              // how to use '.up' with lookAt?
+              //geometry.applyMatrix4( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+              this.iss.up = this.up;
+              
+              this.iss.lookAt(rotation.elements[12], rotation.elements[13], rotation.elements[14]);
+ 
+            }
+
+
+            // update lighting
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            //view.environment.lighting.date = Date.now();
+
+            var l = context.sunLight;
+            this.sun.position.set(
+              l.direction[0],
+              l.direction[1],
+              l.direction[2]
+            );
+            this.sun.intensity = l.diffuse.intensity;
+            this.sun.color = new THREE.Color(l.diffuse.color[0], l.diffuse.color[1], l.diffuse.color[2]);
+
+            this.ambient.intensity = l.ambient.intensity;
+            this.ambient.color = new THREE.Color(l.ambient.color[0], l.ambient.color[1], l.ambient.color[2]);
+
+            // draw the scene
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            this.renderer.resetState();
+            context.bindRenderTarget();
+            this.renderer.render(this.scene, this.camera);
+            externalRenderers.requestRender(view);
+
+            // cleanup
+            context.resetWebGLState();
+        },
+    })
+    externalRenderers.add(view, skeletonRenderer);
+    // End of externalRenderers
+
+
+    //
+    function shiftCamera(deg) {
+      var camera = view.camera.clone();
+      camera.position.longitude += deg;
+      return camera;
+    }
+  
+    function catchAbortError(error) {
+      if (error.name != "AbortError") {
+        console.error(error);
+      }
+    }
+  
+    // Setup UI
+    var headerTitleDiv = document.getElementById("headerTitleDiv");
+    const chartTbmDiv = document.getElementById("chartTbmDiv");
+  
+  
+  
+  
+  //*******************************//
+  // Label Class Property Settings //
+  //*******************************//
+  
+  //********* Define LabelingInfo *************//
+  // Station labels
+  var stationLabelClass = new LabelClass({
+      symbol: {
+        type: "label-3d",// autocasts as new LabelSymbol3D()
+        symbolLayers: [
+          {
+            type: "text", // autocasts as new TextSymbol3DLayer()
+            material: {
+              color: "white"
+            },
+            size: 10,
+            color: "black",
+            haloColor: "black",
+            haloSize: 1,
+            font: {
+              family: "Ubuntu Mono",
+              //weight: "bold"
+            },
+          }
+        ],
+        verticalOffset: {
+          screenLength: 40,
+          maxWorldLength: 100,
+          minWorldLength: 20
+        },
+  
+      },
+      labelPlacement: "above-center",
+      labelExpressionInfo: {
+        expression: 'DefaultValue($feature.Station, "no data")'
+      }
+    });
+  
+  // TBM spot label class using transit layer
+  /*
+  var tbmSpotLabel2 = new LabelClass({
+  symbol: {
+  type: "label-3d", // autocast as new LabelSymbol3D()
+  symbolLayers: [
+  {
+    type: "text",
+    material: {
+      color: "#E83618"
+    },
+    size: 15,
+    haloColor: "black",
+    haloSize: 1,
+    font: {
+      family: "Ubuntu Mono",
+      weight: "bold"
+    },
+  }
+  ],
+  verticalOffset: {
+  screenLength: 100,
+  maxWorldLength: 500,
+  minWorldLength: 10
+  },
+  callout: {
+  type: "line",
+  size: 3,
+  color: "#E83618",
+  border: {
+    color: "#E83618"
+  }
+  }
+  },
+  labelPlacement: "above-center",
+  labelExpressionInfo: {
+  expression: "IIF($feature.tbmSpot == 1, $feature.line, '')"
+  //'DefaultValue($feature.GeoTechName, "no data")'
+  //"IIF($feature.Score >= 13, '', '')"
+  //value: "{Type}"
+  },
+  maxScale: 200,
+  minScale: 1000,
+  });
+  */
+  
+  
+  // monitor buildings Label
+    var monitorBuillabelClass = new LabelClass({
+      symbol: {
+        type: "label-3d", // autocast as new LabelSymbol3D()
+        symbolLayers: [
+          {
+            type: "text",
+            material: {
+              color: [137, 205, 102]
+            },
+            size: 9,
+            color: "black",
+            haloColor: "black",
+            haloSize: 1,
+            font: {
+              family: "Ubuntu Mono",
+              weight: "normal"
+            },
+          }
+        ],
+        verticalOffset: {
+          screenLength: 80,
+          maxWorldLength: 500,
+          minWorldLength: 30
+        },
+        callout: {
+          type: "line",
+          size: 0.5,
+          color: [0, 0, 0],
+          border: {
+            color: [255, 255, 255, 0.7]
+          }
+        }
+      },
+      labelPlacement: "above-center",
+      labelExpressionInfo: {
+        expression: "IIF($feature.Type == 'Hospital' || $feature.Type == 'School' || $feature.Type == 'Government', $feature.Type, '')"
+        //'DefaultValue($feature.GeoTechName, "no data")'
+        //"IIF($feature.Score >= 13, '', '')"
+        //value: "{Type}"
+      }
+    });
+  
+  
+  //*****************************//
+  //      Renderer Settings      //
+  //*****************************//        
+    // convenience function to retrieve the WebStyleSymbols based on their name
+    function stationsSymbol(name) {
+      return {
+        type: "web-style", // autocasts as new WebStyleSymbol()
+        name: name,
+        styleName: "EsriIconsStyle"//EsriRealisticTransportationStyle, EsriIconsStyle
+      };
+    }
+  
+    function tbmspotSymbol(name) { // TBM Spot 
+      return {
+        type: "web-style",
+        name: name,
+        styleName: "EsriRealisticTransportationStyle"
+      };
+    }
+  
+  // Statin Renderer
+    var stationsRenderer = {
+      type: "unique-value", // autocasts as new UniqueValueRenderer()
+      field: "Name",
+      defaultSymbol: stationsSymbol("Train"),//Backhoe, Train
+    };
+   
+  // Geotechnical information Renderer:-------------------
+    ///-- Profile Options for rendering geotechnical informatino (polyline Z)
+    const options_g = {
+      profile: "circle",
+      cap: "none",
+      join: "miter",
+      width: 6,
+      height: 6,
+      color: [200, 200, 200],
+      profileRotation: "all"
+    };
+  
+    ///-- Color
+    const colors_g = {
+      'Sandy Sand': [0, 112, 255, 1],
+      'Silty Sand': [230, 230, 0, 1],
+      'Rock Type': [197, 0, 255, 1]
+    };
+
+  
+  // Bridge: -----------
+  const colorsBridge = {
+      'Minor': [112, 168, 0, 0.4], // To be Constructed (white)
+      'Moderate': [230, 230, 0, 0.4], // Excavation (Dark brown)
+      'Severe': [230, 0, 0, 0.7], // Rebar (Yellow)
+    };
+  
+  // Monitored Buildings:-----
+  /*****************************************************************
+     * Define symbols for each unique type of building. One each for
+     * Government, Septic Tank, Ordinary House, Gas Station, Hospital, School, Pedestrian.
+     * Good, Fair, and Dilapidated
+     *****************************************************************/
+  
+     var goodSym = {
+      type: "polygon-3d", // autocasts as new PolygonSymbol3D()
+      symbolLayers: [
+        {
+          type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
+          material: {
+            color: [112, 168, 0, 0.4]
+          },
+          edges: {
+            type: "solid",
+            color: "#4E4E4E",
+            size: 1.0
+          }
+        }
+      ]
+    };
+  
+    var fairSym = {
+      type: "polygon-3d", // autocasts as new PolygonSymbol3D()
+      symbolLayers: [
+        {
+          type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
+          material: {
+            color: [230, 230, 0, 0.4]
+          },
+          edges: {
+            type: "solid",
+            color: "#4E4E4E",
+            size: 1.0
+          }
+        }
+      ]
+    };
+  
+    var dilapSym = {
+      type: "polygon-3d", // autocasts as new PolygonSymbol3D()
+      symbolLayers: [
+        {
+          type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
+          material: {
+            color: [230, 0, 0, 0.7]
+          },
+          edges: {
+            type: "solid",
+            color: "#4E4E4E",
+            size: 1.0
+          }
+        }
+      ]
+    };
+  
+  
+  var obstructionRenderer = {
+      type: "unique-value", // autocasts as new UniqueValueRenderer()
+      defaultSymbol: {
+        type: "polygon-3d", // autocasts as new PolygonSymbol3D()
+        symbolLayers: [
+          {
+            type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
+            material: {
+              color: "#E1E1E1"
+            },
+            edges: {
+              type: "solid",
+              color: "#4E4E4E",
+              size: 1.0
+            }
+          }
+        ]
+      },
+      defaultLabel: "Other",
+      field: "Rating",
+      legendOptions: {
+        title: "Rating for Defects"
+        },
+      uniqueValueInfos: [
+        {
+          value: "Good",
+          symbol: goodSym,
+          label: "Good"
+        },
+        {
+          value: "Fair",
+          symbol: fairSym,
+          label: "Fair"
+        },
+        {
+          value: "Dilapidated",
+          symbol: dilapSym,
+          label: "Dilapidated"
+        }          
+      ],
+      visualVariables: [
+        {
+          type: "size",
+          field: "Height",
+          valueUnit: "meters" // Converts and extrudes all data values in feet
+        }
+      ]
+    };
+  
+  
+  //*******************************//
+  // Import Layers                 //
+  //*******************************//
+  // Land and Structure
+  // Lot Layer Renderer ---------
+  let defaultLotSymbolBoundary = {
+      type: "simple-fill",
+      color: [0, 0, 0, 0],
+      style: "solid",
+      outline: {
+        style: "short-dash",
+        color: [215, 215, 158],
+        width: 1.5
+      }
+    };
+  
+  let lotDefaultSymbol = {
+      type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+      color: [0,0,0,0],
+      style: "solid",
+      outline: {  // autocasts as new SimpleLineSymbol()
+        color: [110, 110, 110],
+        width: 0.7
+      }
+    };
+    
+    function colorLotReqs(){
+      return {
+        1: [112,173,71, 0.5],
+        2: [0,112,255, 0.5],
+        3: [255,255,0, 0.5],
+        4: [255,170,0, 0.5],
+        5: [255,0,0, 0.5],
+        6: [0,115,76, 0.5]
+      }
+    }
+    
+    
+    let lotLayerRenderer = {
+      type: "unique-value",
+      //field: "StatusLA",
+      defaultSymbol: lotDefaultSymbol,  // autocasts as new SimpleFillSymbol()
+      valueExpression: "When($feature.StatusNVS3 == 1, '1',$feature.StatusNVS3 == 2, '2', $feature.StatusNVS3 == 3, '3', \
+                             $feature.StatusNVS3 == 4, '4', $feature.StatusNVS3 == 5, '5', \
+                             $feature.StatusNVS3 == 6, '6', $feature.StatusNVS3)",
+      uniqueValueInfos: [
+      {
+        // All features with value of "North" will be blue
+        value: "1",
+        label: "Paid",
+        symbol: {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: colorLotReqs()[1],
+        }
+      },
+      {
+        // All features with value of "North" will be blue
+        value: "2",
+        label: "For Payment Processing",
+        symbol: {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: colorLotReqs()[2],
+        }
+      },
+      {
+        // All features with value of "North" will be blue
+        value: "3",
+        label: "For Legal Pass",
+        symbol: {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: colorLotReqs()[3],
+        }
+      },
+      {
+        // All features with value of "North" will be blue
+        value: "4",
+        label: "For Appraisal/Offer to Buy",
+        symbol: {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: colorLotReqs()[4],
+        }
+      },
+      {
+        // All features with value of "North" will be blue
+        value: "5",
+        label: "For Expro",
+        symbol: {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: colorLotReqs()[5],
+        }
+      },
+      {
+        // All features with value of "North" will be blue
+        value: "6",
+        label: "with WOP Fully Turned-over",
+        symbol: {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: colorLotReqs()[6],
+        }
+      }
+      /*
+      {
+        // All features with value of "North" will be blue
+        value: "others",
+        label: "Others",
+        symbol: {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: colorLotReqs()[6],
+          outline: {
+            width: 2,
+            color: "grey"
+          }
+        }
+      }
+      */
+      ]
+    }
+    
+     const LOT_LABEL_CLASS = {
+      // autocasts as new LabelClass()
+      symbol: {
+        type: "text",  // autocasts as new TextSymbol()
+        color: "black",
+        font: {  // autocast as new Font()
+          family: "Gill Sans",
+          size: 8
+        }
+      },
+      labelPlacement: "above-center",
+      labelExpressionInfo: {
+        expression: "$feature.CN"
+      }
+    };
+  
+    var lotLayer = new FeatureLayer({
+      url: "https://services7.arcgis.com/jcAkCSW40GDaQ1L6/arcgis/rest/services/MMSP_Land_Structure_Alignment/FeatureServer",
+      layerId: 15,
+      outFields: ["*"],
+      title: "Status of Land Acquisition",
+            
+    //labelsVisible: false,
+      labelingInfo: [LOT_LABEL_CLASS],
+      renderer: lotLayerRenderer,
+      popupTemplate: {
+        title: "<p>{Id}</p>",
+        lastEditInfoEnabled: false,
+        returnGeometry: true,
+        content: [
+          {
+            type: "fields",
+            fieldInfos: [
+              {
+                fieldName: "OWNER",
+                label: "Land Owner"
+              },
+              {
+                fieldName: "Station1"
+              },
+              {
+                fieldName: "StatusNVS3",
+                label: "<p>Status of Land Acquisition</p>"
+              }
+            ]
+          }
+        ]
+      }
+    });
+    map.add(lotLayer, 0);
+    
+    
+  // Construction boundary
+  // Construction boundary
+  let ConstructionBoundaryFill = {
+            type: "unique-value",
+            valueExpression: "When($feature.MappingBoundary == 1, 'Boundary',$feature.MappingBoundary)",
+            uniqueValueInfos: [
+                {
+                    value: "Boundary",
+                    symbol: {
+                        type: "simple-fill",
+                        color: [0, 0, 0,0],
+                        outline: {
+                            width: 2.5,
+                            color: [220,220,220],
+                            style: "short-dash"
+                        }
+                    }
+                }
+  
+            ]
+  };
+  
+  
+  // Construction Boundary
+  var constBoundary = new FeatureLayer({
+    url: "https://services7.arcgis.com/jcAkCSW40GDaQ1L6/arcgis/rest/services/MMSP_Land_Structure_Alignment/FeatureServer",
+    layerId: 4,
+    outFields: ["*"],
+    renderer: ConstructionBoundaryFill,
+    definitionExpression: "MappingBoundary = 1",
+    title: "Construction Boundary",
+    elevationInfo: {
+      mode: "on-the-ground",
+    },
+    popupEnabled: false
+  });
+  constBoundary.listMode = "hide";
+  map.add(constBoundary);
+  
+  // Station Layer:-------------------
+  var stationLayer = new SceneLayer({
+    portalItem: {
+        id: "ed16fe84702a478ea2a113b205f993dd",
+      },
+         labelingInfo: [stationLabelClass],
+         renderer: stationsRenderer,
+         definitionExpression: "sector = 'MMSP'",
+         popupEnabled: false,
+         elevationInfo: {
+             // this elevation mode will place points on top of
+             // buildings or other SceneLayer 3D objects
+             mode: "relative-to-ground"
+             },
+          //screenSizePerspectiveEnabled: false, // gives constant size regardless of zoom
+    });
+    stationLayer.listMode = "hide";
+    map.add(stationLayer);
+  
+  // Geotechnical information:-------------------
+  /*
+  var geotech = new FeatureLayer({
+    portalItem: {
+        id: "30cdb9f9775146308a05dd17cfbfa87a",
+        portal: {
+          url: "https://gis.railway-sector.com/portal"
+        }
+      },
+      layerId: 3,
+      elevationInfo: {
+      mode: "absolute-height", //absolute-height
+      offset: 0,
+    },
+    hasZ: true,
+     //renderer: roundTubeSymbol,
+     title: "Soil Profile",
+     //definitionExpression: "sens='Aller'",
+     outFields: ["*"]
+    });
+    map.add(geotech);
+  
+    function renderGeotechLayer() {
+      const renderer = new UniqueValueRenderer({
+        field: "Class"
+      });
+  
+      for (let property in colors_g) {
+        if (colors_g.hasOwnProperty(property)) {
+          renderer.addUniqueValueInfo({
+            value: property,
+            symbol: {
+              type: "line-3d",
+              symbolLayers: [
+                {
+                  type: "path",
+                  profile: options_g.profile,
+                  material: {
+                    color: colors_g[property]
+                  },
+                  width: options_g.width,
+                  height: options_g.height,
+                  join: options_g.join,
+                  cap: options_g.cap,
+                  anchor: "bottom",
+                  profileRotation: options_g.profileRotation
+                }
+              ]
+            }
+          });
+        }
+      }
+  
+      geotech.renderer = renderer;
+    }
+    renderGeotechLayer();
+  */
+
+  // NATM
+  
+  const colors_NATM = {
+      1: [225, 225, 225, 0.1], // To be Constructed (white)
+      2: [130, 130, 130, 0.5], // Under Construction
+      3: [255, 0, 0, 0.8], // Delayed
+      4: [0, 112, 255, 0.8], // Completed
+    };
+  
+  var natmLayer = new SceneLayer({
+    portalItem: {
+      id: "19ce0415417d425587326a1b3458a21a",
+    },
+    elevationInfo: {
+      mode: "absolute-height",//"on-the-ground", relative-to-ground, absolute-height
+      offset: 0
+    },
+  
+     //renderer: roundTubeSymbol,
+     title: "NATM",
+     //definitionExpression: "sens='Aller'",
+     outFields: ["*"]
+
+    });
+    map.add(natmLayer);
+  
+  // Symbology for natmLayer
+  function renderNATMLayer() {
+  // Obtain unique values from Status1
+  const renderer = new UniqueValueRenderer({
+  field: "status"
+  });
+  
+  for (let property in colors_NATM) {
+  if (colors_NATM.hasOwnProperty(property)) {
+  renderer.addUniqueValueInfo({
+    value: property,
+    symbol: {
+      type: "mesh-3d",
+      symbolLayers: [
+        {
+          type: "fill",
+          material: {
+            color: colors_NATM[property],
+            colorMixMode: "replace"
+          },
+          edges: {
+            type: "solid", // autocasts as new SolidEdges3D()
+            color: [225, 225, 225, 0.3]
+          }
+        }
+      ]
+    }
+  });
+  }
+  }
+  natmLayer.renderer = renderer;
+  }
+  renderNATMLayer();
+  
+  
+  // TBM segmented line:-------------------
+    // TBM Alignment:-------------------
+const options = {
+    profile: "circle",
+    cap: "butt", // butt
+    join: "miter",
+    width: 5,
+    height: 5,
+    color: [200, 200, 200, 0.3],
+    profileRotation: "all"
+};
+
+/* The colors used for the each transit line */
+const colors = {
+  1: [225, 225, 225, 0.1], // To be Constructed (white)
+  2: [232, 54, 24, 1], // Excavated
+  3: [0, 112, 255, 0.8], // Completed
+};
+
+let tbmStatusRenderer = {
+  type: "unique-value",
+  field: "status",
+  uniqueValueInfos: [
+    {
+      value: 1,
+      label: 'To be Constructed',
+      symbol: {
+              type: "line-3d",
+              symbolLayers: [
+                {
+                  type: "path",
+                  profile: options.profile,
+                  material: {
+                    color: colors[1]
+                  },
+                  width: options.width,
+                  height: options.height,
+                  join: options.join,
+                  cap: options.cap,
+                  anchor: "bottom",
+                  profileRotation: options.profileRotation
+                }
+              ]
+            }
+    },
+    {
+      value: 2,
+      label: 'Excavating (Cutter Head)',
+      symbol: {
+              type: "line-3d",
+              symbolLayers: [
+                {
+                  type: "path",
+                  profile: options.profile,
+                  material: {
+                    color: colors[2]
+                  },
+                  width: options.width,
+                  height: options.height,
+                  join: options.join,
+                  cap: options.cap,
+                  anchor: "bottom",
+                  profileRotation: options.profileRotation
+                }
+              ]
+            }
+    },
+    {
+      value: 3,
+      label: 'Segmented',
+      symbol: {
+              type: "line-3d",
+              symbolLayers: [
+                {
+                  type: "path",
+                  profile: options.profile,
+                  material: {
+                    color: colors[3]
+                  },
+                  width: options.width,
+                  height: options.height,
+                  join: options.join,
+                  cap: options.cap,
+                  anchor: "bottom",
+                  profileRotation: options.profileRotation
+                }
+              ]
+            }
+    }
+  ]
+}
+
+  var tbmTunnelLayer = new FeatureLayer({
+    url: "https://services7.arcgis.com/jcAkCSW40GDaQ1L6/arcgis/rest/services/MMSP_TBM_Tunnel_dataset/FeatureServer",
+    elevationInfo: {
+      mode: "absolute-height",//"on-the-ground", relative-to-ground, absolute-height
+      offset: -2
+    },
+    hasZ: true,
+    layerId: 1,
+    renderer: tbmStatusRenderer,
+    //labelingInfo: [tbmSpotLabel2],
+     title: "TBM Segment",
+     outFields: ["*"],
+     popupTemplate: {
+        title: "Ring No.: <b>{segmentno}</b> (<b>{line}</b>)",
+        lastEditInfoEnabled: false,
+        returnGeometry: true,
+      }
+
+    });
+    map.add(tbmTunnelLayer);
+
+    // Muck Pit
+    const muckPitRenderer = {
+      type: "simple",
+      symbol: {
+        type: "mesh-3d",  // autocasts as new MeshSymbol3D()
+        symbolLayers: [
+          {
+          type: "fill",  // autocasts as new FillSymbol3DLayer()
+          material: { color: [0, 112, 255, 0.5] },
+          edges: {
+            type: "solid",
+            color: "#4E4E4E",
+            size: 1
+          }
+          }
+        ]
+      }
+    };
+
+    const muckPitLayer = new SceneLayer({
+      portalItem: {
+        id: "76f519f75b654705b93bfa67f55fe0be",
+      },
+      title: "Muck Pit",
+      renderer: muckPitRenderer
+    });
+    map.add(muckPitLayer);
+  
+
+  // River Layer:-------------------
+    const riverLayer = new FeatureLayer({
+      url: "https://services7.arcgis.com/jcAkCSW40GDaQ1L6/arcgis/rest/services/MMSP_TBM_Tunnel_dataset/FeatureServer",
+      layerId: 2,
+      elevationInfo: {
+        mode: "on-the-ground",
+        offset: 0
+      },
+      renderer: {
+          type: "simple",
+          symbol: {
+              type: "polygon-3d",
+              symbolLayers: [
+                  {
+                      type: "water",
+                      waveDirection: 260,
+                      color: "#005B66", //#005B66, #25427c
+                      waveStrength: "moderate",
+                      waterbodySize: "medium"
+                  }
+              ]
+          }
+      }
+    });
+    riverLayer.listMode = "hide";
+    map.add(riverLayer, 0);
+  
+  // Station structure: reference only
+  const colors3D = {
+      1: [225, 225, 225, 0.1], // To be Constructed (white)
+      2: [225, 225, 225, 0.1], // Under Construction
+      3: [225, 225, 225, 0.1], // Delayed
+      4: [225, 225, 225, 0.1], // Completed
+    };
+  
+  var stationStructure = new SceneLayer({ //structureLayer
+    portalItem: {
+        id: "4974de75486047e3b19166a9146bb812",
+      },
+      definitionExpression: "Type = 1",
+      popupEnabled: false,
+        elevationInfo: {
+            mode: "absolute-height",
+            offset: 0
+        },
+        title: "Station Structure",
+        outFields: ["*"]
+        // when filter using date, example below. use this format
+        //definitionExpressi
+    });
+    //stationStructure.listMode = "hide";
+    map.add(stationStructure, 1);
+  
+    function renderStructureLayer() {
+      const renderer = new UniqueValueRenderer({
+        field: "Status"
+      });
+  
+      for (let property in colors3D) {
+        if (colors3D.hasOwnProperty(property)) {
+          renderer.addUniqueValueInfo({
+            value: property,
+            symbol: {
+              type: "mesh-3d",
+              symbolLayers: [
+                {
+                  type: "fill",
+                  material: {
+                    color: colors3D[property],
+                    colorMixMode: "replace"
+                  },
+                  edges: {
+                    type: "solid", // autocasts as new SolidEdges3D()
+                    color: [225, 225, 225, 0.8]
+                    }
+                }
+              ]
+             }
+          });
+        }
+      }
+  
+      stationStructure.renderer = renderer;
+    }
+  
+    renderStructureLayer();
+
+    // TBM Shaft
+    var tbmShaft = new SceneLayer({ //structureLayer
+      portalItem: {
+        id: "ec3920809423413b85a68c8387e43595",
+      },
+      popupEnabled: false,
+        elevationInfo: {
+            mode: "absolute-height",
+            offset: 0
+        },
+        title: "TBM Shaft"
+        // when filter using date, example below. use this format
+        //definitionExpression: "EndDate = date'2020-6-3'"
+    });
+    map.add(tbmShaft, 1);
+  
+    function renderTbmShaftLayer() {
+      const renderer = new UniqueValueRenderer({
+        field: "Status"
+      });
+  
+      for (let property in colors3D) {
+        if (colors3D.hasOwnProperty(property)) {
+          renderer.addUniqueValueInfo({
+            value: property,
+            symbol: {
+              type: "mesh-3d",
+              symbolLayers: [
+                {
+                  type: "fill",
+                  material: {
+                    color: colors3D[property],
+                    colorMixMode: "replace"
+                  },
+                  edges: {
+                    type: "solid", // autocasts as new SolidEdges3D()
+                    color: [225, 225, 225, 0.8], //225, 225, 225, 0.3
+                    size: 1
+                    }
+                }
+              ]
+             }
+          });
+        }
+      }
+  
+      tbmShaft.renderer = renderer;
+    }
+  
+    renderTbmShaftLayer();
+  
+  
+  // Bridge Layer:-------------------        
+    var bridgeLayer = new SceneLayer({
+      portalItem: {
+        id: "eaef4d10cb674c78b66ab15b5c22a1a9", //8d867de4d0034e08afed516372f8dd86
+      },
+      /*
+      portalItem: {
+      id: "e01d0321d29f4239a383be1ba056d2aa",  
+      portal: {
+        url: "https://mmspgc-gis.mmspgc.local/portal"
+      }
+      },
+      */
+      elevationInfo: {
+        mode: "absolute-height",
+        offset: 0
+      },
+      title: "Monitoring Bridge",
+      outFields: ["*"],
+    });
+    map.add(bridgeLayer, 0);
+  
+    function renderBridgeLayer() {
+      const renderer = new UniqueValueRenderer({
+        field: "Rating",
+        legendOptions: {
+        title: "Rating for Defects"
+        }
+      });
+  
+      for (let property in colorsBridge) {
+        if (colorsBridge.hasOwnProperty(property)) {
+          renderer.addUniqueValueInfo({
+            value: property,
+            symbol: {
+              type: "mesh-3d",
+              symbolLayers: [
+                {
+                  type: "fill",
+                  material: {
+                    color: colorsBridge[property],
+                    colorMixMode: "replace"
+                  },
+                  edges: {
+                    type: "solid", // autocasts as new SolidEdges3D()
+                    color: [225, 225, 225, 0.3]
+                    }
+                }
+              ]
+             }
+          });
+        }
+      }
+  
+      bridgeLayer.renderer = renderer;
+    }
+  
+    renderBridgeLayer();
+  
+  
+  // Monitored Buildings:-----------
+    /*****************************************************************
+     * Set each unique value directly in the renderer's constructor.
+     * At least one field must be used (in this case the "DESCLU" field).
+     * The label property of each unique value will be used to indicate
+     * the field value and symbol in the legend.
+     *
+     * The size visual variable sets the height of each building as it
+     * exists in the real world according to the "ELEVATION" field.
+     *****************************************************************/
+    /*
+  var obstructionLayer = new FeatureLayer({
+  portalItem: {
+        id: "5ebdee597f3540d1baed240034532883",
+        portal: {
+          url: "https://gis.railway-sector.com/portal"
+        },
+      },
+      layerId: 2,
+      elevationInfo: {
+        mode: "on-the-ground",
+        offset: 0
+      },
+      title: "Monitoring Structures",
+      labelingInfo: [monitorBuillabelClass],
+      renderer: obstructionRenderer,
+      popupTemplate: {
+        // autocasts as new PopupTemplate()
+        title: "{Rating}",
+        content: [
+          {
+            type: "fields",
+            fieldInfos: [
+              {
+                fieldName: "Type",
+                label: "Type of Building"
+              },
+              {
+                fieldName: "Score",
+                label: "Score"
+              },
+              {
+                fieldName: "Rating",
+                label: "Rating"
+              }
+            ]
+          }
+        ]
+      },
+      outFields: ["*"],
+      definitionExpression: "Remarks IS NULL" // show only buildings with height, 
+    });
+    map.add(obstructionLayer, 0);
+  */
+
+  // Dilapidation survey Extent line
+  var dilapSurveyExtent = new FeatureLayer({
+    url: "https://services7.arcgis.com/jcAkCSW40GDaQ1L6/arcgis/rest/services/MMSP_TBM_Tunnel_dataset/FeatureServer",
+    layerId: 5,
+    /*
+      portalItem: {
+      id: "8f53ab5eed324f5d9272a09b243198a6",
+      portal: {
+        url: "https://mmspgc-gis.mmspgc.local/portal"
+      }
+      },
+      */
+      elevationInfo: {
+        mode: "on-the-ground",
+        offset: 0
+      },
+      title: "Survey Extent Line"
+    });
+    map.add(dilapSurveyExtent, 0);
+  
+  // TBM Alignment reference line:--------------
+  let defaultTBMAlign = {
+            type: "simple-line",
+            color: [211, 211, 211, 0.5],
+            style: "solid",
+            width: 0.5
+  };
+  
+  let tbmAlignRenderer = {
+  type: "unique-value",
+  field: "LAYER",
+  defaultSymbol: defaultTBMAlign
+  };
+
+
+  //*******************************//
+  //      Progress Chart           //
+  //*******************************//
+  //const totalProgressDiv = document.getElementById("totalProgressDiv");
+  const segmentedDateDiv = document.getElementById("segmentedDateDiv");
+  
+  // Find current position of TBM
+  // The current position refers to the spot of minimum segment No.
+  var graphicsLayer = new GraphicsLayer({
+    title: "Cutter Head Position"
+  });
+  map.add(graphicsLayer);
+
+  function tbmPositionSymbol(cpValue, tbmValue) {
+    graphicsLayer.removeAll();
+    var query = tbmTunnelLayer.createQuery();
+    query.returnGeometry = true;
+
+    const packageExpression = "Package = '" + cpValue + "'";
+    const tbmExpression = "line = '" + tbmValue + "'";
+
+    if (tbmValue === undefined || tbmValue === 'None') {
+      query.where = "tbmSpot = 1" + " AND " + packageExpression; // to be constructed
+    } else {
+      query.where = "tbmSpot = 1" + " AND " + packageExpression + " AND " + tbmExpression;
+    }
+    
+    query.groupByFieldsForStatistics = ["line"];
+    
+    tbmTunnelLayer.queryFeatures(query).then(function(response) {
+    const stats = response.features;   
+    
+    stats.forEach((result, index) => {
+      const attributes = result.attributes;
+      const lineType = attributes.line;
+      const segmentNo = attributes.segmentno;
+      const vertex = result.geometry.paths[0];
+      
+      const long = (vertex[0][0] + vertex[1][0]) / 2;
+      const lat = (vertex[0][1] + vertex[1][1]) / 2;
+      // longitude: vertex[0][0]
+      // latitude: vertex[0][1]
+
+      const point = {
+        spatialReference: spatialReference,
+        type: "point",
+        x: long,
+        y: lat,
+        z: 15
+      }
+
+      const symbol = {
+        type: "point-3d",
+              symbolLayers: [
+                  {
+                      type: "icon",
+                      resource: {
+                        href: "https://EijiGorilla.github.io/Symbols/TBM_LOGO2.png"
+                      },
+                      size: 30
+                      //resource: {primitive: "circle"},
+                      //material: {color: "green"}
+                  }
+              ],
+              verticalOffset: {
+                  screenLength: 100,
+                  maxWorldLength: 500,
+                  minWorldLength: 40
+              },
+              callout: {
+                  type: "line",
+                  size: 1.5,
+                  color: "#E83618",
+                  border: {
+                      color: "#E83618"
+                  }
+              },
+              maxScale: 1000,
+              minScale: 25000000
+      }
+
+      const myGraphic = new Graphic({
+        geometry: point,
+        symbol: symbol
+      });
+
+      graphicsLayer.add(myGraphic);
+    /*
+          view.graphics.add({
+              geometry: {
+                  spatialReference: spatialReference,
+                  type: "point",
+                  x: long,
+                  y: lat,
+                  z: 15
+              },
+              symbol: {
+              type: "point-3d",
+              symbolLayers: [
+                  {
+                      type: "icon",
+                      resource: {
+                        href: "https://EijiGorilla.github.io/Symbols/TBM_LOGO2.png"
+                      },
+                      size: 30
+                      //resource: {primitive: "circle"},
+                      //material: {color: "green"}
+                  }
+              ],
+              verticalOffset: {
+                  screenLength: 100,
+                  maxWorldLength: 500,
+                  minWorldLength: 40
+              },
+              callout: {
+                  type: "line",
+                  size: 1.5,
+                  color: "#E83618",
+                  border: {
+                      color: "#E83618"
+                  }
+              },
+              maxScale: 1000,
+              minScale: 25000000
+          }
+          });
+    */
+    });
+    });
+  }
+  
+  /////////////////////////////////////
+  
+  
+  
+  /* Function for zooming to selected layers */
+  function zoomToLayer(layer) {
+  return layer.queryExtent().then(function(response) {
+  view.goTo(response.extent, { //response.extent
+  speedFactor: 2
+  }).catch(function(error) {
+  if (error.name != "AbortError") {
+    console.error(error);
+  }
+  });
+  });
+  }
+  
+  var highlightSelect;
+  
+    async function initialization() {
+      //play.style.display = "none";
+      //pause.style.display = "block";
+      document.getElementById("myLink").checked = true;
+      map.ground.opacity = 0;
+      abort = false;
+      addStop();
+      //zoomToLayer(tbmShaft);
+    }
+
+    // Get last edited date
+    const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    function getEditedDateValue() {
+      var tempDates = [];
+
+      var query = tbmTunnelLayer.createQuery();
+      //query.fields = ["enddate"];
+      query.where = "last_edited_date IS NOT NULL";
+      return tbmTunnelLayer.queryFeatures(query).then(function(response) {
+        var stats = response.features;
+        stats.forEach((result, index) => {
+          var attributes = result.attributes;
+          const dates = attributes.last_edited_date;
+          tempDates.push(dates);
+        });
+        const lastDate = Math.max(...tempDates);
+        const lastEdit = new Date(lastDate);
+        const yyyy = lastEdit.getFullYear();
+        const mm = month[lastEdit.getMonth()];
+        const dd = lastEdit.getDate();
+        const lastEditedDate = `${mm} ${dd}, ${yyyy}`;
+        document.getElementById("dateDiv").innerHTML = "As of July 3, 2023";//lastEditedDate;
+      });
+    }
+    getEditedDateValue();
+ 
+  // Create a Bar chart to calculate % completion for each viaduct sample
+  am5.ready(function() {
+        // Define color and labelling properties
+    // color
+    const chartTitleColor = am5.color("#d4ff33"); // yellow green
+    const percentProgressLabelColor = am5.color("#00C3FF"); // light blue
+    const strokeOtherColor = am5.color("#c5c5c5"); // grey
+
+    // Thousand separators function
+    function thousands_separators(num) {
+      var num_parts = num.toString().split(".");
+      num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return num_parts.join(".");
+    }
+
+
+    // Count the total number of rings
+    const totalSegmentNoDiv = document.getElementById("totalSegmentNoDiv");
+
+    function totalNumberRings(cpValue, tbmValue) {
+      const cpExpression = "Package = '" + cpValue + "'";
+      const tbmExpression = "line = '" + tbmValue + "'";
+
+      var query = tbmTunnelLayer.createQuery();
+
+      if (tbmValue == 'None' || tbmValue == undefined) {
+        query.where = "Package = '" + cpValue + "'";
+      } else {
+        query.where = cpExpression + " AND " + tbmExpression;
+      }
+
+      var total_number_ring = {
+        onStatisticField: "line",
+        outStatisticFieldName: "total_number_ring",
+        statisticType: "count"
+      };
+
+      query.outStatistics = [total_number_ring];
+      query.returnGeometry = true;
+  
+      tbmTunnelLayer.queryFeatures(query).then(function(response) {
+        var stats = response.features[0].attributes;
+        const value = thousands_separators(stats.total_number_ring);
+
+        totalSegmentNoDiv.innerHTML = `
+                                    <b>Total No. of Rings</b><br>
+                                    <h5>${value}</h5>
+                                  `;
+      })
+    }
+
+          ///////// PIE CHART /////////
+  // 1. TBM
+  var root = am5.Root.new("chartTbmDiv");
+  root._logo.dispose();
+function tbmChart() {
+  var total_number = {
+      onStatisticField: "line",
+      outStatisticFieldName: "total_number",
+      statisticType: "count"
+    }
+    
+    var total_complete = {
+      onStatisticField: "CASE WHEN status = 3 THEN 1 ELSE 0 END",
+      outStatisticFieldName: "total_complete",
+      statisticType: "sum"
+    }
+    
+    var query = tbmTunnelLayer.createQuery();
+    query.outStatistics = [total_number, total_complete];
+    query.returnGeometry = true;
+    
+    tbmTunnelLayer.queryFeatures(query).then(function(response) {
+    var stats = response.features[0].attributes;
+    
+    
+    const totalNumber = stats.total_number;
+    const completed = stats.total_complete;
+    const LOT_HANDOVER_PERC = ((completed/totalNumber)*100).toFixed(1);
+
+  root.container.children.clear();
+    // Set themes
+  // https://www.amcharts.com/docs/v5/concepts/themes/
+  root.setThemes([
+    am5themes_Animated.new(root),
+    am5themes_Responsive.new(root)
+  ]);
+
+  // Create chart
+  // https://www.amcharts.com/docs/v5/charts/radar-chart/
+  var chart = root.container.children.push(
+    am5radar.RadarChart.new(root, {
+      panX: false,
+      panY: false,
+      startAngle: -180,
+      endAngle: 0,
+      radius: am5.percent(90), // size of overall chart
+      innerRadius: -20, // expand inward,
+
+    })
+  );
+
+  // Chart title
+ 
+  chart.children.unshift(am5.Label.new(root, {
+    text: "[bold]SEGMENT RING",
+    fontSize: "1.9em",
+    //fontWeight: "bold",
+    textAlign: "center",
+    fill: percentProgressLabelColor,
+    x: am5.percent(50),
+    centerX: am5.percent(50),
+    y: am5.percent(5),
+    centerY: am5.percent(50),
+    paddingBottom: 20
+    //marginBottom: 20
+  }));
+
+
+  chart.children.unshift(am5.Label.new(root, {
+    text: "Completed",
+    fontSize: 25,
+    textAlign: "center",
+    fill: percentProgressLabelColor,
+    x: am5.percent(50),
+    centerX: am5.percent(50),
+    y: am5.percent(100),
+    centerY: am5.percent(100),
+  }));
+
+  chart.children.unshift(am5.Label.new(root, {
+    text: "[bold]" + completed,
+    fontSize: "2.3em",
+    textAlign: "center",
+    fill: chartTitleColor,
+    x: am5.percent(50),
+    centerX: am5.percent(50),
+    y: am5.percent(65),
+    centerY: am5.percent(100),
+
+  }));
+
+  //chart.getNumberFormatter().set("numberFormat", "#'%'");
+
+  // Create axis and its renderer
+  // https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Axes
+  var axisRenderer = am5radar.AxisRendererCircular.new(root, {
+    innerRadius: am5.percent(120), //gagues width becomes thicker outward
+    strokeOpacity: 0.1,
+    minGridDistance: 30
+  });
+
+  // Enable ticks
+  axisRenderer.ticks.template.setAll({
+    visible: true,
+    strokeOpacity: 0.5,
+    length: -6,
+    //inside: true,
+    stroke: strokeOtherColor
+  });
+
+  axisRenderer.grid.template.setAll({
+    stroke: root.interfaceColors.get("background"),
+    visible: false,
+    strokeOpacity: 0.8
+  });
+
+  var xAxis = chart.xAxes.push(
+    am5xy.ValueAxis.new(root, {
+      maxDeviation: 0,
+      min: 0,
+      max: 100,
+      strictMinMax: true,
+      renderer: axisRenderer,
+    })
+  );
+
+  // Axis labels properties
+  xAxis.get("renderer").labels.template.setAll({
+    fill: strokeOtherColor,
+    fontSize: 10,
+    textAlign: "center",  
+    inside: true, // move labels inside ticks
+    radius: 20
+      
+  });
+
+  // Add clock hand
+  // https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Clock_hands
+  var axisDataItem = xAxis.makeDataItem({});
+  var clockHand = am5radar.ClockHand.new(root, {
+    //pinRadius: 10,
+    radius: am5.percent(-3),
+    innerRadius: -30,
+    bottomWidth: 10,
+    topWidth: 0
+  });
+
+  clockHand.pin.setAll({
+    fillOpacity: 0,
+    strokeOpacity: 0,
+  });
+
+  clockHand.hand.setAll({
+    fillOpacity: 0.5,
+    strokeOpacity: 0.7,
+    stroke: am5.color("#808080"),
+    fill: am5.color("#FFA500"),
+    strokeWidth: 1,
+  });
+
+  var bullet = axisDataItem.set(
+    "bullet",
+    am5xy.AxisBullet.new(root, {
+      sprite: clockHand
+    })
+  );
+
+  xAxis.createAxisRange(axisDataItem);
+
+  // Label for percent progress
+  var label = chart.radarContainer.children.push(
+    am5.Label.new(root, {
+      centerX: am5.percent(50),
+      textAlign: "center",
+      centerY: am5.percent(90),
+      y: am5.percent(25),
+      fontSize: "2.9em",
+      fill: percentProgressLabelColor
+    })
+  );
+
+  // Add percent progress values
+  bullet.get("sprite").on("rotation", function () {
+    var value = axisDataItem.get("value");
+    label.set("text", value.toString() + "%");
+  });
+
+    //var value = 30;
+
+    axisDataItem.animate({
+      key: "value",
+      to: LOT_HANDOVER_PERC,
+      duration: 500,
+      easing: am5.ease.out(am5.ease.cubic)
+    });
+
+  chart.bulletsContainer.set("mask", undefined);
+
+  var colorSet = am5.ColorSet.new(root, {});
+  var axisRange0 = xAxis.createAxisRange(
+    xAxis.makeDataItem({
+      above: true,
+      value: 0,
+      endValue: LOT_HANDOVER_PERC
+    })
+  );
+
+  axisRange0.get("axisFill").setAll({
+    visible: true,
+    fill: percentProgressLabelColor
+  });
+
+  axisRange0.get("label").setAll({
+    forceHidden: true
+  });
+
+  var axisRange1 = xAxis.createAxisRange(
+    xAxis.makeDataItem({
+      above: true,
+      value: LOT_HANDOVER_PERC,
+      endValue: 100
+    })
+  );
+
+  axisRange1.get("axisFill").setAll({
+    visible: true,
+    fill: strokeOtherColor
+  });
+
+  axisRange1.get("label").setAll({
+    forceHidden: true,
+  });
+
+  // Make stuff animate on load
+  chart.appear(1000, 100);
+}); 
+}
+
+  tbmTunnelLayer.definitionExpression = "Package = 'CP101'";
+  
+  // When CP is selected, reset tbm value is 'None'
+  const changeSelected = (e) => {
+    const $select = document.querySelector('#tbmSelect');
+    $select.value = 'None'
+    };
+
+  // Selected Value Labels above gauge
+  const filterValuesDiv = document.getElementById("filterValuesDiv");
+  function selectedValuesLabel(cpValue, tbmValue) {
+    if (tbmValue === 'None' || tbmValue === undefined) {
+      filterValuesDiv.innerHTML = `<b>${cpValue} - All Segments</b>`;
+    } else {
+      filterValuesDiv.innerHTML = `<b>${cpValue} - ${tbmValue}</b>`;
+    }
+  }
+
+    // Default
+    const cutterHeadPositionDiv = document.getElementById("cutterHeadPositionDiv");
+    function defaultRender(){
+      const defaultCP = 'CP101';
+
+      tbmTunnelLayer.definitionExpression = "Package = 'CP101'";
+      tbmTunnelLayer.visible = true;
+      natmLayer.visible = false;
+      tbmChart();
+
+      // cutter head position symbol
+      tbmPositionSymbol(defaultCP);
+
+      // As default, change tbm No = 'None'
+      tbmFilterList(defaultCP)
+      changeSelected();
+
+      //selectedValuesLabel("CP101")
+      selectedValuesLabel(defaultCP)
+
+      // Total Number of rings
+      totalNumberRings(defaultCP);
+
+      //surveyChart();
+      cutterHeadPositionDiv.innerHTML = `
+                                    <b>Cutter Head Position</b><br>
+                                    <h6>-----</h6>
+                                  `;
+    }
+    defaultRender();
+
+       // Cutter head position for each TBM
+  // note that cutter head position = permanently cased segment No. + 7
+  // E.g., if segment no. 10 is casted, cutter head position = 10 + 7 = No. 17
+  // In the attribute table, tbmSpot = 1
+
+  function cutterHeadPosition(tbmValue) {
+    var query = tbmTunnelLayer.createQuery();
+    query.where = "tbmSpot = 1" + " AND " + "line = '" + tbmValue + "'";
+
+    // when TBM dropdown is 'None': ---
+    // otherwise, 
+    // this message is automatically overwritten if we have progress of casted segement
+    // i.e., tbmSpot = 1
+    if (tbmValue === 'None') {
+      cutterHeadPositionDiv.innerHTML = `
+                                          <b>Cutter Head Position</b><br>
+                                          <h6>-----</h6>
+                                        `;
+    } else {
+      cutterHeadPositionDiv.innerHTML = `
+                                          <b>Cutter Head Position</b><br>
+                                          <h4>No segment is casted yet<h4>
+                                        `;
+    }
+
+
+    tbmTunnelLayer.queryFeatures(query).then(function(response) {
+      var stats = response.features[0].attributes;
+      const segmentNo = stats.segmentno;
+      const tbmNo = stats.line;
+      
+      cutterHeadPositionDiv.innerHTML = `
+                                          <b>Cutter Head Position</b><br>
+                                          <h3>Ring No. <span>${segmentNo}</span></h3>
+                                      `;
+    });
+  }
+
+  // time series chart to show monthly progress
+  var root2 = am5.Root.new("timeSeriesChart");
+  root2._logo.dispose();
+  
+  function timeSeriesChart() {
+    root2.container.children.clear();
+
+    var total_complete_segment = {
+      onStatisticField: "CASE WHEN status = 3 THEN 1 ELSE 0 END",
+      outStatisticFieldName: "total_complete_segment",
+      statisticType: "sum"
+    };
+
+    var query = tbmTunnelLayer.createQuery();
+    query.where = "enddate IS NOT NULL";
+    query.outStatistics = [total_complete_segment];
+    query.outFields = ["enddate"];
+    query.orderByFields = ["enddate"];
+    query.groupByFieldsForStatistics = ["enddate"];
+
+    tbmTunnelLayer.queryFeatures(query).then(function(response) {
+      var stats = response.features;
+
+      // collect all dates for each viaduct type
+      const data = stats.map((result, index) => {
+        const attributes = result.attributes;
+        const date = attributes.enddate;
+        const value = attributes.total_complete_segment;
+ 
+        // compile in object
+        return Object.assign({}, {
+          date: date,
+          value: value,
+        });
+      });
+
+      console.log(data);
+
+      // 6. Add to Chart
+      // set themes
+      // set themes
+      root2.setThemes([
+        am5themes_Animated.new(root2)
+      ]);
+
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      var chart = root2.container.children.push(am5xy.XYChart.new(root2, {
+        panX: false,
+        panY: false,
+        wheelX: "panX",
+        wheelY: "zoomX"
+      }));
+
+      // Chart title
+      chart.children.unshift(am5.Label.new(root2, {
+        text: "Monthly Progress of Segmentation",
+        fontSize: 14,
+        fontWeight: "bold",
+        textAlign: "center",
+        fill: am5.color("#ffffff"),
+        x: am5.percent(50),
+        centerX: am5.percent(50),
+        paddingTop: 0,
+        paddingBottom: 0,
+      }));
+
+      // Add cursor
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+      var cursor = chart.set("cursor", am5xy.XYCursor.new(root2, {
+        behavior: "zoomX"
+      }));
+      cursor.lineY.set("visible", false);
+
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root2, {
+        maxDeviation: 0,
+        groupData: true,
+        baseInterval: {
+          timeUnit: "day",
+          count: 1
+        },
+        groupIntervals: [{timeUnit: "month", count: 1}],
+        categoryField: "date",
+        renderer: am5xy.AxisRendererX.new(root2, {
+          //minGridDistance: 60,
+          strokeOpacity: 1,
+          strokeWidth: 1,
+          stroke: am5.color("#ffffff"),
+        }),
+        tooltip: am5.Tooltip.new(root2, {})
+      }));
+
+      // Label properties for yAxis (category axis)
+      xAxis.get("renderer").labels.template.setAll({
+        //oversizedBehavior: "wrap",
+        textAlign: "center",
+        fill: am5.color("#ffffff"),
+        //maxWidth: 150,
+        fontSize: 12
+      });
+
+      var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root2, {
+        renderer: am5xy.AxisRendererY.new(root2, {
+          minGridDistance: 60,
+          strokeOpacity: 1,
+          strokeWidth: 1,
+          stroke: am5.color("#ffffff"),
+        })
+      }));
+
+      yAxis.get("renderer").labels.template.setAll({
+        //oversizedBehavior: "wrap",
+        textAlign: "center",
+        fill: am5.color("#ffffff"),
+        //maxWidth: 150,
+        fontSize: 12
+      });
+
+      // Add yaxix title
+      yAxis.children.unshift(
+        am5.Label.new(root2, {
+          rotation: -90,
+          text: "No. of Segmented Rings",
+          y: am5.p50,
+          centerX: am5.p50,
+          fill: am5.color("#ffffff"),
+          fontSize: 11
+        })
+      );
+
+      // Add series
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+      var series = chart.series.push(am5xy.ColumnSeries.new(root2, {
+        name: "Series",
+        xAxis: xAxis,
+        yAxis: yAxis,
+        valueYField: "value",
+        valueXField: "date",
+        valueYGrouped: "sum",
+        tooltip: am5.Tooltip.new(root2, {
+          labelText: "{valueY}"
+        })
+      }));
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root2, {
+          sprite: am5.Label.new(root2, {
+            text: "{valueY}",
+            fill: root2.interfaceColors.get("alternativeText"),
+            centerY: am5.p50,
+            centerX: am5.p50,
+            populateText: true
+          })
+        });
+      });
+
+      series.columns.template.setAll({ strokeOpacity: 0 })
+
+      // Add scrollbar
+      /*
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+      chart.set("scrollbarX", am5.Scrollbar.new(root2, {
+        orientation: "horizontal",
+        fillOpacity: 0.5
+      }));
+  */
+      series.data.setAll(data);
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      series.appear(1000);
+      chart.appear(1000, 100);
+    }); 
+  }
+  timeSeriesChart();
+
+  
+
+  // Define 
+  var cpSelect = document.getElementById("cpSelect");
+  var tbmSelect = document.getElementById("tbmSelect");
+
+  // Add Section and tunnel type to drop-down lists
+  /// 1. Section
+  function contractPackageValues() {
+    var cpArray = [];
+    var query = lotLayer.createQuery();
+    query.outField = ["Package"];
+    query.where = "Package IS NOT NULL";
+    query.returnGeometry = true;
+    return lotLayer.queryFeatures(query).then(function(response) {
+      var stats = response.features;
+      stats.forEach((result, index) => {
+      var attributes = result.attributes;
+      const SectionValues = attributes.Package;
+      cpArray.push(SectionValues);
+    });
+    return cpArray;
+  });
+  }
+  
+  function getUniqueValueSection(values) {
+  var uniqueValues = [];
+  values.forEach(function(item, i) {
+  if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
+    uniqueValues.push(item);
+  }
+  });
+  return uniqueValues;
+  }
+  
+  function addToSelectSection(values) {
+    values.sort();
+    //values.unshift('None');
+    values.forEach(function(value) {
+      var option = document.createElement("option");
+      option.text = value;
+      cpSelect.add(option);
+    });
+  }
+
+  function cpListQuery(){
+    contractPackageValues()
+  .then(getUniqueValueSection)
+  .then(addToSelectSection)
+  }
+  cpListQuery();
+
+  /// 3. TBM
+  function tbmFilterList(cpValue) {
+  function tbmQuery() {
+    const tbmArray = [];
+    var query = tbmTunnelLayer.createQuery();
+    query.where = "Package = '" + cpValue + "'";
+    query.returnGeometry = true;
+    return tbmTunnelLayer.queryFeatures(query).then(function(response) {
+      var stats = response.features;
+      stats.forEach((result, index) => {
+      var attributes = result.attributes;
+      const tbmNo = attributes.line;
+      tbmArray.push(tbmNo);
+    });
+    return tbmArray;
+  });
+  }
+
+  function getUniqueValueTBM(values) {
+  var uniqueValues = [];
+  values.forEach(function(item, i) {
+  if ((uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) && item !== "") {
+    uniqueValues.push(item);
+  }
+  });
+  return uniqueValues;
+  }
+
+  function addToSelectTBM(values) {
+    tbmSelect.options.length = 0;
+    values.sort();
+    values.unshift('None');
+    values.forEach(function(value) {
+      var option = document.createElement("option");
+      option.text = value;
+      tbmSelect.add(option);
+    });
+  }
+    tbmQuery()
+    .then(getUniqueValueTBM)
+    .then(addToSelectTBM)
+  }
+  //tbmFilterList();
+
+
+  ////////////////// Expression based on the selected from dropdown list
+  function sectionOnlyExpression(cpValue) {
+      tbmTunnelLayer.definitionExpression = "Package = '" + cpValue + "'";
+      natmLayer.definitionExpression = "Package = '" + cpValue + "'";
+      natmLayer.visible = true;
+
+      zoomToLayer(tbmTunnelLayer);
+  }
+  
+  function sectionTbmExpression(cpValue, tbmValue) {
+    map.ground.opacity = 0.5;
+
+
+    const packageExpression = "Package = '" + cpValue + "'";
+    const tbmExpression = "line = '" + tbmValue + "'";
+
+    if (tbmValue === 'None') {
+      tbmTunnelLayer.definitionExpression = packageExpression;
+    } else {
+      tbmTunnelLayer.definitionExpression = packageExpression + " AND " + tbmExpression;
+    }
+    zoomToLayer(tbmTunnelLayer);
+  }
+  
+
+  // Dropdown List
+  // When section is changed, tunnel type is reset to 'None'
+
+  
+  /// 1. Section dropdown list ('PO', 'Remaining')
+  cpSelect.addEventListener("change", function(event) {
+    var cpValue = event.target.value;
+    changeSelected();
+    tbmFilterList(cpValue);
+    sectionOnlyExpression(cpValue);
+
+    selectedValuesLabel(cpValue);
+
+    // char title 
+    tbmChart();
+
+    // Cutter head position 3D point symbol
+    tbmPositionSymbol(cpValue);
+
+    // Total number of rings
+    totalNumberRings(cpValue);
+
+    // Cutter head position label
+
+    cutterHeadPositionDiv.innerHTML = `
+                                          <b>Cutter Head Position</b><br>
+                                          <h6>-----</h6>
+                                      `;
+
+  });
+
+  // 2. TBM No select
+  tbmSelect.addEventListener("change", function(event) {
+    var tbmValue = event.target.value;
+    var cpValue = cpSelect.value;
+    sectionTbmExpression(cpValue, tbmValue);
+
+    const tbmno = tbmValue == 'None' ? "TBM" : tbmValue; 
+    tbmChart(tbmno);
+    cutterHeadPosition(tbmValue);
+
+    // Cutter head position 3D point symbol
+    tbmPositionSymbol(cpValue, tbmValue);
+
+    // selected value lable above gauge
+    selectedValuesLabel(cpValue, tbmValue);
+
+    // Total number of rings
+    totalNumberRings(cpValue, tbmValue);
+
+  });
+
+        // view.when
+        view.when(() => {
+          document.querySelector("#header-title").textContent = "MMSP TUNNEL CONSTRUCTION";
+          document.querySelector("#item-description").innerHTML = `
+                                                                    <p>1. <b>Filter</b> by contract package from the dropdown list in the header panel.</p>
+                                                                    <p>2. <b>Filter</b> by tunnel segment No.from the 2nd dropdown list if needed.</p>
+                                                                    <p>3. <b>Toggle</b> 'See through ground' at the bottom right to view underground.</p>
+                                                                  `;
+          const timeSeriesChartDiv = document.getElementById("timeSeriesChart");
+          let activeWidget;
+          const handleActionBarClick = ({ target }) => {
+            if (target.tagName !== "CALCITE-ACTION") {
+              return;
+            }
+
+            if (activeWidget) {
+              document.querySelector(`[data-action-id=${activeWidget}]`).active = false;
+              document.querySelector(`[data-panel-id=${activeWidget}]`).hidden = true;
+
+            // Close the progress time series chart when chart widget is closed
+            if (`${activeWidget}` === "charts") {
+              //document.getElementById("land-checkbox").checked = false;
+              timeSeriesChartDiv.style.display = "none";
+            }
+            }
+
+            const nextWidget = target.dataset.actionId;
+            if (nextWidget !== activeWidget) {
+              document.querySelector(`[data-action-id=${nextWidget}]`).active = true;
+              document.querySelector(`[data-panel-id=${nextWidget}]`).hidden = false;
+              activeWidget = nextWidget;
+
+            // Open the time series chart when chart widget is opened.
+            if (`${activeWidget}` === "charts") {
+              //document.getElementById("land-checkbox").checked = true;
+              timeSeriesChartDiv.style.display = "block";
+            }
+
+            // Open the time series chart when chart widget is opened.
+            if (`${activeWidget}` === "animation") {
+              initialization();
+            }
+
+            } else {
+              activeWidget = null;
+            }
+          };
+
+          // Action bar 
+          document.querySelector("calcite-action-bar").addEventListener("click", handleActionBarClick);
+          let actionBarExpanded = false;
+          document.addEventListener("calciteActionBarToggle", event => {
+            actionBarExpanded = !actionBarExpanded;
+            view.padding = {
+              left: actionBarExpanded ? 135 : 45
+            };
+          });
+        
+      }); // end of view.when
+
+  }); // end am4core.ready()
+  
+  const basemaps = new BasemapGallery({
+    view,
+    container: "basemaps-container"
+  });
+
+  const layerList = new LayerList({
+    view: view,
+    selectionEnabled: true,
+    container: "layers-container",
+    listItemCreatedFunction: function(event) {
+      const item = event.item;
+      if (item.title === "Monitoring Structures" ||
+          item.title === "Monitoring Bridge" ||
+          item.title === "Soil Profile" ||
+          item.title === "Survey Extent Line" ||
+          item.title === "OpenStreetMap 3D Buildings" ||
+          item.title === "Status of Land Acquisition" ||
+          item.title === "Status of Structure"){
+        item.visible = false
+      }
+    }
+      });
+  
+  // Legend
+  const legend = new Legend({
+    view: view,
+    container: "legend-container",
+    layerInfos: [
+      {
+        layer: tbmTunnelLayer,
+        title: "TBM Tunnel"
+      },
+      {
+        layer: muckPitLayer,
+        title: "Muck Pit"
+      },
+      {
+        layer: bridgeLayer,
+        title: "OBS Bridge"
+      },
+      {
+        layer: riverLayer,
+        title: "Creek or River"
+      },
+      {
+          layer: natmLayer,
+          title: "NATM"
+      },
+      {
+          layer: lotLayer,
+          title: "Land Acquisition Status"
+      },
+    ]
+  });
+  
+  view.ui.empty("top-left");
+
+ // 
+
+  // See-through-Ground        
+  view.when(function() {
+  // allow navigation above and below the ground
+  map.ground.navigationConstraint = {
+    type: "none"
+  };
+  // the webscene has no basemap, so set a surfaceColor on the ground
+  map.ground.surfaceColor = "#fff";
+  // to see through the ground, set the ground opacity to 0.4
+  map.ground.opacity = 0.9; //
+  });
+
+  document.getElementById("myLink").addEventListener("click", function(event) {
+      const checked = event.srcElement.checked;
+      map.ground.opacity = event.srcElement.checked ? 0.1 : 0.6;
+    });
+
+  });
+  </script>
+</html>

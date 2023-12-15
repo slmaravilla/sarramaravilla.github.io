@@ -1,0 +1,2506 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
+  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
+  -->
+    <title>Tree Cutting (MMSP)</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.28/esri/themes/dark/main.css"
+    />
+    <script
+      type="module"
+      src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"
+    />
+
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Micro.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
+
+    <script src="https://js.arcgis.com/4.28/"></script>
+  </head>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      display: flex;
+    }
+
+    #header-title {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+
+    #info-content {
+      padding: 0.75rem;
+    }
+
+    #item-description b {
+      color: orange;
+    }
+
+    calcite-loader {
+      align-self: center;
+      justify-self: center;
+    }
+
+    calcite-label {
+      --calcite-label-margin-bottom: 0px;
+    }
+
+    #container {
+      display: grid;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      grid-template-columns: 1fr 0.25fr;
+      width: 100%;
+      height: 100%;
+    }
+
+    calcite-tabs {
+      width: 100%;
+      height: 100%;
+    }
+
+    calcite-rating {
+      margin-top: 0.25rem;
+    }
+
+    #header {
+      display: flex;
+      padding: 0 1rem;
+      padding-bottom: 0.7rem;
+      background-color: var(--calcite-ui-foreground-1);
+    }
+
+    #header-controls {
+      display: flex;
+      margin-inline-start: auto;
+      align-self: center;
+      vertical-align: middle;
+    }
+
+    .label-wrapper {
+      display: flex;
+      margin-inline: 1rem;
+      padding: 0.5rem;
+      border: 1px solid var(--calcite-ui-border-1);
+      cursor: pointer;
+    }
+
+    #dateDiv {
+      font-size: 0.85vw;
+      text-align: right;
+      display: flex;
+      align-items: flex-end;
+      font-weight: bold;
+    }
+
+    #dropdownDiv {
+      background-color: rgb(0, 0, 0, 0);
+      width: 50%;
+      opacity: 1;
+      color: black;
+      text-align: right;
+      margin: auto;
+      color: white;
+    }
+
+    /* Expropriation List */
+    /** clear background color of list box **/
+    .panel-side {
+      background-color: rgb(0, 0, 0, 0);
+      margin-top: 1%;
+    }
+
+    /** adjust line height between texts **/
+    .panel-side li {
+      padding: 1% 1%;
+    }
+
+    /** adjust lot ID's font size and color **/
+    .panel-side li b {
+      color: red;
+      font-size: 0.8vw;
+    }
+
+    .panel-result {
+      cursor: pointer;
+      margin: 0px 0;
+    }
+
+    .panel-result:hover,
+    .panel-result:focus,
+    .panel-result.selected {
+      background-color: rgba(73, 72, 72, 0.5);
+    }
+
+    #ongoingApplicationListDiv {
+      list-style: none;
+      padding: 1%;
+      font-size: 0.8vw;
+      width: 18vw;
+      margin: auto;
+    }
+
+    #ongoingApplicationListDiv p {
+      font-size: 0.8vw;
+      margin: auto;
+    }
+
+    #chartPanel {
+      background-color: rgb(0, 0, 0, 0);
+      padding: 8;
+      width: 100%;
+      height: 100%;
+    }
+
+    #treeCuttingNumberDiv,
+    #treeCompensationNumberDiv,
+    #treeConservationNumberDiv {
+      color: rgb(0, 197, 255);
+      text-align: center;
+      font-weight: normal;
+      font-size: 1.6vw;
+      border: solid 0.5px gray;
+      padding-top: 2%;
+      padding-bottom: 4%;
+      margin: auto;
+      width: 80%;
+    }
+
+    #treeCuttingNumberDiv p,
+    #treeCompensationNumberDiv p,
+    #treeConservationNumberDiv p {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: rgb(250, 246, 246);
+      margin: auto;
+      text-align: center;
+      padding-bottom: 5%;
+    }
+
+    #toggle-cluster,
+    #toggle-cluster2,
+    #toggle-cluster3 {
+      width: 70%;
+      margin: auto;
+      margin-top: 20%;
+    }
+
+    #treeCuttingDiv,
+    #treeCompensationDiv,
+    #treeConservationDiv {
+      height: 50vh;
+      align-items: center;
+      margin-bottom: 1vw;
+    }
+
+    p {
+      color: red;
+      text-align: left;
+      font-weight: bold;
+      font-size: 0.5rem;
+    }
+
+    h2 {
+      font-weight: 400;
+      font-style: normal;
+      font-size: 2vw;
+      color: white;
+      padding: 3px;
+      margin: 0px;
+      vertical-align: text-top;
+    }
+
+    img {
+      padding: 0;
+      margin: 0;
+    }
+
+    h4 {
+      color: rgb(0, 197, 255);
+      text-align: left;
+      font-weight: normal;
+      font-size: 14px;
+      padding-top: 20px;
+      margin: 0;
+      width: 160px;
+      vertical-align: text-bottom;
+    }
+
+    h5 {
+      color: rgb(0, 197, 255);
+      text-align: left;
+      font-weight: normal;
+      font-size: 14px;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Browser Setting */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+  <body class="calcite-mode-dark">
+    <calcite-loader></calcite-loader>
+    <calcite-shell content-behind>
+      <!--  Header slot  -->
+      <div slot="header" id="header">
+        <!-- Title -->
+        <h2 id="header-title" slot="header"></h2>
+        <div id="dateDiv"></div>
+
+        <!-- Dropdown Lists -->
+        <div id="dropdownDiv" class="esri-widget">
+          <label id="dropdownContractPackageLabel">
+            CP:
+            <select id="packageSelect" class="esri-widget"></select>
+          </label>
+          <label id="dropdownStationTypeLabel">
+            Section:
+            <select id="stationSelect" class="esri-widget"></select>
+          </label>
+        </div>
+      </div>
+      <!-- Icon -->
+      <!-- https://developers.arcgis.com/calcite-design-system/icons/?icon=list&library=Calcite%20UI -->
+      <calcite-shell-panel slot="panel-start" display-mode="float" detached>
+        <calcite-action-bar slot="action-bar">
+          <calcite-action
+            data-action-id="layers"
+            icon="layers"
+            text="Layers"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="basemaps"
+            icon="basemap"
+            text="Basemaps"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="legend"
+            icon="legend"
+            text="Legend"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="locate"
+            icon="gps-on-f"
+            text="My Location"
+          ></calcite-action>
+          <calcite-action
+            data-action-id="information"
+            icon="information"
+            text="Information"
+          ></calcite-action>
+        </calcite-action-bar>
+
+        <!-- Map-specific panels (each one provides a div for ArcGIS Maps SDK for JavaScript widgets) -->
+        <calcite-panel
+          heading="Layers"
+          height-scale="l"
+          data-panel-id="layers"
+          hidden
+        >
+          <div id="layers-container"></div>
+        </calcite-panel>
+        <calcite-panel
+          heading="Basemaps"
+          height-scale="l"
+          data-panel-id="basemaps"
+          hidden
+        >
+          <div id="basemaps-container"></div>
+        </calcite-panel>
+        <calcite-panel
+          heading="Legend"
+          height-scale="l"
+          data-panel-id="legend"
+          hidden
+        >
+          <div id="legend-container"></div>
+        </calcite-panel>
+        <calcite-panel
+          heading="Click the icon below"
+          width-scale="w"
+          data-panel-id="locate"
+          hidden
+        >
+          <div id="locate-container"></div>
+        </calcite-panel>
+
+        <!-- Info panel (populates with info from the web map) -->
+        <calcite-panel heading="Description" data-panel-id="information" hidden>
+          <div id="info-content">
+            <!-- <img id="item-thumbnail" alt="webmap thumbnail" /> -->
+            <div id="item-description">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </calcite-panel>
+      </calcite-shell-panel>
+
+      <div id="container">
+        <div id="viewDiv"></div>
+        <calcite-tabs>
+          <div id="chartPanel">
+            <calcite-tab-nav slot="tab-nav" id="thetabs">
+              <calcite-tab-title class="Cutting" selected
+                >Cutting</calcite-tab-title
+              >
+              <calcite-tab-title class="Compensation"
+                >Compensation</calcite-tab-title
+              >
+              <!-- <calcite-tab-title>Application</calcite-tab-title> -->
+            </calcite-tab-nav>
+            <calcite-tab>
+              <div class="boxCut" id="treeCuttingDiv"></div>
+              <div id="treeCuttingNumberDiv"></div>
+              <button id="toggle-cluster" class="esri-button" type="button">
+                Disable Clustering
+              </button>
+            </calcite-tab>
+            <calcite-tab>
+              <div class="boxCompen" id="treeCompensationDiv"></div>
+              <div id="treeCompensationNumberDiv"></div>
+            </calcite-tab>
+          </div>
+        </calcite-tabs>
+      </div>
+    </calcite-shell>
+  </body>
+  <script>
+    require([
+      "esri/Basemap",
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/views/SceneView",
+      "esri/layers/FeatureLayer",
+      "esri/layers/support/FeatureFilter",
+      "esri/layers/SceneLayer",
+      "esri/layers/Layer",
+      "esri/layers/TileLayer",
+      "esri/layers/VectorTileLayer",
+      "esri/layers/support/LabelClass",
+      "esri/symbols/LabelSymbol3D",
+      "esri/WebMap",
+      "esri/WebScene",
+      "esri/portal/PortalItem",
+      "esri/portal/Portal",
+      "esri/widgets/Legend",
+      "esri/widgets/LayerList",
+      "esri/widgets/Fullscreen",
+      "esri/rest/geometryService",
+      "esri/rest/support/Query",
+      "esri/rest/support/StatisticDefinition",
+      "esri/symbols/WebStyleSymbol",
+      "esri/widgets/Expand",
+      "esri/widgets/Editor",
+      "esri/renderers/UniqueValueRenderer",
+      "esri/layers/support/Sublayer",
+      "esri/widgets/Search",
+      "esri/widgets/Compass",
+      "esri/smartMapping/labels/clusters",
+      "esri/smartMapping/popup/clusters",
+      "esri/widgets/Locate",
+      "esri/widgets/BasemapGallery",
+    ], function (
+      Basemap,
+      Map,
+      MapView,
+      SceneView,
+      FeatureLayer,
+      FeatureFilter,
+      SceneLayer,
+      Layer,
+      TileLayer,
+      VectorTileLayer,
+      LabelClass,
+      LabelSymbol3D,
+      WebMap,
+      WebScene,
+      PortalItem,
+      Portal,
+      Legend,
+      LayerList,
+      Fullscreen,
+      geometryService,
+      Query,
+      StatisticDefinition,
+      WebStyleSymbol,
+      Expand,
+      Editor,
+      UniqueValueRenderer,
+      Sublayer,
+      Search,
+      Compass,
+      clusterLabelCreator,
+      clusterPopupCreator,
+      Locate,
+      BasemapGallery
+    ) {
+      let chartLayerView;
+      var highlightSelect;
+
+      var basemap = new Basemap({
+        baseLayers: [
+          new VectorTileLayer({
+            portalItem: {
+              id: "8a9ef2a144e8423786f6139408ac3424", // 3a62040541b84f528da3ac7b80cf4a63
+            },
+          }),
+        ],
+      });
+
+      var map = new Map({
+        basemap: basemap, // "streets-night-vector",
+        ground: "world-elevation",
+      });
+
+      var view = new MapView({
+        map: map,
+        center: [121.0194387, 14.6972616],
+        zoom: 14,
+        container: "viewDiv",
+        environment: {
+          background: {
+            type: "color", // autocasts as new ColorBackground()
+            color: [0, 0, 0, 1],
+          },
+        },
+      });
+
+      view.ui.components = [];
+
+      // Station1 dropdown list
+      var packageSelect = document.getElementById("packageSelect");
+      var stationSelect = document.getElementById("stationSelect");
+
+      ///// Renderer ///
+      // Boundary
+      // Construction boundary
+      let ConstructionBoundaryFill = {
+        type: "unique-value",
+        valueExpression:
+          "When($feature.MappingBoundary == 1, 'Boundary',$feature.MappingBoundary)",
+        uniqueValueInfos: [
+          {
+            value: "Boundary",
+            symbol: {
+              type: "simple-fill",
+              color: [0, 0, 0, 0],
+              outline: {
+                width: 1.5,
+                color: [215, 215, 158], //[78, 78, 78]
+                style: "short-dash",
+              },
+            },
+          },
+        ],
+      };
+
+      // Lot
+      let defaultLotSymbol = {
+        type: "simple-fill",
+        color: [0, 0, 0, 0],
+        style: "solid",
+        outline: {
+          color: [225, 225, 225],
+          width: 0.7,
+        },
+      };
+
+      let lotRenderer = {
+        type: "unique-value",
+        field: "TCP_Proces",
+        defaultSymbol: defaultLotSymbol,
+        uniqueValueInfos: [
+          {
+            value: 1,
+            symbol: {
+              type: "simple-fill",
+              color: [0, 0, 0, 0],
+              style: "solid",
+              outline: {
+                color: [225, 225, 225],
+                width: 0.7,
+              },
+            },
+          },
+          {
+            value: 2,
+            symbol: {
+              type: "simple-fill",
+              color: [0, 0, 0, 0],
+              style: "solid",
+              outline: {
+                color: [225, 225, 225],
+                width: 0.7,
+              },
+            },
+          },
+          {
+            value: 3,
+            symbol: {
+              type: "simple-fill",
+              color: [0, 0, 0, 0],
+              style: "solid",
+              outline: {
+                color: [225, 225, 225],
+                width: 0.7,
+              },
+            },
+          },
+          {
+            value: 4,
+            symbol: {
+              type: "simple-fill",
+              color: [0, 0, 0, 0],
+              style: "solid",
+              outline: {
+                color: [225, 225, 225],
+                width: 0.7,
+              },
+            },
+          },
+          {
+            value: 5,
+            symbol: {
+              type: "simple-fill",
+              color: [0, 0, 0, 0],
+              style: "solid",
+              outline: {
+                color: [225, 225, 225],
+                width: 0.7,
+              },
+            },
+          },
+          {
+            value: 6,
+            symbol: {
+              type: "simple-fill",
+              color: [0, 0, 0, 0],
+              style: "solid",
+              outline: {
+                color: [225, 225, 225],
+                width: 0.7,
+              },
+            },
+          },
+        ],
+      };
+
+      // Tree cut
+      const cutStatus = {
+        tcpapp: "For TCP Application",
+        denr: "Submitted to DENR",
+        permitc: "With Permit-Not Yet Cut",
+        permite: "With Permit-Not Yet Earthballed",
+        cut: "Cut",
+        earthb: "Earthballed",
+        expro: "TCP Expired",
+      };
+
+      const cutColor = {
+        tcpapp_hex: "#71AB48",
+        tcpapp_rgb: [113, 171, 72],
+
+        denr_hex: "#5E4FA2",
+        denr_rgb: [94, 79, 162],
+
+        permitc_hex: "#FFFF00",
+        permitc_rgb: [255, 255, 0],
+
+        permite_hex: "#FFAA00",
+        permite_rgb: [255, 170, 0],
+
+        cut_hex: "#0073FF",
+        cut_rgb: [0, 115, 255],
+
+        earthb_hex: "#3288BD",
+        earthb_rgb: [50, 136, 189],
+
+        exp_hex: "#FF0000",
+        exp_rgb: [255, 0, 0],
+      };
+
+      const outlineColor = "gray";
+
+      let treeCuttingRenderer = {
+        type: "unique-value",
+        valueExpression:
+          "When($feature.TCP_Proces == 1, 'tcpapp', $feature.TCP_Proces == 2, 'denr', \
+                        $feature.TCP_Proces == 3, 'permitcut', $feature.TCP_Proces == 4, 'permitearthb', \
+                        $feature.TCP_Proces == 5, 'cut', $feature.TCP_Proces == 6, 'earthb', \
+                        $feature.TCP_Proces == 7, 'tcpexp', 'other')",
+        uniqueValueInfos: [
+          {
+            value: "tcpapp",
+            label: "For TCP Application",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: cutColor.tcpapp_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "denr",
+            label: "Submitted to DENR",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: cutColor.denr_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "permitcut",
+            label: "With Permit-Not Yet Cut",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: cutColor.permitc_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "permitearthb",
+            label: "With Permit-Not Yet Earthballed",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 4,
+              color: cutColor.permite_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "cut",
+            label: "Cut",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: cutColor.cut_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "earthb",
+            label: "Earthballed",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: cutColor.earthb_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "tcpexp",
+            label: "TCP Expired",
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: cutColor.exp_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+        ],
+      };
+
+      //
+      const compenStatus = {
+        appraisal: "For Appraisal",
+        serving: "For Serving of RfD/OtC",
+        served: "Served RfD/OtC",
+        legalp: "For Legal Pass",
+        payp: "For Payment Processing/Obligation/Signing of ACRCT",
+        check: "For Check Issuance",
+        paid: "Paid",
+        nocompen: "No Compensation",
+        donation: "For Donation",
+        expro: "Expro",
+        row: "Right of Way Usage Agreement (ROWUA)",
+      };
+
+      const compenColor = {
+        appraisal_hex: "#FFFF00",
+        appraisal_rgb: [255, 255, 0],
+
+        serving_hex: "#FF5500",
+        serving_rgb: [255, 85, 0],
+
+        served_hex: "#FF73DF",
+        served_rgb: [255, 115, 223],
+
+        legalp_hex: "#00A884",
+        legalp_rgb: [0, 168, 132],
+
+        payp_hex: "#FFAA00",
+        payp_rgb: [255, 170, 0],
+
+        check_hex: "#3288BD",
+        check_rgb: [50, 136, 189],
+
+        paid_hex: "#71AB48",
+        paid_rgb: [113, 171, 72],
+
+        nocompen_hex: "#0073FF",
+        nocompen_rgb: [0, 115, 255],
+
+        donation_hex: "#5E4FA2",
+        donation_rgb: [94, 79, 162],
+
+        expro_hex: "#FF0000",
+        expro_rgb: [255, 0, 0],
+
+        row_hex: "#E1E1E1",
+        row_rgb: [225, 225, 225],
+      };
+
+      let treeTree_CompeRenderer = {
+        type: "unique-value",
+        valueExpression:
+          "When($feature.Tree_Compe == 1, 'appraisal', $feature.Tree_Compe == 2, 'serving', \
+                        $feature.Tree_Compe == 3, 'served', $feature.Tree_Compe == 4, 'legalp', \
+                        $feature.Tree_Compe == 5, 'payp', $feature.Tree_Compe == 6, 'check', \
+                        $feature.Tree_Compe == 7, 'paid', $feature.Tree_Compe == 8, 'nocompen', $feature.Tree_Compe == 9, 'donation', \
+                        $feature.Tree_Compe == 10, 'expro', $feature.Tree_Compe == 11, 'row', $feature.Tree_Compe)",
+        uniqueValueInfos: [
+          {
+            value: "appraisal",
+            label: compenStatus.appraisal,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.appraisal_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "serving",
+            label: compenStatus.serving,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.serving_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "served",
+            label: compenStatus.served,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.served_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "legalp",
+            label: compenStatus.legalp,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.legalp_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "payp",
+            label: compenStatus.payp,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.payp_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "check",
+            label: compenStatus.check,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.check_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "paid",
+            label: compenStatus.paid,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.paid_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "nocompen",
+            label: compenStatus.nocompen,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.nocompen_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "donation",
+            label: compenStatus.donation,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.donation_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "expro",
+            label: compenStatus.expro,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.expro_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+          {
+            value: "row",
+            label: compenStatus.row,
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              size: 5,
+              color: compenColor.row_rgb, // the first two letters dictate transparency.
+              outline: {
+                width: 0.5,
+                color: outlineColor,
+              },
+            },
+          },
+        ],
+      };
+
+      //*******************************//
+      // Import Layers                 //
+      //*******************************//
+      // Station1 point feature
+      var stationLayer = new FeatureLayer({
+        portalItem: {
+          id: "c34277793d164f248abb0926963ae92d",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 1,
+        definitionExpression: "Project = 'MMSP'",
+      });
+      stationLayer.listMode = "hide";
+      map.add(stationLayer, 0);
+
+      // Construction boundary
+      var constBoundary = new FeatureLayer({
+        portalItem: {
+          id: "c34277793d164f248abb0926963ae92d",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 4,
+        outFields: ["*"],
+        renderer: ConstructionBoundaryFill,
+        definitionExpression: "MappingBoundary = 1",
+        title: "Construction Boundary",
+        popupEnabled: false,
+      });
+      //constBoundary.listMode = "hide";
+      map.add(constBoundary);
+
+      // Status of LA
+      // Lot
+      var lotLayer = new FeatureLayer({
+        portalItem: {
+          id: "7e20edfba96e4854acd716cbadf5f57f",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        layerId: 1,
+        title: "Status of Land Acquisition",
+        renderer: lotRenderer,
+        popupEnabled: false,
+        outFields: ["*"],
+      });
+      //lotLayer.listMode = "hide";
+      map.add(lotLayer, 1);
+
+      //
+
+      const lotBoundaryOnlyRenderer = {
+        type: "simple",
+        symbol: {
+          type: "simple-fill", // autocasts as new SimpleFillSymbol()
+          color: [0, 0, 0, 0],
+          style: "solid",
+          outline: {
+            // autocasts as new SimpleLineSymbol()
+            color: [110, 110, 110],
+            width: 1.5,
+          },
+        },
+      };
+
+      // Tree Cutting
+      var treeCuttingLayer = new FeatureLayer({
+        portalItem: {
+          id: "9aa2711a35ba4ab998551e3861422c9c",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        elevationInfo: {
+          mode: "on-the-ground",
+        },
+        layerId: 1,
+        outFields: ["*"],
+        title: "Status of Tree Cutting",
+        renderer: treeCuttingRenderer,
+        popupTemplate: {
+          title: "<h5>{TCP_Proces}</h5>",
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          /*
+            actions: [
+                {
+                    id: "find-lot",
+                    title: "Lot"
+                }
+            ],
+            */
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "Scientific",
+                  label: "Scientific Name",
+                },
+                {
+                  fieldName: "Common_Nam",
+                  label: "Common Name",
+                },
+                {
+                  fieldName: "TreeStatus",
+                  label: "Tree Status",
+                },
+                {
+                  fieldName: "Recom",
+                  label: "Recommendation",
+                },
+                {
+                  fieldName: "City",
+                },
+                {
+                  fieldName: "Id",
+                  label: "Tree ID",
+                },
+                {
+                  fieldName: "TCP_Proces",
+                  label: "Tree Cutting",
+                },
+                {
+                  fieldName: "Remarks2",
+                  label: "Remarks",
+                },
+              ],
+            },
+          ],
+        },
+      });
+      map.add(treeCuttingLayer, 2);
+
+      // Tree Tree_Compe
+      var compensationLayer = new FeatureLayer({
+        portalItem: {
+          id: "9aa2711a35ba4ab998551e3861422c9c",
+          portal: {
+            url: "https://gis.railway-sector.com/portal",
+          },
+        },
+        outFields: ["*"],
+        layerId: 1,
+        title: "Status of Tree Compensation",
+        renderer: treeTree_CompeRenderer,
+        popupTemplate: {
+          title: "<h5>{Tree_Compe}</h5>",
+          lastEditInfoEnabled: false,
+          returnGeometry: true,
+          /*
+            actions: [
+                {
+                    id: "find-lot",
+                    title: "Lot"
+                }
+            ],
+            */
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "Scientific",
+                  label: "Scientific Name",
+                },
+                {
+                  fieldName: "Common_Nam",
+                  label: "Common Name",
+                },
+                {
+                  fieldName: "TreeStatus",
+                  label: "Tree Status",
+                },
+                {
+                  fieldName: "Recom",
+                  label: "Recommendation",
+                },
+                {
+                  fieldName: "City",
+                },
+                {
+                  fieldName: "Id",
+                  label: "Tree ID",
+                },
+                {
+                  fieldName: "Remarks2",
+                  label: "Remarks",
+                },
+              ],
+            },
+          ],
+        },
+      });
+      map.add(compensationLayer, 1);
+
+      treeCuttingLayer
+        .when()
+        .then(generateClusterConfig)
+        .then((featureReduction) => {
+          treeCuttingLayer.featureReduction = featureReduction;
+
+          const toggleButton = document.getElementById("toggle-cluster");
+          toggleButton.addEventListener("click", toggleClustering);
+
+          // To turn off clustering on a layer, set the
+          // featureReduction property to null
+          function toggleClustering() {
+            if (isWithinScaleThreshold()) {
+              let fr = treeCuttingLayer.featureReduction;
+              treeCuttingLayer.featureReduction =
+                fr && fr.type === "cluster" ? null : featureReduction;
+            }
+            toggleButton.innerText =
+              toggleButton.innerText === "Enable Clustering"
+                ? "Disable Clustering"
+                : "Enable Clustering";
+          }
+
+          view.watch("scale", (scale) => {
+            if (toggleButton.innerText === "Disable Clustering") {
+              treeCuttingLayer.featureReduction = isWithinScaleThreshold()
+                ? featureReduction
+                : null;
+            }
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      function isWithinScaleThreshold() {
+        return view.scale > 5000;
+      }
+
+      async function generateClusterConfig(layer) {
+        // generates default popupTemplate
+        const popupTemplate = await clusterPopupCreator
+          .getTemplates({ layer })
+          .then(
+            (popupTemplateResponse) =>
+              popupTemplateResponse.primaryTemplate.value
+          );
+
+        // generates default labelingInfo
+        const { labelingInfo, clusterMinSize } = await clusterLabelCreator
+          .getLabelSchemes({ layer, view })
+          .then((labelSchemes) => labelSchemes.primaryScheme);
+
+        return {
+          type: "cluster",
+          popupTemplate,
+          labelingInfo,
+          clusterMinSize,
+        };
+      }
+
+      /////////////////////////////////////////////////////////////////////////////////////
+      //*******************************//
+      //      Progress Chart           //
+      //*******************************//
+      /* Function for zooming to selected layers */
+      function zoomToLayer(layer) {
+        return layer.queryExtent().then(function (response) {
+          view
+            .goTo(response.extent, {
+              //response.extent
+              speedFactor: 2,
+            })
+            .catch(function (error) {
+              if (error.name != "AbortError") {
+                console.error(error);
+              }
+            });
+        });
+      }
+
+      document.getElementById("dateDiv").innerHTML = "As of November 28, 2023"; //lastEditedDate;lastEditedDate;
+
+      am5.ready(function () {
+        var root = am5.Root.new("treeCuttingDiv");
+        root._logo.dispose();
+
+        function updateChartCutting() {
+          root.container.children.clear();
+
+          var total_tcpapp = {
+            onStatisticField: "CASE WHEN TCP_Proces = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_tcpapp",
+            statisticType: "sum",
+          };
+
+          var total_denr = {
+            onStatisticField: "CASE WHEN TCP_Proces = 2 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_denr",
+            statisticType: "sum",
+          };
+
+          var total_permitcut = {
+            onStatisticField: "CASE WHEN TCP_Proces = 3 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_permitcut",
+            statisticType: "sum",
+          };
+
+          var total_permitearthb = {
+            onStatisticField: "CASE WHEN TCP_Proces = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_permitearthb",
+            statisticType: "sum",
+          };
+
+          var total_cut = {
+            onStatisticField: "CASE WHEN TCP_Proces = 5 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_cut",
+            statisticType: "sum",
+          };
+
+          var total_earthb = {
+            onStatisticField: "CASE WHEN TCP_Proces = 6 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_earthb",
+            statisticType: "sum",
+          };
+
+          var total_tcpexp = {
+            onStatisticField: "CASE WHEN TCP_Proces = 7 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_tcpexp",
+            statisticType: "sum",
+          };
+
+          var query = treeCuttingLayer.createQuery();
+          query.outStatistics = [
+            total_tcpapp,
+            total_denr,
+            total_permitcut,
+            total_permitearthb,
+            total_cut,
+            total_earthb,
+            total_tcpexp,
+          ];
+          query.returnGeometry = true;
+
+          treeCuttingLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const depot_tcpapp = stats.total_tcpapp;
+            const depot_denr = stats.total_denr;
+            const depot_permitcut = stats.total_permitcut;
+            const depot_permitearthb = stats.total_permitearthb;
+            const depot_cut = stats.total_cut;
+            const depot_earthb = stats.total_earthb;
+            const depot_tcpexp = stats.total_tcpexp;
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root.setThemes([
+              am5themes_Animated.new(root),
+              am5themes_Responsive.new(root),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
+            var chart = root.container.children.push(
+              am5percent.PieChart.new(root, {
+                //centerY: am5.percent(-2), //-10
+                //y: am5.percent(-30), // -30
+                layout: root.verticalLayout,
+              })
+            );
+
+            // Create series
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
+            var pieSeries = chart.series.push(
+              am5percent.PieSeries.new(root, {
+                name: "Series",
+                categoryField: "category",
+                valueField: "value",
+                //legendLabelText: "[{fill}]{category}[/]",
+                legendValueText:
+                  "{valuePercentTotal.formatNumber('#.')}% ({value})",
+                radius: am5.percent(85), // outer radius
+                innerRadius: am5.percent(40),
+                scale: 0.8,
+              })
+            );
+
+            // Set data
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
+            //https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/pie-series/
+
+            // Set slice opacity and stroke color
+            pieSeries.slices.template.setAll({
+              fillOpacity: 0.9,
+              stroke: am5.color("#ffffff"),
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              templateField: "sliceSettings",
+            });
+
+            // Disabling labels and ticks
+            pieSeries.labels.template.set("visible", false);
+            pieSeries.ticks.template.set("visible", false);
+
+            //pieSeries.appear(1000, 100)
+            pieSeries.slices.template.events.on("click", function (ev) {
+              const SELECTED = ev.target.dataItem.dataContext.category;
+
+              if (SELECTED == cutStatus.tcpapp) {
+                selectedStatus = 1;
+              } else if (SELECTED == cutStatus.denr) {
+                selectedStatus = 2;
+              } else if (SELECTED == cutStatus.permitc) {
+                selectedStatus = 3;
+              } else if (SELECTED == cutStatus.permite) {
+                selectedStatus = 4;
+              } else if (SELECTED == cutStatus.cut) {
+                selectedStatus = 5;
+              } else if (SELECTED == cutStatus.earthb) {
+                selectedStatus = 6;
+              } else if (SELECTED == cutStatus.expro) {
+                selectedStatus = 7;
+              } else {
+                selectedStatus = null;
+              }
+
+              view.when(function () {
+                view.whenLayerView(treeCuttingLayer).then(function (layerView) {
+                  //chartLayerView = layerView;
+
+                  treeCuttingLayer.queryFeatures().then(function (results) {
+                    const RESULT_LENGTH = results.features;
+                    const ROW_N = RESULT_LENGTH.length;
+
+                    let objID = [];
+                    for (var i = 0; i < ROW_N; i++) {
+                      var obj = results.features[i].attributes.OBJECTID;
+                      objID.push(obj);
+                    }
+                    
+                    console.log(objID);
+
+                    var queryExt = new Query({
+                      objectIds: objID,
+                    });
+
+                    treeCuttingLayer
+                      .queryExtent(queryExt)
+                      .then(function (result) {
+                        if (result.extent) {
+                          view.goTo(result.extent);
+                        }
+                      });
+
+                    if (highlightSelect) {
+                      highlightSelect.remove();
+                    }
+                    highlightSelect = layerView.highlight(objID);
+
+                    view.on("click", function () {
+                      layerView.filter = null;
+                      highlightSelect.remove();
+                    });
+                  }); // End of queryFeatures
+                  layerView.filter = {
+                    where: "TCP_Proces = " + selectedStatus,
+                  };
+                }); // End of view.whenLayerView
+              }); // End of view.when
+            });
+
+            pieSeries.data.setAll([
+              {
+                category: cutStatus.tcpapp,
+                value: depot_tcpapp,
+                sliceSettings: {
+                  fill: am5.color(cutColor.tcpapp_hex),
+                },
+              },
+              {
+                category: cutStatus.denr,
+                value: depot_denr,
+                sliceSettings: {
+                  fill: am5.color(cutColor.denr_hex),
+                },
+              },
+              {
+                category: cutStatus.permitc,
+                value: depot_permitcut,
+                sliceSettings: {
+                  fill: am5.color(cutColor.permitc_hex),
+                },
+              },
+              {
+                category: cutStatus.permite,
+                value: depot_permitearthb,
+                sliceSettings: {
+                  fill: am5.color(cutColor.permite_hex),
+                },
+              },
+              {
+                category: cutStatus.cut,
+                value: depot_cut,
+                sliceSettings: {
+                  fill: am5.color(cutColor.cut_hex),
+                },
+              },
+              {
+                category: cutStatus.earthb,
+                value: depot_earthb,
+                sliceSettings: {
+                  fill: am5.color(cutColor.earthb_hex),
+                },
+              },
+              {
+                category: cutStatus.expro,
+                value: depot_tcpexp,
+                sliceSettings: {
+                  fill: am5.color(cutColor.exp_hex),
+                },
+              },
+            ]);
+
+            // Legend
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
+            var legend = chart.children.push(
+              am5.Legend.new(root, {
+                centerX: am5.percent(50),
+                x: am5.percent(50),
+                layout: root.verticalLayout,
+                marginBottom: 10,
+              })
+            );
+            legend.data.setAll(pieSeries.dataItems);
+
+            // Change the size of legend markers
+            legend.markers.template.setAll({
+              width: 18,
+              height: 18,
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              stroke: am5.color("#ffffff"),
+            });
+
+            // Change the marker shape
+            legend.markerRectangles.template.setAll({
+              cornerRadiusTL: 10,
+              cornerRadiusTR: 10,
+              cornerRadiusBL: 10,
+              cornerRadiusBR: 10,
+            });
+
+            // To align legend items: valueLabels right, labels to left
+            // 1. fix width of valueLabels
+            // 2. dynamically change width of labels by screen size
+
+            const valueLabelsWidth = 50;
+
+            // Responsive legend
+            // https://www.amcharts.com/docs/v5/tutorials/pie-chart-with-a-legend-with-dynamically-sized-labels/
+            chart.onPrivate("width", function (width) {
+              let box = document.querySelector(".boxCut");
+              const boxWidth = box.offsetWidth;
+              var availableSpace = Math.max(width - chart.width() - 150, 180);
+              //var availableSpace = (boxWidth - valueLabelsWidth) * 0.7
+              legend.labels.template.setAll({
+                width: availableSpace,
+                maxWidth: availableSpace,
+              });
+            });
+
+            // Change legend labelling properties
+            // To have responsive font size, do not set font size
+            legend.labels.template.setAll({
+              oversizedBehavior: "truncate",
+              fill: am5.color("#ffffff"),
+              //textDecoration: "underline"
+              //width: am5.percent(200)
+              //fontWeight: "300"
+            });
+
+            legend.valueLabels.template.setAll({
+              textAlign: "right",
+              width: valueLabelsWidth,
+              fill: am5.color("#ffffff"),
+              //fontSize: LEGEND_FONT_SIZE,
+            });
+
+            legend.itemContainers.template.setAll({
+              // set space between legend items
+              paddingTop: 1.1,
+              paddingBottom: 2,
+            });
+
+            pieSeries.appear(1000, 100);
+          }); // End of queryFeatures
+        } // End of updateChartCutting function
+
+        var root2 = am5.Root.new("treeCompensationDiv");
+        root2._logo.dispose();
+        function updateChartTreeComp() {
+          root2.container.children.clear();
+
+          var total_appraisal = {
+            onStatisticField: "CASE WHEN Tree_Compe = 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_appraisal",
+            statisticType: "sum",
+          };
+
+          var total_serving = {
+            onStatisticField: "CASE WHEN Tree_Compe = 2 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_serving",
+            statisticType: "sum",
+          };
+
+          var total_served = {
+            onStatisticField: "CASE WHEN Tree_Compe = 3 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_served",
+            statisticType: "sum",
+          };
+
+          var total_legalpass = {
+            onStatisticField: "CASE WHEN Tree_Compe = 4 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_legalpass",
+            statisticType: "sum",
+          };
+
+          var total_payp = {
+            onStatisticField: "CASE WHEN Tree_Compe = 5 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_payp",
+            statisticType: "sum",
+          };
+
+          var total_check = {
+            onStatisticField: "CASE WHEN Tree_Compe = 6 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_check",
+            statisticType: "sum",
+          };
+
+          var total_paid = {
+            onStatisticField: "CASE WHEN Tree_Compe = 7 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_paid",
+            statisticType: "sum",
+          };
+
+          var total_nocompen = {
+            onStatisticField: "CASE WHEN Tree_Compe = 8 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_nocompen",
+            statisticType: "sum",
+          };
+
+          var total_donation = {
+            onStatisticField: "CASE WHEN Tree_Compe = 9 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_donation",
+            statisticType: "sum",
+          };
+
+          var total_expro = {
+            onStatisticField: "CASE WHEN Tree_Compe = 10 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_expro",
+            statisticType: "sum",
+          };
+
+          var total_row = {
+            onStatisticField: "CASE WHEN Tree_Compe = 11 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_row",
+            statisticType: "sum",
+          };
+
+          var query = compensationLayer.createQuery();
+          query.outStatistics = [
+            total_appraisal,
+            total_serving,
+            total_served,
+            total_legalpass,
+            total_payp,
+            total_check,
+            total_paid,
+            total_nocompen,
+            total_donation,
+            total_expro,
+            total_row,
+          ];
+          query.returnGeometry = true;
+
+          compensationLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const appraisal = stats.total_appraisal;
+            const serving = stats.total_serving;
+            const served = stats.total_served;
+            const legalp = stats.total_legalpass;
+            const paymentp = stats.total_payp;
+            const checkissue = stats.total_checkissue;
+            const paid = stats.total_paid;
+            const noncompen = stats.total_nocompen;
+            const donation = stats.total_donation;
+            const expro = stats.total_expro;
+            const row = stats.total_row;
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root2.setThemes([
+              am5themes_Animated.new(root2),
+              am5themes_Responsive.new(root2),
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
+            var chart = root2.container.children.push(
+              am5percent.PieChart.new(root2, {
+                //centerY: am5.percent(-2), //-10
+                //y: am5.percent(-30), // -30
+                layout: root2.verticalLayout,
+              })
+            );
+
+            // Create series
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
+            var pieSeries = chart.series.push(
+              am5percent.PieSeries.new(root2, {
+                name: "Series",
+                categoryField: "category",
+                valueField: "value",
+                //legendLabelText: "[{fill}]{category}[/]",
+                legendValueText:
+                  "{valuePercentTotal.formatNumber('#.')}% ({value})",
+                radius: am5.percent(85), // outer radius
+                innerRadius: am5.percent(40),
+                scale: 0.8,
+              })
+            );
+
+            // Set data
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
+            //https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/pie-series/
+
+            // Set slice opacity and stroke color
+            pieSeries.slices.template.setAll({
+              fillOpacity: 0.9,
+              stroke: am5.color("#ffffff"),
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              templateField: "sliceSettings",
+            });
+
+            // Disabling labels and ticks
+            pieSeries.labels.template.set("visible", false);
+            pieSeries.ticks.template.set("visible", false);
+
+            //pieSeries.appear(1000, 100)
+            pieSeries.slices.template.events.on("click", function (ev) {
+              const SELECTED = ev.target.dataItem.dataContext.category;
+              console.log(SELECTED);
+              if (SELECTED == compenStatus.appraisal) {
+                selectedStatus = 1;
+              } else if (SELECTED == compenStatus.serving) {
+                selectedStatus = 2;
+              } else if (SELECTED == compenStatus.served) {
+                selectedStatus = 3;
+              } else if (SELECTED == compenStatus.legalp) {
+                selectedStatus = 4;
+              } else if (SELECTED == compenStatus.payp) {
+                selectedStatus = 5;
+              } else if (SELECTED == compenStatus.check) {
+                selectedStatus = 6;
+              } else if (SELECTED == compenStatus.paid) {
+                selectedStatus = 7;
+              } else if (SELECTED == compenStatus.nocompen) {
+                selectedStatus = 8;
+              } else if (SELECTED == compenStatus.donation) {
+                selectedStatus = 9;
+              } else if (SELECTED == compenStatus.expro) {
+                selectedStatus = 10;
+              } else if (SELECTED == compenStatus.row) {
+                selectedStatus = 11;
+              } else {
+                selectedStatus = null;
+              }
+
+              view.when(function () {
+                view
+                  .whenLayerView(compensationLayer)
+                  .then(function (layerView) {
+                    //chartLayerView = layerView;
+
+                    compensationLayer.queryFeatures().then(function (results) {
+                      const RESULT_LENGTH = results.features;
+                      const ROW_N = RESULT_LENGTH.length;
+
+                      let objID = [];
+                      for (var i = 0; i < ROW_N; i++) {
+                        var obj = results.features[i].attributes.OBJECTID;
+                        objID.push(obj);
+                      }
+
+                      var queryExt = new Query({
+                        objectIds: objID,
+                      });
+
+                      compensationLayer
+                        .queryExtent(queryExt)
+                        .then(function (result) {
+                          if (result.extent) {
+                            view.goTo(result.extent);
+                          }
+                        });
+
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      highlightSelect = layerView.highlight(objID);
+
+                      view.on("click", function () {
+                        layerView.filter = null;
+                        highlightSelect.remove();
+                      });
+                    }); // End of queryFeatures
+                    layerView.filter = {
+                      where: "Tree_Compe = " + selectedStatus,
+                    };
+                  }); // End of view.whenLayerView
+              }); // End of view.when
+            });
+
+            pieSeries.data.setAll([
+              {
+                category: compenStatus.appraisal,
+                value: appraisal,
+                sliceSettings: {
+                  fill: am5.color(compenColor.appraisal_hex),
+                },
+              },
+              {
+                category: compenStatus.serving,
+                value: serving,
+                sliceSettings: {
+                  fill: am5.color(compenColor.serving_hex),
+                },
+              },
+              {
+                category: compenStatus.served,
+                value: served,
+                sliceSettings: {
+                  fill: am5.color(compenColor.served_hex),
+                },
+              },
+              {
+                category: compenStatus.legalp,
+                value: legalp,
+                sliceSettings: {
+                  fill: am5.color(compenColor.legalp_hex),
+                },
+              },
+              {
+                category: compenStatus.payp,
+                value: paymentp,
+                sliceSettings: {
+                  fill: am5.color(compenColor.payp_hex),
+                },
+              },
+              {
+                category: compenStatus.check,
+                value: checkissue,
+                sliceSettings: {
+                  fill: am5.color(compenColor.check_hex),
+                },
+              },
+              {
+                category: compenStatus.paid,
+                value: paid,
+                sliceSettings: {
+                  fill: am5.color(compenColor.paid_hex),
+                },
+              },
+              {
+                category: compenStatus.nocompen,
+                value: noncompen,
+                sliceSettings: {
+                  fill: am5.color(compenColor.nocompen_hex),
+                },
+              },
+              {
+                category: compenStatus.donation,
+                value: donation,
+                sliceSettings: {
+                  fill: am5.color(compenColor.donation_hex),
+                },
+              },
+              {
+                category: compenStatus.expro,
+                value: expro,
+                sliceSettings: {
+                  fill: am5.color(compenColor.expro_hex),
+                },
+              },
+              {
+                category: compenStatus.row,
+                value: row,
+                sliceSettings: {
+                  fill: am5.color(compenColor.row_hex),
+                },
+              },
+            ]);
+
+            // Legend
+            // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
+            var legend = chart.children.push(
+              am5.Legend.new(root2, {
+                centerX: am5.percent(50),
+                x: am5.percent(50),
+                layout: root2.verticalLayout,
+                marginBottom: 10,
+              })
+            );
+            legend.data.setAll(pieSeries.dataItems);
+
+            // Change the size of legend markers
+            legend.markers.template.setAll({
+              width: 18,
+              height: 18,
+              strokeWidth: 1,
+              strokeOpacity: 1,
+              stroke: am5.color("#ffffff"),
+            });
+
+            // Change the marker shape
+            legend.markerRectangles.template.setAll({
+              cornerRadiusTL: 10,
+              cornerRadiusTR: 10,
+              cornerRadiusBL: 10,
+              cornerRadiusBR: 10,
+            });
+
+            // To align legend items: valueLabels right, labels to left
+            // 1. fix width of valueLabels
+            // 2. dynamically change width of labels by screen size
+
+            const valueLabelsWidth = 50;
+
+            // Responsive legend
+            // https://www.amcharts.com/docs/v5/tutorials/pie-chart-with-a-legend-with-dynamically-sized-labels/
+            chart.onPrivate("width", function (width) {
+              let box = document.querySelector(".boxCompen");
+              const boxWidth = box.offsetWidth;
+              var availableSpace = Math.max(width - chart.width() - 150, 180);
+              //var availableSpace = (boxWidth - valueLabelsWidth) * 0.7
+              legend.labels.template.setAll({
+                width: availableSpace,
+                maxWidth: availableSpace,
+              });
+            });
+
+            // Change legend labelling properties
+            // To have responsive font size, do not set font size
+            legend.labels.template.setAll({
+              oversizedBehavior: "truncate",
+              fill: am5.color("#ffffff"),
+              //textDecoration: "underline"
+              //width: am5.percent(200)
+              //fontWeight: "300"
+            });
+
+            legend.valueLabels.template.setAll({
+              textAlign: "right",
+              width: valueLabelsWidth,
+              fill: am5.color("#ffffff"),
+              //fontSize: LEGEND_FONT_SIZE,
+            });
+
+            legend.itemContainers.template.setAll({
+              // set space between legend items
+              paddingTop: 1.1,
+              paddingBottom: 2,
+            });
+
+            pieSeries.appear(1000, 100);
+          }); // End of queryFeatures
+        } // End of updateChartTreeComp
+
+        updateChartCutting();
+        updateChartTreeComp();
+
+        // Thousand separators function
+        function thousands_separators(num) {
+          var num_parts = num.toString().split(".");
+          num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          return num_parts.join(".");
+        }
+
+        // Total number of tree
+        function totalNumberTreeCut() {
+          var total_number_cutting = {
+            onStatisticField:
+              "CASE WHEN (TCP_Proces >= 1 AND TCP_Proces <= 7) THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_number_cutting",
+            statisticType: "sum",
+          };
+
+          var query = treeCuttingLayer.createQuery();
+          query.outStatistics = [total_number_cutting];
+          query.returnGeometry = true;
+
+          treeCuttingLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const total = thousands_separators(stats.total_number_cutting);
+            document.getElementById(
+              "treeCuttingNumberDiv"
+            ).innerHTML = `<p>Number of Trees</p>${total}`;
+            //`<b>Number of Trees</b><br>${total}`
+          });
+        }
+        totalNumberTreeCut();
+
+        function totalNumberTreeCompen() {
+          var total_number_compen = {
+            onStatisticField: "CASE WHEN Tree_Compe >= 1 THEN 1 ELSE 0 END",
+            outStatisticFieldName: "total_number_compen",
+            statisticType: "sum",
+          };
+
+          var query = compensationLayer.createQuery();
+          query.outStatistics = [total_number_compen];
+          query.returnGeometry = true;
+
+          compensationLayer.queryFeatures(query).then(function (response) {
+            var stats = response.features[0].attributes;
+            const total = thousands_separators(stats.total_number_compen);
+            document.getElementById(
+              "treeCompensationNumberDiv"
+            ).innerHTML = `<p>Number of Trees</p>${total}`;
+            //`<b>Number of Trees</b><br>${total}`
+          });
+        }
+
+        // TCP Expired List
+        view.when(function () {
+          var tcpExpiredList = document.getElementById("tcpExpiredListDiv");
+
+          view.whenLayerView(treeCuttingLayer).then(function (tcpExpiredView) {
+            tcpExpiredView.watch("updating", function (val) {
+              if (!val) {
+                // Query for only Expropriation lots
+                var query = new Query();
+                query.where = "TCP_Proces = 7";
+                tcpExpiredView.queryFeatures(query).then(function (result) {
+                  tcpExpiredList.innerHTML = "";
+                  result.features.forEach(function (feature) {
+                    var attributes = feature.attributes;
+                    var li = document.createElement("li");
+                    li.setAttribute("class", "panel-result");
+
+                    const status = attributes.TCP_Proces;
+                    if (status == 7) {
+                      statusla = "TCP Expired";
+                    }
+
+                    // Add Expropriation lots to list
+                    const Id = attributes.Id;
+                    const station = attributes.Station1;
+                    const commonName = attributes.Common_Nam;
+
+                    li.innerHTML = `<p>ID: ${Id}</p>
+                                            <p>Station: ${station}</p>
+                                            Common Name: ${commonName}
+                                            `;
+
+                    li.addEventListener("click", function (event) {
+                      var target = event.target;
+                      var objectId = feature.attributes.OBJECTID;
+                      var queryExtent = new Query({
+                        objectIds: [objectId],
+                      });
+
+                      // Query extent for selected expropriation lot in the list
+                      tcpExpiredView
+                        .queryExtent(queryExtent)
+                        .then(function (result) {
+                          if (result.extent) {
+                            view
+                              .goTo({
+                                target: result.extent,
+                                speedFactor: 2,
+                                zoom: 17,
+                              })
+                              .catch(function (error) {
+                                if (error.name != "AbortError") {
+                                  console.error(error);
+                                }
+                              }); // End of catch
+                          } // End of if (result.extent)
+                        }); // End of layerView.queryExtent
+
+                      // Highlight selected lots
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      highlightSelect = tcpExpiredView.highlight([objectId]);
+                      view.on("click", function () {
+                        tcpExpiredView.filter = null;
+                        highlightSelect.remove();
+                      });
+                    }); // End of li.addEventListener
+                    tcpExpiredList.appendChild(li);
+
+                    // Hover a mouse over the list and highlight
+                    li.addEventListener("mouseenter", function (event) {
+                      var objectId = feature.attributes.OBJECTID;
+
+                      if (highlightSelect) {
+                        highlightSelect.remove();
+                      }
+                      highlightSelect = tcpExpiredView.highlight([objectId]);
+
+                      view.on("click", function () {
+                        tcpExpiredView.filter = null;
+                        highlightSelect.remove();
+                      });
+                    }); // End of mouse hover highlight
+                  }); // End of result.features.forEach
+                }); // End of layerView.queryFeatures
+              }
+            }); // end of .watch
+          }); // end of view.whenLayerView
+        }); // end of view.when
+
+        // Dropdown List
+        // 1. Define Query
+        // 1.1. Query all features from lot layer
+        view
+          .when(function () {
+            return treeCuttingLayer.when(function () {
+              var query = treeCuttingLayer.createQuery();
+              return treeCuttingLayer.queryFeatures(query);
+            });
+          })
+          .then(getValues)
+          .then(getUniqueValues)
+          .then(addToSelect);
+
+        function queryForLotGeometries() {
+          var lotQuery = treeCuttingLayer.createQuery();
+
+          return treeCuttingLayer
+            .queryFeatures(lotQuery)
+            .then(function (response) {
+              lotGeometries = response.features.map(function (feature) {
+                return feature.geometry;
+              });
+              return lotGeometries;
+            });
+        }
+
+        // 1. Contract Package:--------------------------------
+        function getValues(response) {
+          var features = response.features;
+          var values = features.map(function (feature) {
+            return feature.attributes.Package;
+          });
+          return values;
+        }
+
+        // Return an array of unique values in the 'Municipality' field of the lot Layer
+        function getUniqueValues(values) {
+          var uniqueValues = [];
+
+          values.forEach(function (item, i) {
+            if (
+              (uniqueValues.length < 1 || uniqueValues.indexOf(item) === -1) &&
+              item !== ""
+            ) {
+              uniqueValues.push(item);
+            }
+          });
+          return uniqueValues;
+        }
+
+        // Add the unique values to the municipalility select element. this will allow the user
+        // to filter lot layer by municipality.
+        function addToSelect(values) {
+          values.sort();
+          values.unshift("None"); // Add 'None' to the array and place it to the beginning of the array
+          values.forEach(function (value) {
+            var option = document.createElement("option");
+            option.text = value;
+            packageSelect.add(option);
+          });
+        }
+
+        // 2. Station:--------------------------------
+        function stationFilterList(cpValue) {
+          var stationArray = [];
+
+          function stationQuery() {
+            var query = treeCuttingLayer.createQuery();
+            query.where =
+              cpValue === undefined || cpValue === "None"
+                ? "1=1"
+                : "Package = '" + cpValue + "'";
+
+            return treeCuttingLayer
+              .queryFeatures(query)
+              .then(function (response) {
+                stats = response.features;
+                stats.forEach((result, index) => {
+                  const attributes = result.attributes;
+                  const stationName = attributes.Station1;
+                  stationArray.push(stationName);
+                });
+                return stationArray;
+              });
+          }
+
+          function getUniqueValues2(values2) {
+            var uniqueValues2 = [];
+            values2.forEach(function (item, i) {
+              if (
+                (uniqueValues2.length < 1 ||
+                  uniqueValues2.indexOf(item) === -1) &&
+                item !== ""
+              ) {
+                uniqueValues2.push(item);
+              }
+            });
+            return uniqueValues2;
+          }
+
+          function addToSelectQuery2(query2Values) {
+            stationSelect.options.length = 0;
+            query2Values.sort();
+            query2Values.unshift("None");
+            query2Values.forEach(function (value) {
+              var option = document.createElement("option");
+              option.text = value;
+              stationSelect.add(option);
+            });
+          }
+          stationQuery().then(getUniqueValues2).then(addToSelectQuery2);
+        }
+        stationFilterList();
+
+        // Set the definition expression on the lot layer to reflect the selecction of the user
+        // This is activated, only when station is updated in the dropdown list (not priority)
+        function setContractPackageOnlyExpression(cpValue) {
+          if (cpValue == "None") {
+            compensationLayer.definitionExpression = null;
+            treeCuttingLayer.definitionExpression = null;
+            constBoundary.definitionExpression = null;
+          } else {
+            compensationLayer.definitionExpression =
+              "Package = '" + cpValue + "'";
+            treeCuttingLayer.definitionExpression =
+              "Package = '" + cpValue + "'";
+            constBoundary.definitionExpression = "Package = '" + cpValue + "'";
+          }
+
+          //if (!treeCuttingLayer.visible) {
+          //    treeCuttingLayer.visible = true;
+          // }
+
+          zoomToLayer(treeCuttingLayer);
+          return queryForLotGeometries();
+        }
+
+        function setConstractPackageStationExpression(cpValue, stationValue) {
+          if (cpValue == "None" && stationValue == "None") {
+            compensationLayer.definitionExpression = null;
+            treeCuttingLayer.definitionExpression = null;
+            constBoundary.definitionExpression = null;
+          } else if (cpValue !== "None" && stationValue == "None") {
+            compensationLayer.definitionExpression =
+              "Package = '" + cpValue + "'";
+            treeCuttingLayer.definitionExpression =
+              "Package = '" + cpValue + "'";
+            constBoundary.definitionExpression = "Package = '" + cpValue + "'";
+          } else if (cpValue == "None" && stationValue !== "None") {
+            compensationLayer.definitionExpression =
+              "Station1 = '" + stationValue + "'";
+            treeCuttingLayer.definitionExpression =
+              "Station1 = '" + stationValue + "'";
+            constBoundary.definitionExpression =
+              "Station1 = '" + stationValue + "'";
+          } else if (cpValue !== "None" && stationValue !== "None") {
+            compensationLayer.definitionExpression =
+              "Package = '" +
+              cpValue +
+              "'" +
+              " AND " +
+              "Station1 = '" +
+              stationValue +
+              "'";
+            treeCuttingLayer.definitionExpression =
+              "Package = '" +
+              cpValue +
+              "'" +
+              " AND " +
+              "Station1 = '" +
+              stationValue +
+              "'";
+            constBoundary.definitionExpression =
+              "Package = '" +
+              cpValue +
+              "'" +
+              " AND " +
+              "Station1 = '" +
+              stationValue +
+              "'";
+          }
+
+          zoomToLayer(treeCuttingLayer);
+          return queryForLotGeometries();
+        }
+
+        // When CP is changed, stations is reset to 'None'
+        const changeSelected = (e) => {
+          const $select = document.querySelector("#stationSelect");
+          $select.value = "None";
+        };
+
+        // CP dropdown list
+        packageSelect.addEventListener("change", function () {
+          const selectedCP = event.target.value;
+
+          // Filter data
+          setContractPackageOnlyExpression(selectedCP);
+
+          // Reset dropdown
+          changeSelected();
+
+          // Filter dropdown list
+          stationFilterList(selectedCP);
+
+          // update chart
+          updateChartCutting();
+          updateChartTreeComp();
+
+          totalNumberTreeCut();
+          totalNumberTreeCompen();
+        });
+
+        // Statino Dropdown list Event Listener
+        stationSelect.addEventListener("change", function () {
+          const cpValue = packageSelect.value;
+          const selectedStation = event.target.value;
+
+          // Filter data
+          setConstractPackageStationExpression(cpValue, selectedStation);
+
+          // Update chart
+          updateChartCutting();
+          updateChartTreeComp();
+
+          totalNumberTreeCut();
+          totalNumberTreeCompen();
+        });
+
+        /////////////////////////////////////////////////////////
+
+        // view.when
+        view.when(() => {
+          document.querySelector("#header-title").textContent = "MMSP TREE";
+          document.querySelector(
+            "#item-description"
+          ).innerHTML = `1. You can <b>filter the data</b> by contract pakcage using a dropdown list in the header panel.
+                                                                <br><br>2. You can view summary statistics and progress on tree cutting and tree compensation in charts.
+                                                                <br><br>3. <b>Click pie chart</b> to view trees on the map corresponding to the selected progress.
+                                                                <br><br>4. <b>Click/unclick widgets</b> icon for viewing Layer list, legend, basemaps, and locate widgets under the main title.`;
+
+          let activeWidget;
+          const handleActionBarClick = ({ target }) => {
+            if (target.tagName !== "CALCITE-ACTION") {
+              return;
+            }
+
+            if (activeWidget) {
+              document.querySelector(
+                `[data-action-id=${activeWidget}]`
+              ).active = false;
+              document.querySelector(
+                `[data-panel-id=${activeWidget}]`
+              ).hidden = true;
+            }
+
+            const nextWidget = target.dataset.actionId;
+            if (nextWidget !== activeWidget) {
+              document.querySelector(
+                `[data-action-id=${nextWidget}]`
+              ).active = true;
+              document.querySelector(
+                `[data-panel-id=${nextWidget}]`
+              ).hidden = false;
+              activeWidget = nextWidget;
+            } else {
+              activeWidget = null;
+            }
+          };
+
+          // Action bar
+          document
+            .querySelector("calcite-action-bar")
+            .addEventListener("click", handleActionBarClick);
+          let actionBarExpanded = false;
+          document.addEventListener("calciteActionBarToggle", (event) => {
+            actionBarExpanded = !actionBarExpanded;
+            view.padding = {
+              left: actionBarExpanded ? 135 : 45,
+            };
+          });
+
+          //
+          document
+            .querySelector("#thetabs")
+            .addEventListener("click", tabChange);
+          function tabChange(event) {
+            const value = event.target.className;
+
+            if (value === "Cutting") {
+              compensationLayer.visible = false;
+              treeCuttingLayer.visible = true;
+              updateChartCutting();
+              totalNumberTreeCut();
+            } else if (value === "Compensation") {
+              treeCuttingLayer.visible = false;
+              compensationLayer.visible = true;
+              updateChartTreeComp();
+              totalNumberTreeCompen();
+            }
+          }
+        }); // end of view.when
+      }); // End of am4core.ready
+
+      //*****************************//
+      //      PopUp Settig           //
+      //*****************************//
+
+      /////////////////////////////////////////////////////////////////////////////////////
+      /*
+view.when(function () {
+    view.popup.autoOpenEnabled = true; //disable popups
+
+    // Create the Editor
+    let editor = new Editor({
+      view: view
+    });
+
+    // Add widget to top-right of the view
+    view.ui.add(editor, "bottom-right");
+  });
+*/
+      const basemaps = new BasemapGallery({
+        view,
+        container: "basemaps-container",
+      });
+
+      var searchWidget = new Search({
+        view: view,
+        locationEnabled: false,
+        allPlaceholder: "Tree No, Chainage",
+        includeDefaultSources: false,
+        sources: [
+          {
+            layer: treeCuttingLayer,
+            searchFields: ["ID"],
+            displayField: "ID",
+            exactMatch: false,
+            outFields: ["*"],
+            name: "Tree ID.",
+            placeholder: "Tree ID: DP-T-1",
+          },
+        ],
+      });
+
+      const searchExpand = new Expand({
+        view: view,
+        content: searchWidget,
+        expandIconClass: "esri-icon-search",
+        group: "top-right",
+      });
+
+      view.ui.add(searchExpand, {
+        position: "top-right",
+      });
+      searchExpand.watch("expanded", function () {
+        if (!searchExpand.expanded) {
+          searchWidget.searchTerm = null;
+        }
+      });
+
+      // LayerList and Add legend to the LayerList
+      // On-off feature layer tab
+      var layerList = new LayerList({
+        view: view,
+        selectionEnabled: true,
+        container: "layers-container",
+        listItemCreatedFunction: function (event) {
+          const item = event.item;
+          if (item.title === "Chainage") {
+            item.visible = false;
+          }
+        },
+      });
+
+      var legend = new Legend({
+        view,
+        container: "legend-container",
+        layerInfos: [
+          {
+            layer: treeCuttingLayer,
+            title: "Status of Tree Cutting",
+          },
+          {
+            layer: compensationLayer,
+            title: "Status of Tree Compensation",
+          },
+          {
+            layer: constBoundary,
+            title: "Construction Boundary",
+          },
+        ],
+      });
+
+      const locate = new Locate({
+        view: view,
+        container: "locate-container",
+      });
+
+      view.ui.empty("top-left");
+    });
+  </script>
+</html>

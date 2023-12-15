@@ -1,0 +1,285 @@
+html,
+body,
+#viewDiv {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#headerTitleDiv {
+    font-size: 3vw;
+    vertical-align: middle;
+    padding-top: 3px;
+    z-index: 99;
+    position: absolute;
+    left: 17;
+    top: 18;
+    color: white;
+  }
+
+  .dateDiv {
+    color: rgb(0, 197, 255);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    text-align: left;
+    font-weight: normal;
+    font-size: 1.1vw;
+    padding-top: 2%;
+    margin: 0;
+    z-index:99;
+    top: 55;
+    left: 30;
+    position: absolute;
+  }
+
+  .responsive {
+    float: left;
+    z-index: 99;
+    position: absolute;
+    right: 10%;
+    bottom: 20%;
+    width: 100%;
+    max-width: 50px;
+    height: auto;
+  }
+
+.img {
+float: left;
+padding-left: 20;
+}
+
+img {
+width: 40;
+height: 40;
+/*- center images-*/
+display: block;
+margin-left: auto;
+margin-right: auto;
+}
+
+#segmentedDateDiv {
+  font-size: 3rem;
+  color:rgb(0, 197, 255);
+  position: absolute;
+  z-index: 99;
+  top: 7.5rem;
+  left: 4rem;
+}
+
+#segmentedDateDiv b {
+  font-size: 1.5rem;
+  color:rgb(0, 197, 255);
+}
+
+
+#labelTbm,
+#labelNatm,
+#labelSurvey,
+#labelTotalDiv {
+color: white;
+font-weight: normal;
+font-size: 1.5vw;
+text-align: center;
+width: 14vw;
+height: 4vh;
+padding-top: 3;
+}
+
+.lowerPanelBox {
+display: flex;
+height: 70%;
+}
+
+#logoDiv {
+width: 35%;
+height: 100%;
+/*-Vertically align in the middle-*/
+display: flex;
+align-items: center;
+}
+
+#chartPanel {
+display: inline-block;
+width: 100%;
+height: 100%;
+/*-Vertically align in the middle-*/
+}
+
+
+
+#boxTBM {
+position: absolute;
+z-index: 99;
+background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+border-color: white;
+box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+background-color: rgb(0,0,0,0.5);
+bottom: 20;
+left: 0.5%;
+color: white;
+font-size: 2vw;
+text-align: center;
+aspect-ratio: auto 4 / 2;
+}
+
+#boxNATM {
+position: absolute;
+z-index: 99;
+background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+border-color: white;
+box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+background-color: rgb(0,0,0,0.5);
+bottom: 20;
+left: 15%;
+color: white;
+font-size: 2vw;
+text-align: center;
+aspect-ratio: auto 4 / 2;
+}
+
+#boxSurvey {
+position: absolute;
+z-index: 99;
+background-image: linear-gradient(rgb(0,0,0,0), rgb(0,185,242,0.4));
+border-color: white;
+box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+background-color: rgb(0,0,0,0.5);
+bottom: 20;
+left: 29.5%;
+color: white;
+font-size: 2vw;
+text-align: center;
+aspect-ratio: auto 4 / 2;
+}
+
+#chartTbmDiv,
+#chartNatmDiv,
+#chartSurveyDiv {
+position: absolute;
+padding-top: 5%;
+margin-top: 0;
+z-index: 99;
+background-color: rgb(0,0,0,0);
+aspect-ratio: auto 4 / 2;
+}
+
+  #dropdownDiv {
+    background-color: rgb(0, 0, 0 ,0);
+    font-size: 1.1vw;
+    opacity: 1;
+    color: white;
+    font-weight: bold;
+    padding-right: 5;
+    padding-top: 6;
+    right: 100;
+    top: 19;
+    z-index: 99;
+    position: absolute;
+  }
+
+#totalProgressDiv {
+position: absolute;
+color: rgb(0, 197, 255);
+font-size: 3vw;
+text-align: center;
+width: 14vw;
+padding-top: 4%;
+}
+  
+  p {
+    color: rgb(0, 197, 255);
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    width: auto;
+    vertical-align: text-bottom;
+    padding: 3px;
+    margin-top: 10px;
+  }
+
+  h2 {
+    font-weight: 400;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-style: normal;
+    font-size: 1.8vw;
+    color: white;
+    padding:3px;
+    margin: 0px;
+    vertical-align: text-top;
+  }
+
+
+  h4 {
+    color: rgb(0, 197, 255);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    text-align: left;
+    font-weight: normal;
+    font-size: 1.2vw;
+    padding-top: 10%;
+    margin: 0;
+    width: 10vw;
+    vertical-align: text-bottom;
+  }
+
+  h5 {
+    color: gray;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 3;
+    margin: 10;
+  }
+
+  h6 {
+    color: rgb(0, 197, 255);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    text-align: center;
+    font-weight: normal;
+    font-size: 3rem;
+    margin-top: 30px;
+    padding: 0px 0px 5px 0px;
+    }
+
+ 
+  #menu {
+    background-color: rgb(0, 0, 0 ,0);
+  }
+
+
+  br{content:' ';}
+  br:after{content:' ';}
+
+
+.esri-search__container button,
+.esri-layerlist__container button  {
+  background-color: rgb(17, 54, 81);
+}
+
+ .esri-layer-list__item-toggle-icon,
+ .esri-layer-list__item-title {
+  color: orange;
+ }
+
+  .sassy-theme .esri-menu,
+  .sassy-theme .esri-popup__main-container,
+  .sassy-theme .esri-popup .esri-popup__pointer-direction,
+  .sassy-theme .esri-popup .esri-popup__button,
+  .sassy-theme .esri-button,
+  .sassy-theme .esri-input,
+  .sassy-theme .esri-legend,
+  .sassy-theme .esri-layer-list,
+  .sassy-theme .esri-widget a {
+    background-color: rgb(0, 0, 0, 0.5);
+    color: #fff;
+  }
+
+
+  .sassy-theme .esri-legend__layer-caption {
+display: none;
+}
+
+  /* Browser Setting */
+  ::-webkit-scrollbar {
+    display: none;
+  }
