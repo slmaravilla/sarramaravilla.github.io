@@ -2010,95 +2010,95 @@
         }
 
         // TCP Expired List
-        view.when(function () {
-          var tcpExpiredList = document.getElementById("tcpExpiredListDiv");
+        // view.when(function () {
+        //   var tcpExpiredList = document.getElementById("tcpExpiredListDiv");
 
-          view.whenLayerView(treeCuttingLayer).then(function (tcpExpiredView) {
-            tcpExpiredView.watch("updating", function (val) {
-              if (!val) {
-                // Query for only Expropriation lots
-                var query = new Query();
-                query.where = "TCP_Proces = 7";
-                tcpExpiredView.queryFeatures(query).then(function (result) {
-                  tcpExpiredList.innerHTML = "";
-                  result.features.forEach(function (feature) {
-                    var attributes = feature.attributes;
-                    var li = document.createElement("li");
-                    li.setAttribute("class", "panel-result");
+        //   view.whenLayerView(treeCuttingLayer).then(function (tcpExpiredView) {
+        //     tcpExpiredView.watch("updating", function (val) {
+        //       if (!val) {
+        //         // Query for only Expropriation lots
+        //         var query = new Query();
+        //         query.where = "TCP_Proces = 7";
+        //         tcpExpiredView.queryFeatures(query).then(function (result) {
+        //           tcpExpiredList.innerHTML = "";
+        //           result.features.forEach(function (feature) {
+        //             var attributes = feature.attributes;
+        //             var li = document.createElement("li");
+        //             li.setAttribute("class", "panel-result");
 
-                    const status = attributes.TCP_Proces;
-                    if (status == 7) {
-                      statusla = "TCP Expired";
-                    }
+        //             const status = attributes.TCP_Proces;
+        //             if (status == 7) {
+        //               statusla = "TCP Expired";
+        //             }
 
-                    // Add Expropriation lots to list
-                    const Id = attributes.Id;
-                    const station = attributes.Station1;
-                    const commonName = attributes.Common_Nam;
+        //             // Add Expropriation lots to list
+        //             const Id = attributes.Id;
+        //             const station = attributes.Station1;
+        //             const commonName = attributes.Common_Nam;
 
-                    li.innerHTML = `<p>ID: ${Id}</p>
-                                            <p>Station: ${station}</p>
-                                            Common Name: ${commonName}
-                                            `;
+        //             li.innerHTML = `<p>ID: ${Id}</p>
+        //                                     <p>Station: ${station}</p>
+        //                                     Common Name: ${commonName}
+        //                                     `;
 
-                    li.addEventListener("click", function (event) {
-                      var target = event.target;
-                      var objectId = feature.attributes.OBJECTID;
-                      var queryExtent = new Query({
-                        objectIds: [objectId],
-                      });
+        //             li.addEventListener("click", function (event) {
+        //               var target = event.target;
+        //               var objectId = feature.attributes.OBJECTID;
+        //               var queryExtent = new Query({
+        //                 objectIds: [objectId],
+        //               });
 
-                      // Query extent for selected expropriation lot in the list
-                      tcpExpiredView
-                        .queryExtent(queryExtent)
-                        .then(function (result) {
-                          if (result.extent) {
-                            view
-                              .goTo({
-                                target: result.extent,
-                                speedFactor: 2,
-                                zoom: 17,
-                              })
-                              .catch(function (error) {
-                                if (error.name != "AbortError") {
-                                  console.error(error);
-                                }
-                              }); // End of catch
-                          } // End of if (result.extent)
-                        }); // End of layerView.queryExtent
+        //               // Query extent for selected expropriation lot in the list
+        //               tcpExpiredView
+        //                 .queryExtent(queryExtent)
+        //                 .then(function (result) {
+        //                   if (result.extent) {
+        //                     view
+        //                       .goTo({
+        //                         target: result.extent,
+        //                         speedFactor: 2,
+        //                         zoom: 17,
+        //                       })
+        //                       .catch(function (error) {
+        //                         if (error.name != "AbortError") {
+        //                           console.error(error);
+        //                         }
+        //                       }); // End of catch
+        //                   } // End of if (result.extent)
+        //                 }); // End of layerView.queryExtent
 
-                      // Highlight selected lots
-                      if (highlightSelect) {
-                        highlightSelect.remove();
-                      }
-                      highlightSelect = tcpExpiredView.highlight([objectId]);
-                      view.on("click", function () {
-                        tcpExpiredView.filter = null;
-                        highlightSelect.remove();
-                      });
-                    }); // End of li.addEventListener
-                    tcpExpiredList.appendChild(li);
+        //               // Highlight selected lots
+        //               if (highlightSelect) {
+        //                 highlightSelect.remove();
+        //               }
+        //               highlightSelect = tcpExpiredView.highlight([objectId]);
+        //               view.on("click", function () {
+        //                 tcpExpiredView.filter = null;
+        //                 highlightSelect.remove();
+        //               });
+        //             }); // End of li.addEventListener
+        //             tcpExpiredList.appendChild(li);
 
-                    // Hover a mouse over the list and highlight
-                    li.addEventListener("mouseenter", function (event) {
-                      var objectId = feature.attributes.OBJECTID;
+        //             // Hover a mouse over the list and highlight
+        //             li.addEventListener("mouseenter", function (event) {
+        //               var objectId = feature.attributes.OBJECTID;
 
-                      if (highlightSelect) {
-                        highlightSelect.remove();
-                      }
-                      highlightSelect = tcpExpiredView.highlight([objectId]);
+        //               if (highlightSelect) {
+        //                 highlightSelect.remove();
+        //               }
+        //               highlightSelect = tcpExpiredView.highlight([objectId]);
 
-                      view.on("click", function () {
-                        tcpExpiredView.filter = null;
-                        highlightSelect.remove();
-                      });
-                    }); // End of mouse hover highlight
-                  }); // End of result.features.forEach
-                }); // End of layerView.queryFeatures
-              }
-            }); // end of .watch
-          }); // end of view.whenLayerView
-        }); // end of view.when
+        //               view.on("click", function () {
+        //                 tcpExpiredView.filter = null;
+        //                 highlightSelect.remove();
+        //               });
+        //             }); // End of mouse hover highlight
+        //           }); // End of result.features.forEach
+        //         }); // End of layerView.queryFeatures
+        //       }
+        //     }); // end of .watch
+        //   }); // end of view.whenLayerView
+        // }); // end of view.when
 
         // Dropdown List
         // 1. Define Query
@@ -2296,7 +2296,7 @@
         // CP dropdown list
         packageSelect.addEventListener("change", function () {
           const selectedCP = event.target.value;
-
+console.log(selectedCP);
           // Filter data
           setContractPackageOnlyExpression(selectedCP);
 
@@ -2313,12 +2313,14 @@
           totalNumberTreeCut();
           totalNumberTreeCompen();
         });
+        console.log(packageSelect.value);
 
         // Statino Dropdown list Event Listener
         stationSelect.addEventListener("change", function () {
           const cpValue = packageSelect.value;
           const selectedStation = event.target.value;
-
+        //  console.log(cpValue);
+        //  console.log(selectedStation);
           // Filter data
           setConstractPackageStationExpression(cpValue, selectedStation);
 
@@ -2329,7 +2331,7 @@
           totalNumberTreeCut();
           totalNumberTreeCompen();
         });
-
+        console.log(stationSelect.value);
         /////////////////////////////////////////////////////////
 
         // view.when

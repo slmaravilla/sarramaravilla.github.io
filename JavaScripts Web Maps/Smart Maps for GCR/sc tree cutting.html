@@ -2262,9 +2262,12 @@
             }
 
             // CP dropdown list
-            packageSelect.addEventListener("change", function () {
-                const selectedCP = event.target.value;
+            
+            
 
+            packageSelect.addEventListener("change", function (event) {
+                const selectedCP = event.target.value;
+                
                 // Filter data
                 setContractPackageOnlyExpression(selectedCP);
 
@@ -2278,6 +2281,7 @@
                 totalNumberTreeConservation();
 
             });
+            
 
             /////////////////////////////////////////////////////////
 

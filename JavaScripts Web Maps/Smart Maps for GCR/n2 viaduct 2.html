@@ -389,7 +389,7 @@
         bottom: 1%;
     }
 
-    #segmentedDateDiv {
+    #constructionDateDiv {
         font-size: 3rem;
         color: rgb(0, 197, 255);
         position: absolute;
@@ -398,7 +398,7 @@
         left: 4rem;
     }
 
-    #segmentedDateDiv b {
+    #constructionDateDiv b {
         font-size: 1.5rem;
         color: rgb(0, 197, 255);
     }
@@ -408,13 +408,13 @@
     <calcite-loader></calcite-loader>
     <calcite-shell content-behind>
         <div id="viewDiv">
-            <!-- <div id="segmentedDateDiv"></div> -->
+
             <div id="dateDiv"></div>
 
             <div id="headerTitleDiv">N2 VIADUCT</div>
 
-            <div id="segmentedDateDiv"></div>
-            <!-- <div id="timeContainer" class="timeSlider"></div> -->
+            <div id="constructionDateDiv"></div>
+
             <calcite-segmented-control id="contractPackage">
                 <calcite-segmented-control-item id="N-01" value="N-01" checked>N-01</calcite-segmented-control-item>
                 <calcite-segmented-control-item id="N-02" value="N-02">N-02</calcite-segmented-control-item>
@@ -3209,24 +3209,7 @@
             }
             timeSeriesChart("N-01");
 
-            //
-            // contractPackage.addEventListener(
-            //     "calciteSegmentedControlChange", async (event) => {
-            //         (cpValue = event.target.value), filterItems();
-            //     }
 
-            // );
-
-
-            function defaultRenderer() {
-                viaductLayer.definitionExpression = "CP = 'N-01'";
-                PierNoLayer.definitionExpression = "CP = 'N-01'";
-                zoomToLayer(viaductLayer);
-                chartAllViaduct();
-
-                perCpProgress();
-            }
-            defaultRenderer();
 
             ////////////// Time Slider///////////////////
 
@@ -3234,7 +3217,6 @@
 
             const start = new Date(2021, 8, 1)
             const end = new Date(2026, 8, 1)
-
 
             const timeSlider = new TimeSlider({
                 container: "timeSlider",
@@ -3264,81 +3246,105 @@
             });
             view.ui.add(timesliderExpand, { position: "top-right" });
 
-
-            const segmentedDateDiv = document.getElementById("segmentedDateDiv");
-            segmentedDateDiv.style.display = 'none';
-
-
-            // To initialize the TimeSlider for CP N-01
-            reactiveUtils.when(() => timesliderExpand?.expanded === false, () => viaductLayer.definitionExpression = "CP = 'N-01'");
-            reactiveUtils.when(() => timesliderExpand?.expanded === true, () => initialState());
-
-            reactiveUtils.when(() => timesliderExpand?.expanded === false, () => segmentedDateDiv.style.display = 'none');
-            reactiveUtils.watch(() => timesliderExpand?.expanded === true, () => initialSegmented());
-            reactiveUtils.when(() => timesliderExpand?.expanded === true, () => segmentedDateDiv.style.display = 'block');
+            const constructionDateDiv = document.getElementById("constructionDateDiv");
+            constructionDateDiv.style.display = 'none';
 
 
-            function initialSegmented() {
-                timeSlider.watch("timeExtent", function (timeExtent) {
-                    const tunnelStart = timeExtent.end.getFullYear() + "-" + (timeExtent.end.getMonth() + 1) + "-" + (timeExtent.end.getDate());
-                    const tunnelStartTitle = "Construction Plan Date:";
-                    segmentedDateDiv.innerHTML = "<pre>" + "<b>" + tunnelStartTitle + "</b>" + "\n" + tunnelStart + "</pre>";
-                });
-            }
-            initialSegmented();
+            // Default setting for timeslider
+            
+                reactiveUtils.when(() => timesliderExpand?.expanded === false, () => viaductLayer.definitionExpression = "CP = 'N-01'");
+                reactiveUtils.when(() => timesliderExpand?.expanded === true, () => initialState());
 
-            function initialState() {
-                timeSlider.watch("timeExtent", function (timeExtent) {
-                    const dateFilterExpression = "planned_date <= date'" + timeExtent.end.getFullYear() + "-" + (timeExtent.end.getMonth() + 1) + "-" + (timeExtent.end.getDate()) + "'";
-                    viaductLayer.definitionExpression = "CP = 'N-01'" + " AND " + dateFilterExpression;
-                });
-            }
+                reactiveUtils.when(() => timesliderExpand?.expanded === false, () => constructionDateDiv.style.display = 'none');
+                reactiveUtils.watch(() => timesliderExpand?.expanded === true, () => initialSegmented());
+                reactiveUtils.when(() => timesliderExpand?.expanded === true, () => constructionDateDiv.style.display = 'block');
 
 
+                function initialSegmented() {
+                    timeSlider.watch("timeExtent", function (timeExtent) {
+                        const viaductStart = timeExtent.end.getFullYear() + "-" + (timeExtent.end.getMonth() + 1) + "-" + (timeExtent.end.getDate());
+                        const viaductStartTitle = "Construction Plan Date:";
+                        constructionDateDiv.innerHTML = "<pre>" + "<b>" + viaductStartTitle + "</b>" + "\n" + viaductStart + "</pre>";
+                    });
+                }
+                initialSegmented();
 
-            // Event Listener for contrack package
-
-
-            contractPackage.addEventListener("calciteSegmentedControlChange", function (event) {
-                var cpValue = event.target.value;
-                viaductLayer.definitionExpression = "CP = '" + cpValue + "'";
-                PierNoLayer.definitionExpression = "CP = '" + cpValue + "'";
-                zoomToLayer(viaductLayer);
-                chartAllViaduct();
-                perCpProgress();
-                timeSeriesChart(cpValue);
-                timeslider(cpValue);
+                function initialState() {
+                    timeSlider.watch("timeExtent", function (timeExtent) {
+                        const dateFilterExpression = "planned_date <= date'" + timeExtent.end.getFullYear() + "-" + (timeExtent.end.getMonth() + 1) + "-" + (timeExtent.end.getDate()) + "'";
+                        viaductLayer.definitionExpression = "CP = 'N-01'" + " AND " + dateFilterExpression;
+                    });
+                }
+            
 
 
 
-            })
-
+            // Timeslider update for selected CP
             function timeslider(cpValue) {
-                // Watch update on timesliderExpand state
-
-                reactiveUtils.when(() => timesliderExpand?.expanded === false, () => segmentedDateDiv.style.display = 'none');
                 reactiveUtils.when(() => timesliderExpand?.expanded === false, () => viaductLayer.definitionExpression = "CP = '" + cpValue + "'");
                 reactiveUtils.when(() => timesliderExpand?.expanded === true, () => withSelectedCP());
-                reactiveUtils.when(() => timesliderExpand?.expanded === true, () => segmentedDateDiv.style.display = 'block');
 
-                console.log(cpValue);
+                reactiveUtils.when(() => timesliderExpand?.expanded === false, () => constructionDateDiv.style.display = 'none');
+                reactiveUtils.when(() => timesliderExpand?.expanded === true, () => constructionDateDiv.style.display = 'block');
+
+
                 // Watch update on timeSlider
 
-                function withSelectedCP () {
+                function withSelectedCP() {
                     timeSlider.watch("timeExtent", function (timeExtent) {
                         const dateFilterExpression = "planned_date <= date'" + timeExtent.end.getFullYear() + "-" + (timeExtent.end.getMonth() + 1) + "-" + (timeExtent.end.getDate()) + "'";
 
                         viaductLayer.definitionExpression = cpValue === "N-01" ? "CP = 'N-01'" + " AND " + dateFilterExpression : "CP = '" + cpValue + "'" + " AND " + dateFilterExpression;
 
-                        const tunnelStart = timeExtent.end.getFullYear() + "-" + (timeExtent.end.getMonth() + 1) + "-" + (timeExtent.end.getDate());
-                        const tunnelStartTitle = "Construction Plan Date:";
-                        segmentedDateDiv.innerHTML = "<pre>" + "<b>" + tunnelStartTitle + "</b>" + "\n" + tunnelStart + "</pre>";
+                        const viaductStart = timeExtent.end.getFullYear() + "-" + (timeExtent.end.getMonth() + 1) + "-" + (timeExtent.end.getDate());
+                        const viaductStartTitle = "Construction Plan Date:";
+                        constructionDateDiv.innerHTML = "<pre>" + "<b>" + viaductStartTitle + "</b>" + "\n" + viaductStart + "</pre>";
 
 
                     });
-            }
+                }
 
             }
+
+
+
+
+
+            ////////////// Default ///////////////////
+
+
+            ////////////// EventListener for Contract Package ///////////////////
+
+            contractPackage.addEventListener(
+                "calciteSegmentedControlChange",
+                async (event) => {
+                    (cpValue = event.target.value), filterItems(), timeslider();
+                }
+            );
+
+            function filterItems() {
+                viaductLayer.definitionExpression = "CP = '" + cpValue + "'";
+                PierNoLayer.definitionExpression = "CP = '" + cpValue + "'";
+
+                zoomToLayer(viaductLayer);
+                chartAllViaduct();
+                perCpProgress();
+                timeSeriesChart(cpValue);
+            }
+
+            ////////////// Default ///////////////////
+            function defaultRenderer() {
+                viaductLayer.definitionExpression = "CP = 'N-01'";
+                PierNoLayer.definitionExpression = "CP = 'N-01'";
+                zoomToLayer(viaductLayer);
+                chartAllViaduct();
+
+                perCpProgress();
+            }
+            defaultRenderer();
+
+
+
 
 
 
@@ -3536,9 +3542,6 @@
         view.ui.add(pause, {
             position: "top-right",
         });
-
-
-
 
     });
 </script>
