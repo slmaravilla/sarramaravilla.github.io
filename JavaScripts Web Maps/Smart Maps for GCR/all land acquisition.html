@@ -1,0 +1,582 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <!--
+  ArcGIS API for JavaScript, https://js.arcgis.com
+  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
+  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
+  -->
+  <title>Land Acquisition Work Progress</title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/dark/main.css" />
+
+  <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css" />
+
+  <!-- Resources -->
+  <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+  <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+  <script src="https://js.arcgis.com/4.28/"></script>
+</head>
+
+<body class="calcite-mode-dark">
+  <calcite-loader></calcite-loader>
+  <calcite-shell content-behind>
+    <div id="applicationDiv">
+      <div id="headerTitleDiv">LAND ACQUISITION WORK PROGRESS</div>
+
+      <div class="container">
+        <div class="landBox">
+          <div id="landChartDiv"></div>
+        </div>
+        <div class="structureBox">
+          <div id="structureChartDiv"></div>
+        </div>
+        <div class="isfBox">
+          <div id="isfChartDiv"></div>
+        </div>
+        <div class="container1">
+          <div class="projectBox">
+            <calcite-segmented-control id="Project" scale="l" width="full">
+              <calcite-segmented-control-item id="MMSP" value="mmsp" checked>MMSP</calcite-segmented-control-item>
+              <calcite-segmented-control-item id="N2" value="mcrp">MCRP</calcite-segmented-control-item>
+              <calcite-segmented-control-item id="SC" value="nsrp">NSRP</calcite-segmented-control-item>
+            </calcite-segmented-control>
+          </div>
+          <div id="overviewDiv"></div>
+        </div>
+
+
+      </div>
+
+
+
+
+
+
+      <div class="dateDiv">December 31, 2023</div>
+
+    </div>
+  </calcite-shell>
+</body>
+<style>
+  html,
+  body {
+    padding: 0;
+    margin: 0;
+  }
+
+
+
+
+  #extentDiv {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    z-index: 2;
+  }
+
+  #applicationDiv {
+    display: flex;
+    flex-wrap: wrap;
+    height: 97%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    background-color: #113149;
+  }
+
+
+
+  calcite-shell {
+    background-color: #113149;
+  }
+
+  calcite-action-bar {
+    position: absolute;
+    z-index: 99;
+    top: 0;
+    right: 0;
+    margin: 1rem;
+  }
+
+  calcite-panel {
+    position: absolute;
+    z-index: 1;
+    bottom: 10px;
+    right: 300px;
+    width: 30vw;
+    height: 50%;
+  }
+
+  calcite-loader {
+    align-self: center;
+    justify-self: center;
+  }
+
+  calcite-label {
+    --calcite-label-margin-bottom: 0px;
+  }
+
+  #info-content {
+    padding: 0.75rem;
+  }
+
+  .container1 {
+    /* display: inline-flex; */
+    height: 100%;
+    width: 25%;
+    box-sizing: border-box;
+    border-top: 0;
+    border-bottom: 0;
+    margin: 0;
+    padding: 0;
+    /* border: solid yellow; */
+  }
+
+
+
+  #overviewDiv {
+    position: relative;
+    top: 6%;
+    width: 70%;
+    height: 60%;
+    right: -14%;
+    border: 1.7px solid grey;
+    overflow: hidden;
+
+  }
+
+  .projectBox {
+    position: relative;
+    width: 70%;
+    height: auto;
+    right: -14%;
+    overflow: hidden;
+
+  }
+
+  .dateDiv {
+    z-index: 99;
+    position: absolute;
+    padding-bottom: 10;
+    font-size: 1vw;
+    color: rgb(0, 197, 255);
+    right: 10;
+    bottom: 10;
+  }
+
+  /* .contentBox {
+    display: grid;
+    grid-template-columns: 80vw 17.8vw;
+    width: 80%;
+    height: 88vh;
+    border: solid yellow;
+  } */
+
+  .container {
+    display: flex;
+    grid-template-columns: 1fr 1fr 1fr;
+    height: 80vh;
+    width: 100%;
+    /* border: solid blue; */
+  }
+
+  #headerTitleDiv {
+    color: white;
+    font-weight: bold;
+    font-size: 1.8vw;
+    margin: 0.5rem;
+    /* border: solid; */
+    width: 100%
+  }
+
+
+
+  .landBox,
+  .structureBox,
+  .isfBox {
+    display: inline-flex;
+    height: 100%;
+    width: 25%;
+    box-sizing: border-box;
+    border-top: 0;
+    border-bottom: 0;
+    margin: 0;
+    padding: 0;
+    border-inline: 0.1px solid rgb(82, 82, 82);
+    writing-mode: horizontal-tb;
+  }
+
+
+
+  #landChartDiv,
+  #structureChartDiv,
+  #isfChartDiv {
+    width: 35%;
+    height: 32vh;
+    align-items: center;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+      sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    font-size: 1.2rem;
+    color: white;
+    font-weight: bold;
+  }
+
+  a:hover,
+  a:focus {
+    color: rgb(185, 171, 171);
+    font-size: 1.2vw;
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 10;
+    line-height: 3rem;
+  }
+
+  ​ p {
+    font-size: 1rem;
+    width: auto;
+    vertical-align: text-bottom;
+    padding: 0;
+    margin-top: 0;
+  }
+
+  h2 {
+    font-weight: 400;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+      sans-serif;
+    font-style: normal;
+    font-size: 23px;
+    color: white;
+    padding: 3px;
+    margin: 0px;
+    width: 470px;
+    vertical-align: text-top;
+  }
+
+  h3 {
+    color: white;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+      sans-serif;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 10;
+    width: 100%;
+  }
+
+  h4 {
+    color: rgb(0, 197, 255);
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+      sans-serif;
+    text-align: left;
+    font-weight: normal;
+    font-size: 16px;
+    padding-top: 20px;
+    margin: 0;
+    width: 160px;
+    vertical-align: text-bottom;
+  }
+
+  h5 {
+    color: rgb(0, 197, 255);
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+      sans-serif;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 3;
+    margin: 10;
+  }
+
+  h6 {
+    color: rgb(0, 197, 255);
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+      sans-serif;
+    text-align: center;
+    font-weight: normal;
+    font-size: 30px;
+    padding: 0px 0px 0px 0px;
+  }
+
+  .sassy-theme .esri-menu,
+  .sassy-theme .esri-popup__main-container,
+  .sassy-theme .esri-popup .esri-popup__pointer-direction,
+  .sassy-theme .esri-popup .esri-popup__button,
+  .sassy-theme .esri-button,
+  .sassy-theme .esri-input,
+  .sassy-theme .esri-legend,
+  .sassy-theme .esri-layer-list,
+  .sassy-theme .esri-widget a {
+    background-color: rgb(0, 0, 0, 0.7);
+    color: #fff;
+  }
+
+  .sassy-theme .esri-legend__layer-caption {
+    display: none;
+  }
+</style>
+
+<script>
+  require([
+    "esri/Basemap",
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/views/SceneView",
+    "esri/layers/FeatureLayer",
+    "esri/layers/support/FeatureFilter",
+    "esri/layers/SceneLayer",
+    "esri/layers/Layer",
+    "esri/layers/TileLayer",
+    "esri/layers/VectorTileLayer",
+    "esri/layers/support/LabelClass",
+    "esri/symbols/LabelSymbol3D",
+    "esri/WebMap",
+    "esri/WebScene",
+    "esri/portal/PortalItem",
+    "esri/portal/Portal",
+    "esri/widgets/TimeSlider",
+    "esri/widgets/Legend",
+    "esri/widgets/LayerList",
+    "esri/widgets/Fullscreen",
+    "esri/rest/geometryService",
+    "esri/rest/support/Query",
+    "esri/rest/support/StatisticDefinition",
+    "esri/symbols/WebStyleSymbol",
+    "esri/TimeExtent",
+    "esri/widgets/Expand",
+    "esri/widgets/Editor",
+    "esri/renderers/UniqueValueRenderer",
+    "esri/widgets/support/DatePicker",
+    "esri/widgets/FeatureTable",
+    "esri/widgets/Compass",
+    "esri/layers/ElevationLayer",
+    "esri/Ground",
+    "esri/layers/GraphicsLayer",
+    "esri/widgets/Search",
+  ], function (
+    Basemap,
+    Map,
+    MapView,
+    SceneView,
+    FeatureLayer,
+    FeatureFilter,
+    SceneLayer,
+    Layer,
+    TileLayer,
+    VectorTileLayer,
+    LabelClass,
+    LabelSymbol3D,
+    WebMap,
+    WebScene,
+    PortalItem,
+    Portal,
+    TimeSlider,
+    Legend,
+    LayerList,
+    Fullscreen,
+    geometryService,
+    Query,
+    StatisticDefinition,
+    WebStyleSymbol,
+    TimeExtent,
+    Expand,
+    Editor,
+    UniqueValueRenderer,
+    DatePicker,
+    FeatureTable,
+    Compass,
+    ElevationLayer,
+    Ground,
+    GraphicsLayer,
+    Search
+  ) {
+    ////////////////////////////////////////////////////
+
+    /// For Inset Map
+    var overViewMap = new Map({
+      basemap: "streets-night-vector",
+    });
+
+    var overView = new MapView({
+      map: overViewMap,
+      container: "overviewDiv",
+      center: [120.9411264, 14.735462],
+      zoom: 5,
+      constraints: {
+        rotationEnabled: false,
+      },
+      ui: {
+        components: ["attribution"],
+      },
+    });
+    view.ui.add("overviewDiv", "top-right");
+
+
+    //Importing layer for inset map
+
+    const centerlineProjectColor = {
+      nscr_hex: "#ff5f22",
+      mmsp_hex: "#00b7ff", //"#0000ff"
+      nscrex_hex: "#ff5f22", //"#00b3ff","#00B0F0", "#15C2FF"
+    };
+
+    var mmspCenterlineOverView = new FeatureLayer({
+      portalItem: {
+        id: "71dfd84340024822859586922ced59d7",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 4,
+      renderer: {
+        type: "simple", // autocasts as new SimpleLineSymbol()
+        symbol: {
+          type: "simple-line",
+          color: centerlineProjectColor.nscrex_hex,
+          width: "2.5px",
+          style: "solid",
+        },
+      },
+      labelingInfo: false,
+      popupEnabled: false,
+    })
+    overViewMap.add(mmspCenterlineOverView);
+
+
+
+
+
+
+
+
+
+
+
+
+
+    var basemap = new Basemap({
+      baseLayers: [
+        new VectorTileLayer({
+          portalItem: {
+            id: "8a9ef2a144e8423786f6139408ac3424", // 3a62040541b84f528da3ac7b80cf4a63
+          },
+        }),
+      ],
+    });
+
+    var map = new Map({
+      basemap: basemap, //"gray-vector", // "streets-night-vector", basemap
+      ground: "world-elevation",
+    });
+    //map.ground.surfaceColor = "#FFFF";
+    //map.ground.opacity = 0.5;
+
+    var view = new MapView({
+      map: map,
+      center: [120.5793, 15.18],
+      zoom: 10,
+      container: "viewDiv",
+      environment: {
+        background: {
+          type: "color", // autocasts as new ColorBackground()
+          color: [0, 0, 0, 1],
+        },
+        // disable stars
+        starsEnabled: false,
+        //disable atmosphere
+        atmosphereEnabled: false,
+      },
+    });
+
+    //
+    function shiftCamera(deg) {
+      var camera = view.camera.clone();
+      camera.position.longitude += deg;
+      return camera;
+    }
+
+    function catchAbortError(error) {
+      if (error.name != "AbortError") {
+        console.error(error);
+      }
+    }
+
+    // Setup UI
+
+
+
+    //*******************************//
+    // Import Layers                 //
+    //*******************************//
+    var lotLayer = new FeatureLayer({
+      portalItem: {
+        id: "13026f2da4804673be557e959ed154c4",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 7,
+      outFields: ["*"],
+      title: "Status of Land Acquisition",
+      labelsVisible: false,
+    });
+
+    // Structure
+    var structureLayer = new FeatureLayer({
+      portalItem: {
+        id: "13026f2da4804673be557e959ed154c4",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 6,
+      title: "Status of Structure",
+      outFields: ["*"],
+    });
+
+    // Relocation Status point layer
+    var reloISFLayer = new FeatureLayer({
+      portalItem: {
+        id: "13026f2da4804673be557e959ed154c4",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 4,
+      outFields: ["*"],
+      title: "Status for Relocation (ISF)",
+    });
+    //reloISFLayer.listMode = "hide";
+
+
+
+    /////////////////////////////////////////////////////////////////////
+    var applicationDiv = document.getElementById("applicationDiv");
+
+    var headerDiv = document.getElementById("headerDiv");
+    var headerTitleDiv = document.getElementById("headerTitleDiv");
+
+    // Land, structure, and ISF
+    var landChartDiv = document.getElementById("landChartDiv");
+    var structureChartDiv = document.getElementById("structureChartDiv");
+    var isfChartDiv = document.getElementById("isfChartDiv");
+
+
+
+    ////////// Chart Begins //////////////////
+
+
+  });
+</script>
+
+</html>

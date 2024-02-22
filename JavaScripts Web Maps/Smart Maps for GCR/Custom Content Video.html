@@ -1,0 +1,182 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <title>Adding Video in the Pop Up Window</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/dark/main.css" />
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.4.2/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.4.2/calcite.css" />
+
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Micro.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
+    <!-- Resources -->
+    <script src="https://js.arcgis.com/4.27/"></script>
+
+</head>
+
+<style>
+    html,
+    body,
+    #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 99%;
+        width: 100%;
+    }
+</style>
+
+<body class="sassy-theme">
+    <calcite-loader></calcite-loader>
+    <calcite-shell content-behind>
+        <div id="viewDiv"></div>
+    </calcite-shell>
+
+</body>
+
+<script>
+    require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/views/SceneView",
+        "esri/layers/FeatureLayer",
+        "esri/PopupTemplate",
+        "esri/popup/content/CustomContent",
+    ], function (
+        Map,
+        MapView,
+        SceneView,
+        FeatureLayer,
+        PopupTemplate,
+        CustomContent,
+    ) {
+        var map = new Map({
+            basemap: "dark-gray-vector",
+            ground: "world-elevation",
+        });
+
+
+        var view = new SceneView({
+            map: map,
+            container: "viewDiv",
+            viewingMode: "local",
+            camera: {
+                position: {
+                    x: 120.565000,
+                    y: 15.210,
+                    z: 750
+                },
+                tilt: 65
+            },
+            environment: {
+                background: {
+                    type: "color", // autocasts as new ColorBackground()
+                    color: [0, 0, 0, 1]
+                },
+                // disable stars
+                starsEnabled: false,
+                //disable atmosphere
+                atmosphereEnabled: false
+            }
+        });
+
+
+
+        var buildingSpotLabelClass = {
+            symbol: {
+                type: "label-3d",// autocasts as new LabelSymbol3D()
+                symbolLayers: [
+                    {
+                        type: "text", // autocasts as new TextSymbol3DLayer()
+                        material: {
+                            color: "orange"
+                        },
+                        size: 12,
+                        color: "black",
+                        haloColor: "black",
+                        haloSize: 1,
+                        font: {
+                            family: "Ubuntu Mono",
+                            //weight: "bold"
+                        },
+                    }
+                ],
+                verticalOffset: {
+                    screenLength: 50,
+                    maxWorldLength: 300,
+                    minWorldLength: 40
+                },
+                callout: {
+                    type: "line", // autocasts as new LineCallout3D()
+                    color: "white",
+                    size: 0.5,
+                    border: {
+                        color: "grey"
+                    }
+                }
+            },
+            labelPlacement: "above-center",
+            labelExpressionInfo: {
+                expression: "$feature.Name"
+                //value: "{TEXTSTRING}"
+            }
+        }
+
+
+        // Building location
+        let buildingSpotSymbol = {
+            type: "simple",  // autocasts as new SimpleRenderer()
+            symbol: {
+                type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                size: 5,
+                color: "white",
+                outline: {  // autocasts as new SimpleLineSymbol()
+                    width: 0.5,
+                    color: [0, 0, 0, 0]
+                }
+            }
+        };
+
+        
+        var buildingLocation = new FeatureLayer({
+            url: "https://services3.arcgis.com/PDfv0I40sqpcaZxV/arcgis/rest/services/sample_point/FeatureServer",
+            elevationInfo: {
+                mode: "relative-to-ground"
+            },
+            title: "Building Spot",
+            renderer: buildingSpotSymbol,
+            labelingInfo: [buildingSpotLabelClass],
+            outFields: ["*"],
+        });
+        map.add(buildingLocation);
+
+
+        let customContent = new CustomContent ({
+            outFields: ["*"],
+            creator: (event) => {
+                const name = event.graphic.attributes.Name;
+                const link = event.graphic.attributes.imgURL;
+
+                return `${name}<br>
+                        <video width="250" height="250" controls><source src=${link} type=video/mp4></video>`;
+            }
+            
+        });
+
+
+        const template = new PopupTemplate ({
+            outFields: ["*"],
+            content: [customContent],
+        });
+        buildingLocation.popupTemplate = template;
+
+    })
+</script>
+
+</html>
