@@ -56,7 +56,7 @@ require([
 
         },
         highlightOptions: {
-            color: [255, 255, 0, 1],//255, 255, 0, 1
+            color: [255, 200, 0, 1],//255, 255, 0, 1
             haloOpacity: 0.0, //0.9
             fillOpacity: 0.0 //0.2
           }

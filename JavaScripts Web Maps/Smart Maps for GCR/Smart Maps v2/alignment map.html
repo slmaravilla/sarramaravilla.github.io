@@ -1,0 +1,192 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Intro to map components - Create a 2D map | Sample | ArcGIS Maps SDK for JavaScript 4.30</title>
+
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.30/"></script>
+
+    <script>
+        require(["esri/Basemap","esri/layers/VectorTileLayer","esri/WebMap","esri/views/MapView","esri/Map","esri/layers/FeatureLayer",
+        "esri/widgets/Bookmarks","esri/widgets/BasemapGallery","esri/widgets/LayerList","esri/widgets/Legend","esri/rest/support/Query",
+        "esri/widgets/Fullscreen",
+        "esri/layers/support/FeatureFilter",
+        "esri/widgets/TableList",
+        "esri/portal/PortalItem",
+        "esri/portal/Portal",
+        "esri/rest/geometryService",
+        "esri/rest/support/StatisticDefinition",
+        "esri/symbols/WebStyleSymbol",
+        "esri/widgets/Expand",
+        "esri/renderers/UniqueValueRenderer",
+        "esri/Ground",
+        "esri/rest/support/RelationshipQuery",
+        "esri/layers/GraphicsLayer",
+        "esri/Graphic",
+        "esri/widgets/Search",
+        "esri/widgets/Locate",
+        "esri/widgets/BasemapToggle",
+        "esri/PopupTemplate",
+        "esri/layers/support/LabelClass",
+        "esri/popup/content/CustomContent",
+        "esri/layers/TileLayer",
+        "esri/geometry/Extent",
+        "esri/core/reactiveUtils",
+        "esri/core/promiseUtils",
+        "esri/layers/GroupLayer",
+        "esri/widgets/Home",
+        "esri/widgets/Print",
+        "esri/geometry/Circle",
+        "esri/widgets/Compass",
+        "esri/widgets/Slider",
+    ], function (
+        Basemap,
+        VectorTileLayer,
+        WebMap,
+        MapView,
+        Map,
+        FeatureLayer,
+        Bookmarks,
+        BasemapGallery,
+        LayerList,
+        Legend,
+        Query,
+        Fullscreen,
+        FeatureFilter,
+        TableList,
+        PortalItem,
+        Portal,
+        geometryService,
+        StatisticDefinition,
+        WebStyleSymbol,
+        Expand,
+        UniqueValueRenderer,
+        Ground,
+        RelationshipQuery,
+        GraphicsLayer,
+        Graphic,
+        Search,
+        Locate,
+        BasemapToggle,
+        PopupTemplate,
+        LabelClass,
+        CustomContent,
+        TileLayer,
+        Extent,
+        reactiveUtils,
+        promiseUtils,
+        GroupLayer,
+        Home,
+        Print,
+        Circle,
+        Compass,
+        Slider) {
+
+
+            // **********************************************************
+            // ***** As of Date
+            const dateTable = new FeatureLayer({
+                portalItem: {
+                    id: 'b2a118b088a44fa0a7a84acbe0844cb2',
+                    portal: {
+                        url: 'https://gis.railway-sector.com/portal',
+                    },
+                },
+            });
+
+            const monthList = [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+            ];
+
+            var query = dateTable.createQuery();
+            query.where = "project = 'N2SC'" + ' AND ' + "category = 'Alignment Map'";
+            dateTable.queryFeatures(query).then((response) => {
+                const stats = response.features;
+                stats.forEach((result) => {
+                    const date = new Date(result.attributes.date);
+                    const year = date.getFullYear();
+                    const month = monthList[date.getMonth()];
+                    const day = date.getDate();
+                    const final = year < 1990 ? '' : `${month} ${day}, ${year}`;
+                    document.getElementById("date").innerHTML = final;
+                })
+            })
+
+            // ***** End of As of Date
+            // document.getElementById("date").innerHTML = "As of December 15, 2023";
+            // **********************************************************
+
+
+            // **********************************************************
+            // ***** Main map
+            const basemap = new Basemap({
+                baseLayers: [
+                    new VectorTileLayer({
+                        portalItem: {
+                            id: "824fe99ab989479f83b9a6d7f2da0bcb"
+                        },
+                    }),
+                ],
+            });
+
+            var map = new Map({
+                basemap: basemap, //basemap, // "streets-night-vector", basemap
+                ground: "world-elevation",
+            });
+
+
+            const home_rotation = 330;
+            const home_center = [120.9, 14.7832299];
+            const home_scale = 292400;
+
+            var view = new MapView({
+                map: map,
+                container: "viewDiv",
+                environment: {
+                    background: {
+                        type: "color", // autocasts as new ColorBackground()
+                        color: [0, 0, 0, 1],
+                    },
+                },
+                opacity: 0.5,
+                rotation: home_rotation,
+                center: home_center,
+                scale: home_scale,
+            });
+            // ********************************************************** 
+
+
+        });
+    </script>
+
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+</body>
+
+</html>

@@ -3,19 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <!--
-  ArcGIS API for JavaScript, https://js.arcgis.com
-  For more information about the views-switch-2d-3d sample, read the original sample description at developers.arcgis.com.
-  https://developers.arcgis.com/javascript/latest/sample-code/views-switch-2d-3d/index.html
-  -->
-  <title>Progress Summary (N2)</title>
 
+  <title>Pre-Construction Progress (N2)</title>
+
+  <!-- Resources -->
   <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/dark/main.css" />
 
   <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
   <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css" />
 
-  <!-- Resources -->
   <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
   <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
   <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
@@ -31,7 +27,6 @@
       <div class="contentBox">
         <div class="container">
           <div class="landStrucIsfBox">
-            <!-- <div id="landChartDiv"></div> -->
             <div id="landChartCountDiv"></div>
             <div id="structureChartDiv"></div>
             <div id="structurePNRChartDiv"></div>
@@ -45,7 +40,6 @@
             <div id="treeCuttingChartDiv"></div>
             <div id="treeCompenChartDiv"></div>
             <div id="utilityEmptyChartDiv"></div>
-            <!-- <div id="utilityLineChartDiv"></div> -->
           </div>
         </div>
       </div>
@@ -93,35 +87,6 @@
     background-color: #03283f;
   }
 
-  calcite-action-bar {
-    position: absolute;
-    z-index: 99;
-    top: 0;
-    right: 0;
-    margin: 1rem;
-  }
-
-  calcite-panel {
-    position: absolute;
-    z-index: 1;
-    bottom: 10px;
-    right: 300px;
-    width: 30vw;
-    height: 50%;
-  }
-
-  calcite-loader {
-    align-self: center;
-    justify-self: center;
-  }
-
-  calcite-label {
-    --calcite-label-margin-bottom: 0px;
-  }
-
-  #info-content {
-    padding: 0.75rem;
-  }
 
   .contentBox {
     display: grid;
@@ -136,12 +101,6 @@
     height: 88vh;
     box-sizing: border-box;
     border-right: 0;
-  }
-
-  .containerB {
-    font-size: 1.5vw;
-    color: white;
-    padding-top: 40%;
   }
 
   #headerTitleDiv {
@@ -197,7 +156,6 @@
     width: 10vw;
   }
 
-  /* #landChartDiv, */
   #landChartCountDiv,
   #structureChartDiv,
   #structurePNRChartDiv,
@@ -206,7 +164,6 @@
   #treeCuttingChartDiv,
   #treeCompenChartDiv,
   #utilityPointChartDiv,
-  #utilityLineChartDiv,
   #treeEmptyChartDiv,
   #utilityEmptyChartDiv {
     width: 35%;
@@ -217,182 +174,16 @@
     margin: 0;
     padding: 0;
   }
-
-  a {
-    font-size: 1.2rem;
-    color: white;
-    font-weight: bold;
-  }
-
-  a:hover,
-  a:focus {
-    color: rgb(185, 171, 171);
-    font-size: 1.2vw;
-  }
-
-  ul {
-    list-style: none;
-    padding-left: 10;
-    line-height: 3rem;
-  }
-
-  ​ p {
-    font-size: 1rem;
-    width: auto;
-    vertical-align: text-bottom;
-    padding: 0;
-    margin-top: 0;
-  }
-
-  h2 {
-    font-weight: 400;
-    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
-      sans-serif;
-    font-style: normal;
-    font-size: 23px;
-    color: white;
-    padding: 3px;
-    margin: 0px;
-    width: 470px;
-    vertical-align: text-top;
-  }
-
-  h3 {
-    color: white;
-    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
-      sans-serif;
-    text-align: center;
-    font-weight: bold;
-    font-size: 14px;
-    padding: 10;
-    width: 100%;
-  }
-
-  h4 {
-    color: rgb(0, 197, 255);
-    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
-      sans-serif;
-    text-align: left;
-    font-weight: normal;
-    font-size: 16px;
-    padding-top: 20px;
-    margin: 0;
-    width: 160px;
-    vertical-align: text-bottom;
-  }
-
-  h5 {
-    color: rgb(0, 197, 255);
-    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
-      sans-serif;
-    text-align: center;
-    font-weight: bold;
-    font-size: 14px;
-    padding: 3;
-    margin: 10;
-  }
-
-  h6 {
-    color: rgb(0, 197, 255);
-    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
-      sans-serif;
-    text-align: center;
-    font-weight: normal;
-    font-size: 30px;
-    padding: 0px 0px 0px 0px;
-  }
-
-  .sassy-theme .esri-menu,
-  .sassy-theme .esri-popup__main-container,
-  .sassy-theme .esri-popup .esri-popup__pointer-direction,
-  .sassy-theme .esri-popup .esri-popup__button,
-  .sassy-theme .esri-button,
-  .sassy-theme .esri-input,
-  .sassy-theme .esri-legend,
-  .sassy-theme .esri-layer-list,
-  .sassy-theme .esri-widget a {
-    background-color: rgb(0, 0, 0, 0.7);
-    color: #fff;
-  }
-
-  .sassy-theme .esri-legend__layer-caption {
-    display: none;
-  }
 </style>
 
 <script>
   require([
-    "esri/Basemap",
-    "esri/Map",
-    "esri/views/MapView",
-    "esri/views/SceneView",
     "esri/layers/FeatureLayer",
-    "esri/layers/support/FeatureFilter",
-    "esri/layers/SceneLayer",
-    "esri/layers/Layer",
-    "esri/layers/TileLayer",
-    "esri/layers/VectorTileLayer",
-    "esri/layers/support/LabelClass",
-    "esri/symbols/LabelSymbol3D",
-    "esri/WebMap",
-    "esri/WebScene",
     "esri/portal/PortalItem",
     "esri/portal/Portal",
-    "esri/widgets/TimeSlider",
-    "esri/widgets/Legend",
-    "esri/widgets/LayerList",
-    "esri/widgets/Fullscreen",
-    "esri/rest/geometryService",
     "esri/rest/support/Query",
-    "esri/rest/support/StatisticDefinition",
-    "esri/symbols/WebStyleSymbol",
-    "esri/TimeExtent",
-    "esri/widgets/Expand",
-    "esri/widgets/Editor",
-    "esri/renderers/UniqueValueRenderer",
-    "esri/widgets/support/DatePicker",
-    "esri/widgets/FeatureTable",
-    "esri/widgets/Compass",
-    "esri/layers/ElevationLayer",
-    "esri/Ground",
-    "esri/layers/GraphicsLayer",
-    "esri/widgets/Search",
   ], function (
-    Basemap,
-    Map,
-    MapView,
-    SceneView,
-    FeatureLayer,
-    FeatureFilter,
-    SceneLayer,
-    Layer,
-    TileLayer,
-    VectorTileLayer,
-    LabelClass,
-    LabelSymbol3D,
-    WebMap,
-    WebScene,
-    PortalItem,
-    Portal,
-    TimeSlider,
-    Legend,
-    LayerList,
-    Fullscreen,
-    geometryService,
-    Query,
-    StatisticDefinition,
-    WebStyleSymbol,
-    TimeExtent,
-    Expand,
-    Editor,
-    UniqueValueRenderer,
-    DatePicker,
-    FeatureTable,
-    Compass,
-    ElevationLayer,
-    Ground,
-    GraphicsLayer,
-    Search
+    FeatureLayer, PortalItem, Portal, Legend, Query,
   ) {
     ////////////////////////////////////////////////////
 
@@ -438,57 +229,10 @@
 
 
 
+    ////////////////////////////////////////////////////
 
-    var basemap = new Basemap({
-      baseLayers: [
-        new VectorTileLayer({
-          portalItem: {
-            id: "8a9ef2a144e8423786f6139408ac3424", // 3a62040541b84f528da3ac7b80cf4a63
-          },
-        }),
-      ],
-    });
+    // ************ Import Layers ****************** //
 
-    var map = new Map({
-      basemap: basemap, //"gray-vector", // "streets-night-vector", basemap
-      ground: "world-elevation",
-    });
-
-    var view = new MapView({
-      map: map,
-      center: [120.5793, 15.18],
-      zoom: 10,
-      container: "viewDiv",
-      environment: {
-        background: {
-          type: "color", // autocasts as new ColorBackground()
-          color: [0, 0, 0, 1],
-        },
-        // disable stars
-        starsEnabled: false,
-        //disable atmosphere
-        atmosphereEnabled: false,
-      },
-    });
-
-    //
-    function shiftCamera(deg) {
-      var camera = view.camera.clone();
-      camera.position.longitude += deg;
-      return camera;
-    }
-
-    function catchAbortError(error) {
-      if (error.name != "AbortError") {
-        console.error(error);
-      }
-    }
-
-    // Setup UI
-
-    //*******************************//
-    // Import Layers                 //
-    //*******************************//
     var lotLayer = new FeatureLayer({
       portalItem: {
         id: "23500954a8d84a46886e76e6e0883a69",
@@ -589,7 +333,6 @@
     var headerTitleDiv = document.getElementById("headerTitleDiv");
 
     // Land, structure, and ISF
-    // var landChartDiv = document.getElementById("landChartDiv");
     var landChartCountDiv = document.getElementById("landChartCountDiv");
     var structureChartDiv = document.getElementById("structureChartDiv");
     var structurePNRChartDiv = document.getElementById("structurePNRChartDiv");
@@ -601,14 +344,11 @@
     var treeCompenChartDiv = document.getElementById("treeCompenChartDiv");
 
     // Utitlity Relocation
-    var utilityPointChartDiv = document.getElementById(
-      "utilityPointChartDiv"
-    );
-    var utilityLineChartDiv = document.getElementById("utilityLineChartDiv");
+    var utilityPointChartDiv = document.getElementById("utilityPointChartDiv");
 
     var informationDiv = document.getElementById("informationDiv");
 
-    //informationDiv.innerHTML =  "<br>" + "<b>" + "Note:" + "</b>" + "<br>" + "<br>" + "* Each gauge shows percent progress of each CP in the sliced chart.";
+    // informationDiv.innerHTML =  "<br>" + "<b>" + "Note:" + "</b>" + "<br>" + "<br>" + "* Each gauge shows percent progress of each CP in the sliced chart.";
     // informationDiv.innerHTML = `<b>Note:</b><br>
     //                             <p>1. The progress of individual CPs is indicated in the sliced areas of gauges.</p>
     //                             <p>2. Values in the parentheses represent the total number of observations or total area (m2).
@@ -621,7 +361,7 @@
       return num_parts.join(".");
     }
 
-    ////////// Chart Begins //////////////////
+    //////////////////////------Chart Begins------////////////////////////////////////////
     am4core.ready(function () {
       am4core.useTheme(am4themes_animated);
 
@@ -651,10 +391,11 @@
       const totalNumberLabel_y = 5;
       const totalNumberLabel_fontSize = "1.5em";
 
-      // Themes begin
+      // Axis Tick Color
+      var axis1TickColor = "#C5C5C5";
 
-      // Legend
-      //
+
+      //////////////////------Legend for Contract Package------//////////////////
       function legendCP() {
         var total_n01_lot = {
           onStatisticField: "CASE WHEN CP = 'N-01' THEN 1 ELSE 0 END",
@@ -776,9 +517,6 @@
             chart.legend.labels.template.fill = "#ffffff";
             chart.legend.valueLabels.template.fill = am4core.color("#ffffff");
 
-            //pieSeries.legendSettings.valueText = "{value.percent.formatNumber('#.')}% ({value})";
-            //pieSeries.legendSettings.labelText = "Series: [bold {color}]{category}[/]";
-
             // Responsive code for chart
             chart.responsive.enabled = true;
             chart.responsive.useDefault = false;
@@ -816,15 +554,6 @@
                 return null;
               },
             });
-            // Responsive code for chart
-
-            // Chart Title
-            //var title = chart.titles.create();
-            //title.text = "Land"; // [#00ff00]world[/], Hello [font-size: 30px]world[/]
-            //title.fontSize = 20;
-            //title.fontWeight = "bold";
-            //title.fill = "#ffffff";
-            //title.marginTop = 5;
 
             var marker = chart.legend.markers.template.children.getIndex(0);
             var markerTemplate = chart.legend.markers.template;
@@ -836,397 +565,17 @@
             // Change size of legend marker
             markerTemplate.width = 18;
             markerTemplate.height = 18;
-            // This creates initial animation
-            //pieSeries.hiddenState.properties.opacity = 1;
-            //pieSeries.hiddenState.properties.endAngle = -90;
-            //pieSeries.hiddenState.properties.startAngle = -90;
-          } // End of createSlices function
-
+          }
           createSlices("status", "CP");
-        }); // End of queryFeatures
-      } // End of updateChartLot()
+        });
+      }
       legendCP();
 
-      // Calculate Statistcis
-      // Land, Structure, and ISF
 
-      //////////////////////////////////////////
 
-      /// 1. Land (handed-over area)
-      // function lotTotalArea() {
-      //   var total_affected_area = {
-      //     onStatisticField: "AffectedArea",
-      //     outStatisticFieldName: "total_affected_area",
-      //     statisticType: "sum",
-      //   };
+      //////////////////----GAUGE CHART------////////////////////////
 
-      //   var total_handover_area = {
-      //     onStatisticField: "HandedOverArea",
-      //     outStatisticFieldName: "total_handover_area",
-      //     statisticType: "sum",
-      //   };
-
-      //   var query = lotLayer.createQuery();
-      //   query.outStatistics = [total_affected_area, total_handover_area];
-
-      //   return lotLayer.queryFeatures(query).then(function (response) {
-      //     var stats = response.features[0].attributes;
-
-      //     const totalAffected = stats.total_affected_area;
-      //     const totalHandedOver = stats.total_handover_area;
-      //     //const LOT_HANDOVER_PERC = (handedOver/affected)*100;
-      //     return totalAffected;
-      //   });
-      // }
-
-      // function lotSummary(totalAffected) {
-      //   var total_affected_area = {
-      //     onStatisticField: "AffectedArea",
-      //     outStatisticFieldName: "total_affected_area",
-      //     statisticType: "sum",
-      //   };
-
-      //   var total_handover_area = {
-      //     onStatisticField: "HandedOverArea",
-      //     outStatisticFieldName: "total_handover_area",
-      //     statisticType: "sum",
-      //   };
-
-      //   var query = lotLayer.createQuery();
-      //   query.outStatistics = [total_affected_area, total_handover_area];
-      //   query.returnGeometry = true;
-      //   query.groupByFieldsForStatistics = ["CP"];
-
-      //   var cpN01 = [];
-      //   var cpN01_a = [];
-
-      //   var cpN02 = [];
-      //   var cpN02_a = [];
-
-      //   var cpN03 = [];
-      //   var cpN03_a = [];
-
-      //   var cpN04 = [];
-      //   var cpN04_a = [];
-
-      //   var cpN05 = [];
-      //   var cpN05_a = [];
-
-      //   return lotLayer.queryFeatures(query).then(function (response) {
-      //     stats = response.features;
-
-      //     stats.forEach((result, index) => {
-      //       const attributes = result.attributes;
-      //       const cpPackage = result.attributes.CP;
-      //       const affected = attributes.total_affected_area;
-      //       const handedOver = attributes.total_handover_area;
-      //       const LOT_HANDOVER_PERC = (handedOver / totalAffected) * 100;
-      //       const lot_handedover = (handedOver / affected) * 100;
-
-      //       if (cpPackage === "N-01") {
-      //         cpN01.push(LOT_HANDOVER_PERC);
-      //         cpN01_a.push(lot_handedover);
-      //       } else if (cpPackage === "N-02") {
-      //         cpN02.push(LOT_HANDOVER_PERC);
-      //         cpN02_a.push(lot_handedover);
-      //       } else if (cpPackage === "N-03") {
-      //         cpN03.push(LOT_HANDOVER_PERC);
-      //         cpN03_a.push(lot_handedover);
-      //       } else if (cpPackage === "N-04") {
-      //         cpN04.push(LOT_HANDOVER_PERC);
-      //         cpN04_a.push(lot_handedover);
-      //       } else if (cpPackage === "N-05") {
-      //         cpN05.push(LOT_HANDOVER_PERC);
-      //         cpN05_a.push(lot_handedover);
-      //       }
-      //     });
-      //     return [
-      //       cpN01,
-      //       cpN02,
-      //       cpN03,
-      //       cpN04,
-      //       cpN05,
-      //       cpN01_a,
-      //       cpN02_a,
-      //       cpN03_a,
-      //       cpN04_a,
-      //       cpN05_a,
-      //       totalAffected,
-      //     ];
-      //   });
-      // } // End of lotSummary function
-
-      var axis1TickColor = "#C5C5C5";
-
-  //     function laFigureLot([
-  //       cpN01,
-  //       cpN02,
-  //       cpN03,
-  //       cpN04,
-  //       cpN05,
-  //       cpN01_a,
-  //       cpN02_a,
-  //       cpN03_a,
-  //       cpN04_a,
-  //       cpN05_a,
-  //       totalAffected,
-  //     ]) {
-  //       var totalScore =
-  //         Number(cpN01) +
-  //         Number(cpN02) +
-  //         Number(cpN03) +
-  //         Number(cpN04) +
-  //         Number(cpN05);
-
-  //       var N01 = Number(cpN01);
-  //       var N02 = Number(cpN01) + Number(cpN02);
-  //       var N03 = Number(cpN01) + Number(cpN02) + Number(cpN03);
-  //       var N04 =
-  //         Number(cpN01) + Number(cpN02) + Number(cpN03) + Number(cpN04);
-  //       var N05 =
-  //         Number(cpN01) +
-  //         Number(cpN02) +
-  //         Number(cpN03) +
-  //         Number(cpN04) +
-  //         Number(cpN05);
-
-  //       var n01 = Number(cpN01_a);
-  //       var n02 = Number(cpN02_a);
-  //       var n03 = Number(cpN03_a);
-  //       var n04 = Number(cpN04_a);
-  //       var n05 = Number(cpN05_a);
-
-  //       var chartMin = 0;
-  //       var chartMax = 100;
-
-  //       // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
-  //       // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
-
-  //       var data = {
-  //         score: totalScore,
-  //         gradingData: [
-  //           {
-  //             title: n01.toFixed(0),
-  //             color: color_101,
-  //             lowScore: 0,
-  //             highScore: N01,
-  //           },
-  //           {
-  //             title: n02.toFixed(0),
-  //             color: color_102,
-  //             lowScore: N01,
-  //             highScore: N02,
-  //           },
-  //           {
-  //             title: n03.toFixed(0),
-  //             color: color_103,
-  //             lowScore: N02,
-  //             highScore: N03,
-  //           },
-  //           {
-  //             title: n04.toFixed(0),
-  //             color: color_104,
-  //             lowScore: N03,
-  //             highScore: N04,
-  //           },
-  //           {
-  //             title: n05.toFixed(0),
-  //             color: color_105,
-  //             lowScore: N04,
-  //             highScore: N05,
-  //           },
-  //           {
-  //             title: "",
-  //             color: "#C5C5C5",
-  //             lowScore: N05,
-  //             highScore: 100,
-  //           },
-  //         ],
-  //       };
-
-  //       /**
-  // Grading Lookup
-  // */
-  //       function lookUpGrade(lookupScore, grades) {
-  //         // Only change code below this line
-  //         for (var i = 0; i < grades.length; i++) {
-  //           if (
-  //             grades[i].lowScore < lookupScore &&
-  //             grades[i].highScore >= lookupScore
-  //           ) {
-  //             return grades[i];
-  //           }
-  //         }
-  //         return null;
-  //       }
-
-  //       // create chart
-  //       var chart = am4core.create("landChartDiv", am4charts.GaugeChart);
-  //       chart.hiddenState.properties.opacity = 0;
-  //       chart.fontSize = 11;
-  //       chart.innerRadius = am4core.percent(80);
-  //       chart.resizable = true;
-  //       chart.responsive.enabled = true;
-  //       chart.logo.disabled = true;
-  //       /**
-  //        * Chart Title
-  //        */
-  //       // Title Color
-  //       var title = chart.titles.create();
-  //       //'<a href="https://google.com"}">More info</a>'
-
-  //       title.text = "LAND";
-  //       //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/N2_Land_Structure2/index2.html" target="_blank">LAND</a>';
-  //       title.fontSize = titleFontSize;
-  //       title.align = "center";
-  //       title.marginBottom = -10;
-  //       title.marginTop = 0;
-  //       title.fill = TOP_TITLE_COL;
-
-  //       //var sourceLabel = chart.createChild(am4core.Label);
-  //       //sourceLabel.html = '<a href="https://google.com">Test</a>';
-
-  //       // Add bottom label
-  //       var label = chart.chartContainer.createChild(am4core.Label);
-  //       label.text = "[bold]HANDED-OVER AREA";
-  //       //label.html = '<a href="https://google.com">HANDED-OVER AREA</a>';
-  //       label.fontSize = bottomLabelFontSize;
-  //       label.align = "center";
-  //       label.marginTop = labelMarginTop;
-  //       label.fill = BOTTOM_LABEL_COL;
-
-  //       /**
-  //        * Normal axis
-  //        */
-
-  //       var axis = chart.xAxes.push(new am4charts.ValueAxis());
-  //       axis.min = chartMin;
-  //       axis.max = chartMax;
-  //       axis.strictMinMax = true;
-  //       axis.renderer.radius = am4core.percent(80);
-  //       axis.renderer.inside = true;
-  //       axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
-  //       axis.renderer.ticks.template.disabled = false;
-  //       axis.renderer.ticks.template.strokeOpacity = 1;
-  //       //axis.renderer.ticks.template.strokeWidth = 1;
-  //       axis.renderer.ticks.template.length = 10;
-  //       axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
-  //       //axis.renderer.grid.template.disabled = true;
-  //       axis.renderer.labels.template.radius = am4core.percent(40);
-  //       axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
-  //       axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
-
-  //       /**
-  //        * Axis for ranges
-  //        */
-
-  //       var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
-  //       axis2.min = chartMin;
-  //       axis2.max = chartMax;
-  //       axis2.strictMinMax = true;
-  //       axis2.renderer.labels.template.disabled = true;
-  //       axis2.renderer.ticks.template.disabled = true;
-  //       axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
-  //       axis2.renderer.grid.template.opacity = 0.5;
-  //       axis2.renderer.labels.template.bent = true;
-  //       axis2.renderer.labels.template.fill = am4core.color("#000");
-  //       axis2.renderer.labels.template.fontWeight = "bold";
-  //       axis2.renderer.labels.template.fillOpacity = 0.7;
-
-  //       /**
-  // Ranges
-  // */
-
-  //       for (let grading of data.gradingData) {
-  //         var range = axis2.axisRanges.create();
-  //         range.axisFill.fill = am4core.color(grading.color);
-  //         range.axisFill.fillOpacity = 1; // default 0.8 fill-color of
-  //         range.axisFill.zIndex = -1;
-  //         range.value =
-  //           grading.lowScore > chartMin ? grading.lowScore : chartMin;
-  //         range.endValue =
-  //           grading.highScore < chartMax ? grading.highScore : chartMax;
-  //         range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
-  //         range.stroke = am4core.color(grading.color).lighten(-0.1);
-  //         range.label.inside = true;
-  //         range.label.text = grading.title.toUpperCase();
-  //         range.label.inside = true;
-  //         range.label.location = 0.5;
-  //         range.label.inside = true;
-  //         range.label.radius = am4core.percent(10);
-  //         range.label.paddingBottom = -5; // ~half font size
-  //         range.label.fontSize = "1.4em"; // category label (i.e., N-01, N-02, ....)
-  //       }
-
-  //       var matchingGrade = lookUpGrade(data.score, data.gradingData);
-
-  //       /**
-  //        * Label 1 (total Percent)
-  //        */
-
-  //       var label = chart.radarContainer.createChild(am4core.Label);
-  //       label.isMeasured = false;
-  //       label.fontSize = totalPercentLabel_fontSize;
-  //       label.x = am4core.percent(50);
-  //       label.y = totalPercentLabel_y;
-  //       label.paddingBottom = -5;
-  //       label.horizontalCenter = "middle";
-  //       label.verticalCenter = "bottom";
-  //       //label.dataItem = data;
-  //       label.text = data.score.toFixed(0).toString() + "%";
-  //       //label.text = "{score}";
-  //       //label.fill = am4core.color(matchingGrade.color);
-  //       label.fill = am4core.color("#00C3FF");
-
-  //       /**
-  //        * Label 2
-  //        */
-
-  //       var label2 = chart.radarContainer.createChild(am4core.Label);
-  //       label2.isMeasured = false;
-  //       label2.fontSize = totalNumberLabel_fontSize;
-  //       label2.horizontalCenter = "middle";
-  //       label2.verticalCenter = "bottom";
-  //       label2.y = totalNumberLabel_y;
-  //       label2.text =
-  //         "(" + thousands_separators(totalAffected.toFixed(0)) + ")";
-  //       label2.fill = am4core.color("#00C3FF");
-
-  //       /**
-  //        * Hand
-  //        */
-
-  //       var hand = chart.hands.push(new am4charts.ClockHand());
-  //       hand.axis = axis2;
-  //       hand.innerRadius = am4core.percent(55);
-  //       hand.startWidth = 8;
-  //       hand.pin.disabled = true;
-  //       hand.value = data.score;
-  //       hand.fill = am4core.color("#000000"); // inner color of needle
-  //       //hand.stroke = am4core.color("#000");
-  //       hand.fillOpacity = 0.5;
-
-  //       /*
-  // hand.events.on("positionchanged", function(){
-  // label.text = axis2.positionToValue(hand.currentPosition).toFixed(0).toString() + "%";
-  // var value2 = axis.positionToValue(hand.currentPosition);
-  // var matchingGrade = lookUpGrade(axis.positionToValue(hand.currentPosition), data.gradingData);
-  // label2.text = matchingGrade.title.toUpperCase();
-  // label2.fill = am4core.color(matchingGrade.color);
-  // label2.stroke = am4core.color(matchingGrade.color);
-  // label.fill = am4core.color(matchingGrade.color);
-  // })
-  // */
-  //       /*
-  // setInterval(function() {
-  // var value = chartMin + Math.random() * (chartMax - chartMin);
-  // hand.showValue(value, 1000, am4core.ease.cubicOut);
-  // }, 2000);
-  // */
-  //     }
-  //     lotTotalArea().then(lotSummary).then(laFigureLot);
-
-      /// 1. Land (handed-over counts)
+      /// 1. CHART LAND (HANDED-OVER COUNTS)
       function totalLotCount() {
         var total_lot = {
           onStatisticField: "LotID",
@@ -1452,9 +801,7 @@
           ],
         };
 
-        /**
-  Grading Lookup
-  */
+        /**Grading Lookup*/
         function lookUpGrade(lookupScore, grades) {
           // Only change code below this line
           for (var i = 0; i < grades.length; i++) {
@@ -1476,9 +823,8 @@
         chart.resizable = true;
         chart.responsive.enabled = true;
         chart.logo.disabled = true;
-        /**
-         * Chart Title
-         */
+
+        /*** Chart Title*/
         // Title Color
         var title = chart.titles.create();
         //'<a href="https://google.com"}">More info</a>'
@@ -1503,9 +849,7 @@
         label.marginTop = labelMarginTop;
         label.fill = BOTTOM_LABEL_COL;
 
-        /**
-         * Normal axis
-         */
+        /*** Normal axis***/
 
         var axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = chartMin;
@@ -1524,9 +868,7 @@
         axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
         axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /**
-         * Axis for ranges
-         */
+        /*** Axis for ranges***/
 
         var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
         axis2.min = chartMin;
@@ -1541,9 +883,7 @@
         axis2.renderer.labels.template.fontWeight = "bold";
         axis2.renderer.labels.template.fillOpacity = 0.7;
 
-        /**
-  Ranges
-  */
+        /**Ranges*/
 
         for (let grading of data.gradingData) {
           var range = axis2.axisRanges.create();
@@ -1568,9 +908,7 @@
 
         var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /**
-         * Label 1 (total Percent)
-         */
+        /*** Label 1 (total Percent)*/
 
         var label = chart.radarContainer.createChild(am4core.Label);
         label.isMeasured = false;
@@ -1586,9 +924,7 @@
         //label.fill = am4core.color(matchingGrade.color);
         label.fill = am4core.color("#00C3FF");
 
-        /**
-         * Label 2
-         */
+        /*** Label 2*/
 
         var label2 = chart.radarContainer.createChild(am4core.Label);
         label2.isMeasured = false;
@@ -1599,9 +935,7 @@
         label2.text = "(" + thousands_separators(total.toFixed(0)) + ")";
         label2.fill = am4core.color("#00C3FF");
 
-        /**
-         * Hand
-         */
+        /*** Hand*/
 
         var hand = chart.hands.push(new am4charts.ClockHand());
         hand.axis = axis2;
@@ -1613,10 +947,12 @@
         //hand.stroke = am4core.color("#000");
         hand.fillOpacity = 0.5;
       }
-
       totalLotCount().then(chartTotalLotHandedOverCount);
+      ///END OF CHART LAND (HANDED-OVER COUNTS)
 
-      /// 2. Structure
+
+
+      /// 2. CHART STRUCTURE (ALL)
       function totalStrucCount() {
         var total_struc = {
           onStatisticField: "StrucID",
@@ -1863,9 +1199,8 @@
         chart.resizable = true;
         chart.responsive.enabled = true;
         chart.logo.disabled = true;
-        /**
-         * Chart Title
-         */
+
+        /*** Chart Title*/
         // Title Color
         var title = chart.titles.create();
         title.text = "EXISTING STRUCTURE";
@@ -1884,9 +1219,7 @@
         label.marginTop = labelMarginTop;
         label.fill = BOTTOM_LABEL_COL;
 
-        /**
-         * Normal axis
-         */
+        /*** Normal axis*/
 
         var axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = chartMin;
@@ -1905,9 +1238,7 @@
         axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
         axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /**
-         * Axis for ranges
-         */
+        /*** Axis for ranges*/
 
         var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
         axis2.min = chartMin;
@@ -1922,9 +1253,7 @@
         axis2.renderer.labels.template.fontWeight = "bold";
         axis2.renderer.labels.template.fillOpacity = 0.7; // 0.3 // category labels: N-01, N-02,....
 
-        /**
-  Ranges
-  */
+        /**Ranges*/
 
         for (let grading of data.gradingData) {
           var range = axis2.axisRanges.create();
@@ -1949,9 +1278,7 @@
 
         var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /**
-         * Label 1 (total Percent)
-         */
+        /*** Label 1 (total Percent)*/
 
         var label = chart.radarContainer.createChild(am4core.Label);
         label.isMeasured = false;
@@ -1967,9 +1294,7 @@
         //label.fill = am4core.color(matchingGrade.color);
         label.fill = am4core.color("#00C3FF");
 
-        /**
-         * Label 2
-         */
+        /*** Label 2*/
 
         var label2 = chart.radarContainer.createChild(am4core.Label);
         label2.isMeasured = false;
@@ -1980,9 +1305,7 @@
         label2.text = "(" + thousands_separators(total) + ")";
         label2.fill = am4core.color("#00C3FF");
 
-        /**
-         * Hand
-         */
+        /*** Hand*/
 
         var hand = chart.hands.push(new am4charts.ClockHand());
         hand.axis = axis2;
@@ -1994,11 +1317,12 @@
         //hand.stroke = am4core.color("#000");
         hand.fillOpacity = 0.5;
       }
-
       totalStrucCount().then(chartTotalStrucDismantleCount);
+      //END OF CHART STRUCTURE (ALL)
 
 
-      /// 3. Structure (PNR)
+
+      /// 3. CHART STRUCTURE (PNR)
       function totalStrucCountPNR() {
         let total_struc_pnr = {
           onStatisticField: "CASE WHEN PNR = 1 THEN 1 ELSE 0 END",
@@ -2141,7 +1465,6 @@
         });
       }
 
-
       function chartTotalStrucDismantleCountPNR([
         total,
         percent,
@@ -2242,9 +1565,7 @@
         chart.resizable = true;
         chart.responsive.enabled = true;
         chart.logo.disabled = true;
-        /**
-         * Chart Title
-         */
+        /*** Chart Title*/
         // Title Color
         var title = chart.titles.create();
         title.text = "EXISTING STRUCTURE (PNR)";
@@ -2263,9 +1584,7 @@
         label.marginTop = labelMarginTop;
         label.fill = BOTTOM_LABEL_COL;
 
-        /**
-         * Normal axis
-         */
+        /*** Normal axis*/
 
         var axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = chartMin;
@@ -2284,9 +1603,7 @@
         axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
         axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /**
-         * Axis for ranges
-         */
+        /*** Axis for ranges*/
 
         var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
         axis2.min = chartMin;
@@ -2301,9 +1618,7 @@
         axis2.renderer.labels.template.fontWeight = "bold";
         axis2.renderer.labels.template.fillOpacity = 0.7; // 0.3 // category labels: N-01, N-02,....
 
-        /**
-  Ranges
-  */
+        /**Ranges*/
 
         for (let grading of data.gradingData) {
           var range = axis2.axisRanges.create();
@@ -2328,9 +1643,7 @@
 
         var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /**
-         * Label 1 (total Percent)
-         */
+        /*** Label 1 (total Percent)*/
 
         var label = chart.radarContainer.createChild(am4core.Label);
         label.isMeasured = false;
@@ -2346,9 +1659,7 @@
         //label.fill = am4core.color(matchingGrade.color);
         label.fill = am4core.color("#00C3FF");
 
-        /**
-         * Label 2
-         */
+        /*** Label 2*/
 
         var label2 = chart.radarContainer.createChild(am4core.Label);
         label2.isMeasured = false;
@@ -2359,9 +1670,7 @@
         label2.text = "(" + thousands_separators(total) + ")";
         label2.fill = am4core.color("#00C3FF");
 
-        /**
-         * Hand
-         */
+        /*** Hand*/
 
         var hand = chart.hands.push(new am4charts.ClockHand());
         hand.axis = axis2;
@@ -2373,12 +1682,12 @@
         //hand.stroke = am4core.color("#000");
         hand.fillOpacity = 0.5;
       }
-
       totalStrucCountPNR().then(chartTotalStrucDismantleCountPNR);
+      //END OF CHART STRUCTURE (PNR)
 
 
 
-      /// 3. ISF
+      /// 4. CHART ISF (ALL)
       function totalIsfCount() {
         var total_isf = {
           onStatisticField: "StrucID",
@@ -2625,9 +1934,7 @@
         chart.resizable = true;
         chart.responsive.enabled = true;
         chart.logo.disabled = true;
-        /**
-         * Chart Title
-         */
+        /*** Chart Title*/
         // Title Color
         var title = chart.titles.create();
         title.text = "INFORMAL SETTLERS";
@@ -2646,9 +1953,7 @@
         label.marginTop = labelMarginTop;
         label.fill = BOTTOM_LABEL_COL;
 
-        /**
-         * Normal axis
-         */
+        /*** Normal axis*/
 
         var axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = chartMin;
@@ -2667,9 +1972,7 @@
         axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
         axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /**
-         * Axis for ranges
-         */
+        /*** Axis for ranges*/
 
         var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
         axis2.min = chartMin;
@@ -2684,9 +1987,7 @@
         axis2.renderer.labels.template.fontWeight = "bold";
         axis2.renderer.labels.template.fillOpacity = 0.7;
 
-        /**
-  Ranges
-  */
+        /**Ranges*/
 
         for (let grading of data.gradingData) {
           var range = axis2.axisRanges.create();
@@ -2711,9 +2012,7 @@
 
         var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /**
-         * Label 1 (total Percent)
-         */
+        /*** Label 1 (total Percent)*/
 
         var label = chart.radarContainer.createChild(am4core.Label);
         label.isMeasured = false;
@@ -2731,9 +2030,7 @@
         //label.fill = am4core.color(matchingGrade.color);
         label.fill = am4core.color("#00C3FF");
 
-        /**
-         * Label 2
-         */
+        /*** Label 2*/
 
         var label2 = chart.radarContainer.createChild(am4core.Label);
         label2.isMeasured = false;
@@ -2744,9 +2041,7 @@
         label2.text = "(" + thousands_separators(total) + ")";
         label2.fill = am4core.color("#00C3FF");
 
-        /**
-         * Hand
-         */
+        /*** Hand*/
 
         var hand = chart.hands.push(new am4charts.ClockHand());
         hand.axis = axis2;
@@ -2758,11 +2053,12 @@
         //hand.stroke = am4core.color("#000");
         hand.fillOpacity = 0.5;
       }
-
       totalIsfCount().then(chartTotalIsfRelocateCount);
+      //END OF CHART ISF (ALL)
 
 
-      // 5. Chart ISF (PNR)
+
+      // 5. CHART ISF (PNR)
 
       function totalIsfCountPNR() {
         var total_isf_pnr = {
@@ -3005,9 +2301,7 @@
         chart.resizable = true;
         chart.responsive.enabled = true;
         chart.logo.disabled = true;
-        /**
-         * Chart Title
-         */
+        /*** Chart Title */
         // Title Color
         var title = chart.titles.create();
         title.text = "INFORMAL SETTLERS (PNR)";
@@ -3026,9 +2320,7 @@
         label.marginTop = labelMarginTop;
         label.fill = BOTTOM_LABEL_COL;
 
-        /**
-         * Normal axis
-         */
+        /*** Normal axis*/
 
         var axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = chartMin;
@@ -3047,9 +2339,7 @@
         axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
         axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /**
-         * Axis for ranges
-         */
+        /*** Axis for ranges*/
 
         var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
         axis2.min = chartMin;
@@ -3064,9 +2354,7 @@
         axis2.renderer.labels.template.fontWeight = "bold";
         axis2.renderer.labels.template.fillOpacity = 0.7;
 
-        /**
-  Ranges
-  */
+        /**Ranges*/
 
         for (let grading of data.gradingData) {
           var range = axis2.axisRanges.create();
@@ -3091,9 +2379,7 @@
 
         var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /**
-         * Label 1 (total Percent)
-         */
+        /*** Label 1 (total Percent)*/
 
         var label = chart.radarContainer.createChild(am4core.Label);
         label.isMeasured = false;
@@ -3111,9 +2397,7 @@
         //label.fill = am4core.color(matchingGrade.color);
         label.fill = am4core.color("#00C3FF");
 
-        /**
-         * Label 2
-         */
+        /*** Label 2*/
 
         var label2 = chart.radarContainer.createChild(am4core.Label);
         label2.isMeasured = false;
@@ -3124,9 +2408,7 @@
         label2.text = "(" + thousands_separators(total) + ")";
         label2.fill = am4core.color("#00C3FF");
 
-        /**
-         * Hand
-         */
+        /*** Hand*/
 
         var hand = chart.hands.push(new am4charts.ClockHand());
         hand.axis = axis2;
@@ -3138,12 +2420,12 @@
         //hand.stroke = am4core.color("#000");
         hand.fillOpacity = 0.5;
       }
-
       totalIsfCountPNR().then(chartTotalIsfRelocateCountPNR);
+      //END OF CHART ISF (PNR)
 
 
 
-      /// 1. Tree Cutting
+      /// 6. CHART TREE CUTTING
       function totalTreeCuttingCount() {
         var total_tree = {
           onStatisticField: "CommonName",
@@ -3393,9 +2675,8 @@
         chart.resizable = true;
         chart.responsive.enabled = true;
         chart.logo.disabled = true;
-        /**
-         * Chart Title
-         */
+        
+        /*** Chart Title*/
         // Title Color
         var title = chart.titles.create();
         title.text = "TREE CUTTING";
@@ -3414,9 +2695,7 @@
         label.marginTop = labelMarginTop;
         label.fill = BOTTOM_LABEL_COL;
 
-        /**
-         * Normal axis
-         */
+        /*** Normal axis*/
 
         var axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = chartMin;
@@ -3435,9 +2714,7 @@
         axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
         axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /**
-         * Axis for ranges
-         */
+        /*** Axis for ranges*/
 
         var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
         axis2.min = chartMin;
@@ -3452,9 +2729,7 @@
         axis2.renderer.labels.template.fontWeight = "bold";
         axis2.renderer.labels.template.fillOpacity = 0.7;
 
-        /**
-  Ranges
-  */
+        /**Ranges*/
 
         for (let grading of data.gradingData) {
           var range = axis2.axisRanges.create();
@@ -3479,9 +2754,7 @@
 
         var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /**
-         * Label 1 (total Percent)
-         */
+        /*** Label 1 (total Percent)*/
 
         var label = chart.radarContainer.createChild(am4core.Label);
         label.isMeasured = false;
@@ -3499,9 +2772,7 @@
         //label.fill = am4core.color(matchingGrade.color);
         label.fill = am4core.color("#00C3FF");
 
-        /**
-         * Label 2
-         */
+        /*** Label 2*/
 
         var label2 = chart.radarContainer.createChild(am4core.Label);
         label2.isMeasured = false;
@@ -3512,9 +2783,7 @@
         label2.text = "(" + thousands_separators(total) + ")";
         label2.fill = am4core.color("#00C3FF");
 
-        /**
-         * Hand
-         */
+        /*** Hand*/
 
         var hand = chart.hands.push(new am4charts.ClockHand());
         hand.axis = axis2;
@@ -3526,10 +2795,12 @@
         //hand.stroke = am4core.color("#000");
         hand.fillOpacity = 0.5;
       }
-
       totalTreeCuttingCount().then(chartTotalTreeCutCount);
+      //END OF CHART TREE CUTTING
 
-      // Tree Compensation
+      
+
+      // 7. CHART TREE COMPENSATION
       function totalTreeCompensationCount() {
         var total_tree = {
           onStatisticField: "CASE WHEN Compensation >= 2 THEN 1 ELSE 0 END",
@@ -3779,9 +3050,8 @@
         chart.resizable = true;
         chart.responsive.enabled = true;
         chart.logo.disabled = true;
-        /**
-         * Chart Title
-         */
+        
+        /*** Chart Title*/
         // Title Color
         var title = chart.titles.create();
         title.text = "TREE COMPENSATION";
@@ -3800,9 +3070,7 @@
         label.marginTop = labelMarginTop;
         label.fill = BOTTOM_LABEL_COL;
 
-        /**
-         * Normal axis
-         */
+        /*** Normal axis*/
 
         var axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = chartMin;
@@ -3821,9 +3089,7 @@
         axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
         axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /**
-         * Axis for ranges
-         */
+        /*** Axis for ranges*/
 
         var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
         axis2.min = chartMin;
@@ -3838,9 +3104,7 @@
         axis2.renderer.labels.template.fontWeight = "bold";
         axis2.renderer.labels.template.fillOpacity = 0.7;
 
-        /**
-  Ranges
-  */
+        /**Ranges*/
 
         for (let grading of data.gradingData) {
           var range = axis2.axisRanges.create();
@@ -3865,9 +3129,7 @@
 
         var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /**
-         * Label 1 (total Percent)
-         */
+        /*** Label 1 (total Percent)*/
 
         var label = chart.radarContainer.createChild(am4core.Label);
         label.isMeasured = false;
@@ -3885,9 +3147,7 @@
         //label.fill = am4core.color(matchingGrade.color);
         label.fill = am4core.color("#00C3FF");
 
-        /**
-         * Label 2
-         */
+        /*** Label 2*/
 
         var label2 = chart.radarContainer.createChild(am4core.Label);
         label2.isMeasured = false;
@@ -3898,9 +3158,7 @@
         label2.text = "(" + thousands_separators(total) + ")";
         label2.fill = am4core.color("#00C3FF");
 
-        /**
-         * Hand
-         */
+        /*** Hand*/
 
         var hand = chart.hands.push(new am4charts.ClockHand());
         hand.axis = axis2;
@@ -3912,12 +3170,14 @@
         //hand.stroke = am4core.color("#000");
         hand.fillOpacity = 0.5;
       }
-
       totalTreeCompensationCount().then(chartTotalTreeCompensationCount);
+      // END OF CHART TREE COMPENSATION
 
-      // Total Number: Utility Point + Utility Line
+
+
+      // 8. CHART TOTAL NUMBER OF UTILITY POINT AND UTILITY LINE
       async function utilityTotalCount() {
-        /// point
+        /// POINT
         var total_number_point = {
           onStatisticField: "LAYER",
           outStatisticFieldName: "total_number_point",
@@ -3995,7 +3255,7 @@
           statisticType: "sum",
         };
 
-        // Line
+        // LINE
         var total_number_line = {
           onStatisticField: "LAYER",
           outStatisticFieldName: "total_number_line",
@@ -4073,7 +3333,7 @@
           statisticType: "sum",
         };
 
-        // Query point
+        // QUERY POINT
         var query_p = utilPointLayer.createQuery();
         query_p.outStatistics = [
           total_number_point,
@@ -4124,7 +3384,7 @@
             ];
           });
 
-        // Query Line
+        // QUERY LINE
         var query_l = utilLineLayer.createQuery();
         query_l.outStatistics = [
           total_number_line,
@@ -4218,7 +3478,7 @@
           n04_percent_total,
           n05_percent_total,
         ];
-      }
+      } // End of UtilityTotalCount()
 
       function utilityChart([
         total,
@@ -4320,9 +3580,8 @@
         chart.resizable = true;
         chart.responsive.enabled = true;
         chart.logo.disabled = true;
-        /**
-         * Chart Title
-         */
+        
+        /*** Chart Title*/
         // Title Color
         var title = chart.titles.create();
         title.text = "UTILITY";
@@ -4341,9 +3600,7 @@
         label.marginTop = labelMarginTop;
         label.fill = BOTTOM_LABEL_COL;
 
-        /**
-         * Normal axis
-         */
+        /*** Normal axis*/
 
         var axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = chartMin;
@@ -4362,9 +3619,7 @@
         axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
         axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /**
-         * Axis for ranges
-         */
+        /*** Axis for ranges*/
 
         var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
         axis2.min = chartMin;
@@ -4379,9 +3634,7 @@
         axis2.renderer.labels.template.fontWeight = "bold";
         axis2.renderer.labels.template.fillOpacity = 0.7;
 
-        /**
-  Ranges
-  */
+        /**Ranges*/
 
         for (let grading of data.gradingData) {
           var range = axis2.axisRanges.create();
@@ -4406,9 +3659,7 @@
 
         var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /**
-         * Label 1 (total Percent)
-         */
+        /*** Label 1 (total Percent)*/
 
         var label = chart.radarContainer.createChild(am4core.Label);
         label.isMeasured = false;
@@ -4426,9 +3677,7 @@
         //label.fill = am4core.color(matchingGrade.color);
         label.fill = am4core.color("#00C3FF");
 
-        /**
-         * Label 2
-         */
+        /*** Label 2*/
 
         var label2 = chart.radarContainer.createChild(am4core.Label);
         label2.isMeasured = false;
@@ -4439,9 +3688,7 @@
         label2.text = "(" + thousands_separators(total) + ")";
         label2.fill = am4core.color("#00C3FF");
 
-        /**
-         * Hand
-         */
+        /*** Hand*/
 
         var hand = chart.hands.push(new am4charts.ClockHand());
         hand.axis = axis2;
@@ -4452,10 +3699,12 @@
         hand.fill = am4core.color("#000000"); // inner color of needle
         //hand.stroke = am4core.color("#000");
         hand.fillOpacity = 0.5;
-      }
-
+      } // End of Utility Chart
       utilityTotalCount().then(utilityChart);
-    }); // end am4core.ready()
+      //END OF CHART TOTAL UTILITY
+
+
+    }); // END OF am4core.ready()
   });
 </script>
 
