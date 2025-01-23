@@ -741,7 +741,7 @@
     //------------- Layer ----------------------------- /
     // Commercial Operatino Schdule image
 
-    const labelStation_fontSize = 11;
+    const labelStation_fontSize = 100;
     const lineWidth = "6px";
 
     // Centerline
@@ -749,7 +749,7 @@
     const centerlineProjectColor = {
       nscr_hex: "#ff5f22",
       mmsp_hex: "#00b7ff", //"#0000ff"
-      nscrex_hex: "#ff5f22", //"#00b3ff","#00B0F0", "#15C2FF"
+      nscrex_hex: "#f7a07e", //"#00b3ff","#00B0F0", "#15C2FF"
     };
 
     const lineSymbol_mmsp = {
@@ -842,7 +842,7 @@
     const completedConstruction_color = colors[0]; // original: #dc4b00
  
     // Default line width for costruction progress in overview
-    const construction_lineWidth = "6px";
+    const construction_lineWidth = "9px";
     const lineSymbol_construction = {
       type: "unique-value", // autocasts as new SimpleLineSymbol(),
       field: "construcStat",
@@ -886,7 +886,7 @@
     };
 
     // Line width for construction progress in individual projects
-    const construction_lineWidth_project = "8px";
+    const construction_lineWidth_project = "30px";
     const lineSymbol_construction_project = {
       type: "unique-value", // autocasts as new SimpleLineSymbol(),
       field: "construcStat",
@@ -1208,7 +1208,7 @@
 
     // Station point color
     // Alignment
-    const pointSize = "12px"; // original: 10px
+    const pointSize = "15px"; // original: 10px
     const pointColor = "white";
     const pointOutlineWidth = 2.5; // original: 1.5
 
@@ -1477,8 +1477,8 @@
           //weight: "bold"
         },
       },
-      deconflictionStrategy: "none", // show overlapping numbers
-      labelPlacement: "center-right",
+      // deconflictionStrategy: "none", // show overlapping numbers
+      labelPlacement: "above-right" ,//"center-right",
       labelExpressionInfo: {
         expression: "$feature.Station",
       },
@@ -1659,301 +1659,308 @@
     const fontSizeAirport = 12;
 
     // Clark Internation Airport Pins
-    var clarkAirport_pin = new FeatureLayer({
-      portalItem: {
-        id: "158b39ce19c24015b0476c24af9f5264",
-        portal: {
-          url: "https://gis.railway-sector.com/portal",
-        },
-      },
-      definitionExpression: "TITLE = 'Clark International Airport'",
-      popupEnabled: false,
-      opacity: 0,
-    });
+  //   var clarkAirport_pin = new FeatureLayer({
+  //     portalItem: {
+  //       id: "158b39ce19c24015b0476c24af9f5264",
+  //       portal: {
+  //         url: "https://gis.railway-sector.com/portal",
+  //       },
+  //     },
+  //     definitionExpression: "TITLE = 'Clark International Airport'",
+  //     popupEnabled: false,
+  //     opacity: 0,
+  //   });
 
-    // Label 'Manila' on the map
-    const clarkAirport_pin_pointGraphicLayer = new GraphicsLayer();
-    clarkAirport_pin_pointGraphicLayer.listMode = "hide";
-    map.add(clarkAirport_pin_pointGraphicLayer);
+  //   // Label 'Manila' on the map
+  //   const clarkAirport_pin_pointGraphicLayer = new GraphicsLayer();
+  //   clarkAirport_pin_pointGraphicLayer.listMode = "hide";
+  //   map.add(clarkAirport_pin_pointGraphicLayer);
 
-    const clarkAirport_pin_lineGraphicsLayer = new GraphicsLayer({
-      //maxScale: maxScale,
-      //minScale: minScale
-    });
-    clarkAirport_pin_lineGraphicsLayer.listMode = "hide";
-    map.add(clarkAirport_pin_lineGraphicsLayer);
+  //   const clarkAirport_pin_lineGraphicsLayer = new GraphicsLayer({
+  //     //maxScale: maxScale,
+  //     //minScale: minScale
+  //   });
+  //   clarkAirport_pin_lineGraphicsLayer.listMode = "hide";
+  //   map.add(clarkAirport_pin_lineGraphicsLayer);
 
-    var query = clarkAirport_pin.createQuery();
-    clarkAirport_pin.queryFeatures(query).then(function (response) {
-      var stats = response.features[0];
+  //   var query = clarkAirport_pin.createQuery();
+  //   clarkAirport_pin.queryFeatures(query).then(function (response) {
+  //     var stats = response.features[0];
 
-      // Create label point and label for 'Manila'
-      const x0 = stats.geometry.longitude;
-      const y0 = stats.geometry.latitude;
-      const x1 = x0 - 0.1; // Offset
-      const y1 = y0 - 0.15;
+  //     // Create label point and label for 'Manila'
+  //     const x0 = stats.geometry.longitude;
+  //     const y0 = stats.geometry.latitude;
+  //     const x1 = x0 - 0.1; // Offset
+  //     const y1 = y0 - 0.15;
 
-      const point = {
-        type: "point",
-        longitude: x1,
-        latitude: y0,
-      };
+  //     const point = {
+  //       type: "point",
+  //       longitude: x1,
+  //       latitude: y0,
+  //     };
 
-      let clarkAirport_textSymbol = {
-        type: "text", // autocasts as new TextSymbol()
-        color: "white",
-        //backgroundColor: projectBackgroundColor,
-        text: "Clark Int. Airport",
-        horizontalAlignment: "right",
-        //yoffset: -5,
-        font: {
-          // autocasts as new Font()
-          size: fontSizeAirport,
-          //family: "Merriweather",
-          //style: "italic",
-          //weight: "bold"
-        },
-      };
+  //     let clarkAirport_textSymbol = {
+  //       type: "text", // autocasts as new TextSymbol()
+  //       color: "white",
+  //       //backgroundColor: projectBackgroundColor,
+  //       text: "Clark Int. Airport",
+  //       horizontalAlignment: "right",
+  //       //yoffset: -5,
+  //       font: {
+  //         // autocasts as new Font()
+  //         size: fontSizeAirport,
+  //         //family: "Merriweather",
+  //         //style: "italic",
+  //         //weight: "bold"
+  //       },
+  //     };
 
-      const simpleMarkerSymbol = {
-        type: "simple-marker",
-        color: [226, 119, 40],
-        size: 12,
-        style: "circle",
-        outline: {
-          width: 1,
-          color: [255, 255, 255, 1],
-        },
-      };
+  //     const simpleMarkerSymbol = {
+  //       type: "simple-marker",
+  //       color: [226, 119, 40],
+  //       size: 12,
+  //       style: "circle",
+  //       outline: {
+  //         width: 1,
+  //         color: [255, 255, 255, 1],
+  //       },
+  //     };
 
-      const clarkAirport_PointGraphic = new Graphic({
-        geometry: point,
-        symbol: clarkAirport_textSymbol,
-      });
-      clarkAirport_pin_pointGraphicLayer.add(clarkAirport_PointGraphic);
+  //     const clarkAirport_PointGraphic = new Graphic({
+  //       geometry: point,
+  //       symbol: clarkAirport_textSymbol,
+  //     });
+  //     clarkAirport_pin_pointGraphicLayer.add(clarkAirport_PointGraphic);
 
-      // Crate label line for 'Manila'
-      // Create lin path and polyline
-      const path = [
-        [x0, y0],
-        [x1, y0],
-      ];
+  //     // Crate label line for 'Manila'
+  //     // Create lin path and polyline
+  //     const path = [
+  //       [x0, y0],
+  //       [x1, y0],
+  //     ];
 
-      const clarkAirport_pin_polyline = {
-        type: "polyline",
-        paths: path,
-      };
+  //     const clarkAirport_pin_polyline = {
+  //       type: "polyline",
+  //       paths: path,
+  //     };
 
-      // Set line properties
-      const clarkAirport_pin_LineSymbol = {
-        type: "simple-line",
-        color: cpLineColor,
-        width: cpLineWidth,
-      };
+  //     // Set line properties
+  //     const clarkAirport_pin_LineSymbol = {
+  //       type: "simple-line",
+  //       color: cpLineColor,
+  //       width: cpLineWidth,
+  //     };
 
-      // Add to Graphic
-      const clarkAirport_pin_LineGraphic = new Graphic({
-        geometry: clarkAirport_pin_polyline,
-        symbol: clarkAirport_pin_LineSymbol,
-      });
-      clarkAirport_pin_lineGraphicsLayer.add(clarkAirport_pin_LineGraphic);
-    });
+  //     // Add to Graphic
+  //     const clarkAirport_pin_LineGraphic = new Graphic({
+  //       geometry: clarkAirport_pin_polyline,
+  //       symbol: clarkAirport_pin_LineSymbol,
+  //     });
+  //     clarkAirport_pin_lineGraphicsLayer.add(clarkAirport_pin_LineGraphic);
+  //   });
 
-    //----------------------------------------------------------------//
-    // Ninoy Internation Airport Pins
-    var airport_pin = new FeatureLayer({
-      portalItem: {
-        id: "c4391b7c58ec4164922d9a223f3c0066",
-      },
-      layerId: 1,
-      definitionExpression: "TITLE = 'Ninoy Aquino International Airport'",
-      popupEnabled: false,
-      opacity: 0,
-    });
+  //   //----------------------------------------------------------------//
+  //   // Ninoy Internation Airport Pins
+  //   var airport_pin = new FeatureLayer({
+  //     portalItem: {
+  //       id: "158b39ce19c24015b0476c24af9f5264",
+  //       portal: {
+  //         url: "https://gis.railway-sector.com/portal",
+  //       },
+  //     },
+  //     // layerId: 1,
+  //     definitionExpression: "TITLE = 'Ninoy Aquino International Airport'",
+  //     popupEnabled: false,
+  //     opacity: 0,
+  //   });
 
-    // Label 'Manila' on the map
-    const airport_pin_pointGraphicLayer = new GraphicsLayer();
-    airport_pin_pointGraphicLayer.listMode = "hide";
-    map.add(airport_pin_pointGraphicLayer);
+  //   // Label 'Manila' on the map
+  //   const airport_pin_pointGraphicLayer = new GraphicsLayer();
+  //   airport_pin_pointGraphicLayer.listMode = "hide";
+  //   map.add(airport_pin_pointGraphicLayer);
 
-    const airport_pin_lineGraphicsLayer = new GraphicsLayer({
-      //maxScale: maxScale,
-      //minScale: minScale
-    });
-    airport_pin_lineGraphicsLayer.listMode = "hide";
-    map.add(airport_pin_lineGraphicsLayer);
+  //   const airport_pin_lineGraphicsLayer = new GraphicsLayer({
+  //     //maxScale: maxScale,
+  //     //minScale: minScale
+  //   });
+  //   airport_pin_lineGraphicsLayer.listMode = "hide";
+  //   map.add(airport_pin_lineGraphicsLayer);
 
-    var query = airport_pin.createQuery();
-    airport_pin.queryFeatures(query).then(function (response) {
-      var stats = response.features[0];
+  //   var query = airport_pin.createQuery();
+  //   airport_pin.queryFeatures(query).then(function (response) {
+  //     var stats = response.features[0];
 
-      // Create label point and label for 'Manila'
-      const x0 = stats.geometry.longitude;
-      const y0 = stats.geometry.latitude;
-      const x1 = x0 - 0.1; // Offset
+  //     // Create label point and label for 'Manila'
+  //     const x0 = stats.geometry.longitude;
+  //     const y0 = stats.geometry.latitude;
+  //     const x1 = x0 - 0.1; // Offset
 
-      const point = {
-        type: "point",
-        longitude: x1,
-        latitude: y0,
-      };
+  //     const point = {
+  //       type: "point",
+  //       longitude: x1,
+  //       latitude: y0,
+  //     };
 
-      let airport_textSymbol = {
-        type: "text", // autocasts as new TextSymbol()
-        color: "white",
-        //backgroundColor: projectBackgroundColor,
-        text: "Ninoy Aquino Int. Airport",
-        horizontalAlignment: "right",
-        //yoffset: -5,
-        font: {
-          // autocasts as new Font()
-          size: fontSizeAirport,
-          //family: "Merriweather",
-          //style: "italic",
-          //weight: "bold"
-        },
-      };
+  //     let airport_textSymbol = {
+  //       type: "text", // autocasts as new TextSymbol()
+  //       color: "white",
+  //       //backgroundColor: projectBackgroundColor,
+  //       text: "Ninoy Aquino Int. Airport",
+  //       horizontalAlignment: "right",
+  //       //yoffset: -5,
+  //       font: {
+  //         // autocasts as new Font()
+  //         size: fontSizeAirport,
+  //         //family: "Merriweather",
+  //         //style: "italic",
+  //         //weight: "bold"
+  //       },
+  //     };
 
-      const simpleMarkerSymbol = {
-        type: "simple-marker",
-        color: [226, 119, 40],
-        size: 12,
-        style: "circle",
-        outline: {
-          width: 1,
-          color: [255, 255, 255, 1],
-        },
-      };
+  //     const simpleMarkerSymbol = {
+  //       type: "simple-marker",
+  //       color: [226, 119, 40],
+  //       size: 12,
+  //       style: "circle",
+  //       outline: {
+  //         width: 1,
+  //         color: [255, 255, 255, 1],
+  //       },
+  //     };
 
-      const airport_PointGraphic = new Graphic({
-        geometry: point,
-        symbol: airport_textSymbol,
-      });
-      airport_pin_pointGraphicLayer.add(airport_PointGraphic);
+  //     const airport_PointGraphic = new Graphic({
+  //       geometry: point,
+  //       symbol: airport_textSymbol,
+  //     });
+  //     airport_pin_pointGraphicLayer.add(airport_PointGraphic);
 
-      // Crate label line for 'Manila'
-      // Create lin path and polyline
-      const path = [
-        [x0, y0],
-        [x1, y0],
-      ];
+  //     // Crate label line for 'Manila'
+  //     // Create lin path and polyline
+  //     const path = [
+  //       [x0, y0],
+  //       [x1, y0],
+  //     ];
 
-      const airport_pin_polyline = {
-        type: "polyline",
-        paths: path,
-      };
+  //     const airport_pin_polyline = {
+  //       type: "polyline",
+  //       paths: path,
+  //     };
 
-      // Set line properties
-      const airport_pin_LineSymbol = {
-        type: "simple-line",
-        color: cpLineColor,
-        width: cpLineWidth,
-      };
+  //     // Set line properties
+  //     const airport_pin_LineSymbol = {
+  //       type: "simple-line",
+  //       color: cpLineColor,
+  //       width: cpLineWidth,
+  //     };
 
-      // Add to Graphic
-      const airport_pin_LineGraphic = new Graphic({
-        geometry: airport_pin_polyline,
-        symbol: airport_pin_LineSymbol,
-      });
-      airport_pin_lineGraphicsLayer.add(airport_pin_LineGraphic);
-    });
+  //     // Add to Graphic
+  //     const airport_pin_LineGraphic = new Graphic({
+  //       geometry: airport_pin_polyline,
+  //       symbol: airport_pin_LineSymbol,
+  //     });
+  //     airport_pin_lineGraphicsLayer.add(airport_pin_LineGraphic);
+  //   });
 
-    //----------------------------------------------------------------//
-    // Manila Pins
-    var manila_pin = new FeatureLayer({
-      portalItem: {
-        id: "c4391b7c58ec4164922d9a223f3c0066",
-      },
-      layerId: 0,
-      popupEnabled: false,
-      opacity: 0,
-    });
-   // Label 'Manila' on the map
-   const manila_pin_pointGraphicLayer = new GraphicsLayer();
-    manila_pin_pointGraphicLayer.listMode = "hide";
-    map.add(manila_pin_pointGraphicLayer);
+  //   //----------------------------------------------------------------//
+  //   // Manila Pins
+  //   var manila_pin = new FeatureLayer({
+  //     portalItem: {
+  //       id: "158b39ce19c24015b0476c24af9f5264",
+  //       portal: {
+  //         url: "https://gis.railway-sector.com/portal",
+  //       },
+  //     },
+  //     // layerId: 0,
+  //     definitionExpression: "TITLE = 'Manila'",
+  //     popupEnabled: false,
+  //     opacity: 0,
+  //   });
+  //  // Label 'Manila' on the map
+  //  const manila_pin_pointGraphicLayer = new GraphicsLayer();
+  //   manila_pin_pointGraphicLayer.listMode = "hide";
+  //   map.add(manila_pin_pointGraphicLayer);
 
-    const manila_pin_lineGraphicsLayer = new GraphicsLayer({
-      //maxScale: maxScale,
-      //minScale: minScale
-    });
-    manila_pin_lineGraphicsLayer.listMode = "hide";
-    map.add(manila_pin_lineGraphicsLayer);
+  //   const manila_pin_lineGraphicsLayer = new GraphicsLayer({
+  //     //maxScale: maxScale,
+  //     //minScale: minScale
+  //   });
+  //   manila_pin_lineGraphicsLayer.listMode = "hide";
+  //   map.add(manila_pin_lineGraphicsLayer);
 
-    var query = manila_pin.createQuery();
-    manila_pin.queryFeatures(query).then(function (response) {
-      var stats = response.features[0];
+  //   var query = manila_pin.createQuery();
+  //   manila_pin.queryFeatures(query).then(function (response) {
+  //     var stats = response.features[0];
 
-      // Create label point and label for 'Manila'
-      const x0 = stats.geometry.longitude;
-      const y0 = stats.geometry.latitude;
-      const x1 = x0 - 0.15; // Offset
+  //     // Create label point and label for 'Manila'
+  //     const x0 = stats.geometry.longitude;
+  //     const y0 = stats.geometry.latitude;
+  //     const x1 = x0 - 0.15; // Offset
 
-      const point = {
-        type: "point",
-        longitude: x1,
-        latitude: y0,
-      };
+  //     const point = {
+  //       type: "point",
+  //       longitude: x1,
+  //       latitude: y0,
+  //     };
 
-      let manila_textSymbol = {
-        type: "text", // autocasts as new TextSymbol()
-        color: "white",
-        //backgroundColor: projectBackgroundColor,
-        text: "Manila",
-        horizontalAlignment: "right",
-        //yoffset: -5,
-        font: {
-          // autocasts as new Font()
-          size: 15,
-          //family: "Merriweather",
-          //style: "italic",
-          weight: "bold",
-        },
-      };
+  //     let manila_textSymbol = {
+  //       type: "text", // autocasts as new TextSymbol()
+  //       color: "white",
+  //       //backgroundColor: projectBackgroundColor,
+  //       text: "Manila",
+  //       horizontalAlignment: "right",
+  //       //yoffset: -5,
+  //       font: {
+  //         // autocasts as new Font()
+  //         size: 15,
+  //         //family: "Merriweather",
+  //         //style: "italic",
+  //         weight: "bold",
+  //       },
+  //     };
 
-      const simpleMarkerSymbol = {
-        type: "simple-marker",
-        color: [226, 119, 40],
-        size: 12,
-        style: "circle",
-        outline: {
-          width: 1,
-          color: [255, 255, 255, 1],
-        },
-      };
+  //     const simpleMarkerSymbol = {
+  //       type: "simple-marker",
+  //       color: [226, 119, 40],
+  //       size: 12,
+  //       style: "circle",
+  //       outline: {
+  //         width: 1,
+  //         color: [255, 255, 255, 1],
+  //       },
+  //     };
 
-      const manila_PointGraphic = new Graphic({
-        geometry: point,
-        symbol: manila_textSymbol,
-      });
-      manila_pin_pointGraphicLayer.add(manila_PointGraphic);
+  //     const manila_PointGraphic = new Graphic({
+  //       geometry: point,
+  //       symbol: manila_textSymbol,
+  //     });
+  //     manila_pin_pointGraphicLayer.add(manila_PointGraphic);
 
-      // Crate label line for 'Manila'
-      // Create lin path and polyline
-      const path = [
-        [x0, y0],
-        [x1, y0],
-      ];
+  //     // Crate label line for 'Manila'
+  //     // Create lin path and polyline
+  //     const path = [
+  //       [x0, y0],
+  //       [x1, y0],
+  //     ];
 
-      const manila_pin_polyline = {
-        type: "polyline",
-        paths: path,
-      };
+  //     const manila_pin_polyline = {
+  //       type: "polyline",
+  //       paths: path,
+  //     };
 
-      // Set line properties
-      const manila_pin_LineSymbol = {
-        type: "simple-line",
-        color: cpLineColor,
-        width: cpLineWidth,
-      };
+  //     // Set line properties
+  //     const manila_pin_LineSymbol = {
+  //       type: "simple-line",
+  //       color: cpLineColor,
+  //       width: cpLineWidth,
+  //     };
 
-      // Add to Graphic
-      const manila_pin_LineGraphic = new Graphic({
-        geometry: manila_pin_polyline,
-        symbol: manila_pin_LineSymbol,
-      });
-      manila_pin_lineGraphicsLayer.add(manila_pin_LineGraphic);
-    });
+  //     // Add to Graphic
+  //     const manila_pin_LineGraphic = new Graphic({
+  //       geometry: manila_pin_polyline,
+  //       symbol: manila_pin_LineSymbol,
+  //     });
+  //     manila_pin_lineGraphicsLayer.add(manila_pin_LineGraphic);
+  //   });
     //----------------------------------------------------------------//
 
     /////////////////// END Of LAYER IMPORT ////////////////////////////
@@ -2537,7 +2544,7 @@
           symbol: n2ProjectLableSymbol,
         });
 
-        n2GraphicsLayer.add(n2ProjectLabelGraphic);
+        // n2GraphicsLayer.add(n2ProjectLabelGraphic);
       });
     }
     // Initial
@@ -2718,8 +2725,8 @@
         };
         const j = 5;
         //console.log("SC label: " + points);
-        const pointTextX_pLabel = points[j][0] + 0.32 + xoffset;
-        const pointTextY0_pLabel = points[j][1] - 0.75 + yoffset;
+        const pointTextX_pLabel = points[j][0] + 0.5 + xoffset;
+        const pointTextY0_pLabel = points[j][1] - 0.55 + yoffset;
         const pointTextY1_pLabel = points[j + 1][1];
         const pointTextY_pLabel =
           (pointTextY0_pLabel + pointTextY1_pLabel) / 2;
@@ -2742,7 +2749,7 @@
     scGraphics(0, 0);
 
     // Move SC graphicsLayer position when Progress2 is clicked
-    const xoffset_sc = -0.5;
+    const xoffset_sc = -0.2;
     const yoffset_sc = 0.92;
 
     function scGraphicsLayerMove(xoffset_sc, yoffset_sc) {
@@ -3164,7 +3171,9 @@
         trainOperationSchedulePositionOthers();
         mmspGraphicsLayerMove(xoffset_mmsp, yoffset_mmsp);
       } else if (proj === "mcrp") {
-        view.rotation = 360;
+        view.rotation = 325;
+        // view.scale = 190000;
+
         n2LabelStation.labelPlacement = "below-left";
         n2StationLayer.visible = true;
         scStationLayer.visible = false;
@@ -3203,7 +3212,9 @@
         n2GraphicsLayerMove(xoffset_n2, yoffset_n2);
         trainOperationSchedulePositionOthers();
       } else if (proj === "nsrp") {
-        view.rotation = 360;
+        view.rotation = 320;
+        // view.scale = 190000;
+        
         n2StationLayer.visible = false;
         scStationLayer.visible = true;
         mmspStationLayer.visible = false;

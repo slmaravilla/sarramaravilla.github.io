@@ -1,0 +1,3584 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Pre-Construction Progress (MMSP)</title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/dark/main.css" />
+
+  <!-- Resources -->
+  <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+  <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+  <script src="https://js.arcgis.com/4.28/"></script>
+</head>
+
+<body class="calcite-mode-dark">
+  <div id="applicationDiv">
+    <div id="headerTitleDiv">Pre-Construction Work Progress</div>
+    <div class="contentBox">
+      <div class="container">
+        <div class="landStrucIsfBox">
+          <div id="landChartDiv"></div>
+          <div id="landChartDiv2"></div>
+          <div id="structureChartDiv"></div>
+        </div>
+        <div class="treeBox">
+          <div id="isfChartDiv"></div>
+          <div id="treeCuttingChartDiv"></div>
+          <div id="treeCompenChartDiv"></div>
+        </div>
+        <div class="utilityBox">
+          <div id="utilityPointLineChartDiv"></div>
+          <div id="utilityEmptyChartDiv"></div>
+          <div id="utilityEmptyChartDiv"></div>
+        </div>
+      </div>
+    </div>
+    <div id="legendChartDiv"></div>
+    <div id="dateDiv"></div>
+  </div>
+  </calcite-shell>
+</body>
+
+<style>
+  html,
+  body {
+    padding: 0;
+    margin: 0;
+  }
+
+  #applicationDiv {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    background-color: #03283f;
+    /*original: #113149 */
+  }
+
+  #informationDiv {
+    position: absolute;
+    z-index: 99;
+    width: 30vw;
+    height: 10vh;
+    color: white;
+    bottom: 190;
+    right: 5;
+    font-size: 1rem;
+  }
+
+  #informationDiv b {
+    font-size: 1rem;
+    color: orange;
+    margin: 0;
+    padding: 0;
+  }
+
+  .contentBox {
+    display: grid;
+    grid-template-columns: 80vw 17.8vw;
+    width: 100%;
+    height: 88vh;
+  }
+
+  .container {
+    display: grid;
+    flex-wrap: wrap;
+    height: 88vh;
+    box-sizing: border-box;
+    border-right: 0;
+  }
+
+
+  #headerTitleDiv {
+    color: white;
+    font-weight: bold;
+    font-size: 1.8vw;
+    margin: 0.5rem;
+  }
+
+  #dateDiv {
+    z-index: 99;
+    position: absolute;
+    padding-bottom: 10;
+    font-size: 1vw;
+    color: rgb(0, 197, 255);
+    right: 10;
+    bottom: 10;
+  }
+
+
+  .landStrucIsfBox,
+  .treeBox {
+    display: inline-flex;
+    height: 30vh;
+    width: 100%;
+    box-sizing: border-box;
+    border-top: 0;
+    border-bottom: 0;
+    margin: 0;
+    padding: 0;
+    border-bottom: 0.7px solid rgb(185, 171, 171);
+  }
+
+  .utilityBox {
+    display: inline-flex;
+    height: 29.5vh;
+    width: 100%;
+    box-sizing: border-box;
+    border-top: 0;
+    border-bottom: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  #legendChartDiv {
+    position: absolute;
+    z-index: 99;
+    right: 80;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0);
+    height: 40vh;
+    width: 10vw;
+  }
+
+  #landChartDiv,
+  #landChartDiv2,
+  #structureChartDiv,
+  #isfChartDiv,
+  #treeCuttingChartDiv,
+  #treeCompenChartDiv,
+  #utilityPointLineChartDiv,
+  #utilityEmptyChartDiv {
+    width: 35%;
+    height: 30vh;
+    align-items: center;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+      sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+</style>
+
+<script>
+  require([
+    "esri/layers/FeatureLayer",
+    "esri/portal/PortalItem",
+    "esri/portal/Portal",
+    "esri/rest/support/Query",
+  ], function (FeatureLayer, PortalItem, Portal, Legend, Query) {
+    ////////////////////////////////////////////////////
+
+
+
+    // ************ As of Date ****************** //
+    const dateTable = new FeatureLayer({
+      portalItem: {
+        id: "a084d9cae5234d93b7aa50f7eb782aec",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+    });
+
+    const monthList = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    var query = dateTable.createQuery();
+    query.where = "category = 'Progress Summary Gauge'";
+    dateTable.queryFeatures(query).then((response) => {
+      const stats = response.features;
+      stats.forEach((result) => {
+        const date = new Date(result.attributes.date);
+        const year = date.getFullYear();
+        const month = monthList[date.getMonth()];
+        const day = date.getDate();
+        const final = year < 1990 ? "" : `${month} ${day}, ${year}`;
+        document.getElementById("dateDiv").innerHTML = final;
+      });
+    });
+
+
+    ////////////////////////////////////////////////////
+
+    // ************ Import Layers ****************** //
+
+    var lotLayer = new FeatureLayer({
+      portalItem: {
+        id: "0c172b82ddab44f2bb439542dd75e8ae",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 8,
+      title: "Status of Land Acquisition",
+    });
+
+    // Structure
+    var structureLayer = new FeatureLayer({
+      portalItem: {
+        id: "0c172b82ddab44f2bb439542dd75e8ae",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 9,
+      title: "Status of Structure",
+    });
+
+    // Relocation Status point layer
+    var reloISFLayer = new FeatureLayer({
+      portalItem: {
+        id: "0c172b82ddab44f2bb439542dd75e8ae",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 10,
+      title: "Status for Relocation (ISF)",
+    });
+    //reloISFLayer.listMode = "hide";
+
+    // Tree Cutting
+    var treeLayer = new FeatureLayer({
+      portalItem: {
+        id: "4475f1bb9ad04dbda552879188ac1b6c",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      // layerId: 1,
+      title: "Status of Tree Cutting",
+    });
+
+    // Utility Relocation (Point)
+    var utilPointLayer = new FeatureLayer({
+      portalItem: {
+        id: "8d700179fca44aef967ea78a01fc4279",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 1,
+      title: "Utility Point",
+    });
+
+    // Utility Relocation (Line)
+    var utilLineLayer = new FeatureLayer({
+      portalItem: {
+        id: "8d700179fca44aef967ea78a01fc4279",
+        portal: {
+          url: "https://gis.railway-sector.com/portal",
+        },
+      },
+      layerId: 2,
+      title: "Utility Line",
+    });
+
+    /////////////////////////////////////////////////////////////////////
+    var applicationDiv = document.getElementById("applicationDiv");
+
+    // var headerDiv = document.getElementById("headerDiv");
+    var headerTitleDiv = document.getElementById("headerTitleDiv");
+
+    // Land, structure, and ISF
+    var landChartDiv = document.getElementById("landChartDiv");
+    var structureChartDiv = document.getElementById("structureChartDiv");
+    var isfChartDiv = document.getElementById("isfChartDiv");
+
+    // Tree cutting and tree compensation
+    var treeCuttingChartDiv = document.getElementById("treeCuttingChartDiv");
+    var treeCompenChartDiv = document.getElementById("treeCompenChartDiv");
+
+    // Utitlity Relocation
+    var utilityPointChartDiv = document.getElementById(
+      "utilityPointChartDiv"
+    );
+    // var utilityLineChartDiv = document.getElementById("utilityLineChartDiv");
+
+    // Thousand separators function
+    function thousands_separators(num) {
+      var num_parts = num.toString().split(".");
+      num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return num_parts.join(".");
+    }
+
+    ////////// Chart Begins //////////////////
+    am4core.ready(function () {
+      // Themes begin
+      am4core.useTheme(am4themes_animated);
+
+      ////////////////////////////
+      // Color definition
+      const axis1TickColor = "#C5C5C5";
+      const color_101 = "#ffa500";
+      const color_102 = "#00ff00";
+      const color_103 = "#70AD47";
+      const color_104 = "#ffff00";
+      const color_105 = "#bf40bf";
+      const color_108 = "#ff7f7f";
+      const color_109 = "#cdaa66";
+      const color_handedOver = "#00c5ff";
+
+      const BOTTOM_LABEL_COL = am4core.color("#C5C5C5");
+      const TOP_TITLE_COL = am4core.color("#FFFFFF");
+      const chartTitleLabelFillCol = "#00C3FF";
+
+      // Gauge Needle (hand) length
+      const NEEDLE_LENGTH = am4core.percent(70);
+
+      // chart title
+      const titleFontSize = "1.7em";
+      const labelMarginTop = -5;
+      const title_land = "[bold]LAND";
+      const title_struc = "[bold]EXISTING STRUCTURE";
+      const title_ifs = "[bold]INFORMAL SETTLERS";
+      const title_treeCut = "[bold]TREE CUTTING";
+      const title_treeCommpen = "[bold]TREE COMPENSATION";
+      const title_utility = "[bold]UTILITY";
+
+      /////////////////////////////////////////
+
+      // Legend
+      function legendCP() {
+        var chart = am4core.create("legendChartDiv", am4charts.PieChart);
+
+        // Add data
+        chart.data = [
+          {
+            CP: "All CPs (%)",
+            status: 0,
+            color: am4core.color(color_handedOver),
+          },
+          {
+            CP: "CP 101 (%)",
+            status: 0,
+            color: am4core.color(color_101),
+          },
+          {
+            CP: "CP 102 (%)",
+            status: 0,
+            color: am4core.color(color_102),
+          },
+          {
+            CP: "CP 103 (%)",
+            status: 0,
+            color: am4core.color(color_103),
+          },
+          {
+            CP: "CP 104 (%)",
+            status: 0,
+            color: am4core.color(color_104),
+          },
+          {
+            CP: "CP 105 (%)",
+            status: 0,
+            color: am4core.color(color_105),
+          },
+          {
+            CP: "CP 108 (%)",
+            status: 0,
+            color: am4core.color(color_108),
+          },
+          {
+            CP: "CP 109 (%)",
+            status: 0,
+            color: am4core.color(color_109),
+          },
+        ];
+
+        // Set inner radius
+        chart.innerRadius = am4core.percent(0);
+        chart.radius = am4core.percent(0);
+        // Add and configure Series
+
+        function createSlices(field, status) {
+          var pieSeries = chart.series.push(new am4charts.PieSeries());
+          pieSeries.dataFields.value = field;
+          pieSeries.dataFields.category = status;
+          pieSeries.disabled = true;
+          pieSeries.slices.template.propertyFields.fill = "color";
+          pieSeries.slices.template.stroke = am4core.color("#fff");
+          pieSeries.slices.template.strokeWidth = 0;
+          pieSeries.slices.template.strokeOpacity = 1;
+
+          // change the cursor on hover to make it apparent the object can be interacted with
+          pieSeries.slices.template.cursorOverStyle = [
+            {
+              property: "cursor",
+              value: "pointer",
+            },
+          ];
+
+          // Add a legend
+          const LegendFontSizze = "1em";
+          chart.legend = new am4charts.Legend();
+
+          chart.legend.valueLabels.template.align = "right";
+          chart.legend.valueLabels.template.textAlign = "end";
+
+          //chart.legend.position = "bottom";
+          chart.legend.labels.template.fontSize = LegendFontSizze;
+          chart.legend.labels.template.fill = "#ffffff";
+          chart.legend.valueLabels.template.fill = am4core.color("#ffffff");
+          pieSeries.legendSettings.valueText = "{ }";
+
+          // Responsive code for chart
+          chart.responsive.enabled = true;
+          chart.responsive.useDefault = false;
+          chart.logo.disabled = true;
+
+          chart.responsive.rules.push({
+            relevant: function (target) {
+              if (target.pixelWidth <= 400) {
+                return true;
+              }
+              return false;
+            },
+            state: function (target, stateId) {
+              if (target instanceof am4charts.PieSeries) {
+                var state = target.states.create(stateId);
+
+                var labelState =
+                  target.labels.template.states.create(stateId);
+                labelState.properties.disabled = true;
+
+                var tickState = target.ticks.template.states.create(stateId);
+                tickState.properties.disabled = true;
+                return state;
+              }
+              if (target instanceof am4charts.Legend) {
+                var state = target.states.create(stateId);
+                state.properties.paddingTop = 0;
+                state.properties.paddingRight = 0;
+                state.properties.paddingBottom = 0;
+                state.properties.paddingLeft = 0;
+                state.properties.marginLeft = 0;
+                return state;
+              }
+              return null;
+            },
+          });
+
+
+          var marker = chart.legend.markers.template.children.getIndex(0);
+          var markerTemplate = chart.legend.markers.template;
+          //marker.cornerRadius(12, 12, 12, 12); round legend marker
+          marker.strokeWidth = 1;
+          marker.strokeOpacity = 1;
+          marker.stroke = am4core.color("#ccc");
+
+          // Change size of legend marker
+          markerTemplate.width = 18;
+          markerTemplate.height = 18;
+        } // End of createSlices function
+
+        createSlices("status", "CP");
+      } // End of updateChartLot()
+      legendCP();
+
+
+
+
+      //////////////////----GAUGE CHART------////////////////////////
+
+      /// 2. LAND STRUCTURE (STATION)
+      function totalLotCount() {
+        var total_lot = {
+          onStatisticField: "Id",
+          outStatisticFieldName: "total_lot",
+          statisticType: "count",
+        };
+
+        var total_handedover = {
+          onStatisticField: "CASE WHEN HandedOver = 1 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp101 = {
+          onStatisticField: "CASE WHEN Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101",
+          statisticType: "sum",
+        };
+
+        var total_cp101_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver = 1 and Package = 'CP101') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp102 = {
+          onStatisticField: "CASE WHEN Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102",
+          statisticType: "sum"
+        };
+
+        var total_cp102_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver = 1 and Package = 'CP102') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp103 = {
+          onStatisticField: "CASE WHEN Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103",
+          statisticType: "sum"
+        };
+
+        var total_cp103_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver = 1 and Package = 'CP103') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp104 = {
+          onStatisticField: "CASE WHEN Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104",
+          statisticType: "sum"
+        };
+
+        var total_cp104_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver= 1 and Package = 'CP104') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp105 = {
+          onStatisticField: "CASE WHEN Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105",
+          statisticType: "sum"
+        };
+
+        var total_cp105_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver =1 and Package = 'CP105') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp108 = {
+          onStatisticField: "CASE WHEN Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108",
+          statisticType: "sum"
+        };
+
+        var total_cp108_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver= 1 and Package = 'CP108') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp109 = {
+          onStatisticField: "CASE WHEN Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109",
+          statisticType: "sum"
+        };
+
+        var total_cp109_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver =1 and Package = 'CP109') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_handedover",
+          statisticType: "sum"
+        };
+
+        var query = lotLayer.createQuery();
+        query.where = "Type = 'Station'";
+        query.outStatistics = [
+          total_lot,
+          total_handedover,
+          total_cp101,
+          total_cp101_handedover,
+          total_cp102,
+          total_cp102_handedover,
+          total_cp103,
+          total_cp103_handedover,
+          total_cp104,
+          total_cp104_handedover,
+          total_cp105,
+          total_cp105_handedover,
+          total_cp108,
+          total_cp108_handedover,
+          total_cp109,
+          total_cp109_handedover
+        ];
+
+
+        return lotLayer.queryFeatures(query).then((response) => {
+          var stats = response.features[0].attributes;
+          const total = stats.total_lot;
+          const handedOver = stats.total_handedover;
+          const percent = (handedOver / total) * 100;
+
+          const cp101_total = stats.total_cp101;
+          const cp102_total = stats.total_cp102;
+          const cp103_total = stats.total_cp103;
+          const cp104_total = stats.total_cp104;
+          const cp105_total = stats.total_cp105;
+          const cp108_total = stats.total_cp108;
+          const cp109_total = stats.total_cp109;
+
+
+          const cp101_total_handedover = stats.total_cp101_handedover;
+          const cp102_total_handedover = stats.total_cp102_handedover;
+          const cp103_total_handedover = stats.total_cp103_handedover;
+          const cp104_total_handedover = stats.total_cp104_handedover;
+          const cp105_total_handedover = stats.total_cp105_handedover;
+          const cp108_total_handedover = stats.total_cp108_handedover;
+          const cp109_total_handedover = stats.total_cp109_handedover;
+
+
+          const cp101_percent = cp101_total === 0 ? 0 : (cp101_total_handedover / cp101_total) * 100;
+          const cp102_percent = cp102_total === 0 ? 0 : (cp102_total_handedover / cp102_total) * 100;
+          const cp103_percent = cp103_total === 0 ? 0 : (cp103_total_handedover / cp103_total) * 100;
+          const cp104_percent = cp104_total === 0 ? 0 : (cp104_total_handedover / cp104_total) * 100;
+          const cp105_percent = cp105_total === 0 ? 0 : (cp105_total_handedover / cp105_total) * 100;
+          const cp108_percent = cp108_total === 0 ? 0 : (cp108_total_handedover / cp108_total) * 100;
+          const cp109_percent = cp109_total === 0 ? 0 : (cp109_total_handedover / cp109_total) * 100;
+
+          const cp101_percent_total = (cp101_total_handedover / total) * 100;
+          const cp102_percent_total = (cp102_total_handedover / total) * 100;
+          const cp103_percent_total = (cp103_total_handedover / total) * 100;
+          const cp104_percent_total = (cp104_total_handedover / total) * 100;
+          const cp105_percent_total = (cp105_total_handedover / total) * 100;
+          const cp108_percent_total = (cp108_total_handedover / total) * 100;
+          const cp109_percent_total = (cp109_total_handedover / total) * 100;
+
+          return [
+            total,
+            percent,
+            cp101_percent,
+            cp102_percent,
+            cp103_percent,
+            cp104_percent,
+            cp105_percent,
+            cp108_percent,
+            cp109_percent,
+            cp101_percent_total,
+            cp102_percent_total,
+            cp103_percent_total,
+            cp104_percent_total,
+            cp105_percent_total,
+            cp108_percent_total,
+            cp109_percent_total,
+          ];
+        });
+      }
+
+      function chartTotalHandedOver([
+        total,
+        percent,
+        cp101_percent,
+        cp102_percent,
+        cp103_percent,
+        cp104_percent,
+        cp105_percent,
+        cp108_percent,
+        cp109_percent,
+        cp101_percent_total,
+        cp102_percent_total,
+        cp103_percent_total,
+        cp104_percent_total,
+        cp105_percent_total,
+        cp108_percent_total,
+        cp109_percent_total,
+      ]) {
+        var totalScore = percent;
+
+        var CP101 = cp101_percent_total;
+        var CP102 = cp101_percent_total + cp102_percent_total;
+        var CP103 = cp101_percent_total + cp102_percent_total + cp103_percent_total;
+        var CP104 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total;
+        var CP105 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total;
+        var CP108 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total;
+        var CP109 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total + cp109_percent_total;
+
+        var chartMin = 0;
+        var chartMax = 100;
+
+        // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
+        // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
+
+        var data = {
+          score: totalScore,
+          gradingData: [
+            {
+              title: cp101_percent.toFixed(0),
+              color: color_101,
+              lowScore: 0,
+              highScore: CP101,
+            },
+            {
+              title: cp102_percent.toFixed(0),
+              color: color_102,
+              lowScore: CP101,
+              highScore: CP102,
+            },
+            {
+              title: cp103_percent.toFixed(0),
+              color: color_103,
+              lowScore: CP102,
+              highScore: CP103,
+            },
+            {
+              title: cp104_percent.toFixed(0),
+              color: color_104,
+              lowScore: CP103,
+              highScore: CP104,
+            },
+            {
+              title: cp105_percent.toFixed(0),
+              color: color_105,
+              lowScore: CP104,
+              highScore: CP105,
+            },
+            {
+              title: cp108_percent.toFixed(0),
+              color: color_108,
+              lowScore: CP105,
+              highScore: CP108,
+            },
+            {
+              title: cp109_percent.toFixed(0),
+              color: color_109,
+              lowScore: CP108,
+              highScore: CP109,
+            },
+            {
+              title: "",
+              color: "#C5C5C5",
+              lowScore: CP109,
+              highScore: 100,
+            },
+          ],
+        };
+
+        /**Grading Lookup*/
+        function lookUpGrade(lookupScore, grades) {
+          // Only change code below this line
+          for (var i = 0; i < grades.length; i++) {
+            if (
+              grades[i].lowScore < lookupScore &&
+              grades[i].highScore >= lookupScore
+            ) {
+              return grades[i];
+            }
+          }
+          return null;
+        }
+
+        // create chart
+        var chart = am4core.create("landChartDiv", am4charts.GaugeChart);
+        chart.hiddenState.properties.opacity = 0;
+        chart.fontSize = 11;
+        chart.innerRadius = am4core.percent(80);
+        chart.resizable = true;
+        chart.responsive.enabled = true;
+        chart.logo.disabled = true;
+
+        /*** Chart Title */
+        // Title Color
+
+        var title = chart.titles.create();
+        //'<a href="https://google.com"}">More info</a>'
+
+        title.text = "LAND (Station)";
+        //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/MMSP_Land_Structure/index4.html" target="_blank">LAND (Station)</a>';
+        title.fontSize = titleFontSize;
+        title.align = "center";
+        title.marginBottom = -10;
+        title.marginTop = 0;
+        title.fill = TOP_TITLE_COL;
+
+
+        // Add bottom label
+        var label = chart.chartContainer.createChild(am4core.Label);
+        label.text = "[bold]HANDED-OVER";
+        //label.html = '<a href="https://google.com">HANDED-OVER AREA</a>';
+        label.fontSize = "1.4em";
+        label.align = "center";
+        label.marginTop = labelMarginTop;
+        label.fill = BOTTOM_LABEL_COL;
+
+        /** * Normal axis*/
+
+        var axis = chart.xAxes.push(new am4charts.ValueAxis());
+        axis.min = chartMin;
+        axis.max = chartMax;
+        axis.strictMinMax = true;
+        axis.renderer.radius = am4core.percent(80);
+        axis.renderer.inside = true;
+        axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
+        axis.renderer.ticks.template.disabled = false;
+        axis.renderer.ticks.template.strokeOpacity = 1;
+        //axis.renderer.ticks.template.strokeWidth = 1;
+        axis.renderer.ticks.template.length = 10;
+        axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
+        //axis.renderer.grid.template.disabled = true;
+        axis.renderer.labels.template.radius = am4core.percent(40);
+        axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
+        axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
+
+        /*** Axis for ranges*/
+
+        var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
+        axis2.min = chartMin;
+        axis2.max = chartMax;
+        axis2.strictMinMax = true;
+        axis2.renderer.labels.template.disabled = true;
+        axis2.renderer.ticks.template.disabled = true;
+        axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
+        axis2.renderer.grid.template.opacity = 0.5;
+        axis2.renderer.labels.template.bent = true;
+        axis2.renderer.labels.template.fill = am4core.color("#000");
+        axis2.renderer.labels.template.fontWeight = "bold";
+        axis2.renderer.labels.template.fillOpacity = 0.7;
+
+        /**Ranges*/
+
+        for (let grading of data.gradingData) {
+          var range = axis2.axisRanges.create();
+          range.axisFill.fill = am4core.color(grading.color);
+          range.axisFill.fillOpacity = 1; // default 0.8 fill-color of
+          range.axisFill.zIndex = -1;
+          range.value =
+            grading.lowScore > chartMin ? grading.lowScore : chartMin;
+          range.endValue =
+            grading.highScore < chartMax ? grading.highScore : chartMax;
+          range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
+          range.stroke = am4core.color(grading.color).lighten(-0.1);
+          range.label.inside = true;
+          range.label.text = grading.title.toUpperCase();
+          range.label.inside = true;
+          range.label.location = 0.5;
+          range.label.inside = true;
+          range.label.radius = am4core.percent(10);
+          range.label.paddingBottom = -5; // ~half font size
+          range.label.fontSize = "1.4em"; // category label (i.e., CP101, CP102, ....)
+        }
+
+        var matchingGrade = lookUpGrade(data.score, data.gradingData);
+
+        /*** Label 1 (total Percent)*/
+
+        var label = chart.radarContainer.createChild(am4core.Label);
+        label.isMeasured = false;
+        label.fontSize = "3.5em";
+        label.x = am4core.percent(50);
+        label.y = am4core.percent(100);
+        label.paddingBottom = -5;
+        label.horizontalCenter = "middle";
+        label.verticalCenter = "bottom";
+        //label.dataItem = data;
+        label.text = data.score.toFixed(0).toString() + "%";
+        //label.text = "{score}";
+        //label.fill = am4core.color(matchingGrade.color);
+        label.fill = am4core.color(chartTitleLabelFillCol);
+
+        var hand = chart.hands.push(new am4charts.ClockHand());
+        hand.axis = axis2;
+        hand.innerRadius = am4core.percent(55);
+        hand.startWidth = 8;
+        hand.pin.disabled = true;
+        hand.value = data.score;
+        hand.fill = am4core.color("#000000"); // inner color of needle
+        //hand.stroke = am4core.color("#000");
+        hand.fillOpacity = 0.5;
+      }
+      totalLotCount().then(chartTotalHandedOver);
+      //END OF CHART LAND (STATION)
+
+
+
+      /// 2. LAND STRUCTURE (SUBTERRANEAN)
+      function totalLotCount2() {
+        var total_lot = {
+          onStatisticField: "Id",
+          outStatisticFieldName: "total_lot",
+          statisticType: "count",
+        };
+
+        var total_handedover = {
+          onStatisticField: "CASE WHEN HandedOver = 1 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp101 = {
+          onStatisticField: "CASE WHEN Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101",
+          statisticType: "sum",
+        };
+
+        var total_cp101_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver = 1 and Package = 'CP101') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp102 = {
+          onStatisticField: "CASE WHEN Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102",
+          statisticType: "sum"
+        };
+
+        var total_cp102_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver = 1 and Package = 'CP102') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp103 = {
+          onStatisticField: "CASE WHEN Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103",
+          statisticType: "sum"
+        };
+
+        var total_cp103_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver = 1 and Package = 'CP103') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp104 = {
+          onStatisticField: "CASE WHEN Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104",
+          statisticType: "sum"
+        };
+
+        var total_cp104_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver= 1 and Package = 'CP104') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp105 = {
+          onStatisticField: "CASE WHEN Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105",
+          statisticType: "sum"
+        };
+
+        var total_cp105_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver =1 and Package = 'CP105') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp108 = {
+          onStatisticField: "CASE WHEN Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108",
+          statisticType: "sum"
+        };
+
+        var total_cp108_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver= 1 and Package = 'CP108') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_handedover",
+          statisticType: "sum"
+        };
+
+        var total_cp109 = {
+          onStatisticField: "CASE WHEN Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109",
+          statisticType: "sum"
+        };
+
+        var total_cp109_handedover = {
+          onStatisticField: "CASE WHEN (HandedOver =1 and Package = 'CP109') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_handedover",
+          statisticType: "sum"
+        };
+
+        var query = lotLayer.createQuery();
+        query.where = "Type = 'Subterranean'";
+        query.outStatistics = [
+          total_lot,
+          total_handedover,
+          total_cp101,
+          total_cp101_handedover,
+          total_cp102,
+          total_cp102_handedover,
+          total_cp103,
+          total_cp103_handedover,
+          total_cp104,
+          total_cp104_handedover,
+          total_cp105,
+          total_cp105_handedover,
+          total_cp108,
+          total_cp108_handedover,
+          total_cp109,
+          total_cp109_handedover
+        ];
+
+        return lotLayer.queryFeatures(query).then((response) => {
+          var stats = response.features[0].attributes;
+          const total = stats.total_lot;
+          const handedOver = stats.total_handedover;
+          const percent = (handedOver / total) * 100;
+
+          const cp101_total = stats.total_cp101;
+          const cp102_total = stats.total_cp102;
+          const cp103_total = stats.total_cp103;
+          const cp104_total = stats.total_cp104;
+          const cp105_total = stats.total_cp105;
+          const cp108_total = stats.total_cp108;
+          const cp109_total = stats.total_cp109;
+
+
+          const cp101_total_handedover = stats.total_cp101_handedover;
+          const cp102_total_handedover = stats.total_cp102_handedover;
+          const cp103_total_handedover = stats.total_cp103_handedover;
+          const cp104_total_handedover = stats.total_cp104_handedover;
+          const cp105_total_handedover = stats.total_cp105_handedover;
+          const cp108_total_handedover = stats.total_cp108_handedover;
+          const cp109_total_handedover = stats.total_cp109_handedover;
+
+          const cp101_percent = cp101_total === 0 ? 0 : (cp101_total_handedover / cp101_total) * 100;
+          const cp102_percent = cp102_total === 0 ? 0 : (cp102_total_handedover / cp102_total) * 100;
+          const cp103_percent = cp103_total === 0 ? 0 : (cp103_total_handedover / cp103_total) * 100;
+          const cp104_percent = cp104_total === 0 ? 0 : (cp104_total_handedover / cp104_total) * 100;
+          const cp105_percent = cp105_total === 0 ? 0 : (cp105_total_handedover / cp105_total) * 100;
+          const cp108_percent = cp108_total === 0 ? 0 : (cp108_total_handedover / cp108_total) * 100;
+          const cp109_percent = cp109_total === 0 ? 0 : (cp109_total_handedover / cp109_total) * 100;
+
+          const cp101_percent_total = (cp101_total_handedover / total) * 100;
+          const cp102_percent_total = (cp102_total_handedover / total) * 100;
+          const cp103_percent_total = (cp103_total_handedover / total) * 100;
+          const cp104_percent_total = (cp104_total_handedover / total) * 100;
+          const cp105_percent_total = (cp105_total_handedover / total) * 100;
+          const cp108_percent_total = (cp108_total_handedover / total) * 100;
+          const cp109_percent_total = (cp109_total_handedover / total) * 100;
+
+          return [
+            total,
+            percent,
+            cp101_percent,
+            cp102_percent,
+            cp103_percent,
+            cp104_percent,
+            cp105_percent,
+            cp108_percent,
+            cp109_percent,
+            cp101_percent_total,
+            cp102_percent_total,
+            cp103_percent_total,
+            cp104_percent_total,
+            cp105_percent_total,
+            cp108_percent_total,
+            cp109_percent_total,
+          ];
+        });
+      }
+
+      function chartTotalHandedOver2([
+        total,
+        percent,
+        cp101_percent,
+        cp102_percent,
+        cp103_percent,
+        cp104_percent,
+        cp105_percent,
+        cp108_percent,
+        cp109_percent,
+        cp101_percent_total,
+        cp102_percent_total,
+        cp103_percent_total,
+        cp104_percent_total,
+        cp105_percent_total,
+        cp108_percent_total,
+        cp109_percent_total,
+      ]) {
+        var totalScore = percent;
+
+        var CP101 = cp101_percent_total;
+        var CP102 = cp101_percent_total + cp102_percent_total;
+        var CP103 = cp101_percent_total + cp102_percent_total + cp103_percent_total;
+        var CP104 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total;
+        var CP105 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total;
+        var CP108 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total;
+        var CP109 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total + cp109_percent_total;
+
+        var chartMin = 0;
+        var chartMax = 100;
+
+        // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
+        // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
+
+        var data = {
+          score: totalScore,
+          gradingData: [
+            {
+              title: cp101_percent.toFixed(0),
+              color: color_101,
+              lowScore: 0,
+              highScore: CP101,
+            },
+            {
+              title: cp102_percent.toFixed(0),
+              color: color_102,
+              lowScore: CP101,
+              highScore: CP102,
+            },
+            {
+              title: cp103_percent.toFixed(0),
+              color: color_103,
+              lowScore: CP102,
+              highScore: CP103,
+            },
+            {
+              title: cp104_percent.toFixed(0),
+              color: color_104,
+              lowScore: CP103,
+              highScore: CP104,
+            },
+            {
+              title: cp105_percent.toFixed(0),
+              color: color_105,
+              lowScore: CP104,
+              highScore: CP105,
+            },
+            {
+              title: cp108_percent.toFixed(0),
+              color: color_108,
+              lowScore: CP105,
+              highScore: CP108,
+            },
+            {
+              title: cp109_percent.toFixed(0),
+              color: color_109,
+              lowScore: CP108,
+              highScore: CP109,
+            },
+            {
+              title: "",
+              color: "#C5C5C5",
+              lowScore: CP109,
+              highScore: 100,
+            },
+          ],
+        };
+
+        /**Grading Lookup*/
+        function lookUpGrade(lookupScore, grades) {
+          // Only change code below this line
+          for (var i = 0; i < grades.length; i++) {
+            if (
+              grades[i].lowScore < lookupScore &&
+              grades[i].highScore >= lookupScore
+            ) {
+              return grades[i];
+            }
+          }
+          return null;
+        }
+
+        // create chart
+        var chart = am4core.create("landChartDiv2", am4charts.GaugeChart);
+        chart.hiddenState.properties.opacity = 0;
+        chart.fontSize = 11;
+        chart.innerRadius = am4core.percent(80);
+        chart.resizable = true;
+        chart.responsive.enabled = true;
+        chart.logo.disabled = true;
+
+        /*** Chart Title */
+        // Title Color
+
+        var title = chart.titles.create();
+        //'<a href="https://google.com"}">More info</a>'
+
+        title.text = "LAND (Subterranean)";
+        //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/MMSP_Land_Structure/index4.html" target="_blank">LAND (Station)</a>';
+        title.fontSize = titleFontSize;
+        title.align = "center";
+        title.marginBottom = -10;
+        title.marginTop = 0;
+        title.fill = TOP_TITLE_COL;
+
+
+        // Add bottom label
+        var label = chart.chartContainer.createChild(am4core.Label);
+        label.text = "[bold]HANDED-OVER";
+        //label.html = '<a href="https://google.com">HANDED-OVER AREA</a>';
+        label.fontSize = "1.4em";
+        label.align = "center";
+        label.marginTop = labelMarginTop;
+        label.fill = BOTTOM_LABEL_COL;
+
+        /** * Normal axis*/
+
+        var axis = chart.xAxes.push(new am4charts.ValueAxis());
+        axis.min = chartMin;
+        axis.max = chartMax;
+        axis.strictMinMax = true;
+        axis.renderer.radius = am4core.percent(80);
+        axis.renderer.inside = true;
+        axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
+        axis.renderer.ticks.template.disabled = false;
+        axis.renderer.ticks.template.strokeOpacity = 1;
+        //axis.renderer.ticks.template.strokeWidth = 1;
+        axis.renderer.ticks.template.length = 10;
+        axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
+        //axis.renderer.grid.template.disabled = true;
+        axis.renderer.labels.template.radius = am4core.percent(40);
+        axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
+        axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
+
+        /*** Axis for ranges*/
+
+        var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
+        axis2.min = chartMin;
+        axis2.max = chartMax;
+        axis2.strictMinMax = true;
+        axis2.renderer.labels.template.disabled = true;
+        axis2.renderer.ticks.template.disabled = true;
+        axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
+        axis2.renderer.grid.template.opacity = 0.5;
+        axis2.renderer.labels.template.bent = true;
+        axis2.renderer.labels.template.fill = am4core.color("#000");
+        axis2.renderer.labels.template.fontWeight = "bold";
+        axis2.renderer.labels.template.fillOpacity = 0.7;
+
+        /**Ranges*/
+
+        for (let grading of data.gradingData) {
+          var range = axis2.axisRanges.create();
+          range.axisFill.fill = am4core.color(grading.color);
+          range.axisFill.fillOpacity = 1; // default 0.8 fill-color of
+          range.axisFill.zIndex = -1;
+          range.value =
+            grading.lowScore > chartMin ? grading.lowScore : chartMin;
+          range.endValue =
+            grading.highScore < chartMax ? grading.highScore : chartMax;
+          range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
+          range.stroke = am4core.color(grading.color).lighten(-0.1);
+          range.label.inside = true;
+          range.label.text = grading.title.toUpperCase();
+          range.label.inside = true;
+          range.label.location = 0.5;
+          range.label.inside = true;
+          range.label.radius = am4core.percent(10);
+          range.label.paddingBottom = -5; // ~half font size
+          range.label.fontSize = "1.4em"; // category label (i.e., CP101, CP102, ....)
+        }
+
+        var matchingGrade = lookUpGrade(data.score, data.gradingData);
+
+        /*** Label 1 (total Percent)*/
+
+        var label = chart.radarContainer.createChild(am4core.Label);
+        label.isMeasured = false;
+        label.fontSize = "3.5em";
+        label.x = am4core.percent(50);
+        label.y = am4core.percent(100);
+        label.paddingBottom = -5;
+        label.horizontalCenter = "middle";
+        label.verticalCenter = "bottom";
+        //label.dataItem = data;
+        label.text = data.score.toFixed(0).toString() + "%";
+        //label.text = "{score}";
+        //label.fill = am4core.color(matchingGrade.color);
+        label.fill = am4core.color(chartTitleLabelFillCol);
+
+        var hand = chart.hands.push(new am4charts.ClockHand());
+        hand.axis = axis2;
+        hand.innerRadius = am4core.percent(55);
+        hand.startWidth = 8;
+        hand.pin.disabled = true;
+        hand.value = data.score;
+        hand.fill = am4core.color("#000000"); // inner color of needle
+        //hand.stroke = am4core.color("#000");
+        hand.fillOpacity = 0.5;
+      }
+      totalLotCount2().then(chartTotalHandedOver2);
+      //END OF CHART LAND (SUBTERRANEAN)
+
+
+
+      /// 3. CHART STRUCTURE
+      function totalStrucCount() {
+        var total_struc = {
+          onStatisticField: "Id",
+          outStatisticFieldName: "total_struc",
+          statisticType: "count",
+        };
+
+        var total_demolished = {
+          onStatisticField: "CASE WHEN REMARKS = 'Demolished' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_demolished",
+          statisticType: "sum"
+        };
+
+        var total_cp101 = {
+          onStatisticField: "CASE WHEN Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101",
+          statisticType: "sum",
+        };
+
+        var total_cp101_demolished = {
+          onStatisticField: "CASE WHEN (REMARKS = 'Demolished' and Package = 'CP101') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_demolished",
+          statisticType: "sum"
+        };
+
+        var total_cp102 = {
+          onStatisticField: "CASE WHEN Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102",
+          statisticType: "sum"
+        };
+
+        var total_cp102_demolished = {
+          onStatisticField: "CASE WHEN (REMARKS = 'Demolished' and Package = 'CP102') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_demolished",
+          statisticType: "sum"
+        };
+
+        var total_cp103 = {
+          onStatisticField: "CASE WHEN Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103",
+          statisticType: "sum"
+        };
+
+        var total_cp103_demolished = {
+          onStatisticField: "CASE WHEN (REMARKS = 'Demolished' and Package = 'CP103') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_demolished",
+          statisticType: "sum"
+        };
+
+        var total_cp104 = {
+          onStatisticField: "CASE WHEN Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104",
+          statisticType: "sum"
+        };
+
+        var total_cp104_demolished = {
+          onStatisticField: "CASE WHEN (REMARKS = 'Demolished' and Package = 'CP104') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_demolished",
+          statisticType: "sum"
+        };
+
+        var total_cp105 = {
+          onStatisticField: "CASE WHEN Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105",
+          statisticType: "sum"
+        };
+
+        var total_cp105_demolished = {
+          onStatisticField: "CASE WHEN (REMARKS = 'Demolished' and Package = 'CP105') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_demolished",
+          statisticType: "sum"
+        };
+
+        var total_cp108 = {
+          onStatisticField: "CASE WHEN Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108",
+          statisticType: "sum"
+        };
+
+        var total_cp108_demolished = {
+          onStatisticField: "CASE WHEN (REMARKS = 'Demolished' and Package = 'CP108') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_demolished",
+          statisticType: "sum"
+        };
+
+        var total_cp109 = {
+          onStatisticField: "CASE WHEN Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109",
+          statisticType: "sum"
+        };
+
+        var total_cp109_demolished = {
+          onStatisticField: "CASE WHEN (REMARKS = 'Demolished' and Package = 'CP109') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_demolished",
+          statisticType: "sum"
+        };
+
+        var query = structureLayer.createQuery();
+        query.outStatistics = [
+          total_struc,
+          total_demolished,
+          total_cp101,
+          total_cp101_demolished,
+          total_cp102,
+          total_cp102_demolished,
+          total_cp103,
+          total_cp103_demolished,
+          total_cp104,
+          total_cp104_demolished,
+          total_cp105,
+          total_cp105_demolished,
+          total_cp108,
+          total_cp108_demolished,
+          total_cp109,
+          total_cp109_demolished
+        ];
+
+        return structureLayer.queryFeatures(query).then((response) => {
+          var stats = response.features[0].attributes;
+          const total = stats.total_struc;
+          const demolished = stats.total_demolished;
+          const percent = (demolished / total) * 100;
+
+          const cp101_total = stats.total_cp101;
+          const cp102_total = stats.total_cp102;
+          const cp103_total = stats.total_cp103;
+          const cp104_total = stats.total_cp104;
+          const cp105_total = stats.total_cp105;
+          const cp108_total = stats.total_cp108;
+          const cp109_total = stats.total_cp109;
+
+
+          const cp101_total_demolished = stats.total_cp101_demolished;
+          const cp102_total_demolished = stats.total_cp102_demolished;
+          const cp103_total_demolished = stats.total_cp103_demolished;
+          const cp104_total_demolished = stats.total_cp104_demolished;
+          const cp105_total_demolished = stats.total_cp105_demolished;
+          const cp108_total_demolished = stats.total_cp108_demolished;
+          const cp109_total_demolished = stats.total_cp109_demolished;
+
+          const cp101_percent = cp101_total === 0 ? 0 : (cp101_total_demolished / cp101_total) * 100;
+          const cp102_percent = cp102_total === 0 ? 0 : (cp102_total_demolished / cp102_total) * 100;
+          const cp103_percent = cp103_total === 0 ? 0 : (cp103_total_demolished / cp103_total) * 100;
+          const cp104_percent = cp104_total === 0 ? 0 : (cp104_total_demolished / cp104_total) * 100;
+          const cp105_percent = cp105_total === 0 ? 0 : (cp105_total_demolished / cp105_total) * 100;
+          const cp108_percent = cp108_total === 0 ? 0 : (cp108_total_demolished / cp108_total) * 100;
+          const cp109_percent = cp109_total === 0 ? 0 : (cp109_total_demolished / cp109_total) * 100;
+
+          const cp101_percent_total = (cp101_total_demolished / total) * 100;
+          const cp102_percent_total = (cp102_total_demolished / total) * 100;
+          const cp103_percent_total = (cp103_total_demolished / total) * 100;
+          const cp104_percent_total = (cp104_total_demolished / total) * 100;
+          const cp105_percent_total = (cp105_total_demolished / total) * 100;
+          const cp108_percent_total = (cp108_total_demolished / total) * 100;
+          const cp109_percent_total = (cp109_total_demolished / total) * 100;
+
+          return [
+            total,
+            percent,
+            cp101_percent,
+            cp102_percent,
+            cp103_percent,
+            cp104_percent,
+            cp105_percent,
+            cp108_percent,
+            cp109_percent,
+            cp101_percent_total,
+            cp102_percent_total,
+            cp103_percent_total,
+            cp104_percent_total,
+            cp105_percent_total,
+            cp108_percent_total,
+            cp109_percent_total,
+          ];
+        });
+      }
+
+      function chartTotalStrucCount([
+        total,
+        percent,
+        cp101_percent,
+        cp102_percent,
+        cp103_percent,
+        cp104_percent,
+        cp105_percent,
+        cp108_percent,
+        cp109_percent,
+        cp101_percent_total,
+        cp102_percent_total,
+        cp103_percent_total,
+        cp104_percent_total,
+        cp105_percent_total,
+        cp108_percent_total,
+        cp109_percent_total,
+      ]) {
+        var totalScore = percent;
+
+        var CP101 = cp101_percent_total;
+        var CP102 = cp101_percent_total + cp102_percent_total;
+        var CP103 = cp101_percent_total + cp102_percent_total + cp103_percent_total;
+        var CP104 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total;
+        var CP105 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total;
+        var CP108 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total;
+        var CP109 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total + cp109_percent_total;
+
+        var chartMin = 0;
+        var chartMax = 100;
+
+        // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
+        // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
+
+        var data = {
+          score: totalScore,
+          gradingData: [
+            {
+              title: cp101_percent.toFixed(0),
+              color: color_101,
+              lowScore: 0,
+              highScore: CP101,
+            },
+            {
+              title: cp102_percent.toFixed(0),
+              color: color_102,
+              lowScore: CP101,
+              highScore: CP102,
+            },
+            {
+              title: cp103_percent.toFixed(0),
+              color: color_103,
+              lowScore: CP102,
+              highScore: CP103,
+            },
+            {
+              title: cp104_percent.toFixed(0),
+              color: color_104,
+              lowScore: CP103,
+              highScore: CP104,
+            },
+            {
+              title: cp105_percent.toFixed(0),
+              color: color_105,
+              lowScore: CP104,
+              highScore: CP105,
+            },
+            {
+              title: cp108_percent.toFixed(0),
+              color: color_108,
+              lowScore: CP105,
+              highScore: CP108,
+            },
+            {
+              title: cp109_percent.toFixed(0),
+              color: color_109,
+              lowScore: CP108,
+              highScore: CP109,
+            },
+            {
+              title: "",
+              color: "#C5C5C5",
+              lowScore: CP109,
+              highScore: 100,
+            },
+          ],
+        };
+
+        /**Grading Lookup*/
+        function lookUpGrade(lookupScore, grades) {
+          // Only change code below this line
+          for (var i = 0; i < grades.length; i++) {
+            if (
+              grades[i].lowScore < lookupScore &&
+              grades[i].highScore >= lookupScore
+            ) {
+              return grades[i];
+            }
+          }
+          return null;
+        }
+
+        // create chart
+        var chart = am4core.create("structureChartDiv", am4charts.GaugeChart);
+        chart.hiddenState.properties.opacity = 0;
+        chart.fontSize = 11;
+        chart.innerRadius = am4core.percent(80);
+        chart.resizable = true;
+        chart.responsive.enabled = true;
+        chart.logo.disabled = true;
+
+        /*** Chart Title */
+        // Title Color
+
+        var title = chart.titles.create();
+        //'<a href="https://google.com"}">More info</a>'
+
+        title.text = "EXISTING STRUCTURE";
+        //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/MMSP_Land_Structure/index4.html" target="_blank">LAND (Station)</a>';
+        title.fontSize = titleFontSize;
+        title.align = "center";
+        title.marginBottom = -10;
+        title.marginTop = 0;
+        title.fill = TOP_TITLE_COL;
+
+
+        // Add bottom label
+        var label = chart.chartContainer.createChild(am4core.Label);
+        label.text = "[bold]DEMOLISHED";
+        //label.html = '<a href="https://google.com">HANDED-OVER AREA</a>';
+        label.fontSize = "1.4em";
+        label.align = "center";
+        label.marginTop = labelMarginTop;
+        label.fill = BOTTOM_LABEL_COL;
+
+        /** * Normal axis*/
+
+        var axis = chart.xAxes.push(new am4charts.ValueAxis());
+        axis.min = chartMin;
+        axis.max = chartMax;
+        axis.strictMinMax = true;
+        axis.renderer.radius = am4core.percent(80);
+        axis.renderer.inside = true;
+        axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
+        axis.renderer.ticks.template.disabled = false;
+        axis.renderer.ticks.template.strokeOpacity = 1;
+        //axis.renderer.ticks.template.strokeWidth = 1;
+        axis.renderer.ticks.template.length = 10;
+        axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
+        //axis.renderer.grid.template.disabled = true;
+        axis.renderer.labels.template.radius = am4core.percent(40);
+        axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
+        axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
+
+        /*** Axis for ranges*/
+
+        var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
+        axis2.min = chartMin;
+        axis2.max = chartMax;
+        axis2.strictMinMax = true;
+        axis2.renderer.labels.template.disabled = true;
+        axis2.renderer.ticks.template.disabled = true;
+        axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
+        axis2.renderer.grid.template.opacity = 0.5;
+        axis2.renderer.labels.template.bent = true;
+        axis2.renderer.labels.template.fill = am4core.color("#000");
+        axis2.renderer.labels.template.fontWeight = "bold";
+        axis2.renderer.labels.template.fillOpacity = 0.7;
+
+        /**Ranges*/
+
+        for (let grading of data.gradingData) {
+          var range = axis2.axisRanges.create();
+          range.axisFill.fill = am4core.color(grading.color);
+          range.axisFill.fillOpacity = 1; // default 0.8 fill-color of
+          range.axisFill.zIndex = -1;
+          range.value =
+            grading.lowScore > chartMin ? grading.lowScore : chartMin;
+          range.endValue =
+            grading.highScore < chartMax ? grading.highScore : chartMax;
+          range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
+          range.stroke = am4core.color(grading.color).lighten(-0.1);
+          range.label.inside = true;
+          range.label.text = grading.title.toUpperCase();
+          range.label.inside = true;
+          range.label.location = 0.5;
+          range.label.inside = true;
+          range.label.radius = am4core.percent(10);
+          range.label.paddingBottom = -5; // ~half font size
+          range.label.fontSize = "1.4em"; // category label (i.e., CP101, CP102, ....)
+        }
+
+        var matchingGrade = lookUpGrade(data.score, data.gradingData);
+
+        /*** Label 1 (total Percent)*/
+
+        var label = chart.radarContainer.createChild(am4core.Label);
+        label.isMeasured = false;
+        label.fontSize = "3.5em";
+        label.x = am4core.percent(50);
+        label.y = am4core.percent(100);
+        label.paddingBottom = -5;
+        label.horizontalCenter = "middle";
+        label.verticalCenter = "bottom";
+        //label.dataItem = data;
+        label.text = data.score.toFixed(0).toString() + "%";
+        //label.text = "{score}";
+        //label.fill = am4core.color(matchingGrade.color);
+        label.fill = am4core.color(chartTitleLabelFillCol);
+
+        var hand = chart.hands.push(new am4charts.ClockHand());
+        hand.axis = axis2;
+        hand.innerRadius = am4core.percent(55);
+        hand.startWidth = 8;
+        hand.pin.disabled = true;
+        hand.value = data.score;
+        hand.fill = am4core.color("#000000"); // inner color of needle
+        //hand.stroke = am4core.color("#000");
+        hand.fillOpacity = 0.5;
+      }
+      totalStrucCount().then(chartTotalStrucCount);
+      //END OF CHART STRUCTURE
+
+
+      /// 4. CHART ISF
+      function totalISFCount() {
+        var total_isf = {
+          onStatisticField: "Id",
+          outStatisticFieldName: "total_isf",
+          statisticType: "count",
+        };
+
+        var total_relocated = {
+          onStatisticField: "CASE WHEN RELOCATION = 'RELOCATED' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_relocated",
+          statisticType: "sum"
+        };
+
+        var total_cp101 = {
+          onStatisticField: "CASE WHEN Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101",
+          statisticType: "sum",
+        };
+
+        var total_cp101_relocated = {
+          onStatisticField: "CASE WHEN (RELOCATION = 'RELOCATED' and Package = 'CP101') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_relocated",
+          statisticType: "sum"
+        };
+
+        var total_cp102 = {
+          onStatisticField: "CASE WHEN Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102",
+          statisticType: "sum"
+        };
+
+        var total_cp102_relocated = {
+          onStatisticField: "CASE WHEN (RELOCATION = 'RELOCATED' and Package = 'CP102') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_relocated",
+          statisticType: "sum"
+        };
+
+        var total_cp103 = {
+          onStatisticField: "CASE WHEN Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103",
+          statisticType: "sum"
+        };
+
+        var total_cp103_relocated = {
+          onStatisticField: "CASE WHEN (RELOCATION = 'RELOCATED' and Package = 'CP103') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_relocated",
+          statisticType: "sum"
+        };
+
+        var total_cp104 = {
+          onStatisticField: "CASE WHEN Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104",
+          statisticType: "sum"
+        };
+
+        var total_cp104_relocated = {
+          onStatisticField: "CASE WHEN (RELOCATION = 'RELOCATED' and Package = 'CP104') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_relocated",
+          statisticType: "sum"
+        };
+
+        var total_cp105 = {
+          onStatisticField: "CASE WHEN Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105",
+          statisticType: "sum"
+        };
+
+        var total_cp105_relocated = {
+          onStatisticField: "CASE WHEN (RELOCATION = 'RELOCATED' and Package = 'CP105') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_relocated",
+          statisticType: "sum"
+        };
+
+        var total_cp108 = {
+          onStatisticField: "CASE WHEN Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108",
+          statisticType: "sum"
+        };
+
+        var total_cp108_relocated = {
+          onStatisticField: "CASE WHEN (RELOCATION = 'RELOCATED' and Package = 'CP108') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_relocated",
+          statisticType: "sum"
+        };
+
+        var total_cp109 = {
+          onStatisticField: "CASE WHEN Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109",
+          statisticType: "sum"
+        };
+
+        var total_cp109_relocated = {
+          onStatisticField: "CASE WHEN (RELOCATION = 'RELOCATED' and Package = 'CP109') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_relocated",
+          statisticType: "sum"
+        };
+
+        var query = reloISFLayer.createQuery();
+        query.outStatistics = [
+          total_isf,
+          total_relocated,
+          total_cp101,
+          total_cp101_relocated,
+          total_cp102,
+          total_cp102_relocated,
+          total_cp103,
+          total_cp103_relocated,
+          total_cp104,
+          total_cp104_relocated,
+          total_cp105,
+          total_cp105_relocated,
+          total_cp108,
+          total_cp108_relocated,
+          total_cp109,
+          total_cp109_relocated
+        ];
+
+        return reloISFLayer.queryFeatures(query).then((response) => {
+          var stats = response.features[0].attributes;
+          const total = stats.total_isf;
+          const relocated = stats.total_relocated;
+          const percent = (relocated / total) * 100;
+
+          const cp101_total = stats.total_cp101;
+          const cp102_total = stats.total_cp102;
+          const cp103_total = stats.total_cp103;
+          const cp104_total = stats.total_cp104;
+          const cp105_total = stats.total_cp105;
+          const cp108_total = stats.total_cp108;
+          const cp109_total = stats.total_cp109;
+
+
+          const cp101_total_relocated = stats.total_cp101_relocated;
+          const cp102_total_relocated = stats.total_cp102_relocated;
+          const cp103_total_relocated = stats.total_cp103_relocated;
+          const cp104_total_relocated = stats.total_cp104_relocated;
+          const cp105_total_relocated = stats.total_cp105_relocated;
+          const cp108_total_relocated = stats.total_cp108_relocated;
+          const cp109_total_relocated = stats.total_cp109_relocated;
+
+          const cp101_percent = cp101_total === 0 ? 0 : (cp101_total_relocated / cp101_total) * 100;
+          const cp102_percent = cp102_total === 0 ? 0 : (cp102_total_relocated / cp102_total) * 100;
+          const cp103_percent = cp103_total === 0 ? 0 : (cp103_total_relocated / cp103_total) * 100;
+          const cp104_percent = cp104_total === 0 ? 0 : (cp104_total_relocated / cp104_total) * 100;
+          const cp105_percent = cp105_total === 0 ? 0 : (cp105_total_relocated / cp105_total) * 100;
+          const cp108_percent = cp108_total === 0 ? 0 : (cp108_total_relocated / cp108_total) * 100;
+          const cp109_percent = cp109_total === 0 ? 0 : (cp109_total_relocated / cp109_total) * 100;
+
+          const cp101_percent_total = (cp101_total_relocated / total) * 100;
+          const cp102_percent_total = (cp102_total_relocated / total) * 100;
+          const cp103_percent_total = (cp103_total_relocated / total) * 100;
+          const cp104_percent_total = (cp104_total_relocated / total) * 100;
+          const cp105_percent_total = (cp105_total_relocated / total) * 100;
+          const cp108_percent_total = (cp108_total_relocated / total) * 100;
+          const cp109_percent_total = (cp109_total_relocated / total) * 100;
+
+          return [
+            total,
+            percent,
+            cp101_percent,
+            cp102_percent,
+            cp103_percent,
+            cp104_percent,
+            cp105_percent,
+            cp108_percent,
+            cp109_percent,
+            cp101_percent_total,
+            cp102_percent_total,
+            cp103_percent_total,
+            cp104_percent_total,
+            cp105_percent_total,
+            cp108_percent_total,
+            cp109_percent_total,
+          ];
+        });
+      }
+
+      function chartTotalISFCount([
+        total,
+        percent,
+        cp101_percent,
+        cp102_percent,
+        cp103_percent,
+        cp104_percent,
+        cp105_percent,
+        cp108_percent,
+        cp109_percent,
+        cp101_percent_total,
+        cp102_percent_total,
+        cp103_percent_total,
+        cp104_percent_total,
+        cp105_percent_total,
+        cp108_percent_total,
+        cp109_percent_total,
+      ]) {
+        var totalScore = percent;
+
+        var CP101 = cp101_percent_total;
+        var CP102 = cp101_percent_total + cp102_percent_total;
+        var CP103 = cp101_percent_total + cp102_percent_total + cp103_percent_total;
+        var CP104 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total;
+        var CP105 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total;
+        var CP108 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total;
+        var CP109 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total + cp109_percent_total;
+
+        var chartMin = 0;
+        var chartMax = 100;
+
+        // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
+        // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
+
+        var data = {
+          score: totalScore,
+          gradingData: [
+            {
+              title: cp101_percent.toFixed(0),
+              color: color_101,
+              lowScore: 0,
+              highScore: CP101,
+            },
+            {
+              title: cp102_percent.toFixed(0),
+              color: color_102,
+              lowScore: CP101,
+              highScore: CP102,
+            },
+            {
+              title: cp103_percent.toFixed(0),
+              color: color_103,
+              lowScore: CP102,
+              highScore: CP103,
+            },
+            {
+              title: cp104_percent.toFixed(0),
+              color: color_104,
+              lowScore: CP103,
+              highScore: CP104,
+            },
+            {
+              title: cp105_percent.toFixed(0),
+              color: color_105,
+              lowScore: CP104,
+              highScore: CP105,
+            },
+            {
+              title: cp108_percent.toFixed(0),
+              color: color_108,
+              lowScore: CP105,
+              highScore: CP108,
+            },
+            {
+              title: cp109_percent.toFixed(0),
+              color: color_109,
+              lowScore: CP108,
+              highScore: CP109,
+            },
+            {
+              title: "",
+              color: "#C5C5C5",
+              lowScore: CP109,
+              highScore: 100,
+            },
+          ],
+        };
+
+        /**Grading Lookup*/
+        function lookUpGrade(lookupScore, grades) {
+          // Only change code below this line
+          for (var i = 0; i < grades.length; i++) {
+            if (
+              grades[i].lowScore < lookupScore &&
+              grades[i].highScore >= lookupScore
+            ) {
+              return grades[i];
+            }
+          }
+          return null;
+        }
+
+        // create chart
+        var chart = am4core.create("isfChartDiv", am4charts.GaugeChart);
+        chart.hiddenState.properties.opacity = 0;
+        chart.fontSize = 11;
+        chart.innerRadius = am4core.percent(80);
+        chart.resizable = true;
+        chart.responsive.enabled = true;
+        chart.logo.disabled = true;
+
+        /*** Chart Title */
+        // Title Color
+
+        var title = chart.titles.create();
+        //'<a href="https://google.com"}">More info</a>'
+
+        title.text = "INFORMAL SETTLERS";
+        //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/MMSP_Land_Structure/index4.html" target="_blank">LAND (Station)</a>';
+        title.fontSize = titleFontSize;
+        title.align = "center";
+        title.marginBottom = -10;
+        title.marginTop = 0;
+        title.fill = TOP_TITLE_COL;
+
+
+        // Add bottom label
+        var label = chart.chartContainer.createChild(am4core.Label);
+        label.text = "[bold]RELOCATED";
+        //label.html = '<a href="https://google.com">HANDED-OVER AREA</a>';
+        label.fontSize = "1.4em";
+        label.align = "center";
+        label.marginTop = labelMarginTop;
+        label.fill = BOTTOM_LABEL_COL;
+
+        /** * Normal axis*/
+
+        var axis = chart.xAxes.push(new am4charts.ValueAxis());
+        axis.min = chartMin;
+        axis.max = chartMax;
+        axis.strictMinMax = true;
+        axis.renderer.radius = am4core.percent(80);
+        axis.renderer.inside = true;
+        axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
+        axis.renderer.ticks.template.disabled = false;
+        axis.renderer.ticks.template.strokeOpacity = 1;
+        //axis.renderer.ticks.template.strokeWidth = 1;
+        axis.renderer.ticks.template.length = 10;
+        axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
+        //axis.renderer.grid.template.disabled = true;
+        axis.renderer.labels.template.radius = am4core.percent(40);
+        axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
+        axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
+
+        /*** Axis for ranges*/
+
+        var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
+        axis2.min = chartMin;
+        axis2.max = chartMax;
+        axis2.strictMinMax = true;
+        axis2.renderer.labels.template.disabled = true;
+        axis2.renderer.ticks.template.disabled = true;
+        axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
+        axis2.renderer.grid.template.opacity = 0.5;
+        axis2.renderer.labels.template.bent = true;
+        axis2.renderer.labels.template.fill = am4core.color("#000");
+        axis2.renderer.labels.template.fontWeight = "bold";
+        axis2.renderer.labels.template.fillOpacity = 0.7;
+
+        /**Ranges*/
+
+        for (let grading of data.gradingData) {
+          var range = axis2.axisRanges.create();
+          range.axisFill.fill = am4core.color(grading.color);
+          range.axisFill.fillOpacity = 1; // default 0.8 fill-color of
+          range.axisFill.zIndex = -1;
+          range.value =
+            grading.lowScore > chartMin ? grading.lowScore : chartMin;
+          range.endValue =
+            grading.highScore < chartMax ? grading.highScore : chartMax;
+          range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
+          range.stroke = am4core.color(grading.color).lighten(-0.1);
+          range.label.inside = true;
+          range.label.text = grading.title.toUpperCase();
+          range.label.inside = true;
+          range.label.location = 0.5;
+          range.label.inside = true;
+          range.label.radius = am4core.percent(10);
+          range.label.paddingBottom = -5; // ~half font size
+          range.label.fontSize = "1.4em"; // category label (i.e., CP101, CP102, ....)
+        }
+
+        var matchingGrade = lookUpGrade(data.score, data.gradingData);
+
+        /*** Label 1 (total Percent)*/
+
+        var label = chart.radarContainer.createChild(am4core.Label);
+        label.isMeasured = false;
+        label.fontSize = "3.5em";
+        label.x = am4core.percent(50);
+        label.y = am4core.percent(100);
+        label.paddingBottom = -5;
+        label.horizontalCenter = "middle";
+        label.verticalCenter = "bottom";
+        //label.dataItem = data;
+        label.text = data.score.toFixed(0).toString() + "%";
+        //label.text = "{score}";
+        //label.fill = am4core.color(matchingGrade.color);
+        label.fill = am4core.color(chartTitleLabelFillCol);
+
+        var hand = chart.hands.push(new am4charts.ClockHand());
+        hand.axis = axis2;
+        hand.innerRadius = am4core.percent(55);
+        hand.startWidth = 8;
+        hand.pin.disabled = true;
+        hand.value = data.score;
+        hand.fill = am4core.color("#000000"); // inner color of needle
+        //hand.stroke = am4core.color("#000");
+        hand.fillOpacity = 0.5;
+      }
+      totalISFCount().then(chartTotalISFCount);
+      //END OF CHART ISF
+
+
+
+
+
+      /// 5. CHART TREE CUTTING
+      function totalTreeCuttingCount() {
+        var total_tree = {
+          onStatisticField: "CASE WHEN (TCP_Proces >= 1 AND TCP_Proces <= 7) THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_tree",
+          statisticType: "sum",
+        };
+
+        var total_cut = {
+          onStatisticField: "CASE WHEN (TCP_Proces = 5 or TCP_Proces = 6) THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cut",
+          statisticType: "sum"
+        };
+
+        var total_cp101 = {
+          onStatisticField: "CASE WHEN (TCP_Proces >= 1 AND TCP_Proces <= 7) AND Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101",
+          statisticType: "sum",
+        };
+
+        var total_cp101_cut = {
+          onStatisticField: "CASE WHEN (TCP_Proces = 5 OR TCP_Proces = 6) AND Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_cut",
+          statisticType: "sum"
+        };
+
+        var total_cp102 = {
+          onStatisticField: "CASE WHEN (TCP_Proces >= 1 AND TCP_Proces <= 7) AND Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102",
+          statisticType: "sum"
+        };
+
+        var total_cp102_cut = {
+          onStatisticField: "CASE WHEN (TCP_Proces = 5 OR TCP_Proces = 6) AND Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_cut",
+          statisticType: "sum"
+        };
+
+        var total_cp103 = {
+          onStatisticField: "CASE WHEN (TCP_Proces >= 1 AND TCP_Proces <= 7) AND Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103",
+          statisticType: "sum"
+        };
+
+        var total_cp103_cut = {
+          onStatisticField: "CASE WHEN (TCP_Proces = 5 OR TCP_Proces = 6) AND Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_cut",
+          statisticType: "sum"
+        };
+
+        var total_cp104 = {
+          onStatisticField: "CASE WHEN (TCP_Proces >= 1 AND TCP_Proces <= 7) AND Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104",
+          statisticType: "sum"
+        };
+
+        var total_cp104_cut = {
+          onStatisticField: "CASE WHEN (TCP_Proces = 5 OR TCP_Proces = 6) and Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_cut",
+          statisticType: "sum"
+        };
+
+        var total_cp105 = {
+          onStatisticField: "CASE WHEN (TCP_Proces >= 1 AND TCP_Proces <= 7) AND Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105",
+          statisticType: "sum"
+        };
+
+        var total_cp105_cut = {
+          onStatisticField: "CASE WHEN (TCP_Proces = 5 OR TCP_Proces = 6) and Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_cut",
+          statisticType: "sum"
+        };
+
+        var total_cp108 = {
+          onStatisticField: "CASE WHEN (TCP_Proces >= 1 AND TCP_Proces <= 7) AND Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108",
+          statisticType: "sum"
+        };
+
+        var total_cp108_cut = {
+          onStatisticField: "CASE WHEN (TCP_Proces = 5 OR TCP_Proces = 6) and Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_cut",
+          statisticType: "sum"
+        };
+
+        var total_cp109 = {
+          onStatisticField: "CASE WHEN (TCP_Proces >= 1 AND TCP_Proces <= 7) AND Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109",
+          statisticType: "sum"
+        };
+
+        var total_cp109_cut = {
+          onStatisticField: "CASE WHEN (TCP_Proces = 5 OR TCP_Proces = 6) and Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_cut",
+          statisticType: "sum"
+        };
+
+        var query = treeLayer.createQuery();
+        query.outStatistics = [
+          total_tree,
+          total_cut,
+          total_cp101,
+          total_cp101_cut,
+          total_cp102,
+          total_cp102_cut,
+          total_cp103,
+          total_cp103_cut,
+          total_cp104,
+          total_cp104_cut,
+          total_cp105,
+          total_cp105_cut,
+          total_cp108,
+          total_cp108_cut,
+          total_cp109,
+          total_cp109_cut
+        ];
+
+        return treeLayer.queryFeatures(query).then((response) => {
+          var stats = response.features[0].attributes;
+          const total = stats.total_tree;
+          const cut = stats.total_cut;
+          const percent = (cut / total) * 100;
+
+          const cp101_total = stats.total_cp101;
+          const cp102_total = stats.total_cp102;
+          const cp103_total = stats.total_cp103;
+          const cp104_total = stats.total_cp104;
+          const cp105_total = stats.total_cp105;
+          const cp108_total = stats.total_cp108;
+          const cp109_total = stats.total_cp109;
+
+
+          const cp101_total_cut = stats.total_cp101_cut;
+          const cp102_total_cut = stats.total_cp102_cut;
+          const cp103_total_cut = stats.total_cp103_cut;
+          const cp104_total_cut = stats.total_cp104_cut;
+          const cp105_total_cut = stats.total_cp105_cut;
+          const cp108_total_cut = stats.total_cp108_cut;
+          const cp109_total_cut = stats.total_cp109_cut;
+
+          const cp101_percent = cp101_total === 0 ? 0 : (cp101_total_cut / cp101_total) * 100;
+          const cp102_percent = cp102_total === 0 ? 0 : (cp102_total_cut / cp102_total) * 100;
+          const cp103_percent = cp103_total === 0 ? 0 : (cp103_total_cut / cp103_total) * 100;
+          const cp104_percent = cp104_total === 0 ? 0 : (cp104_total_cut / cp104_total) * 100;
+          const cp105_percent = cp105_total === 0 ? 0 : (cp105_total_cut / cp105_total) * 100;
+          const cp108_percent = cp108_total === 0 ? 0 : (cp108_total_cut / cp108_total) * 100;
+          const cp109_percent = cp109_total === 0 ? 0 : (cp109_total_cut / cp109_total) * 100;
+
+          const cp101_percent_total = (cp101_total_cut / total) * 100;
+          const cp102_percent_total = (cp102_total_cut / total) * 100;
+          const cp103_percent_total = (cp103_total_cut / total) * 100;
+          const cp104_percent_total = (cp104_total_cut / total) * 100;
+          const cp105_percent_total = (cp105_total_cut / total) * 100;
+          const cp108_percent_total = (cp108_total_cut / total) * 100;
+          const cp109_percent_total = (cp109_total_cut / total) * 100;
+
+
+          return [
+            total,
+            percent,
+            cp101_percent,
+            cp102_percent,
+            cp103_percent,
+            cp104_percent,
+            cp105_percent,
+            cp108_percent,
+            cp109_percent,
+            cp101_percent_total,
+            cp102_percent_total,
+            cp103_percent_total,
+            cp104_percent_total,
+            cp105_percent_total,
+            cp108_percent_total,
+            cp109_percent_total,
+          ];
+        });
+      }
+
+      function chartTreeCuttingCount([
+        total,
+        percent,
+        cp101_percent,
+        cp102_percent,
+        cp103_percent,
+        cp104_percent,
+        cp105_percent,
+        cp108_percent,
+        cp109_percent,
+        cp101_percent_total,
+        cp102_percent_total,
+        cp103_percent_total,
+        cp104_percent_total,
+        cp105_percent_total,
+        cp108_percent_total,
+        cp109_percent_total,
+      ]) {
+        var totalScore = percent;
+
+        var CP101 = cp101_percent_total;
+        var CP102 = cp101_percent_total + cp102_percent_total;
+        var CP103 = cp101_percent_total + cp102_percent_total + cp103_percent_total;
+        var CP104 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total;
+        var CP105 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total;
+        var CP108 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total;
+        var CP109 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total + cp109_percent_total;
+
+        var chartMin = 0;
+        var chartMax = 100;
+
+        // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
+        // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
+
+        var data = {
+          score: totalScore,
+          gradingData: [
+            {
+              title: cp101_percent.toFixed(0),
+              color: color_101,
+              lowScore: 0,
+              highScore: CP101,
+            },
+            {
+              title: cp102_percent.toFixed(0),
+              color: color_102,
+              lowScore: CP101,
+              highScore: CP102,
+            },
+            {
+              title: cp103_percent.toFixed(0),
+              color: color_103,
+              lowScore: CP102,
+              highScore: CP103,
+            },
+            {
+              title: cp104_percent.toFixed(0),
+              color: color_104,
+              lowScore: CP103,
+              highScore: CP104,
+            },
+            {
+              title: cp105_percent.toFixed(0),
+              color: color_105,
+              lowScore: CP104,
+              highScore: CP105,
+            },
+            {
+              title: cp108_percent.toFixed(0),
+              color: color_108,
+              lowScore: CP105,
+              highScore: CP108,
+            },
+            {
+              title: cp109_percent.toFixed(0),
+              color: color_109,
+              lowScore: CP108,
+              highScore: CP109,
+            },
+            {
+              title: "",
+              color: "#C5C5C5",
+              lowScore: CP109,
+              highScore: 100,
+            },
+          ],
+        };
+
+        /**Grading Lookup*/
+        function lookUpGrade(lookupScore, grades) {
+          // Only change code below this line
+          for (var i = 0; i < grades.length; i++) {
+            if (
+              grades[i].lowScore < lookupScore &&
+              grades[i].highScore >= lookupScore
+            ) {
+              return grades[i];
+            }
+          }
+          return null;
+        }
+
+        // create chart
+        var chart = am4core.create("treeCuttingChartDiv", am4charts.GaugeChart);
+        chart.hiddenState.properties.opacity = 0;
+        chart.fontSize = 11;
+        chart.innerRadius = am4core.percent(80);
+        chart.resizable = true;
+        chart.responsive.enabled = true;
+        chart.logo.disabled = true;
+
+        /*** Chart Title */
+        // Title Color
+
+        var title = chart.titles.create();
+        //'<a href="https://google.com"}">More info</a>'
+
+        title.text = "TREE CUTTING";
+        //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/MMSP_Land_Structure/index4.html" target="_blank">LAND (Station)</a>';
+        title.fontSize = titleFontSize;
+        title.align = "center";
+        title.marginBottom = -10;
+        title.marginTop = 0;
+        title.fill = TOP_TITLE_COL;
+
+
+        // Add bottom label
+        var label = chart.chartContainer.createChild(am4core.Label);
+        label.text = "[bold]CUT/EARTHBALLED";
+        //label.html = '<a href="https://google.com">HANDED-OVER AREA</a>';
+        label.fontSize = "1.4em";
+        label.align = "center";
+        label.marginTop = labelMarginTop;
+        label.fill = BOTTOM_LABEL_COL;
+
+        /** * Normal axis*/
+
+        var axis = chart.xAxes.push(new am4charts.ValueAxis());
+        axis.min = chartMin;
+        axis.max = chartMax;
+        axis.strictMinMax = true;
+        axis.renderer.radius = am4core.percent(80);
+        axis.renderer.inside = true;
+        axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
+        axis.renderer.ticks.template.disabled = false;
+        axis.renderer.ticks.template.strokeOpacity = 1;
+        //axis.renderer.ticks.template.strokeWidth = 1;
+        axis.renderer.ticks.template.length = 10;
+        axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
+        //axis.renderer.grid.template.disabled = true;
+        axis.renderer.labels.template.radius = am4core.percent(40);
+        axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
+        axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
+
+        /*** Axis for ranges*/
+
+        var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
+        axis2.min = chartMin;
+        axis2.max = chartMax;
+        axis2.strictMinMax = true;
+        axis2.renderer.labels.template.disabled = true;
+        axis2.renderer.ticks.template.disabled = true;
+        axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
+        axis2.renderer.grid.template.opacity = 0.5;
+        axis2.renderer.labels.template.bent = true;
+        axis2.renderer.labels.template.fill = am4core.color("#000");
+        axis2.renderer.labels.template.fontWeight = "bold";
+        axis2.renderer.labels.template.fillOpacity = 0.7;
+
+        /**Ranges*/
+
+        for (let grading of data.gradingData) {
+          var range = axis2.axisRanges.create();
+          range.axisFill.fill = am4core.color(grading.color);
+          range.axisFill.fillOpacity = 1; // default 0.8 fill-color of
+          range.axisFill.zIndex = -1;
+          range.value =
+            grading.lowScore > chartMin ? grading.lowScore : chartMin;
+          range.endValue =
+            grading.highScore < chartMax ? grading.highScore : chartMax;
+          range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
+          range.stroke = am4core.color(grading.color).lighten(-0.1);
+          range.label.inside = true;
+          range.label.text = grading.title.toUpperCase();
+          range.label.inside = true;
+          range.label.location = 0.5;
+          range.label.inside = true;
+          range.label.radius = am4core.percent(10);
+          range.label.paddingBottom = -5; // ~half font size
+          range.label.fontSize = "1.4em"; // category label (i.e., CP101, CP102, ....)
+        }
+
+        var matchingGrade = lookUpGrade(data.score, data.gradingData);
+
+        /*** Label 1 (total Percent)*/
+
+        var label = chart.radarContainer.createChild(am4core.Label);
+        label.isMeasured = false;
+        label.fontSize = "3.5em";
+        label.x = am4core.percent(50);
+        label.y = am4core.percent(100);
+        label.paddingBottom = -5;
+        label.horizontalCenter = "middle";
+        label.verticalCenter = "bottom";
+        //label.dataItem = data;
+        label.text = data.score.toFixed(0).toString() + "%";
+        //label.text = "{score}";
+        //label.fill = am4core.color(matchingGrade.color);
+        label.fill = am4core.color(chartTitleLabelFillCol);
+
+        var hand = chart.hands.push(new am4charts.ClockHand());
+        hand.axis = axis2;
+        hand.innerRadius = am4core.percent(55);
+        hand.startWidth = 8;
+        hand.pin.disabled = true;
+        hand.value = data.score;
+        hand.fill = am4core.color("#000000"); // inner color of needle
+        //hand.stroke = am4core.color("#000");
+        hand.fillOpacity = 0.5;
+      }
+      totalTreeCuttingCount().then(chartTreeCuttingCount);
+      //END OF CHART TREE CUTTING
+
+
+
+
+
+
+      /// 6. CHART TREE COMPENSATION
+      function totalTreeCompensationCount() {
+        var total_tree = {
+          onStatisticField: "CASE WHEN Tree_Compe >= 1 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_tree",
+          statisticType: "sum",
+        };
+
+        var total_compensation = {
+          onStatisticField: "CASE WHEN Tree_Compe = 7 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_compensation",
+          statisticType: "sum"
+        };
+
+        var total_cp101 = {
+          onStatisticField: "CASE WHEN Tree_Compe >= 1 AND Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101",
+          statisticType: "sum",
+        };
+
+        var total_cp101_compensation = {
+          onStatisticField: "CASE WHEN Tree_Compe = 7 AND Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_compensation",
+          statisticType: "sum"
+        };
+
+        var total_cp102 = {
+          onStatisticField: "CASE WHEN Tree_Compe >= 1 AND Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102",
+          statisticType: "sum"
+        };
+
+        var total_cp102_compensation = {
+          onStatisticField: "CASE WHEN Tree_Compe = 7 AND Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_compensation",
+          statisticType: "sum"
+        };
+
+        var total_cp103 = {
+          onStatisticField: "CASE WHEN Tree_Compe >= 1 AND Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103",
+          statisticType: "sum"
+        };
+
+        var total_cp103_compensation = {
+          onStatisticField: "CASE WHEN Tree_Compe = 7 AND Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_compensation",
+          statisticType: "sum"
+        };
+
+        var total_cp104 = {
+          onStatisticField: "CASE WHEN Tree_Compe >= 1 AND Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104",
+          statisticType: "sum"
+        };
+
+        var total_cp104_compensation = {
+          onStatisticField: "CASE WHEN Tree_Compe = 7 and Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_compensation",
+          statisticType: "sum"
+        };
+
+        var total_cp105 = {
+          onStatisticField: "CASE WHEN Tree_Compe >= 1 AND Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105",
+          statisticType: "sum"
+        };
+
+        var total_cp105_compensation = {
+          onStatisticField: "CASE WHEN Tree_Compe = 7 and Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_compensation",
+          statisticType: "sum"
+        };
+
+        var total_cp108 = {
+          onStatisticField: "CASE WHEN Tree_Compe >= 1 AND Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108",
+          statisticType: "sum"
+        };
+
+        var total_cp108_compensation = {
+          onStatisticField: "CASE WHEN Tree_Compe = 7 and Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_compensation",
+          statisticType: "sum"
+        };
+
+        var total_cp109 = {
+          onStatisticField: "CASE WHEN Tree_Compe >= 1 AND Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109",
+          statisticType: "sum"
+        };
+
+        var total_cp109_compensation = {
+          onStatisticField: "CASE WHEN Tree_Compe = 7 and Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_compensation",
+          statisticType: "sum"
+        };
+
+        var query = treeLayer.createQuery();
+        query.outStatistics = [
+          total_tree,
+          total_compensation,
+          total_cp101,
+          total_cp101_compensation,
+          total_cp102,
+          total_cp102_compensation,
+          total_cp103,
+          total_cp103_compensation,
+          total_cp104,
+          total_cp104_compensation,
+          total_cp105,
+          total_cp105_compensation,
+          total_cp108,
+          total_cp108_compensation,
+          total_cp109,
+          total_cp109_compensation
+        ];
+
+        return treeLayer.queryFeatures(query).then((response) => {
+          var stats = response.features[0].attributes;
+          const total = stats.total_tree;
+          const compensation = stats.total_compensation;
+          const percent = (compensation / total) * 100;
+
+          const cp101_total = stats.total_cp101;
+          const cp102_total = stats.total_cp102;
+          const cp103_total = stats.total_cp103;
+          const cp104_total = stats.total_cp104;
+          const cp105_total = stats.total_cp105;
+          const cp108_total = stats.total_cp108;
+          const cp109_total = stats.total_cp109;
+
+
+          const cp101_total_compensation = stats.total_cp101_compensation;
+          const cp102_total_compensation = stats.total_cp102_compensation;
+          const cp103_total_compensation = stats.total_cp103_compensation;
+          const cp104_total_compensation = stats.total_cp104_compensation;
+          const cp105_total_compensation = stats.total_cp105_compensation;
+          const cp108_total_compensation = stats.total_cp108_compensation;
+          const cp109_total_compensation = stats.total_cp109_compensation;
+
+          const cp101_percent = cp101_total === 0 ? 0 : (cp101_total_compensation / cp101_total) * 100;
+          const cp102_percent = cp102_total === 0 ? 0 : (cp102_total_compensation / cp102_total) * 100;
+          const cp103_percent = cp103_total === 0 ? 0 : (cp103_total_compensation / cp103_total) * 100;
+          const cp104_percent = cp104_total === 0 ? 0 : (cp104_total_compensation / cp104_total) * 100;
+          const cp105_percent = cp105_total === 0 ? 0 : (cp105_total_compensation / cp105_total) * 100;
+          const cp108_percent = cp108_total === 0 ? 0 : (cp108_total_compensation / cp108_total) * 100;
+          const cp109_percent = cp109_total === 0 ? 0 : (cp109_total_compensation / cp109_total) * 100;
+
+          const cp101_percent_total = (cp101_total_compensation / total) * 100;
+          const cp102_percent_total = (cp102_total_compensation / total) * 100;
+          const cp103_percent_total = (cp103_total_compensation / total) * 100;
+          const cp104_percent_total = (cp104_total_compensation / total) * 100;
+          const cp105_percent_total = (cp105_total_compensation / total) * 100;
+          const cp108_percent_total = (cp108_total_compensation / total) * 100;
+          const cp109_percent_total = (cp109_total_compensation / total) * 100;
+
+
+          return [
+            total,
+            percent,
+            cp101_percent,
+            cp102_percent,
+            cp103_percent,
+            cp104_percent,
+            cp105_percent,
+            cp108_percent,
+            cp109_percent,
+            cp101_percent_total,
+            cp102_percent_total,
+            cp103_percent_total,
+            cp104_percent_total,
+            cp105_percent_total,
+            cp108_percent_total,
+            cp109_percent_total,
+          ];
+        });
+      }
+
+      function chartTreeCompensationCount([
+        total,
+        percent,
+        cp101_percent,
+        cp102_percent,
+        cp103_percent,
+        cp104_percent,
+        cp105_percent,
+        cp108_percent,
+        cp109_percent,
+        cp101_percent_total,
+        cp102_percent_total,
+        cp103_percent_total,
+        cp104_percent_total,
+        cp105_percent_total,
+        cp108_percent_total,
+        cp109_percent_total,
+      ]) {
+        var totalScore = percent;
+
+        var CP101 = cp101_percent_total;
+        var CP102 = cp101_percent_total + cp102_percent_total;
+        var CP103 = cp101_percent_total + cp102_percent_total + cp103_percent_total;
+        var CP104 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total;
+        var CP105 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total;
+        var CP108 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total;
+        var CP109 = cp101_percent_total + cp102_percent_total + cp103_percent_total + cp104_percent_total + cp105_percent_total + cp108_percent_total + cp109_percent_total;
+
+        var chartMin = 0;
+        var chartMax = 100;
+
+        // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
+        // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
+
+        var data = {
+          score: totalScore,
+          gradingData: [
+            {
+              title: cp101_percent.toFixed(0),
+              color: color_101,
+              lowScore: 0,
+              highScore: CP101,
+            },
+            {
+              title: cp102_percent.toFixed(0),
+              color: color_102,
+              lowScore: CP101,
+              highScore: CP102,
+            },
+            {
+              title: cp103_percent.toFixed(0),
+              color: color_103,
+              lowScore: CP102,
+              highScore: CP103,
+            },
+            {
+              title: cp104_percent.toFixed(0),
+              color: color_104,
+              lowScore: CP103,
+              highScore: CP104,
+            },
+            {
+              title: cp105_percent.toFixed(0),
+              color: color_105,
+              lowScore: CP104,
+              highScore: CP105,
+            },
+            {
+              title: cp108_percent.toFixed(0),
+              color: color_108,
+              lowScore: CP105,
+              highScore: CP108,
+            },
+            {
+              title: cp109_percent.toFixed(0),
+              color: color_109,
+              lowScore: CP108,
+              highScore: CP109,
+            },
+            {
+              title: "",
+              color: "#C5C5C5",
+              lowScore: CP109,
+              highScore: 100,
+            },
+          ],
+        };
+
+        /**Grading Lookup*/
+        function lookUpGrade(lookupScore, grades) {
+          // Only change code below this line
+          for (var i = 0; i < grades.length; i++) {
+            if (
+              grades[i].lowScore < lookupScore &&
+              grades[i].highScore >= lookupScore
+            ) {
+              return grades[i];
+            }
+          }
+          return null;
+        }
+
+        // create chart
+        var chart = am4core.create("treeCompenChartDiv", am4charts.GaugeChart);
+        chart.hiddenState.properties.opacity = 0;
+        chart.fontSize = 11;
+        chart.innerRadius = am4core.percent(80);
+        chart.resizable = true;
+        chart.responsive.enabled = true;
+        chart.logo.disabled = true;
+
+        /*** Chart Title */
+        // Title Color
+
+        var title = chart.titles.create();
+        //'<a href="https://google.com"}">More info</a>'
+
+        title.text = "TREE COMPENSATION";
+        //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/MMSP_Land_Structure/index4.html" target="_blank">LAND (Station)</a>';
+        title.fontSize = titleFontSize;
+        title.align = "center";
+        title.marginBottom = -10;
+        title.marginTop = 0;
+        title.fill = TOP_TITLE_COL;
+
+
+        // Add bottom label
+        var label = chart.chartContainer.createChild(am4core.Label);
+        label.text = "[bold]COMPENSATED";
+        //label.html = '<a href="https://google.com">HANDED-OVER AREA</a>';
+        label.fontSize = "1.4em";
+        label.align = "center";
+        label.marginTop = labelMarginTop;
+        label.fill = BOTTOM_LABEL_COL;
+
+        /** * Normal axis*/
+
+        var axis = chart.xAxes.push(new am4charts.ValueAxis());
+        axis.min = chartMin;
+        axis.max = chartMax;
+        axis.strictMinMax = true;
+        axis.renderer.radius = am4core.percent(80);
+        axis.renderer.inside = true;
+        axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
+        axis.renderer.ticks.template.disabled = false;
+        axis.renderer.ticks.template.strokeOpacity = 1;
+        //axis.renderer.ticks.template.strokeWidth = 1;
+        axis.renderer.ticks.template.length = 10;
+        axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
+        //axis.renderer.grid.template.disabled = true;
+        axis.renderer.labels.template.radius = am4core.percent(40);
+        axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
+        axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
+
+        /*** Axis for ranges*/
+
+        var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
+        axis2.min = chartMin;
+        axis2.max = chartMax;
+        axis2.strictMinMax = true;
+        axis2.renderer.labels.template.disabled = true;
+        axis2.renderer.ticks.template.disabled = true;
+        axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
+        axis2.renderer.grid.template.opacity = 0.5;
+        axis2.renderer.labels.template.bent = true;
+        axis2.renderer.labels.template.fill = am4core.color("#000");
+        axis2.renderer.labels.template.fontWeight = "bold";
+        axis2.renderer.labels.template.fillOpacity = 0.7;
+
+        /**Ranges*/
+
+        for (let grading of data.gradingData) {
+          var range = axis2.axisRanges.create();
+          range.axisFill.fill = am4core.color(grading.color);
+          range.axisFill.fillOpacity = 1; // default 0.8 fill-color of
+          range.axisFill.zIndex = -1;
+          range.value =
+            grading.lowScore > chartMin ? grading.lowScore : chartMin;
+          range.endValue =
+            grading.highScore < chartMax ? grading.highScore : chartMax;
+          range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
+          range.stroke = am4core.color(grading.color).lighten(-0.1);
+          range.label.inside = true;
+          range.label.text = grading.title.toUpperCase();
+          range.label.inside = true;
+          range.label.location = 0.5;
+          range.label.inside = true;
+          range.label.radius = am4core.percent(10);
+          range.label.paddingBottom = -5; // ~half font size
+          range.label.fontSize = "1.4em"; // category label (i.e., CP101, CP102, ....)
+        }
+
+        var matchingGrade = lookUpGrade(data.score, data.gradingData);
+
+        /*** Label 1 (total Percent)*/
+
+        var label = chart.radarContainer.createChild(am4core.Label);
+        label.isMeasured = false;
+        label.fontSize = "3.5em";
+        label.x = am4core.percent(50);
+        label.y = am4core.percent(100);
+        label.paddingBottom = -5;
+        label.horizontalCenter = "middle";
+        label.verticalCenter = "bottom";
+        //label.dataItem = data;
+        label.text = data.score.toFixed(0).toString() + "%";
+        //label.text = "{score}";
+        //label.fill = am4core.color(matchingGrade.color);
+        label.fill = am4core.color(chartTitleLabelFillCol);
+
+        var hand = chart.hands.push(new am4charts.ClockHand());
+        hand.axis = axis2;
+        hand.innerRadius = am4core.percent(55);
+        hand.startWidth = 8;
+        hand.pin.disabled = true;
+        hand.value = data.score;
+        hand.fill = am4core.color("#000000"); // inner color of needle
+        //hand.stroke = am4core.color("#000");
+        hand.fillOpacity = 0.5;
+      }
+      totalTreeCompensationCount().then(chartTreeCompensationCount);
+      //END OF CHART TREE COMPENSATION
+
+
+
+      // 7. CHART TOTAL NUMBER OF UTILITY POINT AND UTILITY LINE
+
+      async function utilityTotalCount() {
+        /// POINT
+        var total_number_point = {
+          onStatisticField: "Status",
+          outStatisticFieldName: "total_number_point",
+          statisticType: "count",
+        };
+
+        var total_completed_point = {
+          onStatisticField: "CASE WHEN Status = 1 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_completed_point",
+          statisticType: "sum",
+        };
+
+        var total_cp101_point = {
+          onStatisticField: "CASE WHEN Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_point",
+          statisticType: "sum",
+        };
+
+        var total_cp101_completed_point = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP101') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_completed_point",
+          statisticType: "sum",
+        };
+
+        var total_cp102_point = {
+          onStatisticField: "CASE WHEN Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_point",
+          statisticType: "sum",
+        };
+
+        var total_cp102_completed_point = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP102') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_completed_point",
+          statisticType: "sum",
+        };
+
+        var total_cp103_point = {
+          onStatisticField: "CASE WHEN Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_point",
+          statisticType: "sum",
+        };
+
+        var total_cp103_completed_point = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP103') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_completed_point",
+          statisticType: "sum",
+        };
+
+        var total_cp104_point = {
+          onStatisticField: "CASE WHEN Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_point",
+          statisticType: "sum",
+        };
+
+        var total_cp104_completed_point = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP104') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_completed_point",
+          statisticType: "sum",
+        };
+
+        var total_cp105_point = {
+          onStatisticField: "CASE WHEN Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_point",
+          statisticType: "sum",
+        };
+
+        var total_cp105_completed_point = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP105') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_completed_point",
+          statisticType: "sum",
+        };
+
+        var total_cp108_point = {
+          onStatisticField: "CASE WHEN Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_point",
+          statisticType: "sum",
+        };
+
+        var total_cp108_completed_point = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP108') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_completed_point",
+          statisticType: "sum",
+        };
+
+        var total_cp109_point = {
+          onStatisticField: "CASE WHEN Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_point",
+          statisticType: "sum",
+        };
+
+        var total_cp109_completed_point = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP109') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_completed_point",
+          statisticType: "sum",
+        };
+
+
+        /// LINE
+        var total_number_line = {
+          onStatisticField: "Status",
+          outStatisticFieldName: "total_number_line",
+          statisticType: "count",
+        };
+
+        var total_completed_line = {
+          onStatisticField: "CASE WHEN Status = 1 THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_completed_line",
+          statisticType: "sum",
+        };
+
+        var total_cp101_line = {
+          onStatisticField: "CASE WHEN Package = 'CP101' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_line",
+          statisticType: "sum",
+        };
+
+        var total_cp101_completed_line = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP101') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp101_completed_line",
+          statisticType: "sum",
+        };
+
+        var total_cp102_line = {
+          onStatisticField: "CASE WHEN Package = 'CP102' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_line",
+          statisticType: "sum",
+        };
+
+        var total_cp102_completed_line = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP102') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp102_completed_line",
+          statisticType: "sum",
+        };
+
+        var total_cp103_line = {
+          onStatisticField: "CASE WHEN Package = 'CP103' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_line",
+          statisticType: "sum",
+        };
+
+        var total_cp103_completed_line = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP103') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp103_completed_line",
+          statisticType: "sum",
+        };
+
+        var total_cp104_line = {
+          onStatisticField: "CASE WHEN Package = 'CP104' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_line",
+          statisticType: "sum",
+        };
+
+        var total_cp104_completed_line = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP104') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp104_completed_line",
+          statisticType: "sum",
+        };
+
+        var total_cp105_line = {
+          onStatisticField: "CASE WHEN Package = 'CP105' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_line",
+          statisticType: "sum",
+        };
+
+        var total_cp105_completed_line = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP105') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp105_completed_line",
+          statisticType: "sum",
+        };
+
+        var total_cp108_line = {
+          onStatisticField: "CASE WHEN Package = 'CP108' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_line",
+          statisticType: "sum",
+        };
+
+        var total_cp108_completed_line = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP108') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp108_completed_line",
+          statisticType: "sum",
+        };
+
+        var total_cp109_line = {
+          onStatisticField: "CASE WHEN Package = 'CP109' THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_line",
+          statisticType: "sum",
+        };
+
+        var total_cp109_completed_line = {
+          onStatisticField:
+            "CASE WHEN (Status = 1 and Package = 'CP109') THEN 1 ELSE 0 END",
+          outStatisticFieldName: "total_cp109_completed_line",
+          statisticType: "sum",
+        };
+
+
+
+        var query_p = utilPointLayer.createQuery();
+        query_p.outStatistics = [
+          total_number_point,
+          total_completed_point,
+          total_cp101_point,
+          total_cp101_completed_point,
+          total_cp102_point,
+          total_cp102_completed_point,
+          total_cp103_point,
+          total_cp103_completed_point,
+          total_cp104_point,
+          total_cp104_completed_point,
+          total_cp105_point,
+          total_cp105_completed_point,
+          total_cp108_point,
+          total_cp108_completed_point,
+          total_cp109_point,
+          total_cp109_completed_point,
+        ];
+
+        const pointCompile = utilPointLayer
+          .queryFeatures(query_p)
+          .then(function (response) {
+            var stats = response.features[0].attributes;
+
+            const total_point = stats.total_number_point;
+            const total_comp_point = stats.total_completed_point;
+            const total_cp101_point = stats.total_cp101_point;
+            const total_cp101_comp_point = stats.total_cp101_completed_point;
+            const total_cp102_point = stats.total_cp102_point;
+            const total_cp102_comp_point = stats.total_cp102_completed_point;
+            const total_cp103_point = stats.total_cp103_point;
+            const total_cp103_comp_point = stats.total_cp103_completed_point;
+            const total_cp104_point = stats.total_cp104_point;
+            const total_cp104_comp_point = stats.total_cp104_completed_point;
+            const total_cp105_point = stats.total_cp105_point;
+            const total_cp105_comp_point = stats.total_cp105_completed_point;
+            const total_cp108_point = stats.total_cp108_point;
+            const total_cp108_comp_point = stats.total_cp108_completed_point;
+            const total_cp109_point = stats.total_cp109_point;
+            const total_cp109_comp_point = stats.total_cp109_completed_point;
+
+console.log(total_cp109_point);
+
+            return [
+              total_point,
+              total_comp_point,
+              total_cp101_point,
+              total_cp101_comp_point,
+              total_cp102_point,
+              total_cp102_comp_point,
+              total_cp103_point,
+              total_cp103_comp_point,
+              total_cp104_point,
+              total_cp104_comp_point,
+              total_cp105_point,
+              total_cp105_comp_point,
+              total_cp108_point,
+              total_cp108_comp_point,
+              total_cp109_point,
+              total_cp109_comp_point
+            ];
+          });
+
+        var query_l = utilLineLayer.createQuery();
+        query_l.outStatistics = [
+          total_number_line,
+          total_completed_line,
+          total_cp101_line,
+          total_cp101_completed_line,
+          total_cp102_line,
+          total_cp102_completed_line,
+          total_cp103_line,
+          total_cp103_completed_line,
+          total_cp104_line,
+          total_cp104_completed_line,
+          total_cp105_line,
+          total_cp105_completed_line,
+          total_cp108_line,
+          total_cp108_completed_line,
+          total_cp109_line,
+          total_cp109_completed_line,
+        ];
+
+        const lineCompile = utilLineLayer
+          .queryFeatures(query_l)
+          .then(function (response) {
+            var stats = response.features[0].attributes;
+            const total_line = stats.total_number_line;
+            const total_comp_line = stats.total_completed_line;
+            const total_cp101_line = stats.total_cp101_line;
+            const total_cp101_comp_line = stats.total_cp101_completed_line;
+            const total_cp102_line = stats.total_cp102_line;
+            const total_cp102_comp_line = stats.total_cp102_completed_line;
+            const total_cp103_line = stats.total_cp103_line;
+            const total_cp103_comp_line = stats.total_cp103_completed_line;
+            const total_cp104_line = stats.total_cp104_line;
+            const total_cp104_comp_line = stats.total_cp104_completed_line;
+            const total_cp105_line = stats.total_cp105_line;
+            const total_cp105_comp_line = stats.total_cp105_completed_line;
+            const total_cp108_line = stats.total_cp108_line;
+            const total_cp108_comp_line = stats.total_cp108_completed_line;
+            const total_cp109_line = stats.total_cp109_line;
+            const total_cp109_comp_line = stats.total_cp109_completed_line;
+
+            console.log(total_cp109_line);
+            return [
+              total_line,
+              total_comp_line,
+              total_cp101_line,
+              total_cp101_comp_line,
+              total_cp102_line,
+              total_cp102_comp_line,
+              total_cp103_line,
+              total_cp103_comp_line,
+              total_cp104_line,
+              total_cp104_comp_line,
+              total_cp105_line,
+              total_cp105_comp_line,
+              total_cp108_line,
+              total_cp108_comp_line,
+              total_cp109_line,
+              total_cp109_comp_line
+            ];
+          });
+
+        const point = await pointCompile;
+        const line = await lineCompile;
+
+        const total = point[0] + line[0];
+        const total_comp = point[1] + line[1];
+        const total_cp101 = point[2] + line[2];
+        const total_cp101_comp = point[3] + line[3];
+        const total_cp102 = point[4] + line[4];
+        const total_cp102_comp = point[5] + line[5];
+        const total_cp103 = point[6] + line[6];
+        const total_cp103_comp = point[7] + line[7];
+        const total_cp104 = point[8] + line[8];
+        const total_cp104_comp = point[9] + line[9];
+        const total_cp105 = point[10] + line[10];
+        const total_cp105_comp = point[11] + line[11];
+        const total_cp108 = point[12] + line[12];
+        const total_cp108_comp = point[13] + line[13];
+        const total_cp109 = point[14] + line[14];
+        const total_cp109_comp = point[15] + line[15];
+
+
+        const total_percent = (total_comp / total) * 100;
+        const cp101_percent = (total_cp101_comp / total_cp101) * 100;
+        const cp102_percent = (total_cp102_comp / total_cp102) * 100;
+        const cp103_percent = (total_cp103_comp / total_cp103) * 100;
+        const cp104_percent = (total_cp104_comp / total_cp104) * 100;
+        const cp105_percent = (total_cp105_comp / total_cp105) * 100;
+        const cp108_percent = (total_cp108_comp / total_cp108) * 100;
+        // const cp109_percent = (total_cp109_comp / total_cp109) * 100;
+        const cp109_percent = 0;
+
+        
+        const cp101_percent_total = (total_cp101_comp / total) * 100;
+        const cp102_percent_total = (total_cp102_comp / total) * 100;
+        const cp103_percent_total = (total_cp103_comp / total) * 100;
+        const cp104_percent_total = (total_cp104_comp / total) * 100;
+        const cp105_percent_total = (total_cp105_comp / total) * 100;
+        const cp108_percent_total = (total_cp108_comp / total) * 100;
+        const cp109_percent_total = (total_cp109_comp / total) * 100;
+        
+        return [
+          total,
+          total_percent,
+          cp101_percent,
+          cp102_percent,
+          cp103_percent,
+          cp104_percent,
+          cp105_percent,
+          cp108_percent,
+          cp109_percent,
+          cp101_percent_total,
+          cp102_percent_total,
+          cp103_percent_total,
+          cp104_percent_total,
+          cp105_percent_total,
+          cp108_percent_total,
+          cp109_percent_total,
+        ];
+      }
+
+      // UTILITY PROGRESS CHART
+      function utilityChart([
+        total,
+        percent,
+        cp101_percent,
+        cp102_percent,
+        cp103_percent,
+        cp104_percent,
+        cp105_percent,
+        cp108_percent,
+        cp109_percent,
+        cp101_percent_total,
+        cp102_percent_total,
+        cp103_percent_total,
+        cp104_percent_total,
+        cp105_percent_total,
+        cp108_percent_total,
+        cp109_percent_total,
+      ]) {
+        var totalScore = percent;
+
+        var CP_101 = cp101_percent_total;
+       
+        var CP_102 = cp101_percent_total + cp102_percent_total;
+        var CP_103 = cp101_percent_total + cp102_percent_total + cp103_percent_total;
+        var CP_104 =
+          cp101_percent_total +
+          cp102_percent_total +
+          cp103_percent_total +
+          cp104_percent_total;
+        var CP_105 =
+          cp101_percent_total +
+          cp102_percent_total +
+          cp103_percent_total +
+          cp104_percent_total +
+          cp105_percent_total;
+        var CP_108 =
+          cp101_percent_total +
+          cp102_percent_total +
+          cp103_percent_total +
+          cp104_percent_total +
+          cp105_percent_total +
+          cp108_percent_total;
+        var CP_109 =
+          cp101_percent_total +
+          cp102_percent_total +
+          cp103_percent_total +
+          cp104_percent_total +
+          cp105_percent_total +
+          cp108_percent_total +
+          cp109_percent_total;
+
+
+        var chartMin = 0;
+        var chartMax = 100;
+
+        // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
+        // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
+
+
+        var data = {
+          score: totalScore,
+          gradingData: [
+            {
+              title: cp101_percent.toFixed(0),
+              color: color_101,
+              lowScore: 0,
+              highScore: CP_101,
+            },
+            {
+              title: cp102_percent.toFixed(0),
+              color: color_102,
+              lowScore: CP_101,
+              highScore: CP_102,
+            },
+            {
+              title: cp103_percent.toFixed(0),
+              color: color_103,
+              lowScore: CP_102,
+              highScore: CP_103,
+            },
+            {
+              title: cp104_percent.toFixed(0),
+              color: color_104,
+              lowScore: CP_103,
+              highScore: CP_104,
+            },
+            {
+              title: cp105_percent.toFixed(0),
+              color: color_105,
+              lowScore: CP_104,
+              highScore: CP_105,
+            },
+            {
+              title: cp108_percent.toFixed(0),
+              color: color_108,
+              lowScore: CP_105,
+              highScore: CP_108,
+            },
+            {
+              title: cp109_percent.toFixed(0),
+              color: color_109,
+              lowScore: CP_108,
+              highScore: CP_109,
+            },
+            {
+              title: "",
+              color: "#C5C5C5",
+              lowScore: CP_109,
+              highScore: 100,
+            },
+          ],
+        };
+
+
+
+        /**Grading Lookup*/
+        function lookUpGrade(lookupScore, grades) {
+          // Only change code below this line
+          for (var i = 0; i < grades.length; i++) {
+            if (
+              grades[i].lowScore < lookupScore &&
+              grades[i].highScore >= lookupScore
+            ) {
+              return grades[i];
+            }
+          }
+          return null;
+        }
+
+        // create chart
+        var chart = am4core.create("utilityPointLineChartDiv", am4charts.GaugeChart);
+        chart.hiddenState.properties.opacity = 0;
+        chart.fontSize = 11;
+        chart.innerRadius = am4core.percent(80);
+        chart.resizable = true;
+        chart.responsive.enabled = true;
+        chart.logo.disabled = true;
+
+        /*** Chart Title*/// Title Color
+
+        var title = chart.titles.create();
+        title.text = "UTILITY";
+        //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/civil/Operational/MMSP_Utility_Relocation/index.html" target="_blank">UTILITY</a>';
+        title.fontSize = titleFontSize;
+        title.align = "center";
+        title.marginBottom = -10;
+        title.marginTop = 0;
+        title.fill = TOP_TITLE_COL;
+
+        // Add bottom label
+        var label = chart.chartContainer.createChild(am4core.Label);
+        label.text = "[bold]COMPLETED";
+        label.fontSize = "1.4em";
+        label.align = "center";
+        label.marginTop = labelMarginTop;
+        label.fill = BOTTOM_LABEL_COL;
+
+        /*** Normal axis*/
+
+        var axis = chart.xAxes.push(new am4charts.ValueAxis());
+        axis.min = chartMin;
+        axis.max = chartMax;
+        axis.strictMinMax = true;
+        axis.renderer.radius = am4core.percent(80);
+        axis.renderer.inside = true;
+        axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
+        axis.renderer.ticks.template.disabled = false;
+        axis.renderer.ticks.template.strokeOpacity = 1;
+        //axis.renderer.ticks.template.strokeWidth = 1;
+        axis.renderer.ticks.template.length = 10;
+        axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
+        //axis.renderer.grid.template.disabled = true;
+        axis.renderer.labels.template.radius = am4core.percent(40);
+        axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
+        axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
+
+        /*** Axis for ranges*/
+
+        var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
+        axis2.min = chartMin;
+        axis2.max = chartMax;
+        axis2.strictMinMax = true;
+        axis2.renderer.labels.template.disabled = true;
+        axis2.renderer.ticks.template.disabled = true;
+        axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
+        axis2.renderer.grid.template.opacity = 0.5;
+        axis2.renderer.labels.template.bent = true;
+        axis2.renderer.labels.template.fill = am4core.color("#000");
+        axis2.renderer.labels.template.fontWeight = "bold";
+        axis2.renderer.labels.template.fillOpacity = 0.7;
+
+        /**Ranges*/
+
+        for (let grading of data.gradingData) {
+          var range = axis2.axisRanges.create();
+          range.axisFill.fill = am4core.color(grading.color);
+          range.axisFill.fillOpacity = 1;
+          range.axisFill.zIndex = -1;
+          range.value =
+            grading.lowScore > chartMin ? grading.lowScore : chartMin;
+          range.endValue =
+            grading.highScore < chartMax ? grading.highScore : chartMax;
+          range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
+          range.stroke = am4core.color(grading.color).lighten(-0.1);
+          range.label.inside = true;
+          range.label.text = grading.title.toUpperCase();
+          range.label.inside = true;
+          range.label.location = 0.5;
+          range.label.inside = true;
+          range.label.radius = am4core.percent(10);
+          range.label.paddingBottom = -5; // ~half font size
+          range.label.fontSize = "1.4em"; // category label (i.e., CP101, CP102, ....)
+        }
+
+        var matchingGrade = lookUpGrade(data.score, data.gradingData);
+
+        /*** Label 1 (total Percent)*/
+
+        var label = chart.radarContainer.createChild(am4core.Label);
+        label.isMeasured = false;
+        label.fontSize = "3.5em";
+        label.x = am4core.percent(50);
+        label.y = am4core.percent(100);
+        label.paddingBottom = -5;
+        label.horizontalCenter = "middle";
+        label.verticalCenter = "bottom";
+        //label.dataItem = data;
+        label.text = data.score.toFixed(0).toString() + "%";
+        //label.text = "{score}";
+        //label.fill = am4core.color(matchingGrade.color);
+        label.fill = am4core.color(chartTitleLabelFillCol);
+
+        /*** Label 2*/
+
+        /*** Hand*/
+        var hand = chart.hands.push(new am4charts.ClockHand());
+        hand.axis = axis2;
+        hand.innerRadius = am4core.percent(55);
+        hand.startWidth = 8;
+        hand.pin.disabled = true;
+        hand.value = data.score;
+        hand.fill = am4core.color("#000000"); // inner color of needle
+        //hand.stroke = am4core.color("#000");
+        hand.fillOpacity = 0.5;
+      }
+      utilityTotalCount().then(utilityChart);
+
+
+    }); // end am4core.ready()
+  });
+</script>
+
+</html>
