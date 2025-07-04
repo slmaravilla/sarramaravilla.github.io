@@ -1,0 +1,100 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS Maps SDK for JavaScript Tutorials: Display a map using arcgis/map-components</title>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #00032235;
+            /*#032235*/
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #ffba1f;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b98816;
+        }
+
+        .esri-legend__layer-caption {
+            display: none;
+        }
+
+        .esri-legend {
+            overflow: hidden;
+            overflow-y: auto;
+            margin-left: -10;
+        }
+
+        .esri-icon-non-visible::before {
+            content: "\e610" !important;
+            color: #969696 !important;
+        }
+
+        .esri-icon-visible::before {
+            content: "\e611" !important;
+            background-color: #11a7fd;
+            color: white !important;
+        }
+
+        calcite-segmented-control {
+            margin-left: 10px;
+        }
+
+        #urgentLots-segmented-control {
+            margin-bottom: 20px;
+        }
+
+        .esri-view .esri-view-surface--touch-none:focus::after {
+            outline: none !important;
+        }
+
+        .esri-attribution {
+            display: none;
+            /* or */
+            position: absolute;
+            left: -9999px;
+        }
+    </style>
+
+    <!-- Load Calcite components from CDN -->
+    <script type="module" src="https://js.arcgis.com/calcite-components/3.2.1/calcite.esm.js"></script>
+
+    <!-- Load the ArcGIS Maps SDK for JavaScript from CDN -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.33/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.33/"></script>
+
+    <!-- Load Map components from CDN-->
+    <script type="module" src="https://js.arcgis.com/4.33/map-components/"></script>
+
+</head>
+
+
+<body>
+
+    <arcgis-map item-id="237b9584339446a0b56317b5962a4971">
+
+        <arcgis-zoom position="top-left"></arcgis-zoom>
+        <arcgis-legend position="bottom-right"></arcgis-legend>
+
+    </arcgis-map>
+
+</body>
+
+</html>

@@ -24,17 +24,22 @@
           <!-- <div id="landChartDiv"></div> -->
           <div id="landChartCountDiv"></div>
           <div id="structureChartDiv"></div>
-          <div id="structurePNRChartDiv"></div>
+          <!-- <div id="structurePNRChartDiv"></div> -->
+          <div id="isfChartDiv"></div>
         </div>
         <div class="treeBox">
-          <div id="isfChartDiv"></div>
-          <div id="isfPNRChartDiv"></div>
+          <!-- <div id="isfChartDiv"></div> -->
+          <!-- <div id="isfPNRChartDiv"></div> -->
           <div id="utilityPointLineChartDiv"></div>
           <!-- <div id="treeEmptyChartDiv"></div> -->
-        </div>
-        <div class="utilityBox">
           <div id="treeCuttingChartDiv"></div>
           <div id="treeCompenChartDiv"></div>
+        </div>
+        <div class="utilityBox">
+          <!-- <div id="treeCuttingChartDiv"></div>
+          <div id="treeCompenChartDiv"></div> -->
+          <div id="utilityEmptyChartDiv"></div>
+          <div id="utilityEmptyChartDiv"></div>
           <div id="utilityEmptyChartDiv"></div>
         </div>
       </div>
@@ -1461,7 +1466,7 @@
         /*** Chart Title*/
         // Title Color
         var title = chart.titles.create();
-        title.text = "EXISTING STRUCTURE (ALL)";
+        title.text = "EXISTING STRUCTURE";
         //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/N2_Land_Structure2/index2.html" target="_blank">EXISTING STRUCTURE</a>';
         title.fontSize = titleFontSize;
         title.align = "center";
@@ -1579,539 +1584,539 @@
       totalStrucCount().then(chartTotalStrucDismantleCount);
       //END OF CHART STRUCTURE (ALL)
 
-      /// 3. CHART STRUCTURE (PNR)
-      function totalStrucCountPNR() {
-        let total_struc_pnr = {
-          onStatisticField: "CASE WHEN PNR = 1 THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_struc_pnr",
-          statisticType: "sum",
-        };
+      // /// 3. CHART STRUCTURE (PNR)
+      // function totalStrucCountPNR() {
+      //   let total_struc_pnr = {
+      //     onStatisticField: "CASE WHEN PNR = 1 THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_struc_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s01_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-01') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s01_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s01_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-01') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s01_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s01_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-01' and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s01_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s01_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-01' and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s01_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s02_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-02') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s02_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s02_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-02') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s02_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s02_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-02' and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s02_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s02_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-02' and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s02_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s03a_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-03a') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03a_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s03a_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-03a') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03a_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s03a_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-03a' and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03a_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s03a_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-03a' and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03a_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s03b_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-03b') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03b_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s03b_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-03b') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03b_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s03b_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-03b' and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03b_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s03b_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-03b' and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03b_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s03c_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-03c') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03c_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s03c_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-03c') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03c_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s03c_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-03c' and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03c_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s03c_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-03c' and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03c_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s04_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-04') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s04_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s04_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-04') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s04_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s04_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-04' and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s04_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s04_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-04' and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s04_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s05_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-05') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s05_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s05_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-05') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s05_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s05_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-05' and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s05_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s05_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-05' and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s05_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s06_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-06') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s06_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s06_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-06') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s06_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s06_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-06' and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s06_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s06_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-06' and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s06_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s07_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-07') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s07_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s07_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-07') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s07_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let total_s07_dismantle_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-07' and StatusStruc = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s07_dismantle_pnr",
-          statisticType: "sum",
-        };
+      //   let total_s07_dismantle_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-07' and StatusStruc = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s07_dismantle_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        let query = structureLayer.createQuery();
-        query.outStatistics = [
-          total_struc_pnr,
-          total_dismantle_pnr,
-          total_s01_pnr,
-          total_s01_dismantle_pnr,
-          total_s02_pnr,
-          total_s02_dismantle_pnr,
-          total_s03a_pnr,
-          total_s03a_dismantle_pnr,
-          total_s03b_pnr,
-          total_s03b_dismantle_pnr,
-          total_s03c_pnr,
-          total_s03c_dismantle_pnr,
-          total_s04_pnr,
-          total_s04_dismantle_pnr,
-          total_s05_pnr,
-          total_s05_dismantle_pnr,
-          total_s06_pnr,
-          total_s06_dismantle_pnr,
-          total_s07_pnr,
-          total_s07_dismantle_pnr,
-        ];
+      //   let query = structureLayer.createQuery();
+      //   query.outStatistics = [
+      //     total_struc_pnr,
+      //     total_dismantle_pnr,
+      //     total_s01_pnr,
+      //     total_s01_dismantle_pnr,
+      //     total_s02_pnr,
+      //     total_s02_dismantle_pnr,
+      //     total_s03a_pnr,
+      //     total_s03a_dismantle_pnr,
+      //     total_s03b_pnr,
+      //     total_s03b_dismantle_pnr,
+      //     total_s03c_pnr,
+      //     total_s03c_dismantle_pnr,
+      //     total_s04_pnr,
+      //     total_s04_dismantle_pnr,
+      //     total_s05_pnr,
+      //     total_s05_dismantle_pnr,
+      //     total_s06_pnr,
+      //     total_s06_dismantle_pnr,
+      //     total_s07_pnr,
+      //     total_s07_dismantle_pnr,
+      //   ];
 
-        return structureLayer.queryFeatures(query).then((response) => {
-          var stats = response.features[0].attributes;
-          const total = stats.total_struc_pnr;
-          const dismantled = stats.total_dismantle_pnr;
-          const percent = (dismantled / total) * 100;
+      //   return structureLayer.queryFeatures(query).then((response) => {
+      //     var stats = response.features[0].attributes;
+      //     const total = stats.total_struc_pnr;
+      //     const dismantled = stats.total_dismantle_pnr;
+      //     const percent = (dismantled / total) * 100;
 
-          const s01_total = stats.total_s01_pnr;
-          const s02_total = stats.total_s02_pnr;
-          const s03a_total = stats.total_s03a_pnr;
-          const s03b_total = stats.total_s03b_pnr;
-          const s03c_total = stats.total_s03c_pnr;
-          const s04_total = stats.total_s04_pnr;
-          const s05_total = stats.total_s05_pnr;
-          const s06_total = stats.total_s06_pnr;
-          const s07_total = stats.total_s07_pnr;
+      //     const s01_total = stats.total_s01_pnr;
+      //     const s02_total = stats.total_s02_pnr;
+      //     const s03a_total = stats.total_s03a_pnr;
+      //     const s03b_total = stats.total_s03b_pnr;
+      //     const s03c_total = stats.total_s03c_pnr;
+      //     const s04_total = stats.total_s04_pnr;
+      //     const s05_total = stats.total_s05_pnr;
+      //     const s06_total = stats.total_s06_pnr;
+      //     const s07_total = stats.total_s07_pnr;
 
-          const s01_total_dismantle = stats.total_s01_dismantle_pnr;
-          const s02_total_dismantle = stats.total_s02_dismantle_pnr;
-          const s03a_total_dismantle = stats.total_s03a_dismantle_pnr;
-          const s03b_total_dismantle = stats.total_s03b_dismantle_pnr;
-          const s03c_total_dismantle = stats.total_s03c_dismantle_pnr;
-          const s04_total_dismantle = stats.total_s04_dismantle_pnr;
-          const s05_total_dismantle = stats.total_s05_dismantle_pnr;
-          const s06_total_dismantle = stats.total_s06_dismantle_pnr;
-          const s07_total_dismantle = stats.total_s07_dismantle_pnr;
+      //     const s01_total_dismantle = stats.total_s01_dismantle_pnr;
+      //     const s02_total_dismantle = stats.total_s02_dismantle_pnr;
+      //     const s03a_total_dismantle = stats.total_s03a_dismantle_pnr;
+      //     const s03b_total_dismantle = stats.total_s03b_dismantle_pnr;
+      //     const s03c_total_dismantle = stats.total_s03c_dismantle_pnr;
+      //     const s04_total_dismantle = stats.total_s04_dismantle_pnr;
+      //     const s05_total_dismantle = stats.total_s05_dismantle_pnr;
+      //     const s06_total_dismantle = stats.total_s06_dismantle_pnr;
+      //     const s07_total_dismantle = stats.total_s07_dismantle_pnr;
 
-          const s01_percent =
-            s01_total === 0 ? 0 : (s01_total_dismantle / s01_total) * 100;
-          const s02_percent =
-            s02_total === 0 ? 0 : (s02_total_dismantle / s02_total) * 100;
-          const s03a_percent =
-            s03a_total === 0 ? 0 : (s03a_total_dismantle / s03a_total) * 100;
-          const s03b_percent =
-            s03b_total === 0 ? 0 : (s03b_total_dismantle / s03b_total) * 100;
-          const s03c_percent =
-            s03c_total === 0 ? 0 : (s03c_total_dismantle / s03c_total) * 100;
-          const s04_percent =
-            s04_total === 0 ? 0 : (s04_total_dismantle / s04_total) * 100;
-          const s05_percent =
-            s05_total === 0 ? 0 : (s05_total_dismantle / s05_total) * 100;
-          const s06_percent =
-            s06_total === 0 ? 0 : (s06_total_dismantle / s06_total) * 100;
-          const s07_percent =
-            s07_total === 0 ? 0 : (s07_total_dismantle / s07_total) * 100;
+      //     const s01_percent =
+      //       s01_total === 0 ? 0 : (s01_total_dismantle / s01_total) * 100;
+      //     const s02_percent =
+      //       s02_total === 0 ? 0 : (s02_total_dismantle / s02_total) * 100;
+      //     const s03a_percent =
+      //       s03a_total === 0 ? 0 : (s03a_total_dismantle / s03a_total) * 100;
+      //     const s03b_percent =
+      //       s03b_total === 0 ? 0 : (s03b_total_dismantle / s03b_total) * 100;
+      //     const s03c_percent =
+      //       s03c_total === 0 ? 0 : (s03c_total_dismantle / s03c_total) * 100;
+      //     const s04_percent =
+      //       s04_total === 0 ? 0 : (s04_total_dismantle / s04_total) * 100;
+      //     const s05_percent =
+      //       s05_total === 0 ? 0 : (s05_total_dismantle / s05_total) * 100;
+      //     const s06_percent =
+      //       s06_total === 0 ? 0 : (s06_total_dismantle / s06_total) * 100;
+      //     const s07_percent =
+      //       s07_total === 0 ? 0 : (s07_total_dismantle / s07_total) * 100;
 
-          const s01_percent_total = (s01_total_dismantle / total) * 100;
-          const s02_percent_total = (s02_total_dismantle / total) * 100;
-          const s03a_percent_total = (s03a_total_dismantle / total) * 100;
-          const s03b_percent_total = (s03b_total_dismantle / total) * 100;
-          const s03c_percent_total = (s03c_total_dismantle / total) * 100;
-          const s04_percent_total = (s04_total_dismantle / total) * 100;
-          const s05_percent_total = (s05_total_dismantle / total) * 100;
-          const s06_percent_total = (s06_total_dismantle / total) * 100;
-          const s07_percent_total = (s07_total_dismantle / total) * 100;
+      //     const s01_percent_total = (s01_total_dismantle / total) * 100;
+      //     const s02_percent_total = (s02_total_dismantle / total) * 100;
+      //     const s03a_percent_total = (s03a_total_dismantle / total) * 100;
+      //     const s03b_percent_total = (s03b_total_dismantle / total) * 100;
+      //     const s03c_percent_total = (s03c_total_dismantle / total) * 100;
+      //     const s04_percent_total = (s04_total_dismantle / total) * 100;
+      //     const s05_percent_total = (s05_total_dismantle / total) * 100;
+      //     const s06_percent_total = (s06_total_dismantle / total) * 100;
+      //     const s07_percent_total = (s07_total_dismantle / total) * 100;
 
-          return [
-            total,
-            percent,
-            s01_percent,
-            s02_percent,
-            s03a_percent,
-            s03b_percent,
-            s03c_percent,
-            s04_percent,
-            s05_percent,
-            s06_percent,
-            s07_percent,
-            s01_percent_total,
-            s02_percent_total,
-            s03a_percent_total,
-            s03b_percent_total,
-            s03c_percent_total,
-            s04_percent_total,
-            s05_percent_total,
-            s06_percent_total,
-            s07_percent_total,
-          ];
-        });
-      }
+      //     return [
+      //       total,
+      //       percent,
+      //       s01_percent,
+      //       s02_percent,
+      //       s03a_percent,
+      //       s03b_percent,
+      //       s03c_percent,
+      //       s04_percent,
+      //       s05_percent,
+      //       s06_percent,
+      //       s07_percent,
+      //       s01_percent_total,
+      //       s02_percent_total,
+      //       s03a_percent_total,
+      //       s03b_percent_total,
+      //       s03c_percent_total,
+      //       s04_percent_total,
+      //       s05_percent_total,
+      //       s06_percent_total,
+      //       s07_percent_total,
+      //     ];
+      //   });
+      // }
 
-      function chartTotalStrucDismantleCountPNR([
-        total,
-        percent,
-        s01_percent,
-        s02_percent,
-        s03a_percent,
-        s03b_percent,
-        s03c_percent,
-        s04_percent,
-        s05_percent,
-        s06_percent,
-        s07_percent,
-        s01_percent_total,
-        s02_percent_total,
-        s03a_percent_total,
-        s03b_percent_total,
-        s03c_percent_total,
-        s04_percent_total,
-        s05_percent_total,
-        s06_percent_total,
-        s07_percent_total,
-      ]) {
-        var totalScore = percent;
+      // function chartTotalStrucDismantleCountPNR([
+      //   total,
+      //   percent,
+      //   s01_percent,
+      //   s02_percent,
+      //   s03a_percent,
+      //   s03b_percent,
+      //   s03c_percent,
+      //   s04_percent,
+      //   s05_percent,
+      //   s06_percent,
+      //   s07_percent,
+      //   s01_percent_total,
+      //   s02_percent_total,
+      //   s03a_percent_total,
+      //   s03b_percent_total,
+      //   s03c_percent_total,
+      //   s04_percent_total,
+      //   s05_percent_total,
+      //   s06_percent_total,
+      //   s07_percent_total,
+      // ]) {
+      //   var totalScore = percent;
 
-        var S01 = s01_percent_total;
-        var S02 = s01_percent_total + s02_percent_total;
-        var S03a = s01_percent_total + s02_percent_total + s03a_percent_total;
-        var S03b =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total;
-        var S03c =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total;
-        var S04 =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total +
-          s04_percent_total;
-        var S05 =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total +
-          s04_percent_total +
-          s05_percent_total;
-        var S06 =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total +
-          s04_percent_total +
-          s05_percent_total +
-          s06_percent_total;
-        var S07 =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total +
-          s04_percent_total +
-          s05_percent_total +
-          s06_percent_total +
-          s07_percent_total;
+      //   var S01 = s01_percent_total;
+      //   var S02 = s01_percent_total + s02_percent_total;
+      //   var S03a = s01_percent_total + s02_percent_total + s03a_percent_total;
+      //   var S03b =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total;
+      //   var S03c =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total;
+      //   var S04 =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total +
+      //     s04_percent_total;
+      //   var S05 =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total +
+      //     s04_percent_total +
+      //     s05_percent_total;
+      //   var S06 =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total +
+      //     s04_percent_total +
+      //     s05_percent_total +
+      //     s06_percent_total;
+      //   var S07 =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total +
+      //     s04_percent_total +
+      //     s05_percent_total +
+      //     s06_percent_total +
+      //     s07_percent_total;
 
-        var chartMin = 0;
-        var chartMax = 100;
+      //   var chartMin = 0;
+      //   var chartMax = 100;
 
-        // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
-        // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
+      //   // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
+      //   // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
 
-        var data = {
-          score: totalScore,
-          gradingData: [
-            {
-              title: s01_percent.toFixed(0),
-              color: color_101,
-              lowScore: 0,
-              highScore: S01,
-            },
-            {
-              title: s02_percent.toFixed(0),
-              color: color_102,
-              lowScore: S01,
-              highScore: S02,
-            },
-            {
-              title: s03a_percent.toFixed(0),
-              color: color_103a,
-              lowScore: S02,
-              highScore: S03a,
-            },
-            {
-              title: s03b_percent.toFixed(0),
-              color: color_103b,
-              lowScore: S03a,
-              highScore: S03b,
-            },
-            {
-              title: s03c_percent.toFixed(0),
-              color: color_103c,
-              lowScore: S03b,
-              highScore: S03c,
-            },
-            {
-              title: s04_percent.toFixed(0),
-              color: color_104,
-              lowScore: S03c,
-              highScore: S04,
-            },
-            {
-              title: s05_percent.toFixed(0),
-              color: color_105,
-              lowScore: S04,
-              highScore: S05,
-            },
-            {
-              title: s06_percent.toFixed(0),
-              color: color_106,
-              lowScore: S05,
-              highScore: S06,
-            },
-            {
-              title: s07_percent.toFixed(0),
-              color: color_107,
-              lowScore: S06,
-              highScore: S07,
-            },
-            {
-              title: "",
-              color: "#C5C5C5",
-              lowScore: S07,
-              highScore: 100,
-            },
-          ],
-        };
+      //   var data = {
+      //     score: totalScore,
+      //     gradingData: [
+      //       {
+      //         title: s01_percent.toFixed(0),
+      //         color: color_101,
+      //         lowScore: 0,
+      //         highScore: S01,
+      //       },
+      //       {
+      //         title: s02_percent.toFixed(0),
+      //         color: color_102,
+      //         lowScore: S01,
+      //         highScore: S02,
+      //       },
+      //       {
+      //         title: s03a_percent.toFixed(0),
+      //         color: color_103a,
+      //         lowScore: S02,
+      //         highScore: S03a,
+      //       },
+      //       {
+      //         title: s03b_percent.toFixed(0),
+      //         color: color_103b,
+      //         lowScore: S03a,
+      //         highScore: S03b,
+      //       },
+      //       {
+      //         title: s03c_percent.toFixed(0),
+      //         color: color_103c,
+      //         lowScore: S03b,
+      //         highScore: S03c,
+      //       },
+      //       {
+      //         title: s04_percent.toFixed(0),
+      //         color: color_104,
+      //         lowScore: S03c,
+      //         highScore: S04,
+      //       },
+      //       {
+      //         title: s05_percent.toFixed(0),
+      //         color: color_105,
+      //         lowScore: S04,
+      //         highScore: S05,
+      //       },
+      //       {
+      //         title: s06_percent.toFixed(0),
+      //         color: color_106,
+      //         lowScore: S05,
+      //         highScore: S06,
+      //       },
+      //       {
+      //         title: s07_percent.toFixed(0),
+      //         color: color_107,
+      //         lowScore: S06,
+      //         highScore: S07,
+      //       },
+      //       {
+      //         title: "",
+      //         color: "#C5C5C5",
+      //         lowScore: S07,
+      //         highScore: 100,
+      //       },
+      //     ],
+      //   };
 
-        function lookUpGrade(lookupScore, grades) {
-          // Only change code below this line
-          for (var i = 0; i < grades.length; i++) {
-            if (
-              grades[i].lowScore < lookupScore &&
-              grades[i].highScore >= lookupScore
-            ) {
-              return grades[i];
-            }
-          }
-          return null;
-        }
+      //   function lookUpGrade(lookupScore, grades) {
+      //     // Only change code below this line
+      //     for (var i = 0; i < grades.length; i++) {
+      //       if (
+      //         grades[i].lowScore < lookupScore &&
+      //         grades[i].highScore >= lookupScore
+      //       ) {
+      //         return grades[i];
+      //       }
+      //     }
+      //     return null;
+      //   }
 
-        // create chart
-        var chart = am4core.create(
-          "structurePNRChartDiv",
-          am4charts.GaugeChart
-        );
-        chart.hiddenState.properties.opacity = 0;
-        chart.fontSize = 11;
-        chart.innerRadius = am4core.percent(80);
-        chart.resizable = true;
-        chart.responsive.enabled = true;
-        chart.logo.disabled = true;
-        /*** Chart Title*/
-        // Title Color
-        var title = chart.titles.create();
-        title.text = "EXISTING STRUCTURE (PNR)";
-        //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/N2_Land_Structure2/index2.html" target="_blank">EXISTING STRUCTURE</a>';
-        title.fontSize = titleFontSize;
-        title.align = "center";
-        title.marginBottom = -10;
-        title.marginTop = 0;
-        title.fill = TOP_TITLE_COL;
+      //   // create chart
+      //   var chart = am4core.create(
+      //     "structurePNRChartDiv",
+      //     am4charts.GaugeChart
+      //   );
+      //   chart.hiddenState.properties.opacity = 0;
+      //   chart.fontSize = 11;
+      //   chart.innerRadius = am4core.percent(80);
+      //   chart.resizable = true;
+      //   chart.responsive.enabled = true;
+      //   chart.logo.disabled = true;
+      //   /*** Chart Title*/
+      //   // Title Color
+      //   var title = chart.titles.create();
+      //   title.text = "EXISTING STRUCTURE (PNR)";
+      //   //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/N2_Land_Structure2/index2.html" target="_blank">EXISTING STRUCTURE</a>';
+      //   title.fontSize = titleFontSize;
+      //   title.align = "center";
+      //   title.marginBottom = -10;
+      //   title.marginTop = 0;
+      //   title.fill = TOP_TITLE_COL;
 
-        // Add bottom label
-        var label = chart.chartContainer.createChild(am4core.Label);
-        label.text = "[bold]DISMANTLED";
-        label.fontSize = bottomLabelFontSize;
-        label.align = "center";
-        label.marginTop = labelMarginTop;
-        label.fill = BOTTOM_LABEL_COL;
+      //   // Add bottom label
+      //   var label = chart.chartContainer.createChild(am4core.Label);
+      //   label.text = "[bold]DISMANTLED";
+      //   label.fontSize = bottomLabelFontSize;
+      //   label.align = "center";
+      //   label.marginTop = labelMarginTop;
+      //   label.fill = BOTTOM_LABEL_COL;
 
-        /*** Normal axis*/
+      //   /*** Normal axis*/
 
-        var axis = chart.xAxes.push(new am4charts.ValueAxis());
-        axis.min = chartMin;
-        axis.max = chartMax;
-        axis.strictMinMax = true;
-        axis.renderer.radius = am4core.percent(80);
-        axis.renderer.inside = true;
-        axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
-        axis.renderer.ticks.template.disabled = false;
-        axis.renderer.ticks.template.strokeOpacity = 1;
-        //axis.renderer.ticks.template.strokeWidth = 1;
-        axis.renderer.ticks.template.length = 10;
-        axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
-        //axis.renderer.grid.template.disabled = true;
-        axis.renderer.labels.template.radius = am4core.percent(40);
-        axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
-        axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
+      //   var axis = chart.xAxes.push(new am4charts.ValueAxis());
+      //   axis.min = chartMin;
+      //   axis.max = chartMax;
+      //   axis.strictMinMax = true;
+      //   axis.renderer.radius = am4core.percent(80);
+      //   axis.renderer.inside = true;
+      //   axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
+      //   axis.renderer.ticks.template.disabled = false;
+      //   axis.renderer.ticks.template.strokeOpacity = 1;
+      //   //axis.renderer.ticks.template.strokeWidth = 1;
+      //   axis.renderer.ticks.template.length = 10;
+      //   axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
+      //   //axis.renderer.grid.template.disabled = true;
+      //   axis.renderer.labels.template.radius = am4core.percent(40);
+      //   axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
+      //   axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /*** Axis for ranges*/
+      //   /*** Axis for ranges*/
 
-        var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
-        axis2.min = chartMin;
-        axis2.max = chartMax;
-        axis2.strictMinMax = true;
-        axis2.renderer.labels.template.disabled = true;
-        axis2.renderer.ticks.template.disabled = true;
-        axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
-        axis2.renderer.grid.template.opacity = 0.5;
-        axis2.renderer.labels.template.bent = true;
-        axis2.renderer.labels.template.fill = am4core.color("#000");
-        axis2.renderer.labels.template.fontWeight = "bold";
-        axis2.renderer.labels.template.fillOpacity = 0.7; // 0.3 // category labels: N-01, N-02,....
+      //   var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
+      //   axis2.min = chartMin;
+      //   axis2.max = chartMax;
+      //   axis2.strictMinMax = true;
+      //   axis2.renderer.labels.template.disabled = true;
+      //   axis2.renderer.ticks.template.disabled = true;
+      //   axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
+      //   axis2.renderer.grid.template.opacity = 0.5;
+      //   axis2.renderer.labels.template.bent = true;
+      //   axis2.renderer.labels.template.fill = am4core.color("#000");
+      //   axis2.renderer.labels.template.fontWeight = "bold";
+      //   axis2.renderer.labels.template.fillOpacity = 0.7; // 0.3 // category labels: N-01, N-02,....
 
-        /**Ranges*/
+      //   /**Ranges*/
 
-        for (let grading of data.gradingData) {
-          var range = axis2.axisRanges.create();
-          range.axisFill.fill = am4core.color(grading.color);
-          range.axisFill.fillOpacity = 1;
-          range.axisFill.zIndex = -1;
-          range.value =
-            grading.lowScore > chartMin ? grading.lowScore : chartMin;
-          range.endValue =
-            grading.highScore < chartMax ? grading.highScore : chartMax;
-          range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
-          range.stroke = am4core.color(grading.color).lighten(-0.1);
-          range.label.inside = true;
-          range.label.text = grading.title.toUpperCase();
-          range.label.inside = true;
-          range.label.location = 0.5;
-          range.label.inside = true;
-          range.label.radius = am4core.percent(10);
-          range.label.paddingBottom = -5; // ~half font size
-          range.label.fontSize = "1.4em"; // category label (i.e., N-01, N-02, ....)
-        }
+      //   for (let grading of data.gradingData) {
+      //     var range = axis2.axisRanges.create();
+      //     range.axisFill.fill = am4core.color(grading.color);
+      //     range.axisFill.fillOpacity = 1;
+      //     range.axisFill.zIndex = -1;
+      //     range.value =
+      //       grading.lowScore > chartMin ? grading.lowScore : chartMin;
+      //     range.endValue =
+      //       grading.highScore < chartMax ? grading.highScore : chartMax;
+      //     range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
+      //     range.stroke = am4core.color(grading.color).lighten(-0.1);
+      //     range.label.inside = true;
+      //     range.label.text = grading.title.toUpperCase();
+      //     range.label.inside = true;
+      //     range.label.location = 0.5;
+      //     range.label.inside = true;
+      //     range.label.radius = am4core.percent(10);
+      //     range.label.paddingBottom = -5; // ~half font size
+      //     range.label.fontSize = "1.4em"; // category label (i.e., N-01, N-02, ....)
+      //   }
 
-        var matchingGrade = lookUpGrade(data.score, data.gradingData);
+      //   var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /*** Label 1 (total Percent)*/
+      //   /*** Label 1 (total Percent)*/
 
-        var label = chart.radarContainer.createChild(am4core.Label);
-        label.isMeasured = false;
-        label.fontSize = totalPercentLabel_fontSize;
-        label.x = am4core.percent(50);
-        label.y = totalPercentLabel_y;
-        label.paddingBottom = -5;
-        label.horizontalCenter = "middle";
-        label.verticalCenter = "bottom";
-        //label.dataItem = data;
-        label.text = data.score.toFixed(0).toString() + "%";
-        //label.text = "{score}";
-        //label.fill = am4core.color(matchingGrade.color);
-        label.fill = am4core.color("#00C3FF");
+      //   var label = chart.radarContainer.createChild(am4core.Label);
+      //   label.isMeasured = false;
+      //   label.fontSize = totalPercentLabel_fontSize;
+      //   label.x = am4core.percent(50);
+      //   label.y = totalPercentLabel_y;
+      //   label.paddingBottom = -5;
+      //   label.horizontalCenter = "middle";
+      //   label.verticalCenter = "bottom";
+      //   //label.dataItem = data;
+      //   label.text = data.score.toFixed(0).toString() + "%";
+      //   //label.text = "{score}";
+      //   //label.fill = am4core.color(matchingGrade.color);
+      //   label.fill = am4core.color("#00C3FF");
 
-        /*** Label 2*/
+      //   /*** Label 2*/
 
-        var label2 = chart.radarContainer.createChild(am4core.Label);
-        label2.isMeasured = false;
-        label2.fontSize = totalNumberLabel_fontSize;
-        label2.horizontalCenter = "middle";
-        label2.verticalCenter = "bottom";
-        label2.y = totalNumberLabel_y;
-        label2.text = "(" + thousands_separators(total) + ")";
-        label2.fill = am4core.color("#00C3FF");
+      //   var label2 = chart.radarContainer.createChild(am4core.Label);
+      //   label2.isMeasured = false;
+      //   label2.fontSize = totalNumberLabel_fontSize;
+      //   label2.horizontalCenter = "middle";
+      //   label2.verticalCenter = "bottom";
+      //   label2.y = totalNumberLabel_y;
+      //   label2.text = "(" + thousands_separators(total) + ")";
+      //   label2.fill = am4core.color("#00C3FF");
 
-        /*** Hand*/
+      //   /*** Hand*/
 
-        var hand = chart.hands.push(new am4charts.ClockHand());
-        hand.axis = axis2;
-        hand.innerRadius = am4core.percent(55);
-        hand.startWidth = 8;
-        hand.pin.disabled = true;
-        hand.value = data.score;
-        hand.fill = am4core.color("#000000"); // inner color of needle
-        //hand.stroke = am4core.color("#000");
-        hand.fillOpacity = 0.5;
-      }
-      totalStrucCountPNR().then(chartTotalStrucDismantleCountPNR);
-      //END OF CHART STRUCTURE (PNR)
+      //   var hand = chart.hands.push(new am4charts.ClockHand());
+      //   hand.axis = axis2;
+      //   hand.innerRadius = am4core.percent(55);
+      //   hand.startWidth = 8;
+      //   hand.pin.disabled = true;
+      //   hand.value = data.score;
+      //   hand.fill = am4core.color("#000000"); // inner color of needle
+      //   //hand.stroke = am4core.color("#000");
+      //   hand.fillOpacity = 0.5;
+      // }
+      // totalStrucCountPNR().then(chartTotalStrucDismantleCountPNR);
+      // //END OF CHART STRUCTURE (PNR)
 
       //////////////// 4. ISF ////////////////
       function totalIsfCount() {
@@ -2519,7 +2524,7 @@
         /*** Chart Title*/
         // Title Color
         var title = chart.titles.create();
-        title.text = "INFORMAL SETTLERS (ALL)";
+        title.text = "INFORMAL SETTLERS";
         //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/N2_Land_Structure2/index2.html" target="_blank">INFORMAL SETTLERS</a>';
         title.fontSize = titleFontSize;
         title.align = "center";
@@ -2639,539 +2644,539 @@
       totalIsfCount().then(chartTotalIsfRelocateCount);
       //END OF CHART ISF (ALL)
 
-      // 5. CHART ISF (PNR)
+      // // 5. CHART ISF (PNR)
 
-      function totalIsfCountPNR() {
-        var total_isf_pnr = {
-          onStatisticField: "CASE WHEN PNR = 1 THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_isf_pnr",
-          statisticType: "sum",
-        };
+      // function totalIsfCountPNR() {
+      //   var total_isf_pnr = {
+      //     onStatisticField: "CASE WHEN PNR = 1 THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_isf_relocated_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR =1 and StatusRC = 1) THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_isf_relocated_pnr",
-          statisticType: "sum",
-        };
+      //   var total_isf_relocated_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR =1 and StatusRC = 1) THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_isf_relocated_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s01_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-01') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s01_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s01_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-01') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s01_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s01_isf_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-01') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s01_isf_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s01_isf_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-01') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s01_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s02_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-02') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s02_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s02_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-02') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s02_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s02_isf_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-02') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s02_isf_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s02_isf_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-02') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s02_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s03a_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-03a') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03a_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s03a_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-03a') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03a_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s03a_isf_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-03a') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03a_isf_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s03a_isf_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-03a') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03a_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s03b_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-03b') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03b_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s03b_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-03b') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03b_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s03b_isf_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-03b') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03b_isf_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s03b_isf_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-03b') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03b_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s03c_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-03c') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03c_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s03c_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-03c') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03c_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s03c_isf_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-03c') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s03c_isf_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s03c_isf_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-03c') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s03c_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s04_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-04') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s04_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s04_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-04') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s04_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s04_isf_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-04') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s04_isf_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s04_isf_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-04') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s04_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s05_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-05') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s05_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s05_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-05') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s05_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s05_isf_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-05') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s05_isf_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s05_isf_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-05') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s05_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s06_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-06') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s06_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s06_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-06') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s06_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s06_isf_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-06') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s06_isf_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s06_isf_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-06') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s06_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s07_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and CP = 'S-07') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s07_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s07_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and CP = 'S-07') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s07_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var total_s07_isf_pnr = {
-          onStatisticField:
-            "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-07') THEN 1 ELSE 0 END",
-          outStatisticFieldName: "total_s07_isf_pnr",
-          statisticType: "sum",
-        };
+      //   var total_s07_isf_pnr = {
+      //     onStatisticField:
+      //       "CASE WHEN (PNR = 1 and StatusRC = 1 and CP = 'S-07') THEN 1 ELSE 0 END",
+      //     outStatisticFieldName: "total_s07_isf_pnr",
+      //     statisticType: "sum",
+      //   };
 
-        var query = reloISFLayer.createQuery();
-        query.outStatistics = [
-          total_isf_pnr,
-          total_isf_relocated_pnr,
-          total_s01_pnr,
-          total_s01_isf_pnr,
-          total_s02_pnr,
-          total_s02_isf_pnr,
-          total_s03a_pnr,
-          total_s03a_isf_pnr,
-          total_s03b_pnr,
-          total_s03b_isf_pnr,
-          total_s03c_pnr,
-          total_s03c_isf_pnr,
-          total_s04_pnr,
-          total_s04_isf_pnr,
-          total_s05_pnr,
-          total_s05_isf_pnr,
-          total_s06_pnr,
-          total_s06_isf_pnr,
-          total_s07_pnr,
-          total_s07_isf_pnr,
-        ];
+      //   var query = reloISFLayer.createQuery();
+      //   query.outStatistics = [
+      //     total_isf_pnr,
+      //     total_isf_relocated_pnr,
+      //     total_s01_pnr,
+      //     total_s01_isf_pnr,
+      //     total_s02_pnr,
+      //     total_s02_isf_pnr,
+      //     total_s03a_pnr,
+      //     total_s03a_isf_pnr,
+      //     total_s03b_pnr,
+      //     total_s03b_isf_pnr,
+      //     total_s03c_pnr,
+      //     total_s03c_isf_pnr,
+      //     total_s04_pnr,
+      //     total_s04_isf_pnr,
+      //     total_s05_pnr,
+      //     total_s05_isf_pnr,
+      //     total_s06_pnr,
+      //     total_s06_isf_pnr,
+      //     total_s07_pnr,
+      //     total_s07_isf_pnr,
+      //   ];
 
-        return reloISFLayer.queryFeatures(query).then((response) => {
-          var stats = response.features[0].attributes;
-          const total = stats.total_isf_pnr;
-          const isfd = stats.total_isf_relocated_pnr;
-          const percent = (isfd / total) * 100;
+      //   return reloISFLayer.queryFeatures(query).then((response) => {
+      //     var stats = response.features[0].attributes;
+      //     const total = stats.total_isf_pnr;
+      //     const isfd = stats.total_isf_relocated_pnr;
+      //     const percent = (isfd / total) * 100;
 
-          const s01_total = stats.total_s01_pnr;
-          const s02_total = stats.total_s02_pnr;
-          const s03a_total = stats.total_s03a_pnr;
-          const s03b_total = stats.total_s03b_pnr;
-          const s03c_total = stats.total_s03c_pnr;
-          const s04_total = stats.total_s04_pnr;
-          const s05_total = stats.total_s05_pnr;
-          const s06_total = stats.total_s06_pnr;
-          const s07_total = stats.total_s07_pnr;
+      //     const s01_total = stats.total_s01_pnr;
+      //     const s02_total = stats.total_s02_pnr;
+      //     const s03a_total = stats.total_s03a_pnr;
+      //     const s03b_total = stats.total_s03b_pnr;
+      //     const s03c_total = stats.total_s03c_pnr;
+      //     const s04_total = stats.total_s04_pnr;
+      //     const s05_total = stats.total_s05_pnr;
+      //     const s06_total = stats.total_s06_pnr;
+      //     const s07_total = stats.total_s07_pnr;
 
-          const s01_total_isf = stats.total_s01_isf_pnr;
-          const s02_total_isf = stats.total_s02_isf_pnr;
-          const s03a_total_isf = stats.total_s03a_isf_pnr;
-          const s03b_total_isf = stats.total_s03b_isf_pnr;
-          const s03c_total_isf = stats.total_s03c_isf_pnr;
-          const s04_total_isf = stats.total_s04_isf_pnr;
-          const s05_total_isf = stats.total_s05_isf_pnr;
-          const s06_total_isf = stats.total_s06_isf_pnr;
-          const s07_total_isf = stats.total_s07_isf_pnr;
+      //     const s01_total_isf = stats.total_s01_isf_pnr;
+      //     const s02_total_isf = stats.total_s02_isf_pnr;
+      //     const s03a_total_isf = stats.total_s03a_isf_pnr;
+      //     const s03b_total_isf = stats.total_s03b_isf_pnr;
+      //     const s03c_total_isf = stats.total_s03c_isf_pnr;
+      //     const s04_total_isf = stats.total_s04_isf_pnr;
+      //     const s05_total_isf = stats.total_s05_isf_pnr;
+      //     const s06_total_isf = stats.total_s06_isf_pnr;
+      //     const s07_total_isf = stats.total_s07_isf_pnr;
 
-          const s01_percent =
-            s01_total === 0 ? 0 : (s01_total_isf / s01_total) * 100;
-          const s02_percent =
-            s02_total === 0 ? 0 : (s02_total_isf / s02_total) * 100;
-          const s03a_percent =
-            s03a_total === 0 ? 0 : (s03a_total_isf / s03a_total) * 100;
-          const s03b_percent =
-            s03b_total === 0 ? 0 : (s03b_total_isf / s03b_total) * 100;
-          const s03c_percent =
-            s03c_total === 0 ? 0 : (s03c_total_isf / s03c_total) * 100;
-          const s04_percent =
-            s04_total === 0 ? 0 : (s04_total_isf / s04_total) * 100;
-          const s05_percent =
-            s05_total === 0 ? 0 : (s05_total_isf / s05_total) * 100;
-          const s06_percent =
-            s06_total === 0 ? 0 : (s06_total_isf / s06_total) * 100;
-          const s07_percent =
-            s07_total === 0 ? 0 : (s07_total_isf / s07_total) * 100;
+      //     const s01_percent =
+      //       s01_total === 0 ? 0 : (s01_total_isf / s01_total) * 100;
+      //     const s02_percent =
+      //       s02_total === 0 ? 0 : (s02_total_isf / s02_total) * 100;
+      //     const s03a_percent =
+      //       s03a_total === 0 ? 0 : (s03a_total_isf / s03a_total) * 100;
+      //     const s03b_percent =
+      //       s03b_total === 0 ? 0 : (s03b_total_isf / s03b_total) * 100;
+      //     const s03c_percent =
+      //       s03c_total === 0 ? 0 : (s03c_total_isf / s03c_total) * 100;
+      //     const s04_percent =
+      //       s04_total === 0 ? 0 : (s04_total_isf / s04_total) * 100;
+      //     const s05_percent =
+      //       s05_total === 0 ? 0 : (s05_total_isf / s05_total) * 100;
+      //     const s06_percent =
+      //       s06_total === 0 ? 0 : (s06_total_isf / s06_total) * 100;
+      //     const s07_percent =
+      //       s07_total === 0 ? 0 : (s07_total_isf / s07_total) * 100;
 
-          const s01_percent_total = (s01_total_isf / total) * 100;
-          const s02_percent_total = (s02_total_isf / total) * 100;
-          const s03a_percent_total = (s03a_total_isf / total) * 100;
-          const s03b_percent_total = (s03b_total_isf / total) * 100;
-          const s03c_percent_total = (s03c_total_isf / total) * 100;
-          const s04_percent_total = (s04_total_isf / total) * 100;
-          const s05_percent_total = (s05_total_isf / total) * 100;
-          const s06_percent_total = (s06_total_isf / total) * 100;
-          const s07_percent_total = (s07_total_isf / total) * 100;
+      //     const s01_percent_total = (s01_total_isf / total) * 100;
+      //     const s02_percent_total = (s02_total_isf / total) * 100;
+      //     const s03a_percent_total = (s03a_total_isf / total) * 100;
+      //     const s03b_percent_total = (s03b_total_isf / total) * 100;
+      //     const s03c_percent_total = (s03c_total_isf / total) * 100;
+      //     const s04_percent_total = (s04_total_isf / total) * 100;
+      //     const s05_percent_total = (s05_total_isf / total) * 100;
+      //     const s06_percent_total = (s06_total_isf / total) * 100;
+      //     const s07_percent_total = (s07_total_isf / total) * 100;
 
-          return [
-            total,
-            percent,
-            s01_percent,
-            s02_percent,
-            s03a_percent,
-            s03b_percent,
-            s03c_percent,
-            s04_percent,
-            s05_percent,
-            s06_percent,
-            s07_percent,
-            s01_percent_total,
-            s02_percent_total,
-            s03a_percent_total,
-            s03b_percent_total,
-            s03c_percent_total,
-            s04_percent_total,
-            s05_percent_total,
-            s06_percent_total,
-            s07_percent_total,
-          ];
-        });
-      }
+      //     return [
+      //       total,
+      //       percent,
+      //       s01_percent,
+      //       s02_percent,
+      //       s03a_percent,
+      //       s03b_percent,
+      //       s03c_percent,
+      //       s04_percent,
+      //       s05_percent,
+      //       s06_percent,
+      //       s07_percent,
+      //       s01_percent_total,
+      //       s02_percent_total,
+      //       s03a_percent_total,
+      //       s03b_percent_total,
+      //       s03c_percent_total,
+      //       s04_percent_total,
+      //       s05_percent_total,
+      //       s06_percent_total,
+      //       s07_percent_total,
+      //     ];
+      //   });
+      // }
 
-      function chartTotalIsfRelocateCountPNR([
-        total,
-        percent,
-        s01_percent,
-        s02_percent,
-        s03a_percent,
-        s03b_percent,
-        s03c_percent,
-        s04_percent,
-        s05_percent,
-        s06_percent,
-        s07_percent,
-        s01_percent_total,
-        s02_percent_total,
-        s03a_percent_total,
-        s03b_percent_total,
-        s03c_percent_total,
-        s04_percent_total,
-        s05_percent_total,
-        s06_percent_total,
-        s07_percent_total,
-      ]) {
-        var totalScore = percent;
+      // function chartTotalIsfRelocateCountPNR([
+      //   total,
+      //   percent,
+      //   s01_percent,
+      //   s02_percent,
+      //   s03a_percent,
+      //   s03b_percent,
+      //   s03c_percent,
+      //   s04_percent,
+      //   s05_percent,
+      //   s06_percent,
+      //   s07_percent,
+      //   s01_percent_total,
+      //   s02_percent_total,
+      //   s03a_percent_total,
+      //   s03b_percent_total,
+      //   s03c_percent_total,
+      //   s04_percent_total,
+      //   s05_percent_total,
+      //   s06_percent_total,
+      //   s07_percent_total,
+      // ]) {
+      //   var totalScore = percent;
 
-        var S01 = s01_percent_total;
-        var S02 = s01_percent_total + s02_percent_total;
-        var S03a = s01_percent_total + s02_percent_total + s03a_percent_total;
-        var S03b =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total;
-        var S03c =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total;
-        var S04 =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total +
-          s04_percent_total;
-        var S05 =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total +
-          s04_percent_total +
-          s05_percent_total;
-        var S06 =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total +
-          s04_percent_total +
-          s05_percent_total +
-          s06_percent_total;
-        var S07 =
-          s01_percent_total +
-          s02_percent_total +
-          s03a_percent_total +
-          s03b_percent_total +
-          s03c_percent_total +
-          s04_percent_total +
-          s05_percent_total +
-          s06_percent_total +
-          s07_percent_total;
+      //   var S01 = s01_percent_total;
+      //   var S02 = s01_percent_total + s02_percent_total;
+      //   var S03a = s01_percent_total + s02_percent_total + s03a_percent_total;
+      //   var S03b =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total;
+      //   var S03c =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total;
+      //   var S04 =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total +
+      //     s04_percent_total;
+      //   var S05 =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total +
+      //     s04_percent_total +
+      //     s05_percent_total;
+      //   var S06 =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total +
+      //     s04_percent_total +
+      //     s05_percent_total +
+      //     s06_percent_total;
+      //   var S07 =
+      //     s01_percent_total +
+      //     s02_percent_total +
+      //     s03a_percent_total +
+      //     s03b_percent_total +
+      //     s03c_percent_total +
+      //     s04_percent_total +
+      //     s05_percent_total +
+      //     s06_percent_total +
+      //     s07_percent_total;
 
-        var chartMin = 0;
-        var chartMax = 100;
+      //   var chartMin = 0;
+      //   var chartMax = 100;
 
-        // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
-        // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
+      //   // #ffea8c|#b3ab60|#4b595e|#6693c8|#aadbff
+      //   // const colors = ["#ffea8c", "#b3ab60", "#4b595e", "#6693c8", "#aadbff"];
 
-        var data = {
-          score: totalScore,
-          gradingData: [
-            {
-              title: s01_percent.toFixed(0),
-              color: color_101,
-              lowScore: 0,
-              highScore: S01,
-            },
-            {
-              title: s02_percent.toFixed(0),
-              color: color_102,
-              lowScore: S01,
-              highScore: S02,
-            },
-            {
-              title: s03a_percent.toFixed(0),
-              color: color_103a,
-              lowScore: S02,
-              highScore: S03a,
-            },
-            {
-              title: s03b_percent.toFixed(0),
-              color: color_103b,
-              lowScore: S03a,
-              highScore: S03b,
-            },
-            {
-              title: s03c_percent.toFixed(0),
-              color: color_103c,
-              lowScore: S03b,
-              highScore: S03c,
-            },
-            {
-              title: s04_percent.toFixed(0),
-              color: color_104,
-              lowScore: S03c,
-              highScore: S04,
-            },
-            {
-              title: s05_percent.toFixed(0),
-              color: color_105,
-              lowScore: S04,
-              highScore: S05,
-            },
-            {
-              title: s06_percent.toFixed(0),
-              color: color_106,
-              lowScore: S05,
-              highScore: S06,
-            },
-            {
-              title: s07_percent.toFixed(0),
-              color: color_107,
-              lowScore: S06,
-              highScore: S07,
-            },
-            {
-              title: "",
-              color: "#C5C5C5",
-              lowScore: S07,
-              highScore: 100,
-            },
-          ],
-        };
+      //   var data = {
+      //     score: totalScore,
+      //     gradingData: [
+      //       {
+      //         title: s01_percent.toFixed(0),
+      //         color: color_101,
+      //         lowScore: 0,
+      //         highScore: S01,
+      //       },
+      //       {
+      //         title: s02_percent.toFixed(0),
+      //         color: color_102,
+      //         lowScore: S01,
+      //         highScore: S02,
+      //       },
+      //       {
+      //         title: s03a_percent.toFixed(0),
+      //         color: color_103a,
+      //         lowScore: S02,
+      //         highScore: S03a,
+      //       },
+      //       {
+      //         title: s03b_percent.toFixed(0),
+      //         color: color_103b,
+      //         lowScore: S03a,
+      //         highScore: S03b,
+      //       },
+      //       {
+      //         title: s03c_percent.toFixed(0),
+      //         color: color_103c,
+      //         lowScore: S03b,
+      //         highScore: S03c,
+      //       },
+      //       {
+      //         title: s04_percent.toFixed(0),
+      //         color: color_104,
+      //         lowScore: S03c,
+      //         highScore: S04,
+      //       },
+      //       {
+      //         title: s05_percent.toFixed(0),
+      //         color: color_105,
+      //         lowScore: S04,
+      //         highScore: S05,
+      //       },
+      //       {
+      //         title: s06_percent.toFixed(0),
+      //         color: color_106,
+      //         lowScore: S05,
+      //         highScore: S06,
+      //       },
+      //       {
+      //         title: s07_percent.toFixed(0),
+      //         color: color_107,
+      //         lowScore: S06,
+      //         highScore: S07,
+      //       },
+      //       {
+      //         title: "",
+      //         color: "#C5C5C5",
+      //         lowScore: S07,
+      //         highScore: 100,
+      //       },
+      //     ],
+      //   };
 
-        function lookUpGrade(lookupScore, grades) {
-          // Only change code below this line
-          for (var i = 0; i < grades.length; i++) {
-            if (
-              grades[i].lowScore < lookupScore &&
-              grades[i].highScore >= lookupScore
-            ) {
-              return grades[i];
-            }
-          }
-          return null;
-        }
+      //   function lookUpGrade(lookupScore, grades) {
+      //     // Only change code below this line
+      //     for (var i = 0; i < grades.length; i++) {
+      //       if (
+      //         grades[i].lowScore < lookupScore &&
+      //         grades[i].highScore >= lookupScore
+      //       ) {
+      //         return grades[i];
+      //       }
+      //     }
+      //     return null;
+      //   }
 
-        // create chart
-        var chart = am4core.create("isfPNRChartDiv", am4charts.GaugeChart);
-        chart.hiddenState.properties.opacity = 0;
-        chart.fontSize = 11;
-        chart.innerRadius = am4core.percent(80);
-        chart.resizable = true;
-        chart.responsive.enabled = true;
-        chart.logo.disabled = true;
-        /*** Chart Title */
-        // Title Color
-        var title = chart.titles.create();
-        title.text = "INFORMAL SETTLERS (PNR)";
-        //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/N2_Land_Structure2/index2.html" target="_blank">INFORMAL SETTLERS</a>';
-        title.fontSize = titleFontSize;
-        title.align = "center";
-        title.marginBottom = -10;
-        title.marginTop = 0;
-        title.fill = TOP_TITLE_COL;
+      //   // create chart
+      //   var chart = am4core.create("isfPNRChartDiv", am4charts.GaugeChart);
+      //   chart.hiddenState.properties.opacity = 0;
+      //   chart.fontSize = 11;
+      //   chart.innerRadius = am4core.percent(80);
+      //   chart.resizable = true;
+      //   chart.responsive.enabled = true;
+      //   chart.logo.disabled = true;
+      //   /*** Chart Title */
+      //   // Title Color
+      //   var title = chart.titles.create();
+      //   title.text = "INFORMAL SETTLERS (PNR)";
+      //   //title.html = '<a href="https://eijigorilla.github.io/WebApp/ArcGIS_API_for_JavaScript/envi/Operational/N2_Land_Structure2/index2.html" target="_blank">INFORMAL SETTLERS</a>';
+      //   title.fontSize = titleFontSize;
+      //   title.align = "center";
+      //   title.marginBottom = -10;
+      //   title.marginTop = 0;
+      //   title.fill = TOP_TITLE_COL;
 
-        // Add bottom label
-        var label = chart.chartContainer.createChild(am4core.Label);
-        label.text = "[bold]RELOCATED";
-        label.fontSize = bottomLabelFontSize;
-        label.align = "center";
-        label.marginTop = labelMarginTop;
-        label.fill = BOTTOM_LABEL_COL;
+      //   // Add bottom label
+      //   var label = chart.chartContainer.createChild(am4core.Label);
+      //   label.text = "[bold]RELOCATED";
+      //   label.fontSize = bottomLabelFontSize;
+      //   label.align = "center";
+      //   label.marginTop = labelMarginTop;
+      //   label.fill = BOTTOM_LABEL_COL;
 
-        /*** Normal axis*/
+      //   /*** Normal axis*/
 
-        var axis = chart.xAxes.push(new am4charts.ValueAxis());
-        axis.min = chartMin;
-        axis.max = chartMax;
-        axis.strictMinMax = true;
-        axis.renderer.radius = am4core.percent(80);
-        axis.renderer.inside = true;
-        axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
-        axis.renderer.ticks.template.disabled = false;
-        axis.renderer.ticks.template.strokeOpacity = 1;
-        //axis.renderer.ticks.template.strokeWidth = 1;
-        axis.renderer.ticks.template.length = 10;
-        axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
-        //axis.renderer.grid.template.disabled = true;
-        axis.renderer.labels.template.radius = am4core.percent(40);
-        axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
-        axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
+      //   var axis = chart.xAxes.push(new am4charts.ValueAxis());
+      //   axis.min = chartMin;
+      //   axis.max = chartMax;
+      //   axis.strictMinMax = true;
+      //   axis.renderer.radius = am4core.percent(80);
+      //   axis.renderer.inside = true;
+      //   axis.renderer.line.strokeOpacity = 0.5; // line opacity inside curve line
+      //   axis.renderer.ticks.template.disabled = false;
+      //   axis.renderer.ticks.template.strokeOpacity = 1;
+      //   //axis.renderer.ticks.template.strokeWidth = 1;
+      //   axis.renderer.ticks.template.length = 10;
+      //   axis.renderer.ticks.template.stroke = am4core.color(axis1TickColor);
+      //   //axis.renderer.grid.template.disabled = true;
+      //   axis.renderer.labels.template.radius = am4core.percent(40);
+      //   axis.renderer.labels.template.fontSize = "1.2em"; // default: 1.2em inner radius axis percent labels (0 to 100%)
+      //   axis.renderer.labels.template.fill = am4core.color(axis1TickColor);
 
-        /*** Axis for ranges*/
+      //   /*** Axis for ranges*/
 
-        var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
-        axis2.min = chartMin;
-        axis2.max = chartMax;
-        axis2.strictMinMax = true;
-        axis2.renderer.labels.template.disabled = true;
-        axis2.renderer.ticks.template.disabled = true;
-        axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
-        axis2.renderer.grid.template.opacity = 0.5;
-        axis2.renderer.labels.template.bent = true;
-        axis2.renderer.labels.template.fill = am4core.color("#000");
-        axis2.renderer.labels.template.fontWeight = "bold";
-        axis2.renderer.labels.template.fillOpacity = 0.7;
+      //   var axis2 = chart.xAxes.push(new am4charts.ValueAxis());
+      //   axis2.min = chartMin;
+      //   axis2.max = chartMax;
+      //   axis2.strictMinMax = true;
+      //   axis2.renderer.labels.template.disabled = true;
+      //   axis2.renderer.ticks.template.disabled = true;
+      //   axis2.renderer.grid.template.disabled = true; // when true inside tick marks will disappear
+      //   axis2.renderer.grid.template.opacity = 0.5;
+      //   axis2.renderer.labels.template.bent = true;
+      //   axis2.renderer.labels.template.fill = am4core.color("#000");
+      //   axis2.renderer.labels.template.fontWeight = "bold";
+      //   axis2.renderer.labels.template.fillOpacity = 0.7;
 
-        /**Ranges*/
+      //   /**Ranges*/
 
-        for (let grading of data.gradingData) {
-          var range = axis2.axisRanges.create();
-          range.axisFill.fill = am4core.color(grading.color);
-          range.axisFill.fillOpacity = 1;
-          range.axisFill.zIndex = -1;
-          range.value =
-            grading.lowScore > chartMin ? grading.lowScore : chartMin;
-          range.endValue =
-            grading.highScore < chartMax ? grading.highScore : chartMax;
-          range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
-          range.stroke = am4core.color(grading.color).lighten(-0.1);
-          range.label.inside = true;
-          range.label.text = grading.title.toUpperCase();
-          range.label.inside = true;
-          range.label.location = 0.5;
-          range.label.inside = true;
-          range.label.radius = am4core.percent(10);
-          range.label.paddingBottom = -5; // ~half font size
-          range.label.fontSize = "1.4em"; // category label (i.e., N-01, N-02, ....)
-        }
+      //   for (let grading of data.gradingData) {
+      //     var range = axis2.axisRanges.create();
+      //     range.axisFill.fill = am4core.color(grading.color);
+      //     range.axisFill.fillOpacity = 1;
+      //     range.axisFill.zIndex = -1;
+      //     range.value =
+      //       grading.lowScore > chartMin ? grading.lowScore : chartMin;
+      //     range.endValue =
+      //       grading.highScore < chartMax ? grading.highScore : chartMax;
+      //     range.grid.strokeOpacity = 0; // changes opacity of inside tick mark
+      //     range.stroke = am4core.color(grading.color).lighten(-0.1);
+      //     range.label.inside = true;
+      //     range.label.text = grading.title.toUpperCase();
+      //     range.label.inside = true;
+      //     range.label.location = 0.5;
+      //     range.label.inside = true;
+      //     range.label.radius = am4core.percent(10);
+      //     range.label.paddingBottom = -5; // ~half font size
+      //     range.label.fontSize = "1.4em"; // category label (i.e., N-01, N-02, ....)
+      //   }
 
-        var matchingGrade = lookUpGrade(data.score, data.gradingData);
+      //   var matchingGrade = lookUpGrade(data.score, data.gradingData);
 
-        /*** Label 1 (total Percent)*/
+      //   /*** Label 1 (total Percent)*/
 
-        var label = chart.radarContainer.createChild(am4core.Label);
-        label.isMeasured = false;
-        label.fontSize = totalPercentLabel_fontSize;
-        label.x = am4core.percent(50);
-        label.y = totalPercentLabel_y;
-        label.paddingBottom = -5;
-        label.horizontalCenter = "middle";
-        label.verticalCenter = "bottom";
+      //   var label = chart.radarContainer.createChild(am4core.Label);
+      //   label.isMeasured = false;
+      //   label.fontSize = totalPercentLabel_fontSize;
+      //   label.x = am4core.percent(50);
+      //   label.y = totalPercentLabel_y;
+      //   label.paddingBottom = -5;
+      //   label.horizontalCenter = "middle";
+      //   label.verticalCenter = "bottom";
 
-        //label.dataItem = data;
-        label.wrap = true;
-        label.text = data.score.toFixed(0).toString() + "%";
-        //label.text = "{score}";
-        //label.fill = am4core.color(matchingGrade.color);
-        label.fill = am4core.color("#00C3FF");
+      //   //label.dataItem = data;
+      //   label.wrap = true;
+      //   label.text = data.score.toFixed(0).toString() + "%";
+      //   //label.text = "{score}";
+      //   //label.fill = am4core.color(matchingGrade.color);
+      //   label.fill = am4core.color("#00C3FF");
 
-        /*** Label 2*/
+      //   /*** Label 2*/
 
-        var label2 = chart.radarContainer.createChild(am4core.Label);
-        label2.isMeasured = false;
-        label2.fontSize = totalNumberLabel_fontSize;
-        label2.horizontalCenter = "middle";
-        label2.verticalCenter = "bottom";
-        label2.y = totalNumberLabel_y;
-        label2.text = "(" + thousands_separators(total) + ")";
-        label2.fill = am4core.color("#00C3FF");
+      //   var label2 = chart.radarContainer.createChild(am4core.Label);
+      //   label2.isMeasured = false;
+      //   label2.fontSize = totalNumberLabel_fontSize;
+      //   label2.horizontalCenter = "middle";
+      //   label2.verticalCenter = "bottom";
+      //   label2.y = totalNumberLabel_y;
+      //   label2.text = "(" + thousands_separators(total) + ")";
+      //   label2.fill = am4core.color("#00C3FF");
 
-        /*** Hand*/
+      //   /*** Hand*/
 
-        var hand = chart.hands.push(new am4charts.ClockHand());
-        hand.axis = axis2;
-        hand.innerRadius = am4core.percent(55);
-        hand.startWidth = 8;
-        hand.pin.disabled = true;
-        hand.value = data.score;
-        hand.fill = am4core.color("#000000"); // inner color of needle
-        //hand.stroke = am4core.color("#000");
-        hand.fillOpacity = 0.5;
-      }
-      totalIsfCountPNR().then(chartTotalIsfRelocateCountPNR);
-      //END OF CHART ISF (PNR)
+      //   var hand = chart.hands.push(new am4charts.ClockHand());
+      //   hand.axis = axis2;
+      //   hand.innerRadius = am4core.percent(55);
+      //   hand.startWidth = 8;
+      //   hand.pin.disabled = true;
+      //   hand.value = data.score;
+      //   hand.fill = am4core.color("#000000"); // inner color of needle
+      //   //hand.stroke = am4core.color("#000");
+      //   hand.fillOpacity = 0.5;
+      // }
+      // totalIsfCountPNR().then(chartTotalIsfRelocateCountPNR);
+      // //END OF CHART ISF (PNR)
 
       /// 6. CHART TREE CUTTING
       function totalTreeCuttingCount() {

@@ -521,7 +521,7 @@
                 const month = monthList[date.getMonth()];
                 const day = date.getDate();
                 const final = year < 1990 ? '' : `${month} ${day}, ${year}`;
-                console.log(date);
+                //console.log(date);
                 document.getElementById("dateDiv").innerHTML = final;  
             })
         })
@@ -1509,6 +1509,8 @@
                     const s05_total = stats.total_s05;
                     const s06_total = stats.total_s06;
                     const s07_total = stats.total_s07;
+
+                    console.log(s03a_total); 
 
                     const s01_total_handedover = stats.total_s01_handedover;
                     const s02_total_handedover = stats.total_s02_handedover;
@@ -3130,7 +3132,7 @@
                 return treeLayer.queryFeatures(query).then(function (response) {
                     var stats = response.features[0].attributes;
                     const total = stats.total_tree;
-                    console.log(total);
+                    //console.log(total);
                 
                     const cutd = stats.total_cut;
                     const percent = (cutd / total) * 100;
